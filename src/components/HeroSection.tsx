@@ -43,8 +43,8 @@ const HeroSection = () => {
           <div className="lg:col-span-7 z-10">
             <motion.h1
               initial="hidden"
-              animate="visible"
-              variants={fadeIn}
+              animate="show"
+              variants={fadeIn("right", "tween", 0.2, 0.7)}
               className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight"
             >
               Sustainable Delivery for a{" "}
@@ -53,9 +53,8 @@ const HeroSection = () => {
 
             <motion.p
               initial="hidden"
-              animate="visible"
-              variants={fadeIn}
-              custom={1}
+              animate="show"
+              variants={fadeIn("right", "tween", 0.4, 0.7)}
               className="text-lg text-gray-600 mt-6 max-w-xl"
             >
               Cydex revolutionizes eco-friendly logistics with carbon-neutral
@@ -65,9 +64,8 @@ const HeroSection = () => {
 
             <motion.div
               initial="hidden"
-              animate="visible"
-              variants={fadeIn}
-              custom={2}
+              animate="show"
+              variants={fadeIn("right", "tween", 0.6, 0.7)}
               className="flex flex-wrap gap-4 mt-8"
             >
               <Button
@@ -88,9 +86,8 @@ const HeroSection = () => {
 
             <motion.div
               initial="hidden"
-              animate="visible"
-              variants={fadeIn}
-              custom={3}
+              animate="show"
+              variants={fadeIn("right", "tween", 0.8, 0.7)}
               className="mt-10 flex items-center"
             >
               <div className="flex -space-x-2">

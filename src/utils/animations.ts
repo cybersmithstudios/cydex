@@ -1,5 +1,7 @@
 
-export const staggerContainer = (staggerChildren?: number, delayChildren?: number) => {
+import { Variants } from "framer-motion";
+
+export const staggerContainer = (staggerChildren?: number, delayChildren?: number): Variants => {
   return {
     hidden: {},
     show: {
@@ -11,7 +13,7 @@ export const staggerContainer = (staggerChildren?: number, delayChildren?: numbe
   };
 };
 
-export const fadeInUp = (delay?: number) => {
+export const fadeInUp = (delay?: number): Variants => {
   return {
     hidden: { 
       y: 20, 
@@ -30,7 +32,7 @@ export const fadeInUp = (delay?: number) => {
   };
 };
 
-export const fadeIn = (direction?: string, type?: string, delay?: number, duration?: number) => {
+export const fadeIn = (direction?: string, type?: string, delay?: number, duration?: number): Variants => {
   return {
     hidden: {
       x: direction === "left" ? 50 : direction === "right" ? -50 : 0,
@@ -51,8 +53,8 @@ export const fadeIn = (direction?: string, type?: string, delay?: number, durati
   };
 };
 
-// Add the missing slideUp animation
-export const slideUp = {
+// Fixed slideUp animation to match the Variants type
+export const slideUp: Variants = {
   hidden: { y: 50, opacity: 0 },
   visible: { 
     y: 0, 
