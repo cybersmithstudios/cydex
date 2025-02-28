@@ -1,27 +1,96 @@
-import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Index from "./pages/Index";
-import NotFound from "./pages/NotFound";
 
-const queryClient = new QueryClient();
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import Index from './pages/Index';
+import Auth from './pages/Auth';
+import NotFound from './pages/NotFound';
+import CustomerDashboard from './pages/customer/CustomerDashboard';
+import RiderDashboard from './pages/rider/RiderDashboard';
+import VendorDashboard from './pages/vendor/VendorDashboard';
+import { AuthProvider, useAuth } from './contexts/AuthContext';
+import { Toaster } from './components/ui/sonner';
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
+// Protected route wrapper
+const ProtectedRoute = ({ 
+  children, 
+  allowedRoles = [] 
+}: { 
+  children: JSX.Element, 
+  allowedRoles?: Array<string> 
+}) => {
+  const { isAuthenticated, user } = useAuth();
+  
+  if (!isAuthenticated) {
+    // Redirect them to the auth page, but save the current location they were
+    // trying to go to when they were redirected. This allows us to send them
+    // along to that page after they login, which is a nicer user experience
+    // than dropping them off on the home page.
+    return <Navigate to="/auth" state={{ from: window.location }} replace />;
+  }
+  
+  // Check role if allowedRoles is provided and not empty
+  if (allowedRoles.length > 0 && user && !allowedRoles.includes(user.role)) {
+    // Redirect to dashboard specific to their role
+    return <Navigate to={`/${user.role}`} replace />;
+  }
+  
+  return children;
+};
+
+function App() {
+  return (
+    <AuthProvider>
+      <Router>
         <Routes>
           <Route path="/" element={<Index />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+          <Route path="/auth" element={<Auth />} />
+          
+          {/* Protected customer routes */}
+          <Route 
+            path="/customer/*" 
+            element={
+              <ProtectedRoute allowedRoles={['customer']}>
+                <CustomerDashboard />
+              </ProtectedRoute>
+            } 
+          />
+          
+          {/* Protected rider routes */}
+          <Route 
+            path="/rider/*" 
+            element={
+              <ProtectedRoute allowedRoles={['rider']}>
+                <RiderDashboard />
+              </ProtectedRoute>
+            } 
+          />
+          
+          {/* Protected vendor routes */}
+          <Route 
+            path="/vendor/*" 
+            element={
+              <ProtectedRoute allowedRoles={['vendor']}>
+                <VendorDashboard />
+              </ProtectedRoute>
+            } 
+          />
+          
+          {/* Protected admin routes */}
+          <Route 
+            path="/admin/*" 
+            element={
+              <ProtectedRoute allowedRoles={['admin']}>
+                <div>Admin Dashboard</div>
+              </ProtectedRoute>
+            } 
+          />
+          
+          {/* Catch-all route for 404 */}
           <Route path="*" element={<NotFound />} />
         </Routes>
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
-);
+        <Toaster />
+      </Router>
+    </AuthProvider>
+  );
+}
 
 export default App;
