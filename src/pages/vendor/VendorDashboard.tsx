@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import DashboardLayout from '@/components/layout/DashboardLayout';
@@ -9,10 +8,9 @@ import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { 
   Package, Clock, Leaf, ChevronRight, ArrowUpRight, 
-  TrendingUp, BarChart3, UserCheck, ShoppingBag
+  TrendingUp, BarChart3, UserCheck, ShoppingBag, RecycleIcon
 } from 'lucide-react';
 
-// Mock data
 const pendingOrders = [
   {
     id: 'ORD-5678',
@@ -391,7 +389,7 @@ const VendorDashboard = () => {
                   <div className="p-4 border rounded-lg">
                     <div className="flex justify-between items-center mb-2">
                       <h4 className="font-medium">Recycling Rate</h4>
-                      <Recycle className="h-5 w-5 text-blue-600" />
+                      <RecycleIcon className="h-5 w-5 text-blue-600" />
                     </div>
                     <div className="text-xl font-bold">87%</div>
                     <p className="text-xs text-gray-600 mt-1">Packaging returned</p>
