@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth, UserRole } from '@/contexts/AuthContext';
@@ -175,8 +174,16 @@ const Auth = () => {
       setBusinessAddress('');
       setAdminCode('');
       
-      // Switch to login tab after successful registration
-      document.querySelector('[data-state="inactive"][data-value="login"]')?.click();
+      // Fix: Use the TabsTrigger click event instead of querySelector.click()
+      // Find the login tab trigger and programmatically switch to it
+      const loginTabElement = document.querySelector('[data-state="inactive"][data-value="login"]');
+      if (loginTabElement) {
+        (loginTabElement as HTMLElement).dispatchEvent(new MouseEvent('click', {
+          bubbles: true,
+          cancelable: true,
+          view: window
+        }));
+      }
     } catch (error) {
       console.error(error);
     } finally {

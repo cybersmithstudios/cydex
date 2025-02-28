@@ -50,3 +50,18 @@ export const fadeIn = (direction?: string, type?: string, delay?: number, durati
     },
   };
 };
+
+// Add the missing slideUp animation
+export const slideUp = {
+  hidden: { y: 50, opacity: 0 },
+  visible: { 
+    y: 0, 
+    opacity: 1,
+    transition: {
+      type: "spring",
+      stiffness: 300,
+      damping: 30,
+      duration: 0.8
+    }
+  }
+};
