@@ -6,6 +6,7 @@ import NotFound from './pages/NotFound';
 import CustomerDashboard from './pages/customer/CustomerDashboard';
 import RiderDashboard from './pages/rider/RiderDashboard';
 import VendorDashboard from './pages/vendor/VendorDashboard';
+import AdminDashboard from './pages/admin/AdminDashboard';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { Toaster } from './components/ui/sonner';
 import HowItWorks from './pages/HowItWorks';
@@ -89,7 +90,7 @@ function App() {
             path="/admin/*" 
             element={
               <ProtectedRoute allowedRoles={['admin']}>
-                <div>Admin Dashboard</div>
+                <AdminDashboard />
               </ProtectedRoute>
             } 
           />

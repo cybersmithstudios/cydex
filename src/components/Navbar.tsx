@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { Shield, LogOut, User, Settings, BarChart, Menu, X } from "lucide-react";
+import { Shield, LogOut, User, Settings, BarChart, Menu, X, ChevronDown } from "lucide-react";
 
 const Navbar = () => {
   const { user, logout, isAuthenticated } = useAuth();
@@ -82,27 +82,55 @@ const Navbar = () => {
         </div>
 
         {/* Desktop Navigation */}
-        <nav className="hidden md:flex items-center space-x-8">
-          <Link to="/" className="nav-link">
+        <nav className="hidden md:flex items-center space-x-4 lg:space-x-8">
+          <Link to="/" className="nav-link text-sm lg:text-base">
             Home
           </Link>
-          <Link to="/how-it-works" className="nav-link">
+          <Link to="/how-it-works" className="nav-link text-sm lg:text-base">
             How It Works
           </Link>
-          <Link to="/about" className="nav-link">
+          <Link to="/about" className="nav-link text-sm lg:text-base">
             About Us
           </Link>
-          <Link to="/faq" className="nav-link">
+          <Link to="/faq" className="nav-link text-sm lg:text-base">
             FAQ
           </Link>
-          <Link to="/contact" className="nav-link">
+          <Link to="/contact" className="nav-link text-sm lg:text-base">
             Contact Us
           </Link>
         </nav>
 
+        {/* Tablet Navigation Dropdown */}
+        <div className="hidden sm:flex md:hidden">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="sm" className="gap-1">
+                Menu <ChevronDown className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-48">
+              <DropdownMenuItem asChild>
+                <Link to="/">Home</Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link to="/how-it-works">How It Works</Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link to="/about">About Us</Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link to="/faq">FAQ</Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link to="/contact">Contact Us</Link>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+
         {/* Mobile menu button */}
         <button 
-          className="md:hidden p-2 rounded-md focus:outline-none" 
+          className="sm:hidden p-2 rounded-md focus:outline-none" 
           onClick={toggleMobileMenu}
         >
           {mobileMenuOpen ? (
@@ -113,7 +141,7 @@ const Navbar = () => {
         </button>
 
         {/* Auth Buttons or User Menu */}
-        <div className="hidden md:flex items-center space-x-4">
+        <div className="hidden sm:flex items-center space-x-4">
           {isAuthenticated && user ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -153,10 +181,10 @@ const Navbar = () => {
                   <Settings className="mr-2 h-4 w-4" />
                   <span>Settings</span>
                 </DropdownMenuItem>
-                {user.mfaEnabled && (
-                  <DropdownMenuItem onClick={() => navigate("/security")}>
+                {user.role === 'admin' && (
+                  <DropdownMenuItem onClick={() => navigate("/admin")}>
                     <Shield className="mr-2 h-4 w-4" />
-                    <span>Security</span>
+                    <span>Admin Panel</span>
                   </DropdownMenuItem>
                 )}
                 <DropdownMenuSeparator />
@@ -176,7 +204,7 @@ const Navbar = () => {
                 Log in
               </Button>
               <Button
-                className="bg-primary hover:bg-primary/90"
+                className="bg-primary hover:bg-primary/90 rounded-full"
                 onClick={() => navigate("/auth?tab=register")}
               >
                 Sign up
@@ -188,7 +216,7 @@ const Navbar = () => {
 
       {/* Mobile Navigation Menu */}
       {mobileMenuOpen && (
-        <div className="md:hidden absolute top-full left-0 right-0 bg-white shadow-md p-4 z-50 animate-fade-in">
+        <div className="sm:hidden absolute top-full left-0 right-0 bg-white shadow-md p-4 z-50 animate-fade-in">
           <nav className="flex flex-col space-y-4">
             <Link to="/" className="p-2 hover:bg-gray-100 rounded-md" onClick={() => setMobileMenuOpen(false)}>
               Home
@@ -221,6 +249,19 @@ const Navbar = () => {
                   <BarChart className="mr-2 h-4 w-4" />
                   Dashboard
                 </Button>
+                {user.role === 'admin' && (
+                  <Button 
+                    variant="ghost" 
+                    className="justify-start p-2" 
+                    onClick={() => {
+                      setMobileMenuOpen(false);
+                      navigate("/admin");
+                    }}
+                  >
+                    <Shield className="mr-2 h-4 w-4" />
+                    Admin Panel
+                  </Button>
+                )}
                 <Button 
                   variant="ghost" 
                   className="justify-start p-2" 
@@ -247,7 +288,7 @@ const Navbar = () => {
                   Log in
                 </Button>
                 <Button
-                  className="w-full justify-center bg-primary hover:bg-primary/90"
+                  className="w-full justify-center bg-primary hover:bg-primary/90 rounded-full"
                   onClick={() => {
                     setMobileMenuOpen(false);
                     navigate("/auth?tab=register");
