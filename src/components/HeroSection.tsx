@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { motion } from "framer-motion";
+import { motion, Variants } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ChevronDown, ArrowRight } from "lucide-react";
@@ -26,6 +26,14 @@ const HeroSection = () => {
 
   // Function to handle the Learn More button
   const handleLearnMore = () => {
+    const featuresSection = document.getElementById("features");
+    if (featuresSection) {
+      featuresSection.scrollIntoView({ behavior: "smooth" });
+    }
+  };
+
+  // Function to scroll to features section
+  const scrollToFeatures = () => {
     const featuresSection = document.getElementById("features");
     if (featuresSection) {
       featuresSection.scrollIntoView({ behavior: "smooth" });

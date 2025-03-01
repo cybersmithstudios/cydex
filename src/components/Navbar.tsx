@@ -77,14 +77,20 @@ const Navbar = () => {
 
         {/* Navigation */}
         <nav className="hidden md:flex items-center space-x-8">
-          <a href="/#features" className="nav-link">
-            Features
+          <a href="/" className="nav-link">
+            Home
           </a>
-          <a href="/#testimonials" className="nav-link">
-            Testimonials
+          <a href="/how-it-works" className="nav-link">
+            How It Works
           </a>
-          <a href="/#partners" className="nav-link">
-            Partners
+          <a href="/about" className="nav-link">
+            About Us
+          </a>
+          <a href="/faq" className="nav-link">
+            FAQ
+          </a>
+          <a href="/contact" className="nav-link">
+            Contact Us
           </a>
         </nav>
 

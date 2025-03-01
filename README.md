@@ -1,10 +1,28 @@
-# Welcome to your Lovable project
+# Cydex - Eco-Friendly Delivery Platform
 
-## Project info
+## About the Project
 
-**URL**: https://lovable.dev/projects/3a2eb4a0-877e-4424-b492-6d0f6776ca57
+Cydex is an innovative eco-friendly delivery platform that revolutionizes the logistics industry by prioritizing sustainability without compromising efficiency. Our platform connects customers, delivery riders, and vendors while actively reducing carbon footprint through smart solutions.
 
-## How can I edit this code?
+### Key Features
+
+- **Zero-Emission Delivery Fleet**: Utilizing electric vehicles and bikes for environmentally conscious deliveries
+- **Smart Route Optimization**: AI-powered routing to minimize distance and maximize efficiency
+- **Carbon Credit System**: Transparent tracking and rewards for eco-friendly delivery choices
+- **Multi-Stakeholder Platform**: Seamless integration between customers, riders, and vendors
+- **Real-Time Tracking**: Live monitoring of deliveries with accurate ETAs
+- **Sustainable Packaging**: Eco-friendly packaging solutions to minimize waste
+
+### Built With
+
+- React
+- TypeScript
+- Tailwind CSS
+- Shadcn UI
+- Framer Motion
+- And more modern web technologies
+
+## Getting Started
 
 There are several ways of editing your application.
 
@@ -50,20 +68,15 @@ npm run dev
 - Click on "New codespace" to launch a new Codespace environment.
 - Edit files directly within the Codespace and commit and push your changes once you're done.
 
-## What technologies are used for this project?
+## Contributing
 
-This project is built with .
+We welcome contributions to Cydex! Please follow these guidelines:
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+1.  Fork the repository.
+2.  Create a new branch for your feature or bug fix.
+3.  Make your changes and commit them with clear, concise messages.
+4.  Submit a pull request with a detailed explanation of your changes.
 
-## How can I deploy this project?
+## License
 
-Simply open [Lovable](https://lovable.dev/projects/3a2eb4a0-877e-4424-b492-6d0f6776ca57) and click on Share -> Publish.
-
-## I want to use a custom domain - is that possible?
-
-We don't support custom domains (yet). If you want to deploy your project under your own domain then we recommend using Netlify. Visit our docs for more details: [Custom domains](https://docs.lovable.dev/tips-tricks/custom-domain/)
+This project is licensed under the MIT License. See the `LICENSE` file for details.
