@@ -1,6 +1,7 @@
 
 import React from "react";
-import { Instagram, Linkedin, Twitter, ArrowRight } from "lucide-react";
+import { Link } from "react-router-dom";
+import { Instagram, Linkedin, Twitter, Facebook, ArrowRight } from "lucide-react";
 
 const FooterSection = () => {
   const currentYear = new Date().getFullYear();
@@ -16,9 +17,13 @@ const FooterSection = () => {
       <div className="container mx-auto px-6 py-16">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10">
           <div className="space-y-4">
-            <h3 className="text-2xl font-bold">
-              <span className="text-primary">Cy</span>dex
-            </h3>
+            <Link to="/" className="block">
+              <img 
+                src="/lovable-uploads/logo.png" 
+                alt="Cydex Logo" 
+                className="h-10 w-auto invert" // Invert to white
+              />
+            </Link>
             <p className="text-gray-400 max-w-xs">
               Revolutionary eco-friendly delivery platform transforming logistics with sustainability at its core.
             </p>
@@ -32,6 +37,9 @@ const FooterSection = () => {
               <a href="#" className="transition-colors hover:text-primary">
                 <Twitter />
               </a>
+              <a href="#" className="transition-colors hover:text-primary">
+                <Facebook />
+              </a>
             </div>
           </div>
 
@@ -39,24 +47,24 @@ const FooterSection = () => {
             <h4 className="text-lg font-semibold mb-4">Quick Links</h4>
             <ul className="space-y-2">
               <li>
-                <a href="#" className="text-gray-400 hover:text-primary transition-colors">
+                <Link to="/about" className="text-gray-400 hover:text-primary transition-colors">
                   About Us
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="#features" className="text-gray-400 hover:text-primary transition-colors">
-                  Features
-                </a>
+                <Link to="/how-it-works" className="text-gray-400 hover:text-primary transition-colors">
+                  How It Works
+                </Link>
               </li>
               <li>
-                <a href="#testimonials" className="text-gray-400 hover:text-primary transition-colors">
-                  Testimonials
-                </a>
+                <Link to="/faq" className="text-gray-400 hover:text-primary transition-colors">
+                  FAQ
+                </Link>
               </li>
               <li>
-                <a href="#partners" className="text-gray-400 hover:text-primary transition-colors">
-                  Partners
-                </a>
+                <Link to="/contact" className="text-gray-400 hover:text-primary transition-colors">
+                  Contact
+                </Link>
               </li>
             </ul>
           </div>
@@ -64,11 +72,6 @@ const FooterSection = () => {
           <div>
             <h4 className="text-lg font-semibold mb-4">Support</h4>
             <ul className="space-y-2">
-              <li>
-                <a href="#" className="text-gray-400 hover:text-primary transition-colors">
-                  FAQ
-                </a>
-              </li>
               <li>
                 <a href="#" className="text-gray-400 hover:text-primary transition-colors">
                   Privacy Policy
@@ -81,7 +84,12 @@ const FooterSection = () => {
               </li>
               <li>
                 <a href="#" className="text-gray-400 hover:text-primary transition-colors">
-                  Contact
+                  Help Center
+                </a>
+              </li>
+              <li>
+                <a href="#" className="text-gray-400 hover:text-primary transition-colors">
+                  Sustainability
                 </a>
               </li>
             </ul>
@@ -120,7 +128,7 @@ const FooterSection = () => {
           </p>
           <div className="mt-4 md:mt-0">
             <a href="#" className="text-sm text-gray-500 hover:text-primary transition-colors">
-              Made with sustainability in mind.
+              Made with sustainability in mind in Nigeria.
             </a>
           </div>
         </div>
