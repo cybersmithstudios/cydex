@@ -74,7 +74,7 @@ const Navbar = () => {
         <div className="flex items-center">
           <Link to="/" className="flex items-center">
             <img 
-              src="/lovable-uploads/525fd30a-476a-4e14-ae55-ec2b11d54013.png" 
+              src="/lovable-uploads/logo.png" 
               alt="Cydex Logo" 
               className="h-10" 
             />
