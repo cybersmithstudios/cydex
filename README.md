@@ -1,17 +1,33 @@
-# Cydex - Eco-Friendly Delivery Platform
 
-## About the Project
+# Cydex - Eco-Friendly Delivery Platform
 
 Cydex is an innovative eco-friendly delivery platform that revolutionizes the logistics industry by prioritizing sustainability without compromising efficiency. Our platform connects customers, delivery riders, and vendors while actively reducing carbon footprint through smart solutions.
 
+## About the Project
+
+In a world where convenience often comes at an environmental cost, Cydex offers a different approach. We've built a comprehensive logistics platform that uses zero-emission vehicles, optimized routes, sustainable packaging, and a rewarding carbon credit system to create a delivery ecosystem that benefits both users and the planet.
+
 ### Key Features
 
-- **Zero-Emission Delivery Fleet**: Utilizing electric vehicles and bikes for environmentally conscious deliveries
+- **Zero-Emission Delivery Fleet**: Electric vehicles, bicycles, and walking couriers for environmentally conscious deliveries
 - **Smart Route Optimization**: AI-powered routing to minimize distance and maximize efficiency
 - **Carbon Credit System**: Transparent tracking and rewards for eco-friendly delivery choices
 - **Multi-Stakeholder Platform**: Seamless integration between customers, riders, and vendors
 - **Real-Time Tracking**: Live monitoring of deliveries with accurate ETAs
 - **Sustainable Packaging**: Eco-friendly packaging solutions to minimize waste
+
+### How It Works
+
+- **For Customers**: Order from eco-friendly vendors, choose sustainable delivery methods, track in real-time, and earn carbon credits.
+- **For Riders**: Accept and deliver orders using zero-emission transportation, maximize earnings through carbon credits.
+- **For Vendors**: List your business, join our recycling program, and get incentives for sustainable practices.
+
+### Target Audience
+
+- Eco-conscious consumers who want to reduce their environmental impact
+- Delivery riders looking for flexible work opportunities with purpose
+- Vendors and businesses committed to sustainability goals
+- Organizations seeking to reduce their delivery-related carbon footprint
 
 ### Built With
 
@@ -20,6 +36,7 @@ Cydex is an innovative eco-friendly delivery platform that revolutionizes the lo
 - Tailwind CSS
 - Shadcn UI
 - Framer Motion
+- React Router
 - And more modern web technologies
 
 ## Getting Started
@@ -54,29 +71,60 @@ npm i
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+## Project Structure
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+- `/src/components`: Reusable UI components
+- `/src/pages`: Page components for different routes
+- `/src/contexts`: Context providers for state management
+- `/src/utils`: Utility functions and helpers
+- `/src/lib`: Shared libraries and code
+- `/public`: Static assets and resources
 
-**Use GitHub Codespaces**
+## Features in Detail
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+### Carbon Credit System
+
+Our proprietary carbon credit system calculates and awards credits based on:
+- Delivery distance
+- Transport method (walking, cycling, electric vehicle)
+- Packaging choices
+- Vendor sustainability ratings
+
+These credits can be redeemed for discounts, free deliveries, or donated to environmental projects.
+
+### AI-Powered Route Optimization
+
+Using advanced algorithms, we determine the most fuel-efficient routes while considering:
+- Current traffic conditions
+- Weather factors
+- Delivery vehicle type
+- Multi-delivery batching opportunities
+
+This reduces unnecessary mileage and emissions while maintaining quick delivery times.
+
+### Sustainable Packaging Solutions
+
+We offer vendors:
+- Biodegradable packaging options
+- Reusable container programs
+- Minimal packaging incentives
+- Packaging carbon impact tracking
 
 ## Contributing
 
 We welcome contributions to Cydex! Please follow these guidelines:
 
-1.  Fork the repository.
-2.  Create a new branch for your feature or bug fix.
-3.  Make your changes and commit them with clear, concise messages.
-4.  Submit a pull request with a detailed explanation of your changes.
+1. Fork the repository.
+2. Create a new branch for your feature or bug fix.
+3. Make your changes and commit them with clear, concise messages.
+4. Submit a pull request with a detailed explanation of your changes.
 
 ## License
 
 This project is licensed under the MIT License. See the `LICENSE` file for details.
+
+## Contact
+
+- Email: support@cydex.com
+- Website: [https://cydex.com](https://cydex.com)
+- GitHub: [https://github.com/cydex-eco](https://github.com/cydex-eco)

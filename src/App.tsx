@@ -8,6 +8,10 @@ import RiderDashboard from './pages/rider/RiderDashboard';
 import VendorDashboard from './pages/vendor/VendorDashboard';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { Toaster } from './components/ui/sonner';
+import HowItWorks from './pages/HowItWorks';
+import AboutUs from './pages/AboutUs';
+import Faq from './pages/Faq';
+import Contact from './pages/Contact';
 
 // Protected route wrapper
 const ProtectedRoute = ({ 
@@ -43,6 +47,12 @@ function App() {
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/auth" element={<Auth />} />
+          
+          {/* Public pages */}
+          <Route path="/how-it-works" element={<HowItWorks />} />
+          <Route path="/about" element={<AboutUs />} />
+          <Route path="/faq" element={<Faq />} />
+          <Route path="/contact" element={<Contact />} />
           
           {/* Protected customer routes */}
           <Route 

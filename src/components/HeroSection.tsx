@@ -1,10 +1,10 @@
+
 import React, { useEffect, useState } from "react";
-import { motion, Variants } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ChevronDown, ArrowRight } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
-import { fadeIn, slideUp } from "@/utils/animations";
+import { fadeIn } from "@/utils/animations";
 
 const HeroSection = () => {
   const [isLoaded, setIsLoaded] = useState(false);
@@ -49,7 +49,7 @@ const HeroSection = () => {
 
       <div className="container mx-auto px-6 z-10">
         <div className="flex flex-col lg:flex-row items-center">
-          <div className="lg:w-1/2 lg:pr-12 space-y-6 mb-10 lg:mb-0">
+          <div className="lg:w-1/2 lg:pr-12 space-y-6 mb-10 lg:mb-0 text-center lg:text-left">
             <div
               className={`transition-all duration-700 transform ${isLoaded ? "translate-y-0 opacity-100" : "translate-y-10 opacity-0"}`}
             >
@@ -67,13 +67,13 @@ const HeroSection = () => {
             </h1>
 
             <p
-              className={`text-lg text-gray-600 max-w-xl transition-all duration-700 delay-200 transform ${isLoaded ? "translate-y-0 opacity-100" : "translate-y-10 opacity-0"}`}
+              className={`text-lg text-gray-600 max-w-xl mx-auto lg:mx-0 transition-all duration-700 delay-200 transform ${isLoaded ? "translate-y-0 opacity-100" : "translate-y-10 opacity-0"}`}
             >
               Cydex revolutionizes logistics with zero-emission vehicles, optimized routes, and sustainable packaging, reducing carbon footprint while maintaining exceptional delivery experiences.
             </p>
 
             <div
-              className={`flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 transition-all duration-700 delay-300 transform ${isLoaded ? "translate-y-0 opacity-100" : "translate-y-10 opacity-0"}`}
+              className={`flex flex-col sm:flex-row justify-center lg:justify-start space-y-4 sm:space-y-0 sm:space-x-4 transition-all duration-700 delay-300 transform ${isLoaded ? "translate-y-0 opacity-100" : "translate-y-10 opacity-0"}`}
             >
               <Button
                 onClick={handleSignUp}
@@ -95,7 +95,7 @@ const HeroSection = () => {
           <div
             className={`lg:w-1/2 relative transition-all duration-1000 delay-300 transform ${isLoaded ? "translate-y-0 opacity-100" : "translate-y-20 opacity-0"}`}
           >
-            <div className="relative">
+            <div className="relative px-6 lg:px-0">
               <div className="absolute -top-10 -left-10 w-full h-full bg-primary/20 rounded-2xl transform -rotate-6"></div>
               <div className="glass rounded-2xl overflow-hidden relative z-10">
                 <img
