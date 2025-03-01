@@ -1,4 +1,3 @@
-
 import React from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
@@ -90,22 +89,22 @@ const HeroSection = () => {
               variants={fadeIn("right", "tween", 0.8, 0.7)}
               className="mt-10 flex items-center"
             >
-              <div className="flex -space-x-2">
-                {[1, 2, 3, 4].map((i) => (
-                  <div
-                    key={i}
-                    className="w-10 h-10 rounded-full border-2 border-white overflow-hidden"
-                  >
-                    <img
-                      src={`https://api.dicebear.com/7.x/personas/svg?seed=${i}`}
-                      alt="User avatar"
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                ))}
-              </div>
-              <div className="ml-4">
-                <p className="text-gray-600 text-sm">
+              <div className="flex flex-col items-center space-y-2">
+                <div className="flex -space-x-2">
+                  {[1, 2, 3, 4].map((i) => (
+                    <div
+                      key={i}
+                      className="w-10 h-10 rounded-full border-2 border-white overflow-hidden"
+                    >
+                      <img
+                        src={`https://api.dicebear.com/7.x/personas/svg?seed=${i}`}
+                        alt="User avatar"
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  ))}
+                </div>
+                <p className="text-gray-600 text-sm text-center">
                   Trusted by <span className="font-semibold">500+</span> eco-conscious businesses
                 </p>
               </div>
