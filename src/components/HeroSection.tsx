@@ -77,7 +77,7 @@ const HeroSection = () => {
             >
               <Button
                 onClick={handleSignUp}
-                className="bg-primary hover:bg-primary/90 text-black px-6 py-6 h-auto text-base rounded-full"
+                className="primary-button hover:scale-105"
               >
                 {isAuthenticated ? "Go to Dashboard" : "Sign Up Now"}
                 <ArrowRight className="ml-2 h-5 w-5" />
@@ -85,7 +85,7 @@ const HeroSection = () => {
               <Button
                 variant="outline"
                 onClick={handleLearnMore}
-                className="border-gray-300 hover:bg-gray-100 text-gray-800 px-6 py-6 h-auto text-base rounded-full"
+                className="secondary-button hover:scale-105"
               >
                 Learn More
               </Button>
