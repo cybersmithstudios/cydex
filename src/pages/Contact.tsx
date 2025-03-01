@@ -6,9 +6,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { MessageSquare, Mail, Phone, MapPin, SendHorizonal, Facebook, Twitter, Instagram, Linkedin } from "lucide-react";
+import { MessageSquare, Mail, Phone, MapPin, SendHorizonal } from "lucide-react";
 import { toast } from "sonner";
-import MapComponent from "@/components/MapComponent";
 
 const Contact = () => {
   const [name, setName] = useState("");
@@ -129,7 +128,7 @@ const Contact = () => {
                   </div>
                   <div className="ml-4">
                     <h3 className="text-lg font-bold">Email Us</h3>
-                    <p className="text-gray-600">support@cydex.com.ng</p>
+                    <p className="text-gray-600">support@cydex.com</p>
                     <p className="text-gray-500 text-sm mt-1">We'll respond within 24 hours</p>
                   </div>
                 </div>
@@ -140,8 +139,8 @@ const Contact = () => {
                   </div>
                   <div className="ml-4">
                     <h3 className="text-lg font-bold">Call Us</h3>
-                    <p className="text-gray-600">+234 800 123 4567</p>
-                    <p className="text-gray-500 text-sm mt-1">Mon-Fri, 9:00 AM - 6:00 PM WAT</p>
+                    <p className="text-gray-600">+1 (234) 567-890</p>
+                    <p className="text-gray-500 text-sm mt-1">Mon-Fri, 9:00 AM - 6:00 PM</p>
                   </div>
                 </div>
                 
@@ -151,8 +150,8 @@ const Contact = () => {
                   </div>
                   <div className="ml-4">
                     <h3 className="text-lg font-bold">Headquarters</h3>
-                    <p className="text-gray-600">23 Awolowo Road, Ikoyi</p>
-                    <p className="text-gray-600">Lagos, Nigeria</p>
+                    <p className="text-gray-600">123 Green Street, Suite 456</p>
+                    <p className="text-gray-600">San Francisco, CA 94105</p>
                   </div>
                 </div>
               </div>
@@ -160,38 +159,19 @@ const Contact = () => {
               <div className="mt-12">
                 <h3 className="text-lg font-bold mb-4">Connect With Us</h3>
                 <div className="flex space-x-4">
-                  <a 
-                    href="https://facebook.com" 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="bg-gray-100 hover:bg-primary/10 transition-colors p-3 rounded-full"
-                  >
-                    <Facebook className="w-6 h-6 text-gray-600" />
-                  </a>
-                  <a 
-                    href="https://twitter.com" 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="bg-gray-100 hover:bg-primary/10 transition-colors p-3 rounded-full"
-                  >
-                    <Twitter className="w-6 h-6 text-gray-600" />
-                  </a>
-                  <a 
-                    href="https://instagram.com" 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="bg-gray-100 hover:bg-primary/10 transition-colors p-3 rounded-full"
-                  >
-                    <Instagram className="w-6 h-6 text-gray-600" />
-                  </a>
-                  <a 
-                    href="https://linkedin.com" 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="bg-gray-100 hover:bg-primary/10 transition-colors p-3 rounded-full"
-                  >
-                    <Linkedin className="w-6 h-6 text-gray-600" />
-                  </a>
+                  {["facebook", "twitter", "instagram", "linkedin"].map((platform) => (
+                    <a 
+                      key={platform}
+                      href={`https://${platform}.com`} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="bg-gray-100 hover:bg-primary/10 transition-colors p-3 rounded-full"
+                    >
+                      <div className="w-6 h-6 flex items-center justify-center text-gray-600">
+                        {platform.charAt(0).toUpperCase()}
+                      </div>
+                    </a>
+                  ))}
                 </div>
               </div>
             </div>
@@ -216,9 +196,12 @@ const Contact = () => {
         </div>
       </section>
       
-      {/* Map Section */}
-      <section className="h-80 bg-gray-50">
-        <MapComponent />
+      {/* Map Section (Placeholder) */}
+      <section className="h-80 bg-gray-200 flex items-center justify-center">
+        <div className="text-gray-500 text-center">
+          <MapPin className="h-8 w-8 mx-auto mb-2" />
+          <p className="text-lg">Interactive Map Would Be Displayed Here</p>
+        </div>
       </section>
       
       <FooterSection />

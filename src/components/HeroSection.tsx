@@ -99,7 +99,7 @@ const HeroSection = () => {
               <div className="absolute -top-10 -left-10 w-full h-full bg-primary/20 rounded-2xl transform -rotate-6"></div>
               <div className="glass rounded-2xl overflow-hidden relative z-10">
                 <img
-                  src="/lovable-uploads/heroimage.jpg"
+                  src="https://images.unsplash.com/photo-1487887235947-a955ef187fcc?auto=format&fit=crop&q=80&w=1000"
                   alt="Eco-friendly delivery drone"
                   className="w-full h-auto object-cover"
                   loading="lazy"
