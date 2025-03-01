@@ -1,6 +1,6 @@
 
 import React from "react";
-import { Instagram, Linkedin, Twitter, ArrowRight } from "lucide-react";
+import { Instagram, Linkedin, Twitter, Facebook, ArrowRight } from "lucide-react";
 
 const FooterSection = () => {
   const currentYear = new Date().getFullYear();
@@ -16,21 +16,28 @@ const FooterSection = () => {
       <div className="container mx-auto px-6 py-16">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10">
           <div className="space-y-4">
-            <h3 className="text-2xl font-bold">
-              <span className="text-primary">Cy</span>dex
-            </h3>
+            <div className="flex items-center">
+              <img 
+                src="/lovable-uploads/525fd30a-476a-4e14-ae55-ec2b11d54013.png" 
+                alt="Cydex Logo" 
+                className="h-10 w-auto invert" // Invert the black logo to white
+              />
+            </div>
             <p className="text-gray-400 max-w-xs">
               Revolutionary eco-friendly delivery platform transforming logistics with sustainability at its core.
             </p>
             <div className="flex space-x-4">
               <a href="#" className="transition-colors hover:text-primary">
-                <Instagram />
+                <Instagram size={20} />
               </a>
               <a href="#" className="transition-colors hover:text-primary">
-                <Linkedin />
+                <Linkedin size={20} />
               </a>
               <a href="#" className="transition-colors hover:text-primary">
-                <Twitter />
+                <Twitter size={20} />
+              </a>
+              <a href="#" className="transition-colors hover:text-primary">
+                <Facebook size={20} />
               </a>
             </div>
           </div>
@@ -39,23 +46,23 @@ const FooterSection = () => {
             <h4 className="text-lg font-semibold mb-4">Quick Links</h4>
             <ul className="space-y-2">
               <li>
-                <a href="#" className="text-gray-400 hover:text-primary transition-colors">
+                <a href="/about" className="text-gray-400 hover:text-primary transition-colors">
                   About Us
                 </a>
               </li>
               <li>
-                <a href="#features" className="text-gray-400 hover:text-primary transition-colors">
-                  Features
+                <a href="/how-it-works" className="text-gray-400 hover:text-primary transition-colors">
+                  How It Works
                 </a>
               </li>
               <li>
-                <a href="#testimonials" className="text-gray-400 hover:text-primary transition-colors">
-                  Testimonials
+                <a href="/faq" className="text-gray-400 hover:text-primary transition-colors">
+                  FAQs
                 </a>
               </li>
               <li>
-                <a href="#partners" className="text-gray-400 hover:text-primary transition-colors">
-                  Partners
+                <a href="/contact" className="text-gray-400 hover:text-primary transition-colors">
+                  Contact Us
                 </a>
               </li>
             </ul>
@@ -80,7 +87,7 @@ const FooterSection = () => {
                 </a>
               </li>
               <li>
-                <a href="#" className="text-gray-400 hover:text-primary transition-colors">
+                <a href="/contact" className="text-gray-400 hover:text-primary transition-colors">
                   Contact
                 </a>
               </li>
