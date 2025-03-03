@@ -1,6 +1,8 @@
 
 import React, { createContext, useState, useEffect, useContext } from 'react';
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
+import { Session, User as SupabaseUser } from '@supabase/supabase-js';
 
 // Define user roles
 export type UserRole = 'customer' | 'rider' | 'vendor' | 'admin';
@@ -32,51 +34,10 @@ interface AuthContextType {
   verifyMFA: (code: string) => Promise<boolean>;
   isSessionExpired: () => boolean;
   refreshSession: () => void;
+  session: Session | null;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
-
-// Enhanced mock users with more security features
-const mockUsers: User[] = [
-  {
-    id: '1',
-    name: 'Customer User',
-    email: 'customer@example.com',
-    role: 'customer',
-    avatar: 'https://api.dicebear.com/7.x/personas/svg?seed=customer',
-    verified: true,
-    carbonCredits: 450
-  },
-  {
-    id: '2',
-    name: 'Rider User',
-    email: 'rider@example.com',
-    role: 'rider',
-    avatar: 'https://api.dicebear.com/7.x/personas/svg?seed=rider',
-    verified: true,
-    carbonCredits: 870
-  },
-  {
-    id: '3',
-    name: 'Vendor User',
-    email: 'vendor@example.com',
-    role: 'vendor',
-    avatar: 'https://api.dicebear.com/7.x/personas/svg?seed=vendor',
-    verified: true,
-    mfaEnabled: true,
-    carbonCredits: 1200
-  },
-  {
-    id: '4',
-    name: 'Admin User',
-    email: 'admin@example.com',
-    role: 'admin',
-    avatar: 'https://api.dicebear.com/7.x/personas/svg?seed=admin',
-    verified: true,
-    mfaEnabled: true,
-    carbonCredits: 2500
-  }
-];
 
 // Session timeout in milliseconds (30 minutes)
 const SESSION_TIMEOUT = 30 * 60 * 1000;
@@ -86,27 +47,107 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [loading, setLoading] = useState(true);
   const [sessionExpiry, setSessionExpiry] = useState<number | null>(null);
   const [loginAttempts, setLoginAttempts] = useState<{[key: string]: {count: number, lastAttempt: number}}>({});
+  const [session, setSession] = useState<Session | null>(null);
 
-  // Check if user is already logged in
+  // Listen for auth state changes
   useEffect(() => {
-    const storedUser = localStorage.getItem('cydexUser');
-    const storedExpiry = localStorage.getItem('cydexSessionExpiry');
+    setLoading(true);
     
-    if (storedUser && storedExpiry) {
-      const expiry = parseInt(storedExpiry, 10);
-      if (expiry > Date.now()) {
-        setUser(JSON.parse(storedUser));
-        setSessionExpiry(expiry);
-        // Refresh session when loaded
-        refreshSession();
-      } else {
-        // Session expired
-        logout();
-        toast.info("Your session has expired. Please log in again.");
+    // Set up supabase auth listener
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (event, currentSession) => {
+        if (currentSession) {
+          setSession(currentSession);
+          const { user: supabaseUser } = currentSession;
+          
+          // Fetch user profile from profiles table
+          if (supabaseUser) {
+            await fetchUserProfile(supabaseUser);
+          }
+        } else {
+          setUser(null);
+          setSession(null);
+        }
+        
+        setLoading(false);
       }
-    }
-    setLoading(false);
+    );
+
+    // Check current session on initial load
+    supabase.auth.getSession().then(async ({ data: { session: currentSession } }) => {
+      if (currentSession) {
+        setSession(currentSession);
+        const { user: supabaseUser } = currentSession;
+        
+        // Fetch user profile from profiles table
+        if (supabaseUser) {
+          await fetchUserProfile(supabaseUser);
+        }
+      }
+      
+      setLoading(false);
+    });
+
+    // Cleanup subscription
+    return () => {
+      subscription.unsubscribe();
+    };
   }, []);
+
+  // Fetch user profile from database
+  const fetchUserProfile = async (supabaseUser: SupabaseUser) => {
+    try {
+      const { data: profile, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', supabaseUser.id)
+        .single();
+        
+      if (error) throw error;
+      
+      if (profile) {
+        const userData: User = {
+          id: profile.id,
+          name: profile.name,
+          email: profile.email,
+          role: profile.role,
+          avatar: profile.avatar || `https://api.dicebear.com/7.x/personas/svg?seed=${profile.email}`,
+          verified: profile.verified,
+          mfaEnabled: profile.mfa_enabled,
+          lastActive: profile.last_active,
+          carbonCredits: profile.carbon_credits
+        };
+        
+        setUser(userData);
+        
+        // Set session expiry
+        const expiry = Date.now() + SESSION_TIMEOUT;
+        setSessionExpiry(expiry);
+        
+        // Update last active timestamp
+        updateLastActive(profile.id);
+      }
+    } catch (error) {
+      console.error("Error fetching user profile:", error);
+    }
+  };
+
+  // Update last active timestamp
+  const updateLastActive = async (userId: string) => {
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .update({ 
+          last_active: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', userId);
+        
+      if (error) throw error;
+    } catch (error) {
+      console.error("Error updating last active:", error);
+    }
+  };
 
   // Check for session timeout
   useEffect(() => {
@@ -149,12 +190,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     
     const newExpiry = Date.now() + SESSION_TIMEOUT;
     setSessionExpiry(newExpiry);
-    localStorage.setItem('cydexSessionExpiry', newExpiry.toString());
     
     // Update last active timestamp
-    const updatedUser = { ...user, lastActive: new Date().toISOString() };
-    setUser(updatedUser);
-    localStorage.setItem('cydexUser', JSON.stringify(updatedUser));
+    updateLastActive(user.id);
   };
 
   // Login function with brute force protection
@@ -169,36 +207,24 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         throw new Error('Too many login attempts. Please try again later.');
       }
       
-      // Simulate API call with delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password
+      });
       
-      // Find user in mock data
-      const foundUser = mockUsers.find(u => u.email === email);
-      
-      if (foundUser && password === 'password') { // Simple check for demo
-        // Reset login attempts on successful login
-        setLoginAttempts(prev => ({ ...prev, [email]: { count: 0, lastAttempt: Date.now() } }));
-        
-        // Set session expiry
-        const expiry = Date.now() + SESSION_TIMEOUT;
-        setSessionExpiry(expiry);
-        localStorage.setItem('cydexSessionExpiry', expiry.toString());
-        
-        // Update user and save to localStorage
-        const updatedUser = { ...foundUser, lastActive: new Date().toISOString() };
-        setUser(updatedUser);
-        localStorage.setItem('cydexUser', JSON.stringify(updatedUser));
-        
-        toast.success(`Welcome back, ${foundUser.name}!`);
-      } else {
+      if (error) {
         // Increment login attempts
         setLoginAttempts(prev => ({
           ...prev,
           [email]: { count: (prev[email]?.count || 0) + 1, lastAttempt: Date.now() }
         }));
         
-        throw new Error('Invalid credentials');
+        throw error;
       }
+      
+      // Reset login attempts on successful login
+      setLoginAttempts(prev => ({ ...prev, [email]: { count: 0, lastAttempt: Date.now() } }));
+      
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Login failed';
       toast.error(message);
@@ -208,48 +234,27 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  // Register function with additional info for different roles
+  // Register function
   const register = async (name: string, email: string, password: string, role: UserRole, additionalInfo?: any) => {
     setLoading(true);
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // Check if email already exists
-      if (mockUsers.some(u => u.email === email)) {
-        throw new Error('Email already exists');
-      }
-      
-      // Create new user
-      const newUser: User = {
-        id: (mockUsers.length + 1).toString(),
-        name,
+      // Create the user in Supabase Auth
+      const { error } = await supabase.auth.signUp({
         email,
-        role,
-        avatar: `https://api.dicebear.com/7.x/personas/svg?seed=${email}`,
-        verified: false, // Requires verification
-        carbonCredits: 100 // Starting credits
-      };
+        password,
+        options: {
+          data: {
+            name,
+            role,
+            ...additionalInfo
+          }
+        }
+      });
       
-      // Add role-specific fields
-      if (additionalInfo) {
-        Object.assign(newUser, additionalInfo);
-      }
-      
-      // Add to mock users (in a real app, this would be an API call)
-      mockUsers.push(newUser);
-      
-      // In a real app, we would send a verification email here
+      if (error) throw error;
       
       toast.success('Registration successful! Please check your email to verify your account.');
       
-      // For demo purposes, auto-verify the account
-      setTimeout(() => {
-        const userIndex = mockUsers.findIndex(u => u.email === email);
-        if (userIndex !== -1) {
-          mockUsers[userIndex].verified = true;
-        }
-      }, 5000);
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Registration failed';
       toast.error(message);
@@ -263,11 +268,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const verifyEmail = async (token: string): Promise<boolean> => {
     setLoading(true);
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // In a real implementation, we would verify the token
+      // For Supabase, email verification is handled through the email link
       
-      // In a real app, we would verify the token with the backend
-      // For demo, we'll just return true
       toast.success('Email verified successfully! You can now log in.');
       return true;
     } catch (error) {
@@ -282,16 +285,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const resetPassword = async (email: string): Promise<void> => {
     setLoading(true);
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/reset-password`
+      });
       
-      // Check if email exists
-      const userExists = mockUsers.some(u => u.email === email);
-      if (!userExists) {
-        throw new Error('Email not found');
-      }
+      if (error) throw error;
       
-      // In a real app, we would send a password reset email
       toast.success('Password reset link sent to your email.');
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Password reset failed';
@@ -306,10 +305,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const updatePassword = async (token: string, newPassword: string): Promise<boolean> => {
     setLoading(true);
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // In Supabase, password reset is handled through the email link
+      // The token is part of the URL and handled by Supabase auth
       
-      // In a real app, we would verify the token and update the password
+      const { error } = await supabase.auth.updateUser({
+        password: newPassword
+      });
+      
+      if (error) throw error;
+      
       toast.success('Password updated successfully!');
       return true;
     } catch (error) {
@@ -329,13 +333,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     
     setLoading(true);
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // In a real implementation, we would enable MFA through Supabase
+      // Currently, Supabase doesn't have built-in MFA, so this would require a custom implementation
       
-      // Update user with MFA enabled
-      const updatedUser = { ...user, mfaEnabled: true };
-      setUser(updatedUser);
-      localStorage.setItem('cydexUser', JSON.stringify(updatedUser));
+      // For mock purposes, we'll just update the user profile
+      const { error } = await supabase
+        .from('profiles')
+        .update({ mfa_enabled: true })
+        .eq('id', user.id);
+        
+      if (error) throw error;
+      
+      // Update local user state
+      setUser(prev => prev ? { ...prev, mfaEnabled: true } : null);
       
       toast.success('Multi-Factor Authentication enabled successfully!');
     } catch (error) {
@@ -349,10 +359,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const verifyMFA = async (code: string): Promise<boolean> => {
     setLoading(true);
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // In a real implementation, we would verify the MFA code
+      // For demo purposes, we'll just check if it's a 6-digit code
       
-      // For demo purposes, any 6-digit code is valid
       if (code.length === 6 && /^\d+$/.test(code)) {
         toast.success('MFA verification successful!');
         return true;
@@ -369,12 +378,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   // Logout function
-  const logout = () => {
-    localStorage.removeItem('cydexUser');
-    localStorage.removeItem('cydexSessionExpiry');
-    setUser(null);
-    setSessionExpiry(null);
-    toast.info('You have been logged out');
+  const logout = async () => {
+    try {
+      const { error } = await supabase.auth.signOut();
+      if (error) throw error;
+      
+      setUser(null);
+      setSession(null);
+      setSessionExpiry(null);
+      toast.info('You have been logged out');
+    } catch (error) {
+      console.error("Error signing out:", error);
+      toast.error("Failed to sign out. Please try again.");
+    }
   };
 
   const value = {
@@ -390,7 +406,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     enableMFA,
     verifyMFA,
     isSessionExpired,
-    refreshSession
+    refreshSession,
+    session
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
