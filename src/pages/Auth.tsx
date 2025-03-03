@@ -34,9 +34,12 @@ const Auth = () => {
   }, [searchParams]);
   
   // If user is already logged in, redirect to their dashboard
-  if (isAuthenticated && user) {
-    return <Navigate to={`/${user.role}`} replace />;
-  }
+  useEffect(() => {
+    if (isAuthenticated && user) {
+      // Redirect to role-specific dashboard
+      navigate(`/${user.role}`);
+    }
+  }, [isAuthenticated, user, navigate]);
   
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -48,7 +51,7 @@ const Auth = () => {
     setIsSubmitting(true);
     try {
       await login(loginEmail, loginPassword);
-      // Redirect will happen automatically due to the conditional above
+      // Redirect will happen automatically due to the useEffect above
     } catch (error) {
       console.error("Login failed:", error);
     } finally {
@@ -95,7 +98,6 @@ const Auth = () => {
     
     setIsSubmitting(true);
     try {
-      // Access resetPassword from the auth context and call it
       const { resetPassword } = useAuth();
       await resetPassword(loginEmail);
       toast.success("Password reset link sent to your email");
@@ -106,6 +108,11 @@ const Auth = () => {
       setIsSubmitting(false);
     }
   };
+  
+  // If we're already authenticated, don't render the Auth page
+  if (isAuthenticated && user) {
+    return null; // The useEffect above will handle the redirection
+  }
   
   return (
     <div className="min-h-screen bg-gradient-to-b from-white to-gray-50 flex flex-col items-center justify-center p-4">

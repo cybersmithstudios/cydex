@@ -26,9 +26,7 @@ const ProtectedRoute = ({
   
   if (!isAuthenticated) {
     // Redirect them to the auth page, but save the current location they were
-    // trying to go to when they were redirected. This allows us to send them
-    // along to that page after they login, which is a nicer user experience
-    // than dropping them off on the home page.
+    // trying to go to when they were redirected
     return <Navigate to="/auth" state={{ from: window.location }} replace />;
   }
   
@@ -42,12 +40,28 @@ const ProtectedRoute = ({
 };
 
 function App() {
+  const { user } = useAuth();
+  
+  // Helper to redirect to the appropriate dashboard based on role
+  const RedirectToDashboard = () => {
+    const { isAuthenticated, user } = useAuth();
+    
+    if (isAuthenticated && user) {
+      return <Navigate to={`/${user.role}`} replace />;
+    }
+    
+    return <Navigate to="/" replace />;
+  };
+
   return (
     <AuthProvider>
       <Router>
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/auth" element={<Auth />} />
+          
+          {/* Dashboard redirect route */}
+          <Route path="/dashboard" element={<RedirectToDashboard />} />
           
           {/* Public pages */}
           <Route path="/how-it-works" element={<HowItWorks />} />
