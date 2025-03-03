@@ -8,11 +8,36 @@ import { fadeIn } from "@/utils/animations";
 
 const HeroSection = () => {
   const [isLoaded, setIsLoaded] = useState(false);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const navigate = useNavigate();
   const { isAuthenticated, user } = useAuth();
+  
+  const deliveryImages = [
+    {
+      src: "/lovable-uploads/7e72fc0f-d1c8-4f3c-9814-9a8022212eae.png",
+      alt: "Bicycle delivery"
+    },
+    {
+      src: "/lovable-uploads/c7aa382d-b0a6-46f9-8d0b-a005dc3cfe47.png",
+      alt: "Walking delivery"
+    },
+    {
+      src: "/lovable-uploads/115d316a-f5dd-4b56-8743-232ee3b0c01f.png",
+      alt: "Electric bike delivery"
+    }
+  ];
 
   useEffect(() => {
     setIsLoaded(true);
+  }, []);
+
+  // Image carousel effect
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      setCurrentImageIndex((prevIndex) => (prevIndex + 1) % deliveryImages.length);
+    }, 5000); // Change image every 5 seconds
+
+    return () => clearInterval(intervalId); // Clean up interval on unmount
   }, []);
 
   // Function to navigate to the appropriate dashboard or auth page
@@ -98,12 +123,19 @@ const HeroSection = () => {
             <div className="relative px-6 lg:px-0">
               <div className="absolute -top-10 -left-10 w-full h-full bg-primary/20 rounded-2xl transform -rotate-6"></div>
               <div className="glass rounded-2xl overflow-hidden relative z-10">
-                <img
-                  src="https://images.unsplash.com/photo-1487887235947-a955ef187fcc?auto=format&fit=crop&q=80&w=1000"
-                  alt="Eco-friendly delivery drone"
-                  className="w-full h-auto object-cover"
-                  loading="lazy"
-                />
+                {deliveryImages.map((image, index) => (
+                  <div 
+                    key={index} 
+                    className={`transition-opacity duration-700 absolute inset-0 ${currentImageIndex === index ? 'opacity-100' : 'opacity-0'}`}
+                  >
+                    <img
+                      src={image.src}
+                      alt={image.alt}
+                      className="w-full h-auto object-cover"
+                      loading={index === 0 ? "eager" : "lazy"}
+                    />
+                  </div>
+                ))}
               </div>
             </div>
           </div>
