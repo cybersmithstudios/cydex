@@ -18,7 +18,7 @@ const Auth = () => {
   const [role, setRole] = useState("customer");
   const [isSubmitting, setIsSubmitting] = useState(false);
   
-  const { login, signup, isAuthenticated, user } = useAuth();
+  const { login, register, isAuthenticated, user } = useAuth();
   const location = useLocation();
   
   // If user is already logged in, redirect to their dashboard
@@ -60,7 +60,7 @@ const Auth = () => {
     
     setIsSubmitting(true);
     try {
-      await signup(signupName, signupEmail, signupPassword, role);
+      await register(signupName, signupEmail, signupPassword, role);
       toast.success("Account created successfully! Please log in.");
       // Reset form
       setSignupName("");
