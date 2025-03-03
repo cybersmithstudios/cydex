@@ -192,7 +192,7 @@ const Auth = () => {
                     id="role"
                     className="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
                     value={role}
-                    onChange={(e) => setRole(e.target.value)}
+                    onChange={(e) => setRole(e.target.value as UserRole)}
                   >
                     <option value="customer">Customer</option>
                     <option value="rider">Rider</option>
