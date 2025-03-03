@@ -38,7 +38,7 @@ const HeroSection = () => {
     }, 5000); // Change image every 5 seconds
 
     return () => clearInterval(intervalId); // Clean up interval on unmount
-  }, []);
+  }, [deliveryImages.length]);
 
   // Function to navigate to the appropriate dashboard or auth page
   const handleSignUp = () => {
