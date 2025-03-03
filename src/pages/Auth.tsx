@@ -1,13 +1,12 @@
 
-import React, { useState, useEffect } from "react";
-import { useAuth, UserRole } from "@/contexts/AuthContext";
-import { Navigate, useLocation, useNavigate } from "react-router-dom";
+import React, { useState } from "react";
+import { useAuth } from "@/contexts/AuthContext";
+import { Navigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
-import { useSearchParams } from "react-router-dom";
 
 const Auth = () => {
   const [loginEmail, setLoginEmail] = useState("");
@@ -16,30 +15,16 @@ const Auth = () => {
   const [signupEmail, setSignupEmail] = useState("");
   const [signupPassword, setSignupPassword] = useState("");
   const [signupConfirmPassword, setSignupConfirmPassword] = useState("");
-  const [role, setRole] = useState<UserRole>("customer");
+  const [role, setRole] = useState("customer");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [activeTab, setActiveTab] = useState("login");
   
-  const { login, register, isAuthenticated, user } = useAuth();
+  const { login, signup, isAuthenticated, user } = useAuth();
   const location = useLocation();
-  const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
-  
-  // Set active tab based on URL parameter
-  useEffect(() => {
-    const tab = searchParams.get('tab');
-    if (tab === 'register' || tab === 'login') {
-      setActiveTab(tab);
-    }
-  }, [searchParams]);
   
   // If user is already logged in, redirect to their dashboard
-  useEffect(() => {
-    if (isAuthenticated && user) {
-      // Redirect to role-specific dashboard
-      navigate(`/${user.role}`);
-    }
-  }, [isAuthenticated, user, navigate]);
+  if (isAuthenticated && user) {
+    return <Navigate to={`/${user.role}`} replace />;
+  }
   
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -51,9 +36,10 @@ const Auth = () => {
     setIsSubmitting(true);
     try {
       await login(loginEmail, loginPassword);
-      // Redirect will happen automatically due to the useEffect above
+      // Redirect will happen automatically due to the conditional above
     } catch (error) {
       console.error("Login failed:", error);
+      toast.error("Login failed. Please check your credentials.");
     } finally {
       setIsSubmitting(false);
     }
@@ -74,10 +60,8 @@ const Auth = () => {
     
     setIsSubmitting(true);
     try {
-      await register(signupName, signupEmail, signupPassword, role);
-      toast.success("Account created successfully! Please verify your email to continue.");
-      // Switch to login tab
-      setActiveTab("login");
+      await signup(signupName, signupEmail, signupPassword, role);
+      toast.success("Account created successfully! Please log in.");
       // Reset form
       setSignupName("");
       setSignupEmail("");
@@ -85,34 +69,11 @@ const Auth = () => {
       setSignupConfirmPassword("");
     } catch (error) {
       console.error("Signup failed:", error);
+      toast.error("Signup failed. Please try again later.");
     } finally {
       setIsSubmitting(false);
     }
   };
-  
-  const handleForgotPassword = async () => {
-    if (!loginEmail) {
-      toast.error("Please enter your email address");
-      return;
-    }
-    
-    setIsSubmitting(true);
-    try {
-      const { resetPassword } = useAuth();
-      await resetPassword(loginEmail);
-      toast.success("Password reset link sent to your email");
-    } catch (error) {
-      console.error("Password reset failed:", error);
-      toast.error("Failed to send password reset email. Please try again.");
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-  
-  // If we're already authenticated, don't render the Auth page
-  if (isAuthenticated && user) {
-    return null; // The useEffect above will handle the redirection
-  }
   
   return (
     <div className="min-h-screen bg-gradient-to-b from-white to-gray-50 flex flex-col items-center justify-center p-4">
@@ -128,7 +89,7 @@ const Auth = () => {
         </div>
         
         <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
-          <Tabs value={activeTab} onValueChange={setActiveTab}>
+          <Tabs defaultValue="login">
             <TabsList className="grid w-full grid-cols-2 mb-6">
               <TabsTrigger value="login">Login</TabsTrigger>
               <TabsTrigger value="signup">Sign Up</TabsTrigger>
@@ -151,13 +112,9 @@ const Auth = () => {
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
                     <Label htmlFor="password">Password</Label>
-                    <button
-                      type="button"
-                      onClick={handleForgotPassword}
-                      className="text-xs text-primary hover:underline"
-                    >
+                    <a href="#" className="text-xs text-primary hover:underline">
                       Forgot password?
-                    </button>
+                    </a>
                   </div>
                   <Input
                     id="password"
@@ -235,7 +192,7 @@ const Auth = () => {
                     id="role"
                     className="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
                     value={role}
-                    onChange={(e) => setRole(e.target.value as UserRole)}
+                    onChange={(e) => setRole(e.target.value)}
                   >
                     <option value="customer">Customer</option>
                     <option value="rider">Rider</option>
