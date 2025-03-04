@@ -118,11 +118,11 @@ const HeroSection = () => {
           </div>
 
           <div
-            className={`lg:w-1/2 relative transition-all duration-1000 delay-300 transform ${isLoaded ? "translate-y-0 opacity-100" : "translate-y-20 opacity-0"}`}
+            className={`lg:w-1/2 w-full relative transition-all duration-1000 delay-300 transform ${isLoaded ? "translate-y-0 opacity-100" : "translate-y-20 opacity-0"}`}
           >
             <div className="relative px-6 lg:px-0">
               <div className="absolute -top-10 -left-10 w-full h-full bg-primary/20 rounded-2xl transform -rotate-6"></div>
-              <div className="glass rounded-2xl overflow-hidden relative z-10 w-full h-[400px] sm:h-[360px] md:h-[400px]">
+              <div className="glass rounded-2xl overflow-hidden relative z-10 w-full h-[300px] sm:h-[360px] md:h-[400px]">
                 {deliveryImages.map((image, index) => (
                   <div 
                     key={index} 
