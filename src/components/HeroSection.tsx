@@ -122,7 +122,7 @@ const HeroSection = () => {
           >
             <div className="relative px-6 lg:px-0">
               <div className="absolute -top-10 -left-10 w-full h-full bg-primary/20 rounded-2xl transform -rotate-6"></div>
-              <div className="glass rounded-2xl overflow-hidden relative z-10 h-[400px]">
+              <div className="glass rounded-2xl overflow-hidden relative z-10 w-full h-[400px] sm:h-[360px] md:h-[400px]">
                 {deliveryImages.map((image, index) => (
                   <div 
                     key={index} 
@@ -131,7 +131,7 @@ const HeroSection = () => {
                     <img
                       src={image.src}
                       alt={image.alt}
-                      className="w-full h-full object-cover"
+                      className="w-full h-full object-cover object-center"
                       loading={index === 0 ? "eager" : "lazy"}
                     />
                   </div>

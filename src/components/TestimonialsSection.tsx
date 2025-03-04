@@ -1,12 +1,13 @@
 
 import React, { useState, useEffect, useRef } from "react";
-import { ChevronLeft, ChevronRight, Star } from "lucide-react";
+import { ChevronLeft, ChevronRight, Star, User } from "lucide-react";
 
 interface TestimonialProps {
   quote: string;
   author: string;
   role: string;
-  avatar: string;
+  avatar?: string;
+  location?: string;
   rating: number;
 }
 
@@ -32,6 +33,41 @@ const testimonials: TestimonialProps[] = [
     avatar: "https://randomuser.me/api/portraits/women/3.jpg",
     rating: 4,
   },
+  {
+    quote: "As a small business owner in Ibadan, I was skeptical about eco-friendly delivery, but Cydex has exceeded my expectations. My customers appreciate the sustainable approach.",
+    author: "Adebayo Ogunlesi",
+    role: "Owner, Green Harvest Market",
+    location: "Ibadan, Nigeria",
+    rating: 5,
+  },
+  {
+    quote: "Cydex has helped our restaurant reduce delivery times while maintaining our commitment to sustainability. Their cyclists know Ibadan's streets better than anyone.",
+    author: "Funmi Adekunle",
+    role: "Manager, Spice Route Restaurant",
+    location: "Ibadan, Nigeria",
+    rating: 5,
+  },
+  {
+    quote: "I've seen my carbon credits grow each month with Cydex. It's encouraging to see tangible benefits from choosing green delivery options here in Ibadan.",
+    author: "Oluwaseun Bankole",
+    role: "Logistics Coordinator, Tech Hub Ibadan",
+    location: "Ibadan, Nigeria",
+    rating: 4,
+  },
+  {
+    quote: "The customer service is exceptional. Whenever there's been an issue with a delivery, the Cydex team resolves it immediately.",
+    author: "Chika Nwosu",
+    role: "E-commerce Director, Naija Crafts",
+    location: "Ibadan, Nigeria",
+    rating: 5,
+  },
+  {
+    quote: "As a university bookstore, we need reliable and quick deliveries. Cydex riders navigate UI campus effortlessly, even during exams week!",
+    author: "Dr. Tunde Oladipo",
+    role: "Manager, UI Bookstore",
+    location: "Ibadan, Nigeria",
+    rating: 5,
+  }
 ];
 
 const TestimonialsSection = () => {
@@ -132,14 +168,20 @@ const TestimonialsSection = () => {
               >
                 <div className="flex flex-col md:flex-row items-center md:items-start gap-6 md:gap-10">
                   <div className="flex-shrink-0">
-                    <div className="w-20 h-20 rounded-full overflow-hidden border-2 border-primary/30">
-                      <img
-                        src={testimonial.avatar}
-                        alt={testimonial.author}
-                        className="w-full h-full object-cover"
-                        loading="lazy"
-                      />
-                    </div>
+                    {testimonial.avatar ? (
+                      <div className="w-20 h-20 rounded-full overflow-hidden border-2 border-primary/30">
+                        <img
+                          src={testimonial.avatar}
+                          alt={testimonial.author}
+                          className="w-full h-full object-cover"
+                          loading="lazy"
+                        />
+                      </div>
+                    ) : (
+                      <div className="w-20 h-20 rounded-full flex items-center justify-center bg-primary/20 border-2 border-primary/30">
+                        <User size={36} className="text-primary" />
+                      </div>
+                    )}
                   </div>
                   
                   <div className="flex-1">
@@ -161,7 +203,10 @@ const TestimonialsSection = () => {
                     
                     <div>
                       <p className="font-semibold">{testimonial.author}</p>
-                      <p className="text-gray-500 text-sm">{testimonial.role}</p>
+                      <p className="text-gray-500 text-sm">
+                        {testimonial.role}
+                        {testimonial.location && ` • ${testimonial.location}`}
+                      </p>
                     </div>
                   </div>
                 </div>
