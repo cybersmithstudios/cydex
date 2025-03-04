@@ -1,8 +1,5 @@
 
 import React from "react";
-import { Link } from "react-router-dom";
-import { Home } from "lucide-react";
-import { Button } from "@/components/ui/button";
 
 interface AuthLayoutProps {
   children: React.ReactNode;
@@ -10,14 +7,7 @@ interface AuthLayoutProps {
 
 const AuthLayout: React.FC<AuthLayoutProps> = ({ children }) => {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-white to-gray-50 flex flex-col items-center justify-center p-4 relative">
-      <Link to="/" className="absolute top-8 left-8">
-        <Button variant="ghost" className="flex items-center gap-2">
-          <Home className="h-5 w-5" />
-          <span>Back to Home</span>
-        </Button>
-      </Link>
-      
+    <div className="min-h-screen bg-gradient-to-b from-white to-gray-50 flex flex-col items-center justify-center p-4">
       <div className="w-full max-w-md">
         <div className="mb-8 text-center">
           <img 

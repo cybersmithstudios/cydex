@@ -1,90 +1,260 @@
 
-import React from "react";
+import React, { useEffect } from "react";
+import { motion } from "framer-motion";
 import Navbar from "@/components/Navbar";
-import AboutUsHero from "@/components/AboutUsHero";
 import FooterSection from "@/components/FooterSection";
+import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router-dom";
+import { Bike, Leaf, Lightbulb, Users, ArrowRight } from "lucide-react";
 
 const AboutUs = () => {
+  const navigate = useNavigate();
+  
+  // Scroll to top on page load
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   return (
-    <div>
+    <div className="min-h-screen bg-white">
       <Navbar />
-      <AboutUsHero />
       
-      {/* Main Content */}
-      <section className="py-16 bg-white">
+      {/* Hero Section */}
+      <section className="pt-32 pb-16 bg-gradient-to-b from-white to-gray-50 relative overflow-hidden">
+        <div className="absolute inset-0 z-0 opacity-10">
+          <img 
+            src="https://images.unsplash.com/photo-1501854140801-50d01698950b" 
+            alt="Green landscape" 
+            className="object-cover w-full h-full"
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-white via-transparent to-white"></div>
+        </div>
+        
+        <div className="container mx-auto px-6 text-center relative z-10">
+          <motion.h1 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6"
+          >
+            Redefining <span className="text-primary">Sustainable</span> Logistics
+          </motion.h1>
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.1 }}
+            className="text-xl text-gray-600 max-w-3xl mx-auto mb-8"
+          >
+            Cydex is committed to reducing carbon emissions while offering seamless delivery experiences.
+          </motion.p>
+        </div>
+      </section>
+      
+      {/* Our Story Section */}
+      <section className="py-20 bg-white">
         <div className="container mx-auto px-6">
-          <div className="max-w-4xl mx-auto">
-            <h2 className="text-3xl font-bold mb-8 text-center">Our Story</h2>
-            
-            <div className="prose prose-lg max-w-none">
-              <p>
-                Founded in 2023 in Ibadan, Nigeria, Cydex was born from a simple yet powerful idea: 
-                to revolutionize package delivery in Africa's growing cities while addressing the 
-                pressing issue of carbon emissions from traditional logistics operations.
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <div>
+              <h2 className="text-3xl font-bold mb-6">Our Story</h2>
+              <p className="text-gray-600 mb-4">
+                Cydex was born out of a simple observation: while the world was embracing e-commerce and on-demand deliveries, the environmental impact of this convenience was being ignored.
               </p>
-              
-              <p>
-                Our founder, Adebayo Olamide, witnessed firsthand the environmental impact of 
-                conventional delivery methods while working in Lagos's bustling e-commerce sector. 
-                As someone passionate about environmental sustainability, Adebayo envisioned a 
-                delivery service that could maintain the efficiency and reliability that customers 
-                expect while dramatically reducing the carbon footprint.
+              <p className="text-gray-600 mb-4">
+                In 2020, our founders, a group of environmental scientists and tech entrepreneurs, joined forces with a mission to transform the logistics industry. They envisioned a platform where sustainability and efficiency could coexist.
               </p>
-              
-              <h3 className="text-2xl font-semibold mt-8 mb-4">From Vision to Reality</h3>
-              
-              <p>
-                Teaming up with environmental scientists, logistics experts, and tech innovators, 
-                Adebayo established Cydex with a commitment to zero-emission delivery vehicles, 
-                optimized route planning, and sustainable packaging solutions. The company began 
-                with a small fleet of electric bikes in Ibadan, focusing initially on document 
-                delivery and small packages.
+              <p className="text-gray-600 mb-4">
+                Starting with just three electric bikes in a single neighborhood, Cydex has grown into a comprehensive eco-friendly delivery network spanning multiple cities, with thousands of riders and partnered businesses.
               </p>
-              
-              <p>
-                Word quickly spread about the reliable service that was also helping to reduce 
-                urban pollution. As demand grew, so did our team and our fleet. Today, Cydex 
-                operates in major Nigerian cities, with plans to expand across West Africa.
-              </p>
-              
-              <h3 className="text-2xl font-semibold mt-8 mb-4">Making an Impact</h3>
-              
-              <p>
-                Since our inception, we've completed over 500,000 deliveries without relying on 
-                fossil fuels. Our carbon offset initiatives have planted more than 10,000 trees 
-                across Nigeria, and we've partnered with local recycling programs to ensure our 
-                packaging materials never end up in landfills.
-              </p>
-              
-              <p>
-                But we're most proud of the community we've built. Our network of riders, mostly 
-                young Nigerians passionate about environmental conservation, has found sustainable 
-                employment while contributing to a greener future. Many of our corporate clients 
-                have been inspired to adopt more eco-friendly practices across their operations 
-                after partnering with us.
-              </p>
-              
-              <h3 className="text-2xl font-semibold mt-8 mb-4">Looking Ahead</h3>
-              
-              <p>
-                As we continue to grow, our commitment to sustainability only strengthens. We're 
-                investing in research and development to further reduce our environmental impact, 
-                exploring solar-powered delivery vehicles, and developing even more efficient 
-                routing algorithms.
-              </p>
-              
-              <p>
-                Our vision for the future includes expanding our services to every major city in 
-                Africa, establishing Cydex as the continent's premier eco-friendly logistics provider, 
-                and demonstrating that business success and environmental responsibility can go 
-                hand in hand.
-              </p>
-              
-              <p>
-                Join us on our journey to transform logistics while preserving our planet for 
-                future generations.
+              <p className="text-gray-600">
+                Today, we're proud to have saved over 1.5 million kg of CO₂ emissions through our zero-emission delivery network.
               </p>
             </div>
+            
+            <div className="relative">
+              <div className="absolute -top-6 -right-6 bg-primary/20 w-full h-full rounded-2xl transform rotate-3 z-0"></div>
+              <div className="glass rounded-2xl overflow-hidden relative z-10">
+                <img 
+                  src="https://images.unsplash.com/photo-1487887235947-a955ef187fcc" 
+                  alt="Eco-friendly delivery drone" 
+                  className="w-full h-auto"
+                />
+              </div>
+            </div>
+          </div>
+          
+          {/* Timeline */}
+          <div className="mt-20">
+            <h3 className="text-2xl font-bold mb-10 text-center">Our Journey</h3>
+            
+            <div className="relative border-l-2 border-gray-200 ml-6 md:ml-0 md:mx-auto md:max-w-3xl pl-6 md:pl-0">
+              <div className="md:flex md:items-center mb-12">
+                <div className="md:w-1/2 md:pr-8 md:text-right">
+                  <h4 className="text-xl font-semibold mb-1">2020</h4>
+                  <p className="text-gray-600">Cydex founded with a mission to create sustainable deliveries</p>
+                </div>
+                <div className="absolute left-[-8px] md:left-1/2 md:ml-[-8px] bg-primary w-4 h-4 rounded-full border-4 border-white"></div>
+                <div className="md:w-1/2 md:pl-8 hidden md:block"></div>
+              </div>
+              
+              <div className="md:flex md:items-center mb-12">
+                <div className="md:w-1/2 md:pr-8 hidden md:block"></div>
+                <div className="absolute left-[-8px] md:left-1/2 md:ml-[-8px] bg-primary w-4 h-4 rounded-full border-4 border-white"></div>
+                <div className="md:w-1/2 md:pl-8">
+                  <h4 className="text-xl font-semibold mb-1">2021</h4>
+                  <p className="text-gray-600">Launched carbon credit system and expanded to 5 major cities</p>
+                </div>
+              </div>
+              
+              <div className="md:flex md:items-center mb-12">
+                <div className="md:w-1/2 md:pr-8 md:text-right">
+                  <h4 className="text-xl font-semibold mb-1">2022</h4>
+                  <p className="text-gray-600">Introduced AI-powered route optimization and sustainable packaging</p>
+                </div>
+                <div className="absolute left-[-8px] md:left-1/2 md:ml-[-8px] bg-primary w-4 h-4 rounded-full border-4 border-white"></div>
+                <div className="md:w-1/2 md:pl-8 hidden md:block"></div>
+              </div>
+              
+              <div className="md:flex md:items-center">
+                <div className="md:w-1/2 md:pr-8 hidden md:block"></div>
+                <div className="absolute left-[-8px] md:left-1/2 md:ml-[-8px] bg-primary w-4 h-4 rounded-full border-4 border-white"></div>
+                <div className="md:w-1/2 md:pl-8">
+                  <h4 className="text-xl font-semibold mb-1">2023-Present</h4>
+                  <p className="text-gray-600">Nationwide expansion with over 10,000 riders and 1,000+ partnered businesses</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+      
+      {/* Our Mission & Values */}
+      <section className="py-20 bg-gray-50">
+        <div className="container mx-auto px-6">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl font-bold mb-4">Our Mission & Values</h2>
+            <p className="text-gray-600 max-w-3xl mx-auto">
+              At Cydex, we're driven by more than just making deliveries. We're committed to transforming logistics through sustainable practices and innovative technology.
+            </p>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="bg-white rounded-xl p-8 shadow-md border border-gray-100 hover:shadow-lg transition-shadow">
+              <div className="bg-primary/10 p-4 rounded-full inline-block mb-6">
+                <Leaf className="h-8 w-8 text-primary" />
+              </div>
+              <h3 className="text-xl font-bold mb-4">Sustainability</h3>
+              <p className="text-gray-600">
+                We prioritize green logistics in every aspect of our operations, from zero-emission transportation to eco-friendly packaging solutions.
+              </p>
+            </div>
+            
+            <div className="bg-white rounded-xl p-8 shadow-md border border-gray-100 hover:shadow-lg transition-shadow">
+              <div className="bg-primary/10 p-4 rounded-full inline-block mb-6">
+                <Lightbulb className="h-8 w-8 text-primary" />
+              </div>
+              <h3 className="text-xl font-bold mb-4">Innovation</h3>
+              <p className="text-gray-600">
+                Our AI-powered route optimization, carbon tracking, and sustainable packaging technologies push the boundaries of what's possible in green logistics.
+              </p>
+            </div>
+            
+            <div className="bg-white rounded-xl p-8 shadow-md border border-gray-100 hover:shadow-lg transition-shadow">
+              <div className="bg-primary/10 p-4 rounded-full inline-block mb-6">
+                <Users className="h-8 w-8 text-primary" />
+              </div>
+              <h3 className="text-xl font-bold mb-4">Community</h3>
+              <p className="text-gray-600">
+                We're building a global community of eco-conscious customers, riders, and businesses, rewarding everyone for making sustainable choices.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+      
+      {/* Meet the Team */}
+      <section className="py-20 bg-white">
+        <div className="container mx-auto px-6">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl font-bold mb-4">Meet Our Team</h2>
+            <p className="text-gray-600 max-w-3xl mx-auto">
+              The passionate individuals behind Cydex are united by a common mission to revolutionize the delivery industry through sustainability.
+            </p>
+          </div>
+          
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+            {[1, 2, 3, 4].map((i) => (
+              <div key={i} className="text-center">
+                <div className="relative mb-4 mx-auto w-40 h-40 rounded-full overflow-hidden">
+                  <img 
+                    src={`https://api.dicebear.com/7.x/personas/svg?seed=${100+i}`}
+                    alt={`Team member ${i}`}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <h3 className="text-xl font-bold">{
+                  i === 1 ? "Alex Taylor" : 
+                  i === 2 ? "Morgan Chen" : 
+                  i === 3 ? "Jordan Smith" : "Sam Rodriguez"
+                }</h3>
+                <p className="text-primary font-medium">{
+                  i === 1 ? "CEO & Co-Founder" : 
+                  i === 2 ? "CTO & Co-Founder" : 
+                  i === 3 ? "Head of Sustainability" : "Operations Director"
+                }</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+      
+      {/* Our Partners */}
+      <section className="py-20 bg-gray-50">
+        <div className="container mx-auto px-6">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl font-bold mb-4">Our Partners & Certifications</h2>
+            <p className="text-gray-600 max-w-3xl mx-auto">
+              We collaborate with leading environmental organizations and industry partners to maximize our positive impact.
+            </p>
+          </div>
+          
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 items-center justify-items-center">
+            {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
+              <div key={i} className="bg-white p-6 rounded-xl shadow-md w-full max-w-[180px] h-[100px] flex items-center justify-center">
+                <div className="bg-gray-200 w-full h-12 rounded flex items-center justify-center">
+                  <span className="text-gray-500 font-medium">Partner {i}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+      
+      {/* CTA Section */}
+      <section className="py-20 bg-primary/10">
+        <div className="container mx-auto px-6 text-center">
+          <h2 className="text-3xl md:text-4xl font-bold mb-6">
+            Join Us in Making a Difference
+          </h2>
+          <p className="text-xl text-gray-600 max-w-3xl mx-auto mb-10">
+            Be part of our mission to create a sustainable future for deliveries.
+          </p>
+          
+          <div className="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-4">
+            <Button 
+              className="primary-button hover:scale-105" 
+              onClick={() => navigate("/auth?tab=register")}
+            >
+              Sign Up
+              <ArrowRight className="ml-2 h-5 w-5" />
+            </Button>
+            
+            <Button 
+              variant="outline" 
+              className="secondary-button hover:scale-105"
+              onClick={() => navigate("/contact")}
+            >
+              Become a Partner
+            </Button>
           </div>
         </div>
       </section>
