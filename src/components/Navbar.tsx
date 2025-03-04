@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate, Link } from "react-router-dom";
@@ -13,6 +12,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Shield, LogOut, User, Settings, BarChart, Menu, X, ChevronDown } from "lucide-react";
+import ThemeSwitcher from "@/components/ThemeSwitcher";
 
 const Navbar = () => {
   const { user, logout, isAuthenticated } = useAuth();
@@ -20,7 +20,6 @@ const Navbar = () => {
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  // Handle scroll effect for navbar
   useEffect(() => {
     const handleScroll = () => {
       const isScrolled = window.scrollY > 20;
@@ -35,20 +34,17 @@ const Navbar = () => {
     };
   }, [scrolled]);
 
-  // Navigate to dashboard based on user role
   const goToDashboard = () => {
     if (user) {
       navigate(`/${user.role}`);
     }
   };
 
-  // Handle logout
   const handleLogout = () => {
     logout();
     navigate("/");
   };
 
-  // Get initials for avatar fallback
   const getInitials = (name: string) => {
     return name
       .split(" ")
@@ -65,12 +61,11 @@ const Navbar = () => {
     <header
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
         scrolled
-          ? "bg-white/90 backdrop-blur-md py-4 shadow-sm"
+          ? "bg-white/90 dark:bg-gray-900/90 backdrop-blur-md py-4 shadow-sm"
           : "bg-transparent py-6"
       }`}
     >
       <div className="container max-w-screen-xl mx-auto px-4 flex justify-between items-center">
-        {/* Logo */}
         <div className="flex items-center">
           <Link to="/" className="flex items-center">
             <img 
@@ -81,7 +76,6 @@ const Navbar = () => {
           </Link>
         </div>
 
-        {/* Desktop Navigation */}
         <nav className="hidden md:flex items-center space-x-4 lg:space-x-8">
           <Link to="/" className="nav-link text-sm lg:text-base">
             Home
@@ -100,7 +94,6 @@ const Navbar = () => {
           </Link>
         </nav>
 
-        {/* Tablet Navigation Dropdown */}
         <div className="hidden sm:flex md:hidden">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -128,7 +121,6 @@ const Navbar = () => {
           </DropdownMenu>
         </div>
 
-        {/* Mobile menu button */}
         <button 
           className="sm:hidden p-2 rounded-md focus:outline-none" 
           onClick={toggleMobileMenu}
@@ -140,8 +132,9 @@ const Navbar = () => {
           )}
         </button>
 
-        {/* Auth Buttons or User Menu */}
         <div className="hidden sm:flex items-center space-x-4">
+          <ThemeSwitcher variant="ghost" size="icon" />
+          
           {isAuthenticated && user ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -214,9 +207,8 @@ const Navbar = () => {
         </div>
       </div>
 
-      {/* Mobile Navigation Menu */}
       {mobileMenuOpen && (
-        <div className="sm:hidden absolute top-full left-0 right-0 bg-white shadow-md p-4 z-50 animate-fade-in">
+        <div className="sm:hidden absolute top-full left-0 right-0 bg-white dark:bg-gray-900 shadow-md p-4 z-50 animate-fade-in">
           <nav className="flex flex-col space-y-4">
             <Link to="/" className="p-2 hover:bg-gray-100 rounded-md" onClick={() => setMobileMenuOpen(false)}>
               Home
@@ -234,7 +226,11 @@ const Navbar = () => {
               Contact Us
             </Link>
             
-            {/* Mobile auth buttons */}
+            <div className="flex items-center justify-between p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-md">
+              <span>Theme</span>
+              <ThemeSwitcher variant="ghost" size="sm" />
+            </div>
+            
             {isAuthenticated && user ? (
               <>
                 <div className="border-t my-2 pt-2"></div>

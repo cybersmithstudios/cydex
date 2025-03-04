@@ -8,6 +8,7 @@ import RiderDashboard from './pages/rider/RiderDashboard';
 import VendorDashboard from './pages/vendor/VendorDashboard';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
+import { ThemeProvider } from './contexts/ThemeContext';
 import { Toaster } from './components/ui/sonner';
 import HowItWorks from './pages/HowItWorks';
 import AboutUs from './pages/AboutUs';
@@ -44,62 +45,64 @@ const ProtectedRoute = ({
 function App() {
   return (
     <AuthProvider>
-      <Router>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/auth" element={<Auth />} />
-          
-          {/* Public pages */}
-          <Route path="/how-it-works" element={<HowItWorks />} />
-          <Route path="/about" element={<AboutUs />} />
-          <Route path="/faq" element={<Faq />} />
-          <Route path="/contact" element={<Contact />} />
-          
-          {/* Protected customer routes */}
-          <Route 
-            path="/customer/*" 
-            element={
-              <ProtectedRoute allowedRoles={['customer']}>
-                <CustomerDashboard />
-              </ProtectedRoute>
-            } 
-          />
-          
-          {/* Protected rider routes */}
-          <Route 
-            path="/rider/*" 
-            element={
-              <ProtectedRoute allowedRoles={['rider']}>
-                <RiderDashboard />
-              </ProtectedRoute>
-            } 
-          />
-          
-          {/* Protected vendor routes */}
-          <Route 
-            path="/vendor/*" 
-            element={
-              <ProtectedRoute allowedRoles={['vendor']}>
-                <VendorDashboard />
-              </ProtectedRoute>
-            } 
-          />
-          
-          {/* Protected admin routes */}
-          <Route 
-            path="/admin/*" 
-            element={
-              <ProtectedRoute allowedRoles={['admin']}>
-                <AdminDashboard />
-              </ProtectedRoute>
-            } 
-          />
-          
-          {/* Catch-all route for 404 */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-        <Toaster />
-      </Router>
+      <ThemeProvider>
+        <Router>
+          <Routes>
+            <Route path="/" element={<Index />} />
+            <Route path="/auth" element={<Auth />} />
+            
+            {/* Public pages */}
+            <Route path="/how-it-works" element={<HowItWorks />} />
+            <Route path="/about" element={<AboutUs />} />
+            <Route path="/faq" element={<Faq />} />
+            <Route path="/contact" element={<Contact />} />
+            
+            {/* Protected customer routes */}
+            <Route 
+              path="/customer/*" 
+              element={
+                <ProtectedRoute allowedRoles={['customer']}>
+                  <CustomerDashboard />
+                </ProtectedRoute>
+              } 
+            />
+            
+            {/* Protected rider routes */}
+            <Route 
+              path="/rider/*" 
+              element={
+                <ProtectedRoute allowedRoles={['rider']}>
+                  <RiderDashboard />
+                </ProtectedRoute>
+              } 
+            />
+            
+            {/* Protected vendor routes */}
+            <Route 
+              path="/vendor/*" 
+              element={
+                <ProtectedRoute allowedRoles={['vendor']}>
+                  <VendorDashboard />
+                </ProtectedRoute>
+              } 
+            />
+            
+            {/* Protected admin routes */}
+            <Route 
+              path="/admin/*" 
+              element={
+                <ProtectedRoute allowedRoles={['admin']}>
+                  <AdminDashboard />
+                </ProtectedRoute>
+              } 
+            />
+            
+            {/* Catch-all route for 404 */}
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+          <Toaster />
+        </Router>
+      </ThemeProvider>
     </AuthProvider>
   );
 }
