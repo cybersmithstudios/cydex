@@ -5,6 +5,13 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAuth, UserRole } from "@/contexts/AuthContext";
 import { toast } from "sonner";
+import { 
+  Select, 
+  SelectContent, 
+  SelectItem, 
+  SelectTrigger, 
+  SelectValue 
+} from "@/components/ui/select";
 
 const SignupForm = () => {
   const [signupName, setSignupName] = useState("");
@@ -29,18 +36,24 @@ const SignupForm = () => {
       return;
     }
     
+    if (signupPassword.length < 6) {
+      toast.error("Password must be at least 6 characters");
+      return;
+    }
+    
     setIsSubmitting(true);
     try {
       await register(signupName, signupEmail, signupPassword, role);
-      toast.success("Account created successfully! Please log in.");
+      
       // Reset form
       setSignupName("");
       setSignupEmail("");
       setSignupPassword("");
       setSignupConfirmPassword("");
+      setRole("customer");
     } catch (error) {
       console.error("Signup failed:", error);
-      toast.error("Signup failed. Please try again later.");
+      // Error toast is already shown in the register function
     } finally {
       setIsSubmitting(false);
     }
@@ -98,16 +111,16 @@ const SignupForm = () => {
       
       <div className="space-y-2">
         <Label htmlFor="role">I want to join as a</Label>
-        <select
-          id="role"
-          className="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
-          value={role}
-          onChange={(e) => setRole(e.target.value as UserRole)}
-        >
-          <option value="customer">Customer</option>
-          <option value="rider">Rider</option>
-          <option value="vendor">Vendor</option>
-        </select>
+        <Select value={role} onValueChange={(value) => setRole(value as UserRole)}>
+          <SelectTrigger id="role" className="w-full">
+            <SelectValue placeholder="Select your role" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="customer">Customer</SelectItem>
+            <SelectItem value="rider">Rider</SelectItem>
+            <SelectItem value="vendor">Vendor</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
       
       <Button

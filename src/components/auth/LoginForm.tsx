@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
+import { Link } from "react-router-dom";
 
 const LoginForm = () => {
   const [loginEmail, setLoginEmail] = useState("");
@@ -26,7 +27,7 @@ const LoginForm = () => {
       // Redirect will happen automatically due to the conditional in Auth.tsx
     } catch (error) {
       console.error("Login failed:", error);
-      toast.error("Login failed. Please check your credentials.");
+      // Error toast is already shown in the login function
     } finally {
       setIsSubmitting(false);
     }
@@ -49,9 +50,9 @@ const LoginForm = () => {
       <div className="space-y-2">
         <div className="flex items-center justify-between">
           <Label htmlFor="password">Password</Label>
-          <a href="#" className="text-xs text-primary hover:underline">
+          <Link to="/auth/reset-password" className="text-xs text-primary hover:underline">
             Forgot password?
-          </a>
+          </Link>
         </div>
         <Input
           id="password"

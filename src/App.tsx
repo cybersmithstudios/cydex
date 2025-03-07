@@ -2,6 +2,7 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Index from './pages/Index';
 import Auth from './pages/Auth';
+import ResetPassword from './pages/Auth/ResetPassword';
 import NotFound from './pages/NotFound';
 import CustomerDashboard from './pages/customer/CustomerDashboard';
 import RiderDashboard from './pages/rider/RiderDashboard';
@@ -50,6 +51,7 @@ function App() {
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<Auth />} />
+            <Route path="/auth/reset-password" element={<ResetPassword />} />
             
             {/* Public pages */}
             <Route path="/how-it-works" element={<HowItWorks />} />
