@@ -6,33 +6,11 @@ interface TestimonialProps {
   quote: string;
   author: string;
   role: string;
-  avatar?: string;
-  location?: string;
+  location: string;
   rating: number;
 }
 
 const testimonials: TestimonialProps[] = [
-  {
-    quote: "Cydex has completely transformed how our business handles deliveries. The carbon credit rewards are a game-changer for our sustainability goals.",
-    author: "Sarah Johnson",
-    role: "CEO, EcoStyle",
-    avatar: "https://randomuser.me/api/portraits/women/1.jpg",
-    rating: 5,
-  },
-  {
-    quote: "The real-time tracking is incredibly precise, and knowing our deliveries are eco-friendly gives us and our customers peace of mind.",
-    author: "Michael Chen",
-    role: "Operations Manager, GreenTech",
-    avatar: "https://randomuser.me/api/portraits/men/2.jpg",
-    rating: 5,
-  },
-  {
-    quote: "Since switching to Cydex, we've reduced our carbon footprint by 40%. Our customers love the sustainable approach to deliveries.",
-    author: "Emily Rodriguez",
-    role: "Sustainability Director, Terra Foods",
-    avatar: "https://randomuser.me/api/portraits/women/3.jpg",
-    rating: 4,
-  },
   {
     quote: "As a small business owner in Ibadan, I was skeptical about eco-friendly delivery, but Cydex has exceeded my expectations. My customers appreciate the sustainable approach.",
     author: "Adebayo Ogunlesi",
@@ -65,6 +43,27 @@ const testimonials: TestimonialProps[] = [
     quote: "As a university bookstore, we need reliable and quick deliveries. Cydex riders navigate UI campus effortlessly, even during exams week!",
     author: "Dr. Tunde Oladipo",
     role: "Manager, UI Bookstore",
+    location: "Ibadan, Nigeria",
+    rating: 5,
+  },
+  {
+    quote: "The eco-friendly approach aligns perfectly with our brand values. Our customers appreciate knowing their orders are delivered sustainably.",
+    author: "Amina Yusuf",
+    role: "Brand Manager, Natural Beauty",
+    location: "Ibadan, Nigeria",
+    rating: 5,
+  },
+  {
+    quote: "During last year's heavy rains, Cydex deliveries remained consistent when other services failed. Their commitment is impressive.",
+    author: "Emeka Okafor",
+    role: "Operations Lead, Ibadan Tech Solutions",
+    location: "Ibadan, Nigeria",
+    rating: 5,
+  },
+  {
+    quote: "My elderly mother relies on medication deliveries. Cydex's reliable service has given our family peace of mind.",
+    author: "Folake Adeyemi",
+    role: "Customer",
     location: "Ibadan, Nigeria",
     rating: 5,
   }
@@ -168,20 +167,9 @@ const TestimonialsSection = () => {
               >
                 <div className="flex flex-col md:flex-row items-center md:items-start gap-6 md:gap-10">
                   <div className="flex-shrink-0">
-                    {testimonial.avatar ? (
-                      <div className="w-20 h-20 rounded-full overflow-hidden border-2 border-primary/30">
-                        <img
-                          src={testimonial.avatar}
-                          alt={testimonial.author}
-                          className="w-full h-full object-cover"
-                          loading="lazy"
-                        />
-                      </div>
-                    ) : (
-                      <div className="w-20 h-20 rounded-full flex items-center justify-center bg-primary/20 border-2 border-primary/30">
-                        <User size={36} className="text-primary" />
-                      </div>
-                    )}
+                    <div className="w-20 h-20 rounded-full flex items-center justify-center bg-primary/20 border-2 border-primary/30">
+                      <User size={36} className="text-primary" />
+                    </div>
                   </div>
                   
                   <div className="flex-1">
@@ -204,8 +192,7 @@ const TestimonialsSection = () => {
                     <div>
                       <p className="font-semibold">{testimonial.author}</p>
                       <p className="text-gray-500 text-sm">
-                        {testimonial.role}
-                        {testimonial.location && ` • ${testimonial.location}`}
+                        {testimonial.role} • {testimonial.location}
                       </p>
                     </div>
                   </div>
