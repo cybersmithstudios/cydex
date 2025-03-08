@@ -41,7 +41,7 @@ const AboutUs = () => {
               transition={{ duration: 0.5 }}
               className="inline-block py-1 px-4 rounded-full bg-primary/10 mb-4"
             >
-              <p className="text-primary font-semibold text-sm sm:text-base">
+              <p className="text-primary drop-shadow-md font-semibold text-sm sm:text-base">
                 Our Story & Mission
               </p>
             </motion.div>
@@ -52,7 +52,7 @@ const AboutUs = () => {
               transition={{ duration: 0.5, delay: 0.1 }}
               className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight"
             >
-              Redefining <span className="text-primary drop-shadow-sm">Sustainable</span> Logistics
+              Redefining <span className="text-primary drop-shadow-md">Sustainable</span> Logistics
             </motion.h1>
             
             <motion.p
