@@ -71,7 +71,7 @@ const HeroSection = () => {
 
       <div className="container mx-auto px-4 sm:px-6 z-10">
         <div className="flex flex-col lg:flex-row items-center justify-center">
-          <div className="lg:w-1/2 lg:pr-12 space-y-5 mb-10 lg:mb-0 mx-auto">
+          <div className="lg:w-1/2 lg:pr-12 space-y-5 mb-10 lg:mb-0 text-center mx-auto">
             <div className={`transition-all duration-700 transform ${isLoaded ? "translate-y-0 opacity-100" : "translate-y-10 opacity-0"}`}>
               <p className="text-primary font-semibold mb-2 inline-block py-1 px-3 rounded-full bg-primary/10 text-sm sm:text-base">
                 Eco-Friendly Delivery Platform
@@ -81,7 +81,7 @@ const HeroSection = () => {
             <h1 className={`text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold leading-tight transition-all duration-700 delay-100 transform ${isLoaded ? "translate-y-0 opacity-100" : "translate-y-10 opacity-0"}`}>
               Delivering Packages,
               <br className="hidden sm:block" />
-              <span className="text-primary drop-shadow-md">Preserving Planet</span>
+              <span className="text-primary shadow-md">Preserving Planet</span>
             </h1>
 
             <p className={`text-base sm:text-lg text-gray-600 transition-all duration-700 delay-200 transform ${isLoaded ? "translate-y-0 opacity-100" : "translate-y-10 opacity-0"}`}>
