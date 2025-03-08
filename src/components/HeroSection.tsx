@@ -5,24 +5,32 @@ import { Button } from "@/components/ui/button";
 import { ChevronDown, ArrowRight } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { fadeIn } from "@/utils/animations";
+
 const HeroSection = () => {
   const [isLoaded, setIsLoaded] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const navigate = useNavigate();
+  
   const {
     isAuthenticated,
     user
   } = useAuth();
-  const deliveryImages = [{
-    src: "/lovable-uploads/7e72fc0f-d1c8-4f3c-9814-9a8022212eae.png",
-    alt: "Bicycle delivery"
-  }, {
-    src: "/lovable-uploads/c7aa382d-b0a6-46f9-8d0b-a005dc3cfe47.png",
-    alt: "Walking delivery"
-  }, {
-    src: "/lovable-uploads/115d316a-f5dd-4b56-8743-232ee3b0c01f.png",
-    alt: "Electric bike delivery"
-  }];
+  
+  const deliveryImages = [
+    {
+      src: "/lovable-uploads/7e72fc0f-d1c8-4f3c-9814-9a8022212eae.png",
+      alt: "Bicycle delivery"
+    },
+    {
+      src: "/lovable-uploads/c7aa382d-b0a6-46f9-8d0b-a005dc3cfe47.png",
+      alt: "Walking delivery"
+    },
+    {
+      src: "/lovable-uploads/115d316a-f5dd-4b56-8743-232ee3b0c01f.png",
+      alt: "Electric bike delivery"
+    }
+  ];
+
   useEffect(() => {
     setIsLoaded(true);
   }, []);
@@ -64,7 +72,9 @@ const HeroSection = () => {
       });
     }
   };
-  return <section className="relative min-h-screen flex items-center pt-24 pb-16 overflow-hidden bg-gradient-to-b from-white to-gray-50">
+
+  return (
+    <section className="relative min-h-screen flex items-center pt-24 pb-16 overflow-hidden bg-gradient-to-b from-white to-gray-50">
       <div className="absolute inset-0 z-0">
         <div className="absolute top-1/4 -right-20 w-96 h-96 bg-primary opacity-10 rounded-full filter blur-3xl animate-pulse-soft"></div>
         <div className="absolute -bottom-20 -left-20 w-96 h-96 bg-primary opacity-10 rounded-full filter blur-3xl"></div>
@@ -104,9 +114,11 @@ const HeroSection = () => {
             <div className="relative px-4 sm:px-6 lg:px-0 mt-8 lg:mt-0">
               <div className="absolute -top-5 sm:-top-10 -left-5 sm:-left-10 w-full h-full bg-primary/20 rounded-2xl transform -rotate-6"></div>
               <div className="glass rounded-2xl overflow-hidden relative z-10 w-full h-[250px] sm:h-[300px] md:h-[350px] lg:h-[400px]">
-                {deliveryImages.map((image, index) => <div key={index} className={`transition-opacity duration-700 absolute inset-0 ${currentImageIndex === index ? 'opacity-100' : 'opacity-0'}`}>
+                {deliveryImages.map((image, index) => (
+                  <div key={index} className={`transition-opacity duration-700 absolute inset-0 ${currentImageIndex === index ? 'opacity-100' : 'opacity-0'}`}>
                     <img src={image.src} alt={image.alt} className="w-full h-full object-cover object-center" loading={index === 0 ? "eager" : "lazy"} />
-                  </div>)}
+                  </div>
+                ))}
               </div>
             </div>
           </div>
@@ -114,9 +126,11 @@ const HeroSection = () => {
 
         <div className={`mt-10 flex items-center justify-center transition-all duration-700 delay-400 transform ${isLoaded ? "translate-y-0 opacity-100" : "translate-y-10 opacity-0"}`}>
           <div className="flex -space-x-2">
-            {[1, 2, 3, 4].map(i => <div key={i} className="w-8 h-8 sm:w-10 sm:h-10 rounded-full border-2 border-white overflow-hidden">
+            {[1, 2, 3, 4].map(i => (
+              <div key={i} className="w-8 h-8 sm:w-10 sm:h-10 rounded-full border-2 border-white overflow-hidden">
                 <img src={`https://api.dicebear.com/7.x/personas/svg?seed=${i}`} alt="User avatar" className="w-full h-full object-cover" />
-              </div>)}
+              </div>
+            ))}
           </div>
           <div className="ml-4">
             <p className="text-gray-600 text-xs sm:text-sm">
@@ -129,6 +143,8 @@ const HeroSection = () => {
           <ChevronDown size={30} className="animate-bounce text-primary" />
         </div>
       </div>
-    </section>;
+    </section>
+  );
 };
+
 export default HeroSection;

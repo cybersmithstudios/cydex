@@ -20,37 +20,81 @@ const HowItWorks = () => {
       <Navbar />
       
       {/* Hero Section */}
-      <section className="pt-32 pb-16 bg-gradient-to-b from-white to-gray-50">
-        <div className="container mx-auto px-6 text-center">
-          <motion.h1 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6"
-          >
-            Sustainable, Smart, & <span className="text-primary">Rewarding</span> Deliveries
-          </motion.h1>
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.1 }}
-            className="text-xl text-gray-600 max-w-3xl mx-auto mb-8"
-          >
-            Cydex helps you make a positive environmental impact while enjoying fast and cost-effective deliveries.
-          </motion.p>
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-          >
-            <Button 
-              className="primary-button hover:scale-105" 
-              onClick={() => navigate("/auth?tab=register")}
+      <section className="pt-32 pb-16 bg-gradient-to-b from-white to-gray-50 relative overflow-hidden">
+        {/* Background Elements */}
+        <div className="absolute inset-0 z-0">
+          <div className="absolute top-1/4 -right-20 w-96 h-96 bg-primary opacity-10 rounded-full filter blur-3xl animate-pulse-soft"></div>
+          <div className="absolute -bottom-20 -left-20 w-96 h-96 bg-primary opacity-10 rounded-full filter blur-3xl"></div>
+        </div>
+        
+        <div className="container mx-auto px-6 text-center lg:text-left relative z-10">
+          <div className="max-w-3xl mx-auto lg:mx-0">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+              className="inline-block py-1 px-4 rounded-full bg-primary/10 mb-4"
             >
-              Get Started
-              <ArrowRight className="ml-2 h-5 w-5" />
-            </Button>
-          </motion.div>
+              <p className="text-primary font-semibold text-sm sm:text-base">
+                Eco-Friendly Logistics Process
+              </p>
+            </motion.div>
+            
+            <motion.h1 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.1 }}
+              className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight"
+            >
+              Sustainable, Smart, & <span className="text-primary drop-shadow-sm">Rewarding</span> Deliveries
+            </motion.h1>
+            
+            <motion.p
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+              className="text-lg md:text-xl text-gray-600 mb-8 max-w-2xl mx-auto lg:mx-0"
+            >
+              Cydex helps you make a positive environmental impact while enjoying fast and cost-effective deliveries with benefits for customers, riders and vendors.
+            </motion.p>
+            
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.3 }}
+              className="flex flex-col sm:flex-row justify-center lg:justify-start gap-4"
+            >
+              <Button 
+                className="primary-button hover:scale-105" 
+                onClick={() => navigate("/auth?tab=register")}
+                size="lg"
+              >
+                Start Your Journey
+                <ArrowRight className="ml-2 h-5 w-5" />
+              </Button>
+              
+              <Button 
+                variant="outline" 
+                className="secondary-button hover:scale-105"
+                size="lg"
+                onClick={() => {
+                  const featuresSection = document.getElementById("features");
+                  if (featuresSection) {
+                    featuresSection.scrollIntoView({ behavior: "smooth" });
+                  }
+                }}
+              >
+                Explore How It Works
+              </Button>
+            </motion.div>
+          </div>
+        </div>
+        
+        {/* Decorative Elements */}
+        <div className="hidden lg:block absolute right-0 bottom-0 w-1/3 h-full z-0 opacity-20">
+          <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
+            <path fill="#10B981" d="M44.5,-76.3C59.1,-70.7,73.1,-60.8,81.6,-47.1C90.1,-33.4,93.2,-16.7,93.4,0.1C93.6,16.9,91,33.9,82.4,47.2C73.8,60.6,59.3,70.4,44.4,75.9C29.6,81.4,14.8,82.7,0.1,82.5C-14.6,82.4,-29.2,80.8,-43.7,75.4C-58.3,70,-72.8,60.7,-81.7,47.5C-90.6,34.2,-93.9,17.1,-92.8,0.6C-91.7,-15.9,-86.1,-31.7,-76.8,-45.3C-67.5,-58.9,-54.5,-70.3,-40.1,-76C-25.6,-81.8,-12.8,-81.9,1.5,-84.4C15.8,-86.8,31.6,-91.7,44.5,-87.4C57.5,-83.2,71.6,-69.7,73.2,-56.1C74.8,-42.5,63.9,-28.9,60.7,-16.7C57.5,-4.4,62,-2.2,66.5,2.3C71,6.9,75.5,13.8,75.5,20.1" transform="translate(100 100)" />
+          </svg>
         </div>
       </section>
       

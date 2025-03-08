@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { MessageSquare, Mail, Phone, MapPin, SendHorizonal, Facebook, Twitter, Instagram, Linkedin } from "lucide-react";
 import { toast } from "sonner";
+import { motion } from "framer-motion";
 import MapComponent from "@/components/MapComponent";
 
 const Contact = () => {
@@ -46,14 +47,79 @@ const Contact = () => {
       <Navbar />
       
       {/* Hero Section */}
-      <section className="pt-32 pb-16 bg-gradient-to-b from-white to-gray-50">
-        <div className="container mx-auto px-6 text-center">
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6">
-            We're Here to <span className="text-primary">Help</span>
-          </h1>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            Have questions or need assistance? Reach out to us!
-          </p>
+      <section className="pt-32 pb-16 bg-gradient-to-b from-white to-gray-50 relative overflow-hidden">
+        {/* Background Elements */}
+        <div className="absolute inset-0 z-0">
+          <div className="absolute top-1/4 -right-20 w-96 h-96 bg-primary opacity-10 rounded-full filter blur-3xl"></div>
+          <div className="absolute -bottom-20 -left-20 w-96 h-96 bg-primary opacity-10 rounded-full filter blur-3xl"></div>
+        </div>
+        
+        <div className="container mx-auto px-6 text-center relative z-10">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="inline-block py-1 px-4 rounded-full bg-primary/10 mb-4"
+          >
+            <p className="text-primary font-semibold text-sm sm:text-base">
+              Get In Touch
+            </p>
+          </motion.div>
+          
+          <motion.h1 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.1 }}
+            className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6"
+          >
+            We're Here to <span className="text-primary drop-shadow-sm">Help</span>
+          </motion.h1>
+          
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+            className="text-lg md:text-xl text-gray-600 max-w-2xl mx-auto mb-8"
+          >
+            Have questions about our services or want to join our mission? Our team is ready to assist you with any inquiries or feedback.
+          </motion.p>
+          
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.3 }}
+            className="flex flex-wrap justify-center gap-4 mb-6"
+          >
+            <div className="flex items-center bg-white rounded-full px-4 py-2 shadow-sm">
+              <Mail className="h-5 w-5 text-primary mr-2" />
+              <span className="text-gray-700">support@cydex.com.ng</span>
+            </div>
+            
+            <div className="flex items-center bg-white rounded-full px-4 py-2 shadow-sm">
+              <Phone className="h-5 w-5 text-primary mr-2" />
+              <span className="text-gray-700">+234 801 234 5678</span>
+            </div>
+          </motion.div>
+          
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.4 }}
+          >
+            <Button 
+              className="primary-button hover:scale-105"
+              size="lg"
+              onClick={() => {
+                const formSection = document.querySelector('.py-20.bg-white');
+                if (formSection) {
+                  formSection.scrollIntoView({ behavior: "smooth" });
+                }
+              }}
+            >
+              Send Us a Message
+              <SendHorizonal className="ml-2 h-5 w-5" />
+            </Button>
+          </motion.div>
         </div>
       </section>
       

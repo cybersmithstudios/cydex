@@ -21,32 +21,84 @@ const AboutUs = () => {
       
       {/* Hero Section */}
       <section className="pt-32 pb-16 bg-gradient-to-b from-white to-gray-50 relative overflow-hidden">
-        <div className="absolute inset-0 z-0 opacity-10">
+        {/* Background Elements */}
+        <div className="absolute inset-0 z-0">
+          <div className="absolute top-1/4 -right-20 w-96 h-96 bg-primary opacity-10 rounded-full filter blur-3xl"></div>
+          <div className="absolute -bottom-20 -left-20 w-96 h-96 bg-primary opacity-10 rounded-full filter blur-3xl"></div>
           <img 
             src="https://images.unsplash.com/photo-1501854140801-50d01698950b" 
             alt="Green landscape" 
-            className="object-cover w-full h-full"
+            className="object-cover w-full h-full opacity-10"
           />
-          <div className="absolute inset-0 bg-gradient-to-r from-white via-transparent to-white"></div>
+          <div className="absolute inset-0 bg-gradient-to-b from-white via-transparent to-white"></div>
         </div>
         
-        <div className="container mx-auto px-6 text-center relative z-10">
-          <motion.h1 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6"
-          >
-            Redefining <span className="text-primary">Sustainable</span> Logistics
-          </motion.h1>
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.1 }}
-            className="text-xl text-gray-600 max-w-3xl mx-auto mb-8"
-          >
-            Cydex is committed to reducing carbon emissions while offering seamless delivery experiences.
-          </motion.p>
+        <div className="container mx-auto px-6 text-center lg:text-left relative z-10">
+          <div className="max-w-3xl mx-auto lg:mx-0">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+              className="inline-block py-1 px-4 rounded-full bg-primary/10 mb-4"
+            >
+              <p className="text-primary font-semibold text-sm sm:text-base">
+                Our Story & Mission
+              </p>
+            </motion.div>
+            
+            <motion.h1 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.1 }}
+              className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight"
+            >
+              Redefining <span className="text-primary drop-shadow-sm">Sustainable</span> Logistics
+            </motion.h1>
+            
+            <motion.p
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+              className="text-lg md:text-xl text-gray-600 mb-8 max-w-2xl mx-auto lg:mx-0"
+            >
+              Since 2020, Cydex has been on a mission to transform the logistics industry by creating eco-friendly delivery solutions that don't compromise on speed or reliability.
+            </motion.p>
+            
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.3 }}
+              className="flex flex-col sm:flex-row justify-center lg:justify-start gap-4"
+            >
+              <Button 
+                className="primary-button hover:scale-105" 
+                onClick={() => navigate("/auth?tab=register")}
+                size="lg"
+              >
+                Join Our Movement
+                <ArrowRight className="ml-2 h-5 w-5" />
+              </Button>
+              
+              <Button 
+                variant="outline" 
+                className="secondary-button hover:scale-105"
+                size="lg"
+                onClick={() => {
+                  const storySection = document.querySelector('.py-20.bg-white');
+                  if (storySection) {
+                    storySection.scrollIntoView({ behavior: "smooth" });
+                  }
+                }}
+              >
+                Read Our Story
+              </Button>
+            </motion.div>
+          </div>
+          
+          {/* Decorative Elements */}
+          <div className="hidden lg:block absolute -right-20 top-40 opacity-30">
+            <Leaf className="w-40 h-40 text-primary" />
+          </div>
         </div>
       </section>
       
