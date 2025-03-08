@@ -1,11 +1,12 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Bell, Menu } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Link } from 'react-router-dom';
 import { User, MessageSquare, Settings, LogOut } from 'lucide-react';
 import { User as UserType } from '@/types/auth.types';
+import LogoutConfirmationDialog from '@/components/auth/LogoutConfirmationDialog';
 
 interface MobileHeaderProps {
   onMenuToggle: () => void;
@@ -20,6 +21,8 @@ const MobileHeader: React.FC<MobileHeaderProps> = ({
   userRole,
   handleLogout 
 }) => {
+  const [showLogoutDialog, setShowLogoutDialog] = useState(false);
+
   // Get role title for display
   const getRoleTitle = () => {
     switch (userRole) {
@@ -36,6 +39,15 @@ const MobileHeader: React.FC<MobileHeaderProps> = ({
     }
   };
 
+  const onLogoutClick = () => {
+    setShowLogoutDialog(true);
+  };
+
+  const onConfirmLogout = () => {
+    handleLogout();
+    setShowLogoutDialog(false);
+  };
+
   return (
     <div className="lg:hidden fixed top-0 left-0 right-0 z-50 bg-white border-b px-4 py-3 flex items-center justify-between">
       <div className="flex items-center">
@@ -45,8 +57,12 @@ const MobileHeader: React.FC<MobileHeaderProps> = ({
         >
           <Menu className="h-5 w-5" />
         </button>
-        <span className="text-xl font-bold">
-          <span className="text-primary">Cy</span>dex
+        <span className="text-xl font-bold flex items-center">
+          <img 
+            src="/lovable-uploads/525fd30a-476a-4e14-ae55-ec2b11d54013.png" 
+            alt="Cydex Logo" 
+            className="h-6"
+          />
         </span>
       </div>
       <div className="flex items-center space-x-2">
@@ -91,13 +107,19 @@ const MobileHeader: React.FC<MobileHeaderProps> = ({
               </Link>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={handleLogout} className="text-red-500 cursor-pointer">
+            <DropdownMenuItem onClick={onLogoutClick} className="text-red-500 cursor-pointer">
               <LogOut className="mr-2 h-4 w-4" />
               <span>Logout</span>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
+
+      <LogoutConfirmationDialog 
+        isOpen={showLogoutDialog}
+        onClose={() => setShowLogoutDialog(false)}
+        onConfirm={onConfirmLogout}
+      />
     </div>
   );
 };

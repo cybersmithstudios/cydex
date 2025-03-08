@@ -13,12 +13,14 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Shield, LogOut, User, Settings, BarChart, Menu, X, ChevronDown } from "lucide-react";
+import LogoutConfirmationDialog from "@/components/auth/LogoutConfirmationDialog";
 
 const Navbar = () => {
   const { user, logout, isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [showLogoutDialog, setShowLogoutDialog] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -40,9 +42,14 @@ const Navbar = () => {
     }
   };
 
-  const handleLogout = () => {
+  const onLogoutClick = () => {
+    setShowLogoutDialog(true);
+  };
+
+  const onConfirmLogout = () => {
     logout();
     navigate("/");
+    setShowLogoutDialog(false);
   };
 
   const getInitials = (name: string) => {
@@ -133,7 +140,7 @@ const Navbar = () => {
         </button>
 
         <div className="hidden sm:flex items-center space-x-4">
-          {/* Removed ThemeSwitcher here */}
+          {/* Theme switcher removed */}
           
           {isAuthenticated && user ? (
             <DropdownMenu>
@@ -181,7 +188,7 @@ const Navbar = () => {
                   </DropdownMenuItem>
                 )}
                 <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={handleLogout}>
+                <DropdownMenuItem onClick={onLogoutClick}>
                   <LogOut className="mr-2 h-4 w-4" />
                   <span>Log out</span>
                 </DropdownMenuItem>
@@ -226,7 +233,7 @@ const Navbar = () => {
               Contact Us
             </Link>
             
-            {/* Remove Theme section from mobile menu */}
+            {/* Theme section removed from mobile menu */}
             
             {isAuthenticated && user ? (
               <>
@@ -260,7 +267,7 @@ const Navbar = () => {
                   className="justify-start p-2" 
                   onClick={() => {
                     setMobileMenuOpen(false);
-                    handleLogout();
+                    onLogoutClick();
                   }}
                 >
                   <LogOut className="mr-2 h-4 w-4" />
@@ -294,6 +301,12 @@ const Navbar = () => {
           </nav>
         </div>
       )}
+
+      <LogoutConfirmationDialog 
+        isOpen={showLogoutDialog}
+        onClose={() => setShowLogoutDialog(false)}
+        onConfirm={onConfirmLogout}
+      />
     </header>
   );
 };

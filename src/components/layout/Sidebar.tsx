@@ -1,10 +1,11 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { ChevronDown, LogOut } from 'lucide-react';
 import { User } from '@/types/auth.types';
+import LogoutConfirmationDialog from '@/components/auth/LogoutConfirmationDialog';
 
 interface SidebarLink {
   name: string;
@@ -30,6 +31,7 @@ const Sidebar: React.FC<SidebarProps> = ({
   userRole
 }) => {
   const location = useLocation();
+  const [showLogoutDialog, setShowLogoutDialog] = useState(false);
 
   // Get role title for display
   const getRoleTitle = () => {
@@ -45,6 +47,15 @@ const Sidebar: React.FC<SidebarProps> = ({
       default:
         return '';
     }
+  };
+
+  const onLogoutClick = () => {
+    setShowLogoutDialog(true);
+  };
+
+  const onConfirmLogout = () => {
+    handleLogout();
+    setShowLogoutDialog(false);
   };
 
   return (
@@ -123,7 +134,7 @@ const Sidebar: React.FC<SidebarProps> = ({
                 <p className="text-xs text-gray-500 truncate">{getRoleTitle()}</p>
               </div>
               <button 
-                onClick={handleLogout}
+                onClick={onLogoutClick}
                 className="p-1 rounded-full hover:bg-gray-100"
               >
                 <LogOut className="h-4 w-4 text-gray-500" />
@@ -139,6 +150,12 @@ const Sidebar: React.FC<SidebarProps> = ({
           )}
         </div>
       </div>
+
+      <LogoutConfirmationDialog 
+        isOpen={showLogoutDialog}
+        onClose={() => setShowLogoutDialog(false)}
+        onConfirm={onConfirmLogout}
+      />
     </aside>
   );
 };
