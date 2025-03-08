@@ -46,7 +46,7 @@ const HowItWorks = () => {
               transition={{ duration: 0.5, delay: 0.1 }}
               className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight"
             >
-              Sustainable, Smart, & <span className="text-primary drop-shadow-sm">Rewarding</span> Deliveries
+              Sustainable, Smart, & <span className="text-primary drop-shadow-md">Rewarding</span> Deliveries
             </motion.h1>
             
             <motion.p
