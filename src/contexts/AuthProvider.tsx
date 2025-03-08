@@ -339,6 +339,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setUser(null);
       setSessionExpiry(null);
       toast.info('You have been logged out');
+      
+      // Redirect to homepage after logout
+      window.location.href = '/';
     } catch (error) {
       console.error('Error during logout:', error);
       toast.error('Failed to log out');

@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -71,7 +72,7 @@ const HeroSection = () => {
 
       <div className="container mx-auto px-4 sm:px-6 z-10">
         <div className="flex flex-col lg:flex-row items-center justify-center">
-          <div className="lg:w-1/2 lg:pr-12 space-y-5 mb-10 lg:mb-0 text-left mx-auto">
+          <div className="lg:w-1/2 lg:pr-12 space-y-5 mb-10 lg:mb-0 text-left lg:mx-auto mx-auto text-center lg:text-left">
             <div className={`transition-all duration-700 transform ${isLoaded ? "translate-y-0 opacity-100" : "translate-y-10 opacity-0"}`}>
               <p className="text-primary font-semibold mb-2 inline-block py-1 px-3 rounded-full bg-primary/10 text-sm sm:text-base">
                 Eco-Friendly Delivery Platform
@@ -88,7 +89,7 @@ const HeroSection = () => {
               Cydex revolutionizes logistics with zero-emission vehicles, optimized routes, and sustainable packaging, reducing carbon footprint while maintaining exceptional delivery experiences.
             </p>
 
-            <div className={`flex flex-col sm:flex-row justify-start gap-4 transition-all duration-700 delay-300 transform ${isLoaded ? "translate-y-0 opacity-100" : "translate-y-10 opacity-0"}`}>
+            <div className={`flex flex-col sm:flex-row justify-center lg:justify-start gap-4 transition-all duration-700 delay-300 transform ${isLoaded ? "translate-y-0 opacity-100" : "translate-y-10 opacity-0"}`}>
               <Button onClick={handleSignUp} className="primary-button hover:scale-105 w-full sm:w-auto">
                 {isAuthenticated ? "Go to Dashboard" : "Sign Up Now"}
                 <ArrowRight className="ml-2 h-4 w-4" />
