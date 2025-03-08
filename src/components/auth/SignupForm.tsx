@@ -12,6 +12,8 @@ import {
   SelectTrigger, 
   SelectValue 
 } from "@/components/ui/select";
+import { Link } from "react-router-dom";
+import { Eye, EyeOff, ArrowLeft } from "lucide-react";
 
 const SignupForm = () => {
   const [signupName, setSignupName] = useState("");
@@ -20,6 +22,8 @@ const SignupForm = () => {
   const [signupConfirmPassword, setSignupConfirmPassword] = useState("");
   const [role, setRole] = useState<UserRole>("customer");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   
   const { register } = useAuth();
   
@@ -60,77 +64,106 @@ const SignupForm = () => {
   };
   
   return (
-    <form onSubmit={handleSignup} className="space-y-4">
-      <div className="space-y-2">
-        <Label htmlFor="name">Full Name</Label>
-        <Input
-          id="name"
-          type="text"
-          placeholder="Oluwasegun Adebayo"
-          value={signupName}
-          onChange={(e) => setSignupName(e.target.value)}
-          required
-        />
+    <div className="space-y-6">
+      <div className="flex items-center mb-4">
+        <Button variant="ghost" size="sm" asChild className="p-0 mr-2">
+          <Link to="/">
+            <ArrowLeft className="h-4 w-4 mr-1" />
+            Back to Home
+          </Link>
+        </Button>
       </div>
       
-      <div className="space-y-2">
-        <Label htmlFor="signup-email">Email</Label>
-        <Input
-          id="signup-email"
-          type="email"
-          placeholder="oluwasegun@example.com"
-          value={signupEmail}
-          onChange={(e) => setSignupEmail(e.target.value)}
-          required
-        />
-      </div>
-      
-      <div className="space-y-2">
-        <Label htmlFor="signup-password">Password</Label>
-        <Input
-          id="signup-password"
-          type="password"
-          placeholder="••••••••"
-          value={signupPassword}
-          onChange={(e) => setSignupPassword(e.target.value)}
-          required
-        />
-      </div>
-      
-      <div className="space-y-2">
-        <Label htmlFor="confirm-password">Confirm Password</Label>
-        <Input
-          id="confirm-password"
-          type="password"
-          placeholder="••••••••"
-          value={signupConfirmPassword}
-          onChange={(e) => setSignupConfirmPassword(e.target.value)}
-          required
-        />
-      </div>
-      
-      <div className="space-y-2">
-        <Label htmlFor="role">I want to join as a</Label>
-        <Select value={role} onValueChange={(value) => setRole(value as UserRole)}>
-          <SelectTrigger id="role" className="w-full">
-            <SelectValue placeholder="Select your role" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="customer">Customer</SelectItem>
-            <SelectItem value="rider">Rider</SelectItem>
-            <SelectItem value="vendor">Vendor</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
-      
-      <Button
-        type="submit"
-        className="w-full"
-        disabled={isSubmitting}
-      >
-        {isSubmitting ? "Creating Account..." : "Create Account"}
-      </Button>
-    </form>
+      <form onSubmit={handleSignup} className="space-y-4">
+        <div className="space-y-2">
+          <Label htmlFor="name">Full Name</Label>
+          <Input
+            id="name"
+            type="text"
+            placeholder="Oluwasegun Adebayo"
+            value={signupName}
+            onChange={(e) => setSignupName(e.target.value)}
+            required
+          />
+        </div>
+        
+        <div className="space-y-2">
+          <Label htmlFor="signup-email">Email</Label>
+          <Input
+            id="signup-email"
+            type="email"
+            placeholder="oluwasegun@example.com"
+            value={signupEmail}
+            onChange={(e) => setSignupEmail(e.target.value)}
+            required
+          />
+        </div>
+        
+        <div className="space-y-2">
+          <Label htmlFor="signup-password">Password</Label>
+          <div className="relative">
+            <Input
+              id="signup-password"
+              type={showPassword ? "text" : "password"}
+              placeholder="••••••••"
+              value={signupPassword}
+              onChange={(e) => setSignupPassword(e.target.value)}
+              required
+            />
+            <button 
+              type="button"
+              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500"
+              onClick={() => setShowPassword(!showPassword)}
+            >
+              {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+            </button>
+          </div>
+        </div>
+        
+        <div className="space-y-2">
+          <Label htmlFor="confirm-password">Confirm Password</Label>
+          <div className="relative">
+            <Input
+              id="confirm-password"
+              type={showConfirmPassword ? "text" : "password"}
+              placeholder="••••••••"
+              value={signupConfirmPassword}
+              onChange={(e) => setSignupConfirmPassword(e.target.value)}
+              required
+            />
+            <button 
+              type="button"
+              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500"
+              onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+            >
+              {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+            </button>
+          </div>
+        </div>
+        
+        <div className="space-y-2">
+          <Label htmlFor="role">I want to join as a</Label>
+          <Select value={role} onValueChange={(value) => setRole(value as UserRole)}>
+            <SelectTrigger id="role" className="w-full">
+              <SelectValue placeholder="Select your role" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="customer">Customer</SelectItem>
+              <SelectItem value="rider">Rider</SelectItem>
+              <SelectItem value="vendor">Vendor</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+        
+        <Button
+          type="submit"
+          className="w-full"
+          disabled={isSubmitting}
+        >
+          {isSubmitting ? "Creating Account..." : "Create Account"}
+        </Button>
+      </form>
+    </div>
   );
 };
 

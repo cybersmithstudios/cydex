@@ -81,7 +81,7 @@ const CustomerDashboard = () => {
 
   return (
     <DashboardLayout userRole="customer">
-      <div className="p-6 max-w-7xl mx-auto space-y-6">
+      <div className="p-2 sm:p-4 md:p-6 max-w-full mx-auto space-y-4 md:space-y-6">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <div>
             <h1 className="text-2xl font-bold">Welcome, {user?.name}</h1>
@@ -94,7 +94,7 @@ const CustomerDashboard = () => {
           </Button>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-6">
           <Card>
             <CardHeader className="pb-2">
               <CardTitle className="text-base font-medium">Active Orders</CardTitle>
@@ -149,26 +149,26 @@ const CustomerDashboard = () => {
                 {activeOrders.length > 0 ? (
                   <div className="space-y-4">
                     {activeOrders.map((order) => (
-                      <div key={order.id} className="bg-white border rounded-lg p-4 hover:shadow-md transition-shadow">
+                      <div key={order.id} className="bg-white border rounded-lg p-3 md:p-4 hover:shadow-md transition-shadow">
                         <div className="flex flex-col md:flex-row justify-between">
-                          <div className="flex items-start space-x-4">
+                          <div className="flex items-start space-x-3 md:space-x-4">
                             <div className="p-2 bg-primary-light rounded-full">
                               {order.status === 'in-transit' ? (
-                                <Truck className="h-6 w-6 text-primary" />
+                                <Truck className="h-5 w-5 md:h-6 md:w-6 text-primary" />
                               ) : (
-                                <Box className="h-6 w-6 text-primary" />
+                                <Box className="h-5 w-5 md:h-6 md:w-6 text-primary" />
                               )}
                             </div>
                             <div>
-                              <div className="flex items-center">
+                              <div className="flex items-center flex-wrap">
                                 <h3 className="font-medium">{order.vendor}</h3>
-                                <span className="mx-2 text-gray-300">•</span>
-                                <span className="text-sm text-gray-500">{order.id}</span>
+                                <span className="mx-2 text-gray-300 hidden sm:inline">•</span>
+                                <span className="text-sm text-gray-500 w-full sm:w-auto">{order.id}</span>
                               </div>
-                              <div className="flex items-center mt-1">
+                              <div className="flex items-center mt-1 flex-wrap">
                                 {getStatusBadge(order.status)}
                                 {order.eta && (
-                                  <div className="ml-3 flex items-center text-sm text-gray-600">
+                                  <div className="ml-0 mt-1 sm:ml-3 sm:mt-0 flex items-center text-sm text-gray-600">
                                     <Clock className="h-4 w-4 mr-1" />
                                     <span>ETA: {order.eta}</span>
                                   </div>
@@ -208,21 +208,21 @@ const CustomerDashboard = () => {
               <TabsContent value="past">
                 <div className="space-y-4">
                   {pastOrders.map((order) => (
-                    <div key={order.id} className="bg-white border rounded-lg p-4 hover:shadow-md transition-shadow">
+                    <div key={order.id} className="bg-white border rounded-lg p-3 md:p-4 hover:shadow-md transition-shadow">
                       <div className="flex flex-col md:flex-row justify-between">
-                        <div className="flex items-start space-x-4">
+                        <div className="flex items-start space-x-3 md:space-x-4">
                           <div className="p-2 bg-gray-100 rounded-full">
-                            <Box className="h-6 w-6 text-gray-500" />
+                            <Box className="h-5 w-5 md:h-6 md:w-6 text-gray-500" />
                           </div>
                           <div>
-                            <div className="flex items-center">
+                            <div className="flex items-center flex-wrap">
                               <h3 className="font-medium">{order.vendor}</h3>
-                              <span className="mx-2 text-gray-300">•</span>
-                              <span className="text-sm text-gray-500">{order.id}</span>
+                              <span className="mx-2 text-gray-300 hidden sm:inline">•</span>
+                              <span className="text-sm text-gray-500 w-full sm:w-auto">{order.id}</span>
                             </div>
-                            <div className="flex items-center mt-1">
+                            <div className="flex items-center mt-1 flex-wrap">
                               {getStatusBadge(order.status)}
-                              <div className="ml-3 text-sm text-gray-600">
+                              <div className="ml-0 mt-1 sm:ml-3 sm:mt-0 text-sm text-gray-600">
                                 {order.date}
                               </div>
                             </div>
@@ -250,7 +250,7 @@ const CustomerDashboard = () => {
           </CardContent>
         </Card>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
           <Card>
             <CardHeader>
               <CardTitle>Recycling Impact</CardTitle>

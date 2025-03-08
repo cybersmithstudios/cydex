@@ -61,11 +61,17 @@ const Sidebar: React.FC<SidebarProps> = ({
           <div className="flex items-center justify-between h-16 px-4 border-b">
             <Link to="/" className={cn("flex items-center", !isSidebarOpen && "justify-center w-full")}>
               {isSidebarOpen ? (
-                <span className="text-xl font-bold">
-                  <span className="text-primary">Cy</span>dex
-                </span>
+                <img 
+                  src="/lovable-uploads/525fd30a-476a-4e14-ae55-ec2b11d54013.png" 
+                  alt="Cydex Logo" 
+                  className="h-8"
+                />
               ) : (
-                <span className="text-xl font-bold text-primary">C</span>
+                <img 
+                  src="/og-tab.png" 
+                  alt="Cydex Icon" 
+                  className="h-8 w-8"
+                />
               )}
             </Link>
             <button

@@ -7,7 +7,6 @@ import Sidebar from './Sidebar';
 import MobileMenu from './MobileMenu';
 import MobileHeader from './MobileHeader';
 import { getNavLinks, getRoleTitle } from './navigationLinks';
-import ThemeSwitcher from '@/components/ThemeSwitcher';
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -29,7 +28,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, userRole })
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex">
+    <div className="min-h-screen bg-gray-50 flex">
       {/* Sidebar for larger screens */}
       <Sidebar 
         navLinks={navLinks}
@@ -58,18 +57,13 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, userRole })
         userRoleTitle={userRoleTitle}
       />
 
-      {/* Main Content with Theme Switcher */}
+      {/* Main Content */}
       <main className={cn(
         "flex-1 transition-all duration-300 ease-in-out",
         isSidebarOpen ? "lg:ml-64" : "lg:ml-20",
         "pt-16 lg:pt-0"
       )}>
-        <div className="p-6 lg:p-8">
-          <div className="flex justify-end mb-4">
-            <ThemeSwitcher />
-          </div>
-          {children}
-        </div>
+        {children}
       </main>
     </div>
   );

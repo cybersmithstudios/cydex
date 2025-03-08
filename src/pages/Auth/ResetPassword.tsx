@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import AuthLayout from "@/components/auth/AuthLayout";
 import { Link } from "react-router-dom";
+import { ArrowLeft } from "lucide-react";
 
 const ResetPassword = () => {
   const [email, setEmail] = useState("");
@@ -37,6 +38,15 @@ const ResetPassword = () => {
   
   return (
     <AuthLayout>
+      <div className="mb-4">
+        <Button variant="ghost" size="sm" asChild className="p-0">
+          <Link to="/auth">
+            <ArrowLeft className="h-4 w-4 mr-1" />
+            Back to Login
+          </Link>
+        </Button>
+      </div>
+      
       <div className="text-center mb-6">
         <h1 className="text-2xl font-bold">Reset Password</h1>
         {!isSubmitted ? (
