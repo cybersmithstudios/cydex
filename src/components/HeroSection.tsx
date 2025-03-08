@@ -71,7 +71,7 @@ const HeroSection = () => {
 
       <div className="container mx-auto px-4 sm:px-6 z-10">
         <div className="flex flex-col lg:flex-row items-center justify-center">
-          <div className="lg:w-1/2 lg:pr-12 space-y-5 mb-10 lg:mb-0 text-center mx-auto">
+          <div className="lg:w-1/2 lg:pr-12 space-y-5 mb-10 lg:mb-0 mx-auto">
             <div className={`transition-all duration-700 transform ${isLoaded ? "translate-y-0 opacity-100" : "translate-y-10 opacity-0"}`}>
               <p className="text-primary font-semibold mb-2 inline-block py-1 px-3 rounded-full bg-primary/10 text-sm sm:text-base">
                 Eco-Friendly Delivery Platform
