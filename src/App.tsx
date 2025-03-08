@@ -114,7 +114,7 @@ function App() {
             allowClickAway={true}
             allowEsc={true}
             notification={true}
-            notificationSound={true}
+            notificationSound={false}
             notificationDelay={30}
             notificationLoop={3}
             style={{ zIndex: 999 }}
