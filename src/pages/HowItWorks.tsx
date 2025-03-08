@@ -6,6 +6,7 @@ import Navbar from "@/components/Navbar";
 import FooterSection from "@/components/FooterSection";
 import { ArrowRight, Bike, Package, CreditCard, Truck, User, Store } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { FloatingWhatsApp } from "react-floating-whatsapp";
 
 const HowItWorks = () => {
   const navigate = useNavigate();
@@ -14,6 +15,13 @@ const HowItWorks = () => {
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
+
+  const scrollToFeatures = () => {
+    const featuresSection = document.getElementById("how-it-works-section");
+    if (featuresSection) {
+      featuresSection.scrollIntoView({ behavior: "smooth" });
+    }
+  };
 
   return (
     <div className="min-h-screen bg-white">
@@ -77,12 +85,7 @@ const HowItWorks = () => {
                 variant="outline" 
                 className="secondary-button hover:scale-105"
                 size="lg"
-                onClick={() => {
-                  const featuresSection = document.getElementById("features");
-                  if (featuresSection) {
-                    featuresSection.scrollIntoView({ behavior: "smooth" });
-                  }
-                }}
+                onClick={scrollToFeatures}
               >
                 Explore How It Works
               </Button>
@@ -99,7 +102,7 @@ const HowItWorks = () => {
       </section>
       
       {/* Step-by-Step Process Sections */}
-      <section className="py-20 bg-white">
+      <section id="how-it-works-section" className="py-20 bg-white">
         <div className="container mx-auto px-6">
           <div className="text-center mb-16">
             <h2 className="text-3xl font-bold mb-4">How Cydex Works</h2>
@@ -351,6 +354,32 @@ const HowItWorks = () => {
       </section>
       
       <FooterSection />
+      
+      {/* WhatsApp Floating Button */}
+      <FloatingWhatsApp 
+        phoneNumber="1234567890"
+        accountName="Cydex"
+        avatar="/og-tab.png"
+        statusMessage="Typically replies within minutes"
+        chatMessage="Hello! 👋 Welcome to Cydex. How can we help you with sustainable deliveries today?"
+        placeholder="Type your message here..."
+        darkMode={true}
+        allowClickAway={true}
+        allowEsc={true}
+        notification={true}
+        notificationSound={true}
+        notificationDelay={30}
+        notificationLoop={3}
+        style={{ zIndex: 999 }}
+        buttonStyle={{ 
+          backgroundColor: "#AFFF64", 
+          boxShadow: "0 4px 12px rgba(175, 255, 100, 0.4)" 
+        }}
+        chatboxStyle={{ 
+          border: "1px solid #333", 
+          boxShadow: "0 8px 24px rgba(0, 0, 0, 0.2)" 
+        }}
+      />
     </div>
   );
 };
