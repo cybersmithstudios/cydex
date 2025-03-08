@@ -120,7 +120,7 @@ function App() {
               notificationLoop={3}
               style={{ zIndex: 999 }}
               buttonStyle={{ 
-                backgroundColor: "#AFFF64", 
+                backgroundColor: "#21CA1B", 
                 boxShadow: "0 4px 12px rgba(175, 255, 100, 0.4)" 
               }}
               chatboxStyle={{ 
