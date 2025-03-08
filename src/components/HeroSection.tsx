@@ -81,7 +81,7 @@ const HeroSection = () => {
             <h1 className={`text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold leading-tight transition-all duration-700 delay-100 transform ${isLoaded ? "translate-y-0 opacity-100" : "translate-y-10 opacity-0"}`}>
               Delivering Packages,
               <br className="hidden sm:block" />
-              <span className="text-primary shadow-md">Preserving Planet</span>
+              <span className="text-primary drop-shadow-md">Preserving Planet</span>
             </h1>
 
             <p className={`text-base sm:text-lg text-gray-600 transition-all duration-700 delay-200 transform ${isLoaded ? "translate-y-0 opacity-100" : "translate-y-10 opacity-0"}`}>
