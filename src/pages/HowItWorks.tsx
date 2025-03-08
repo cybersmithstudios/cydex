@@ -35,7 +35,7 @@ const HowItWorks = () => {
               transition={{ duration: 0.5 }}
               className="inline-block py-1 px-4 rounded-full bg-primary/10 mb-4"
             >
-              <p className="text-primary font-semibold text-sm sm:text-base">
+              <p className="text-green-600 font-semibold text-sm sm:text-base">
                 Eco-Friendly Logistics Process
               </p>
             </motion.div>

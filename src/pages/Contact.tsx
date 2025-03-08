@@ -61,7 +61,7 @@ const Contact = () => {
             transition={{ duration: 0.5 }}
             className="inline-block py-1 px-4 rounded-full bg-primary/10 mb-4"
           >
-            <p className="text-primary font-semibold text-sm sm:text-base">
+            <p className="text-green-600 font-semibold text-sm sm:text-base">
               Get In Touch
             </p>
           </motion.div>
@@ -72,7 +72,7 @@ const Contact = () => {
             transition={{ duration: 0.5, delay: 0.1 }}
             className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6"
           >
-            We're Here to <span className="text-primary drop-shadow-sm">Help</span>
+            We're Here to <span className="text-green-600 drop-shadow-sm">Help</span>
           </motion.h1>
           
           <motion.p
