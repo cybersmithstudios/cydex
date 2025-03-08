@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate, Link } from "react-router-dom";
@@ -12,7 +13,6 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Shield, LogOut, User, Settings, BarChart, Menu, X, ChevronDown } from "lucide-react";
-import ThemeSwitcher from "@/components/ThemeSwitcher";
 
 const Navbar = () => {
   const { user, logout, isAuthenticated } = useAuth();
@@ -61,7 +61,7 @@ const Navbar = () => {
     <header
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
         scrolled
-          ? "bg-white/90 dark:bg-gray-900/90 backdrop-blur-md py-4 shadow-sm"
+          ? "bg-white/90 backdrop-blur-md py-4 shadow-sm"
           : "bg-transparent py-6"
       }`}
     >
@@ -133,7 +133,7 @@ const Navbar = () => {
         </button>
 
         <div className="hidden sm:flex items-center space-x-4">
-          <ThemeSwitcher variant="ghost" size="icon" />
+          {/* Removed ThemeSwitcher here */}
           
           {isAuthenticated && user ? (
             <DropdownMenu>
@@ -208,7 +208,7 @@ const Navbar = () => {
       </div>
 
       {mobileMenuOpen && (
-        <div className="sm:hidden absolute top-full left-0 right-0 bg-white dark:bg-gray-900 shadow-md p-4 z-50 animate-fade-in">
+        <div className="sm:hidden absolute top-full left-0 right-0 bg-white shadow-md p-4 z-50 animate-fade-in">
           <nav className="flex flex-col space-y-4">
             <Link to="/" className="p-2 hover:bg-gray-100 rounded-md" onClick={() => setMobileMenuOpen(false)}>
               Home
@@ -226,10 +226,7 @@ const Navbar = () => {
               Contact Us
             </Link>
             
-            <div className="flex items-center justify-between p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-md">
-              <span>Theme</span>
-              <ThemeSwitcher variant="ghost" size="sm" />
-            </div>
+            {/* Remove Theme section from mobile menu */}
             
             {isAuthenticated && user ? (
               <>

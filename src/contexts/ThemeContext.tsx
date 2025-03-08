@@ -1,10 +1,11 @@
 
-import React, { createContext, useContext } from 'react';
+import React, { createContext, useContext, useState } from 'react';
 
 type Theme = 'light';
 
 interface ThemeContextType {
   theme: Theme;
+  // We don't need setTheme anymore since we're removing dark mode functionality
 }
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
