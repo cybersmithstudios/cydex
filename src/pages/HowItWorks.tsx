@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import Navbar from "@/components/Navbar";
 import FooterSection from "@/components/FooterSection";
-import { ArrowRight, Bike, Package, CreditCard, Truck, User, Store } from "lucide-react";
+import { ArrowRight, Bike, Package, CreditCard, User, Store } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { FloatingWhatsApp } from "react-floating-whatsapp";
 
