@@ -9,6 +9,7 @@ import RiderDashboard from './pages/rider/RiderDashboard';
 import VendorDashboard from './pages/vendor/VendorDashboard';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
+import { FloatingWhatsApp } from "react-floating-whatsapp";
 import { ThemeProvider } from './contexts/ThemeContext';
 import { Toaster } from './components/ui/sonner';
 import HowItWorks from './pages/HowItWorks';
@@ -101,6 +102,32 @@ function App() {
             
             {/* Catch-all route for 404 */}
             <Route path="*" element={<NotFound />} />
+
+            {/* WhatsApp Floating Button */}
+            <FloatingWhatsApp 
+              phoneNumber="1234567890"
+              accountName="Cydex"
+              avatar="/og-tab.png"
+              statusMessage="Typically replies within minutes"
+              chatMessage="Hello! 👋 Welcome to Cydex. How can we help you with sustainable deliveries today?"
+              placeholder="Type your message here..."
+              darkMode={true}
+              allowClickAway={true}
+              allowEsc={true}
+              notification={true}
+              notificationSound={true}
+              notificationDelay={30}
+              notificationLoop={3}
+              style={{ zIndex: 999 }}
+              buttonStyle={{ 
+                backgroundColor: "#AFFF64", 
+                boxShadow: "0 4px 12px rgba(175, 255, 100, 0.4)" 
+              }}
+              chatboxStyle={{ 
+                border: "1px solid #333", 
+                boxShadow: "0 8px 24px rgba(0, 0, 0, 0.2)" 
+              }}
+            />
           </Routes>
           <Toaster />
         </Router>
