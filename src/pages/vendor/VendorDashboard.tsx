@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import DashboardLayout from '@/components/layout/DashboardLayout';
@@ -11,6 +12,7 @@ import {
   TrendingUp, BarChart3, UserCheck, ShoppingBag, RecycleIcon
 } from 'lucide-react';
 
+// Mock data with updated Naira values (1 USD = 1,533.10 NGN)
 const pendingOrders = [
   {
     id: 'ORD-5678',
@@ -18,7 +20,7 @@ const pendingOrders = [
     status: 'pending',
     createdAt: '5 minutes ago',
     items: 3,
-    total: 47.99
+    total: 73,579.77 // 47.99 USD
   },
   {
     id: 'ORD-5679',
@@ -26,7 +28,7 @@ const pendingOrders = [
     status: 'pending',
     createdAt: '12 minutes ago',
     items: 1,
-    total: 18.50
+    total: 28,362.35 // 18.50 USD
   }
 ];
 
@@ -38,7 +40,7 @@ const inProgressOrders = [
     status: 'processing',
     estimatedDelivery: '25 minutes',
     items: 2,
-    total: 36.75
+    total: 56,341.42 // 36.75 USD
   }
 ];
 
@@ -49,7 +51,7 @@ const completedOrders = [
     status: 'delivered',
     completedAt: '1 hour ago',
     items: 4,
-    total: 52.25,
+    total: 80,104.97, // 52.25 USD
     carbonSaved: 0.7
   },
   {
@@ -58,7 +60,7 @@ const completedOrders = [
     status: 'delivered',
     completedAt: '3 hours ago',
     items: 2,
-    total: 29.95,
+    total: 45,916.34, // 29.95 USD
     carbonSaved: 0.4
   },
   {
@@ -67,7 +69,7 @@ const completedOrders = [
     status: 'delivered',
     completedAt: 'Yesterday',
     items: 3,
-    total: 41.80,
+    total: 64,083.58, // 41.80 USD
     carbonSaved: 0.6
   }
 ];
@@ -124,7 +126,7 @@ const VendorDashboard = () => {
               <CardTitle className="text-base font-medium">Today's Orders</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold">{totalOrders}</div>
+              <div className="text-3xl font-bold">{pendingOrders.length + inProgressOrders.length + completedOrders.length}</div>
               <div className="flex items-center mt-1 text-sm text-green-600">
                 <TrendingUp className="h-4 w-4 mr-1" />
                 <span>+3 from yesterday</span>
@@ -137,7 +139,9 @@ const VendorDashboard = () => {
               <CardTitle className="text-base font-medium">Today's Sales</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold">${totalSales.toFixed(2)}</div>
+              <div className="text-3xl font-bold">₦{(pendingOrders.reduce((total, order) => total + order.total, 0) + 
+                                                    inProgressOrders.reduce((total, order) => total + order.total, 0) + 
+                                                    completedOrders.reduce((total, order) => total + order.total, 0)).toLocaleString('en-NG', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</div>
               <div className="flex items-center mt-1 text-sm text-green-600">
                 <TrendingUp className="h-4 w-4 mr-1" />
                 <span>+12% from yesterday</span>
@@ -150,7 +154,7 @@ const VendorDashboard = () => {
               <CardTitle className="text-base font-medium">Carbon Impact</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold">{totalCarbonSaved.toFixed(1)} kg</div>
+              <div className="text-3xl font-bold">{completedOrders.reduce((total, order) => total + (order.carbonSaved || 0), 0).toFixed(1)} kg</div>
               <p className="text-sm text-gray-500">CO₂ saved with eco-delivery</p>
             </CardContent>
           </Card>
@@ -206,7 +210,7 @@ const VendorDashboard = () => {
                           <div className="mt-2 text-sm text-gray-600">
                             <span>{order.items} items</span>
                             <span className="mx-2 text-gray-300">•</span>
-                            <span>${order.total.toFixed(2)}</span>
+                            <span>₦{order.total.toLocaleString('en-NG', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
                           </div>
                         </div>
                       </div>
@@ -268,7 +272,7 @@ const VendorDashboard = () => {
                               <div className="mt-2 text-sm text-gray-600">
                                 <span>{order.items} items</span>
                                 <span className="mx-2 text-gray-300">•</span>
-                                <span>${order.total.toFixed(2)}</span>
+                                <span>₦{order.total.toLocaleString('en-NG', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
                                 {order.rider && (
                                   <>
                                     <span className="mx-2 text-gray-300">•</span>
@@ -325,7 +329,7 @@ const VendorDashboard = () => {
                             <div className="mt-2 text-sm text-gray-600">
                               <span>{order.items} items</span>
                               <span className="mx-2 text-gray-300">•</span>
-                              <span>${order.total.toFixed(2)}</span>
+                              <span>₦{order.total.toLocaleString('en-NG', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
                             </div>
                           </div>
                         </div>
@@ -434,7 +438,7 @@ const VendorDashboard = () => {
                       <p className="text-sm text-gray-600">Eco-friendly products</p>
                     </div>
                   </div>
-                  <span className="font-bold">$42.80</span>
+                  <span className="font-bold">₦65,616.68</span>
                 </div>
                 
                 <div className="p-4 bg-green-50 rounded-lg">

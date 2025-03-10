@@ -1,14 +1,15 @@
-
 import React, { useState, useEffect } from 'react';
 import { toast } from "sonner";
 import { AuthContext } from './AuthContext';
 import { User, UserRole } from '../types/auth.types';
 import { SESSION_TIMEOUT } from '../constants/auth.constants';
 import { supabase } from '../lib/supabase';
+import LoadingDisplay from '@/components/ui/LoadingDisplay';
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [loggingOut, setLoggingOut] = useState(false);
   const [sessionExpiry, setSessionExpiry] = useState<number | null>(null);
   const [loginAttempts, setLoginAttempts] = useState<{[key: string]: {count: number, lastAttempt: number}}>({});
 
@@ -331,26 +332,30 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  // Logout function with Supabase
+  // Logout function with Supabase - updated to ensure immediate redirect
   const logout = async () => {
     try {
+      setLoggingOut(true);
       await supabase.auth.signOut();
       localStorage.removeItem('cydexSessionExpiry');
       setUser(null);
       setSessionExpiry(null);
       toast.info('You have been logged out');
       
-      // Explicitly navigate to homepage after logout
+      // Force page navigation to home
       window.location.href = '/';
     } catch (error) {
       console.error('Error during logout:', error);
       toast.error('Failed to log out');
+    } finally {
+      setLoggingOut(false);
     }
   };
 
   const value = {
     user,
     loading,
+    loggingOut,
     login,
     register,
     logout,
@@ -363,6 +368,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     isSessionExpired,
     refreshSession
   };
+
+  if (loggingOut) {
+    return <LoadingDisplay fullScreen message="Signing out..." size="lg" />;
+  }
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };

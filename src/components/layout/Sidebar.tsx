@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -32,6 +32,9 @@ const Sidebar: React.FC<SidebarProps> = ({
 }) => {
   const location = useLocation();
   const [showLogoutDialog, setShowLogoutDialog] = useState(false);
+  const [isHovering, setIsHovering] = useState(false);
+  const hoverTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const sidebarRef = useRef<HTMLDivElement>(null);
 
   // Get role title for display
   const getRoleTitle = () => {
@@ -58,20 +61,57 @@ const Sidebar: React.FC<SidebarProps> = ({
     setShowLogoutDialog(false);
   };
 
+  const handleMouseEnter = () => {
+    if (hoverTimerRef.current) {
+      clearTimeout(hoverTimerRef.current);
+    }
+    
+    if (!isSidebarOpen) {
+      setIsHovering(true);
+    }
+  };
+
+  const handleMouseLeave = () => {
+    if (hoverTimerRef.current) {
+      clearTimeout(hoverTimerRef.current);
+    }
+    
+    hoverTimerRef.current = setTimeout(() => {
+      setIsHovering(false);
+    }, 300);
+  };
+
+  // Handle clicks outside the sidebar to close hover state
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (sidebarRef.current && !sidebarRef.current.contains(event.target as Node) && !isSidebarOpen) {
+        setIsHovering(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isSidebarOpen]);
+
   return (
     <aside 
+      ref={sidebarRef}
       className={cn(
         "fixed inset-y-0 left-0 bg-white shadow-md z-40 overflow-hidden transition-all duration-300 ease-in-out",
-        isSidebarOpen ? "w-64" : "w-20",
+        (isSidebarOpen || isHovering) ? "w-64" : "w-20",
         "hidden lg:block"
       )}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
     >
       <div className="h-full flex flex-col justify-between">
         <div>
           {/* Logo and collapse button */}
           <div className="flex items-center justify-between h-16 px-4 border-b">
-            <Link to="/" className={cn("flex items-center", !isSidebarOpen && "justify-center w-full")}>
-              {isSidebarOpen ? (
+            <Link to="/" className={cn("flex items-center", !(isSidebarOpen || isHovering) && "justify-center w-full")}>
+              {(isSidebarOpen || isHovering) ? (
                 <img 
                   src="/lovable-uploads/525fd30a-476a-4e14-ae55-ec2b11d54013.png" 
                   alt="Cydex Logo" 
@@ -87,7 +127,7 @@ const Sidebar: React.FC<SidebarProps> = ({
             </Link>
             <button
               onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-              className={cn("p-1 rounded-md hover:bg-gray-100", !isSidebarOpen && "hidden")}
+              className={cn("p-1 rounded-md hover:bg-gray-100", !(isSidebarOpen || isHovering) && "hidden")}
             >
               <ChevronDown className={cn("h-5 w-5 transform transition-transform", isSidebarOpen ? "rotate-90" : "rotate-0")} />
             </button>
@@ -108,11 +148,11 @@ const Sidebar: React.FC<SidebarProps> = ({
                         isActive 
                           ? "bg-primary-light text-gray-900" 
                           : "text-gray-700 hover:bg-gray-100",
-                        !isSidebarOpen && "justify-center"
+                        !(isSidebarOpen || isHovering) && "justify-center"
                       )}
                     >
                       <link.icon className={cn("h-5 w-5", isActive && "text-primary")} />
-                      {isSidebarOpen && <span className="ml-3">{link.name}</span>}
+                      {(isSidebarOpen || isHovering) && <span className="ml-3">{link.name}</span>}
                     </Link>
                   </li>
                 );
@@ -123,7 +163,7 @@ const Sidebar: React.FC<SidebarProps> = ({
 
         {/* User Section */}
         <div className="border-t p-4">
-          {isSidebarOpen ? (
+          {(isSidebarOpen || isHovering) ? (
             <div className="flex items-center">
               <Avatar className="h-8 w-8">
                 <AvatarImage src={user?.avatar} alt={user?.name || 'User'} />
@@ -142,7 +182,10 @@ const Sidebar: React.FC<SidebarProps> = ({
             </div>
           ) : (
             <div className="flex justify-center">
-              <Avatar className="h-8 w-8 cursor-pointer" onClick={() => setIsSidebarOpen(true)}>
+              <Avatar 
+                className="h-8 w-8 cursor-pointer" 
+                onClick={() => setIsSidebarOpen(true)}
+              >
                 <AvatarImage src={user?.avatar} alt={user?.name || 'User'} />
                 <AvatarFallback>{user?.name?.[0] || 'U'}</AvatarFallback>
               </Avatar>
