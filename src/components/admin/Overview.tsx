@@ -1,112 +1,159 @@
 
-import { ArrowUpRight, Users, Package, Wallet, Leaf, ShieldCheck, Settings, BarChart } from 'lucide-react';
+import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { RevenueChart } from '@/components/ui/chart';
+import { ArrowUpRight, Users, Package, TrendingUp, CreditCard } from 'lucide-react';
 
-export function Overview() {
-  // Mock data for the dashboard
-  const stats = [
-    {
-      title: "Total Users",
-      value: "2,856",
-      change: "+12.5%",
-      icon: Users,
-    },
-    {
-      title: "Active Orders",
-      value: "134",
-      change: "+3.2%",
-      icon: Package,
-    },
-    {
-      title: "Revenue",
-      value: "$28.4k",
-      change: "+15.6%",
-      icon: Wallet,
-    },
-    {
-      title: "Carbon Saved",
-      value: "12.6t",
-      change: "+24.3%",
-      icon: Leaf,
-    },
-  ];
-
+export const Overview = () => {
   return (
     <div className="space-y-4">
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        {stats.map((stat, index) => (
-          <Card key={index}>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">
-                {stat.title}
-              </CardTitle>
-              <stat.icon className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{stat.value}</div>
-              <p className="text-xs text-muted-foreground flex items-center mt-1">
-                <span className={stat.change.startsWith('+') ? 'text-green-500' : 'text-red-500'}>
-                  {stat.change}
-                </span>
-                <ArrowUpRight className="h-3 w-3 ml-1" />
-                <span className="ml-1">from last month</span>
-              </p>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        <Card className="col-span-2">
-          <CardHeader>
-            <CardTitle>Platform Activity</CardTitle>
-            <CardDescription>
-              Daily active users and orders
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="h-[300px] flex items-center justify-center border-t pt-4">
-            <div className="text-center text-muted-foreground">
-              <BarChart className="h-16 w-16 mx-auto mb-2 opacity-50" />
-              <p>Activity chart will be displayed here</p>
-              <Button variant="outline" className="mt-4">Generate Report</Button>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Quick Actions</CardTitle>
-            <CardDescription>
-              Common admin tasks
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-2">
-              <Button variant="outline" className="w-full justify-start">
-                <Users className="mr-2 h-4 w-4" />
-                Manage Users
-              </Button>
-              <Button variant="outline" className="w-full justify-start">
-                <Package className="mr-2 h-4 w-4" />
-                View Active Orders
-              </Button>
-              <Button variant="outline" className="w-full justify-start">
-                <Wallet className="mr-2 h-4 w-4" />
-                Process Refunds
-              </Button>
-              <Button variant="outline" className="w-full justify-start">
-                <ShieldCheck className="mr-2 h-4 w-4" />
-                Security Audit
-              </Button>
-              <Button variant="outline" className="w-full justify-start">
-                <Settings className="mr-2 h-4 w-4" />
-                System Settings
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+      <Tabs defaultValue="overview" className="space-y-4">
+        <TabsList>
+          <TabsTrigger value="overview">Overview</TabsTrigger>
+          <TabsTrigger value="analytics">Analytics</TabsTrigger>
+          <TabsTrigger value="reports">Reports</TabsTrigger>
+          <TabsTrigger value="notifications">Notifications</TabsTrigger>
+        </TabsList>
+        <TabsContent value="overview" className="space-y-4">
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">
+                  Total Revenue
+                </CardTitle>
+                <CreditCard className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">₦45,231.89</div>
+                <p className="text-xs text-muted-foreground">
+                  +20.1% from last month
+                </p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">
+                  Active Users
+                </CardTitle>
+                <Users className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">+2350</div>
+                <p className="text-xs text-muted-foreground">
+                  +180.1% from last month
+                </p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Total Orders</CardTitle>
+                <Package className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">+12,234</div>
+                <p className="text-xs text-muted-foreground">
+                  +19% from last month
+                </p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">
+                  Carbon Credits
+                </CardTitle>
+                <TrendingUp className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">+573.5kg</div>
+                <p className="text-xs text-muted-foreground">
+                  +201 credits from last month
+                </p>
+              </CardContent>
+            </Card>
+          </div>
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
+            <Card className="col-span-4">
+              <CardHeader>
+                <CardTitle>Revenue Overview</CardTitle>
+                <CardDescription>
+                  Monthly revenue trends for the current year.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="pl-2">
+                <RevenueChart />
+              </CardContent>
+            </Card>
+            <Card className="col-span-3">
+              <CardHeader>
+                <CardTitle>Recent Sales</CardTitle>
+                <CardDescription>
+                  You made 265 sales this month.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-8">
+                  <div className="flex items-center">
+                    <div className="space-y-1">
+                      <p className="text-sm font-medium leading-none">
+                        Olivia Martin
+                      </p>
+                      <p className="text-sm text-muted-foreground">
+                        olivia.martin@email.com
+                      </p>
+                    </div>
+                    <div className="ml-auto font-medium">+₦1,999.00</div>
+                  </div>
+                  <div className="flex items-center">
+                    <div className="space-y-1">
+                      <p className="text-sm font-medium leading-none">
+                        Jackson Lee
+                      </p>
+                      <p className="text-sm text-muted-foreground">
+                        jackson.lee@email.com
+                      </p>
+                    </div>
+                    <div className="ml-auto font-medium">+₦39.00</div>
+                  </div>
+                  <div className="flex items-center">
+                    <div className="space-y-1">
+                      <p className="text-sm font-medium leading-none">
+                        Isabella Nguyen
+                      </p>
+                      <p className="text-sm text-muted-foreground">
+                        isabella.nguyen@email.com
+                      </p>
+                    </div>
+                    <div className="ml-auto font-medium">+₦299.00</div>
+                  </div>
+                  <div className="flex items-center">
+                    <div className="space-y-1">
+                      <p className="text-sm font-medium leading-none">
+                        William Kim
+                      </p>
+                      <p className="text-sm text-muted-foreground">
+                        will@email.com
+                      </p>
+                    </div>
+                    <div className="ml-auto font-medium">+₦99.00</div>
+                  </div>
+                  <div className="flex items-center">
+                    <div className="space-y-1">
+                      <p className="text-sm font-medium leading-none">
+                        Sofia Davis
+                      </p>
+                      <p className="text-sm text-muted-foreground">
+                        sofia.davis@email.com
+                      </p>
+                    </div>
+                    <div className="ml-auto font-medium">+₦39.00</div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </TabsContent>
+      </Tabs>
     </div>
   );
-}
+};
