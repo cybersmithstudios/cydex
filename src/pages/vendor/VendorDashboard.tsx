@@ -11,6 +11,7 @@ import {
   Package, Clock, Leaf, ChevronRight, ArrowUpRight, 
   TrendingUp, BarChart3, UserCheck, ShoppingBag, RecycleIcon
 } from 'lucide-react';
+import LoadingDisplay from '@/components/ui/LoadingDisplay';
 
 // Mock data with updated Naira values (1 USD = 1,533.10 NGN)
 const pendingOrders = [
@@ -20,7 +21,7 @@ const pendingOrders = [
     status: 'pending',
     createdAt: '5 minutes ago',
     items: 3,
-    total: 73,579.77 // 47.99 USD
+    total: 73579.77 // 47.99 USD
   },
   {
     id: 'ORD-5679',
@@ -28,7 +29,7 @@ const pendingOrders = [
     status: 'pending',
     createdAt: '12 minutes ago',
     items: 1,
-    total: 28,362.35 // 18.50 USD
+    total: 28362.35 // 18.50 USD
   }
 ];
 
@@ -40,7 +41,7 @@ const inProgressOrders = [
     status: 'processing',
     estimatedDelivery: '25 minutes',
     items: 2,
-    total: 56,341.42 // 36.75 USD
+    total: 56341.42 // 36.75 USD
   }
 ];
 
@@ -51,7 +52,7 @@ const completedOrders = [
     status: 'delivered',
     completedAt: '1 hour ago',
     items: 4,
-    total: 80,104.97, // 52.25 USD
+    total: 80104.97, // 52.25 USD
     carbonSaved: 0.7
   },
   {
@@ -60,7 +61,7 @@ const completedOrders = [
     status: 'delivered',
     completedAt: '3 hours ago',
     items: 2,
-    total: 45,916.34, // 29.95 USD
+    total: 45916.34, // 29.95 USD
     carbonSaved: 0.4
   },
   {
@@ -69,7 +70,7 @@ const completedOrders = [
     status: 'delivered',
     completedAt: 'Yesterday',
     items: 3,
-    total: 64,083.58, // 41.80 USD
+    total: 64083.58, // 41.80 USD
     carbonSaved: 0.6
   }
 ];
