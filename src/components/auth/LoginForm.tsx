@@ -7,6 +7,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 import { Link } from "react-router-dom";
 import { Eye, EyeOff, ArrowLeft } from "lucide-react";
+import LoadingDisplay from "@/components/ui/LoadingDisplay";
 
 const LoginForm = () => {
   const [loginEmail, setLoginEmail] = useState("");
@@ -26,10 +27,10 @@ const LoginForm = () => {
     setIsSubmitting(true);
     try {
       await login(loginEmail, loginPassword);
-      // Redirect will happen automatically due to the conditional in Auth.tsx
-    } catch (error) {
+      // Auth Provider will handle the redirect
+    } catch (error: any) {
       console.error("Login failed:", error);
-      // Error toast is already shown in the login function
+      toast.error(error.message || "Login failed. Please try again.");
     } finally {
       setIsSubmitting(false);
     }
@@ -38,6 +39,10 @@ const LoginForm = () => {
   const toggleShowPassword = () => {
     setShowPassword(!showPassword);
   };
+
+  if (isSubmitting) {
+    return <LoadingDisplay message="Signing in..." />;
+  }
   
   return (
     <div className="space-y-6">
