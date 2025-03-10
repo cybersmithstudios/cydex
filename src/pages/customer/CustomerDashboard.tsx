@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import DashboardLayout from '@/components/layout/DashboardLayout';
@@ -296,7 +295,7 @@ const CustomerDashboard = () => {
             <CardContent>
               <div className="mb-6">
                 <p className="text-sm text-gray-600">Available Balance</p>
-                <div className="text-3xl font-bold">$24.50</div>
+                <div className="text-3xl font-bold">₦24.50</div>
               </div>
               
               <div className="space-y-3">
