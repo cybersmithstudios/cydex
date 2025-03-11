@@ -1,12 +1,13 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Eye, EyeOff, ArrowLeft } from "lucide-react";
+import LoadingDisplay from "@/components/ui/LoadingDisplay";
 
 const LoginForm = () => {
   const [loginEmail, setLoginEmail] = useState("");
@@ -14,7 +15,16 @@ const LoginForm = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   
-  const { login } = useAuth();
+  const { login, isAuthenticated, user } = useAuth();
+  const navigate = useNavigate();
+  
+  // Effect to handle redirect after successful login
+  useEffect(() => {
+    if (isAuthenticated && user) {
+      // If user is authenticated, redirect to their role-specific dashboard
+      navigate(`/${user.role}`);
+    }
+  }, [isAuthenticated, user, navigate]);
   
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -24,12 +34,15 @@ const LoginForm = () => {
     }
     
     setIsSubmitting(true);
+    
     try {
+      console.log("Attempting login with:", { email: loginEmail });
       await login(loginEmail, loginPassword);
-      // Redirect will happen automatically due to the conditional in Auth.tsx
-    } catch (error) {
+      
+      // The useEffect above will handle redirection if login is successful
+    } catch (error: any) {
       console.error("Login failed:", error);
-      // Error toast is already shown in the login function
+      toast.error(error.message || "Login failed. Please try again.");
     } finally {
       setIsSubmitting(false);
     }
@@ -97,6 +110,14 @@ const LoginForm = () => {
           {isSubmitting ? "Logging in..." : "Login"}
         </Button>
       </form>
+      
+      {isSubmitting && (
+        <div className="mt-4">
+          <div className="flex justify-center">
+            <LoadingDisplay size="sm" message="Verifying credentials..." />
+          </div>
+        </div>
+      )}
     </div>
   );
 };

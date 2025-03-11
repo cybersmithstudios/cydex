@@ -12,7 +12,7 @@ import {
   ArrowUpRight, Wallet, TrendingUp, Calendar 
 } from 'lucide-react';
 
-// Mock data
+// Mock data for available orders with updated Naira values
 const availableOrders = [
   {
     id: 'ORD-2341',
@@ -21,8 +21,8 @@ const availableOrders = [
     distance: '1.2 miles',
     pickupTime: '10 minutes',
     deliveryTime: '25 minutes',
-    fee: 8.50,
-    ecoBonus: 1.20,
+    fee: 13032.35,
+    ecoBonus: 1839.72,
     items: 2
   },
   {
@@ -32,8 +32,8 @@ const availableOrders = [
     distance: '0.8 miles',
     pickupTime: '5 minutes',
     deliveryTime: '15 minutes',
-    fee: 6.75,
-    ecoBonus: 0.75,
+    fee: 10348.42,
+    ecoBonus: 1149.82,
     items: 1
   },
   {
@@ -43,8 +43,8 @@ const availableOrders = [
     distance: '1.5 miles',
     pickupTime: '15 minutes',
     deliveryTime: '30 minutes',
-    fee: 9.25,
-    ecoBonus: 1.50,
+    fee: 14181.17,
+    ecoBonus: 2299.65,
     items: 3
   }
 ];
@@ -98,10 +98,10 @@ const RiderDashboard = () => {
               <CardTitle className="text-base font-medium">Today's Earnings</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold">$45.50</div>
+              <div className="text-3xl font-bold">₦69,755.05</div>
               <div className="flex items-center mt-1 text-sm text-green-600">
                 <TrendingUp className="h-4 w-4 mr-1" />
-                <span>+$12.50 from eco bonuses</span>
+                <span>+₦19,163.75 from eco bonuses</span>
               </div>
             </CardContent>
           </Card>
@@ -228,8 +228,8 @@ const RiderDashboard = () => {
                     
                     <div className="flex flex-col items-end justify-between mt-4 md:mt-0">
                       <div className="text-right">
-                        <div className="text-lg font-bold">${order.fee.toFixed(2)}</div>
-                        <div className="text-sm text-green-600">+${order.ecoBonus.toFixed(2)} eco bonus</div>
+                        <div className="text-lg font-bold">₦{order.fee.toLocaleString('en-NG', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</div>
+                        <div className="text-sm text-green-600">+₦{order.ecoBonus.toLocaleString('en-NG', {minimumFractionDigits: 2, maximumFractionDigits: 2})} eco bonus</div>
                       </div>
                       <Button className="mt-2 bg-primary hover:bg-primary-hover text-black">
                         Accept Order
@@ -301,19 +301,19 @@ const RiderDashboard = () => {
                     <div className="space-y-4">
                       <div className="flex justify-between items-center">
                         <p className="text-gray-600">Delivery Fees</p>
-                        <p className="font-medium">$152.75</p>
+                        <p className="font-medium">₦234,178.25</p>
                       </div>
                       <div className="flex justify-between items-center">
                         <p className="text-gray-600">Eco Bonuses</p>
-                        <p className="font-medium text-green-600">+$28.50</p>
+                        <p className="font-medium text-green-600">+₦43,693.35</p>
                       </div>
                       <div className="flex justify-between items-center">
                         <p className="text-gray-600">Tips</p>
-                        <p className="font-medium">$42.00</p>
+                        <p className="font-medium">₦64,390.20</p>
                       </div>
                       <div className="border-t pt-3 flex justify-between items-center">
                         <p className="font-bold">Total</p>
-                        <p className="text-xl font-bold">$223.25</p>
+                        <p className="text-xl font-bold">₦342,261.80</p>
                       </div>
                     </div>
                   </TabsContent>
@@ -322,19 +322,19 @@ const RiderDashboard = () => {
                     <div className="space-y-4">
                       <div className="flex justify-between items-center">
                         <p className="text-gray-600">Delivery Fees</p>
-                        <p className="font-medium">$567.25</p>
+                        <p className="font-medium">₦869,588.83</p>
                       </div>
                       <div className="flex justify-between items-center">
                         <p className="text-gray-600">Eco Bonuses</p>
-                        <p className="font-medium text-green-600">+$89.50</p>
+                        <p className="font-medium text-green-600">+₦137,211.45</p>
                       </div>
                       <div className="flex justify-between items-center">
                         <p className="text-gray-600">Tips</p>
-                        <p className="font-medium">$153.00</p>
+                        <p className="font-medium">₦234,564.30</p>
                       </div>
                       <div className="border-t pt-3 flex justify-between items-center">
                         <p className="font-bold">Total</p>
-                        <p className="text-xl font-bold">$809.75</p>
+                        <p className="text-xl font-bold">₦1,241,364.58</p>
                       </div>
                     </div>
                   </TabsContent>

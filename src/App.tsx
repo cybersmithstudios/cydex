@@ -1,14 +1,16 @@
+
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Index from './pages/Index';
 import Auth from './pages/Auth';
 import ResetPassword from './pages/Auth/ResetPassword';
 import NotFound from './pages/NotFound';
 import CustomerDashboard from './pages/customer/CustomerDashboard';
+import NewOrder from './pages/customer/NewOrder';
 import RiderDashboard from './pages/rider/RiderDashboard';
 import VendorDashboard from './pages/vendor/VendorDashboard';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
-import { FloatingWhatsApp } from 'react-floating-whatsapp'
+import { FloatingWhatsApp } from './components/FloatingWhatsApp';
 import { ThemeProvider } from './contexts/ThemeContext';
 import { Toaster } from './components/ui/sonner';
 import HowItWorks from './pages/HowItWorks';
@@ -65,6 +67,16 @@ function App() {
               element={
                 <ProtectedRoute allowedRoles={['customer']}>
                   <CustomerDashboard />
+                </ProtectedRoute>
+              } 
+            />
+            
+            {/* New Order page */}
+            <Route 
+              path="/customer/new-order" 
+              element={
+                <ProtectedRoute allowedRoles={['customer']}>
+                  <NewOrder />
                 </ProtectedRoute>
               } 
             />

@@ -1,14 +1,15 @@
-
 import React, { useState, useEffect } from 'react';
 import { toast } from "sonner";
 import { AuthContext } from './AuthContext';
 import { User, UserRole } from '../types/auth.types';
 import { SESSION_TIMEOUT } from '../constants/auth.constants';
 import { supabase } from '../lib/supabase';
+import LoadingDisplay from '@/components/ui/LoadingDisplay';
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [loggingOut, setLoggingOut] = useState(false);
   const [sessionExpiry, setSessionExpiry] = useState<number | null>(null);
   const [loginAttempts, setLoginAttempts] = useState<{[key: string]: {count: number, lastAttempt: number}}>({});
 
@@ -37,6 +38,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     
     // Listen for authentication changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      console.log('Auth state changed:', event, session ? 'session exists' : 'no session');
       if (event === 'SIGNED_IN' && session) {
         await fetchUserProfile(session.user.id);
       } else if (event === 'SIGNED_OUT') {
@@ -53,6 +55,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   // Fetch user profile from Supabase
   const fetchUserProfile = async (userId: string) => {
     try {
+      console.log('Fetching user profile for:', userId);
       const { data: profile, error } = await supabase
         .from('profiles')
         .select('*')
@@ -60,10 +63,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         .single();
       
       if (error) {
+        console.error('Error fetching profile:', error);
         throw error;
       }
       
       if (profile) {
+        console.log('Profile found:', profile);
         const userData: User = {
           id: profile.id,
           name: profile.name,
@@ -88,6 +93,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           .from('profiles')
           .update({ last_active: new Date().toISOString() })
           .eq('id', userId);
+      } else {
+        console.warn('No profile found for user:', userId);
       }
     } catch (error) {
       console.error('Error fetching user profile:', error);
@@ -153,6 +160,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   // Login function with Supabase
   const login = async (email: string, password: string) => {
+    console.log('Login attempt for:', email);
     setLoading(true);
     try {
       // Check login attempts
@@ -164,12 +172,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
       
       // Sign in with Supabase
-      const { error } = await supabase.auth.signInWithPassword({
+      const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password
       });
       
       if (error) {
+        console.error('Supabase login error:', error);
         // Increment login attempts
         setLoginAttempts(prev => ({
           ...prev,
@@ -179,12 +188,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         throw error;
       }
       
+      if (!data.user || !data.session) {
+        console.error('Login succeeded but no user or session returned');
+        throw new Error('Login failed. Please try again.');
+      }
+      
+      console.log('Login successful for user:', data.user.id);
+      
       // Reset login attempts on successful login
       setLoginAttempts(prev => ({ ...prev, [email]: { count: 0, lastAttempt: Date.now() } }));
       toast.success(`Welcome back!`);
       
     } catch (error: any) {
       const message = error.message || 'Login failed';
+      console.error('Login error:', message);
       toast.error(message);
       throw error;
     } finally {
@@ -331,26 +348,30 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  // Logout function with Supabase
+  // Logout function with Supabase - updated to ensure immediate redirect
   const logout = async () => {
     try {
+      setLoggingOut(true);
       await supabase.auth.signOut();
       localStorage.removeItem('cydexSessionExpiry');
       setUser(null);
       setSessionExpiry(null);
       toast.info('You have been logged out');
       
-      // Redirect to homepage after logout
+      // Force page navigation to home
       window.location.href = '/';
     } catch (error) {
       console.error('Error during logout:', error);
       toast.error('Failed to log out');
+    } finally {
+      setLoggingOut(false);
     }
   };
 
   const value = {
     user,
     loading,
+    loggingOut,
     login,
     register,
     logout,
@@ -364,5 +385,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     refreshSession
   };
 
+  if (loading && !user) {
+    return <LoadingDisplay fullScreen message="Loading..." size="lg" />;
+  }
+
+  if (loggingOut) {
+    return <LoadingDisplay fullScreen message="Signing out..." size="lg" />;
+  }
+
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
+
