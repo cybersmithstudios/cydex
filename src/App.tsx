@@ -1,4 +1,3 @@
-
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Index from './pages/Index';
 import Auth from './pages/Auth';
@@ -63,20 +62,19 @@ function App() {
             
             {/* Protected customer routes */}
             <Route 
-              path="/customer/*" 
-              element={
-                <ProtectedRoute allowedRoles={['customer']}>
-                  <CustomerDashboard />
-                </ProtectedRoute>
-              } 
-            />
-            
-            {/* New Order page */}
-            <Route 
               path="/customer/new-order" 
               element={
                 <ProtectedRoute allowedRoles={['customer']}>
                   <NewOrder />
+                </ProtectedRoute>
+              } 
+            />
+            
+            <Route 
+              path="/customer/*" 
+              element={
+                <ProtectedRoute allowedRoles={['customer']}>
+                  <CustomerDashboard />
                 </ProtectedRoute>
               } 
             />
@@ -118,7 +116,7 @@ function App() {
           <FloatingWhatsApp 
             phoneNumber="1234567890"
             accountName="Cydex"
-            avatar="/whatsapp.svg"
+            avatar="/og-tab.png"
             statusMessage="Typically replies within minutes"
             chatMessage="Hello! 👋 Welcome to Cydex. How can we help you with sustainable deliveries today?"
             placeholder="Type your message here..."

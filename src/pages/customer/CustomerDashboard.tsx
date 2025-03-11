@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import DashboardLayout from '@/components/layout/DashboardLayout';
@@ -8,6 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Truck, Box, Clock, Leaf, ChevronRight, ArrowUpRight } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 // Mock data
 const activeOrders = [
@@ -60,6 +60,7 @@ const pastOrders = [
 
 const CustomerDashboard = () => {
   const { user } = useAuth();
+  const navigate = useNavigate();
 
   const getStatusBadge = (status: string) => {
     switch (status) {
@@ -89,7 +90,10 @@ const CustomerDashboard = () => {
               Track your deliveries and eco-impact
             </p>
           </div>
-          <Button className="bg-primary hover:bg-primary-hover text-black">
+          <Button 
+            className="bg-primary hover:bg-primary-hover text-black"
+            onClick={() => navigate('/customer/new-order')}
+          >
             New Order
           </Button>
         </div>
