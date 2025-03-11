@@ -5,6 +5,7 @@ import Auth from './pages/Auth';
 import ResetPassword from './pages/Auth/ResetPassword';
 import NotFound from './pages/NotFound';
 import CustomerDashboard from './pages/customer/CustomerDashboard';
+import NewOrder from './pages/customer/NewOrder';
 import RiderDashboard from './pages/rider/RiderDashboard';
 import VendorDashboard from './pages/vendor/VendorDashboard';
 import AdminDashboard from './pages/admin/AdminDashboard';
@@ -66,6 +67,16 @@ function App() {
               element={
                 <ProtectedRoute allowedRoles={['customer']}>
                   <CustomerDashboard />
+                </ProtectedRoute>
+              } 
+            />
+            
+            {/* New Order page */}
+            <Route 
+              path="/customer/new-order" 
+              element={
+                <ProtectedRoute allowedRoles={['customer']}>
+                  <NewOrder />
                 </ProtectedRoute>
               } 
             />
