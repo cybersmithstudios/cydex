@@ -106,7 +106,7 @@ function App() {
           <FloatingWhatsApp 
             phoneNumber="1234567890"
             accountName="Cydex"
-            avatar="/og-tab.png"
+            avatar="/whatsapp.svg"
             statusMessage="Typically replies within minutes"
             chatMessage="Hello! 👋 Welcome to Cydex. How can we help you with sustainable deliveries today?"
             placeholder="Type your message here..."
