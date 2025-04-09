@@ -8,6 +8,9 @@ import CustomerDashboard from './pages/customer/CustomerDashboard';
 import NewOrder from './pages/customer/NewOrder';
 import Orders from './pages/customer/Orders';
 import Wallet from './pages/customer/Wallet';
+import Recycling from './pages/customer/Recycling';
+import Messages from './pages/customer/Messages';
+import Profile from './pages/customer/Profile';
 import RiderDashboard from './pages/rider/RiderDashboard';
 import VendorDashboard from './pages/vendor/VendorDashboard';
 import AdminDashboard from './pages/admin/AdminDashboard';
@@ -87,6 +90,33 @@ function App() {
               element={
                 <ProtectedRoute allowedRoles={['customer']}>
                   <Wallet />
+                </ProtectedRoute>
+              } 
+            />
+
+            <Route 
+              path="/customer/recycling" 
+              element={
+                <ProtectedRoute allowedRoles={['customer']}>
+                  <Recycling />
+                </ProtectedRoute>
+              } 
+            />
+            
+            <Route 
+              path="/customer/messages" 
+              element={
+                <ProtectedRoute allowedRoles={['customer']}>
+                  <Messages />
+                </ProtectedRoute>
+              } 
+            />
+            
+            <Route 
+              path="/customer/profile" 
+              element={
+                <ProtectedRoute allowedRoles={['customer']}>
+                  <Profile />
                 </ProtectedRoute>
               } 
             />
