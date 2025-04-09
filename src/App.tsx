@@ -13,6 +13,11 @@ import Messages from './pages/customer/Messages';
 import Profile from './pages/customer/Profile';
 import RiderDashboard from './pages/rider/RiderDashboard';
 import VendorDashboard from './pages/vendor/VendorDashboard';
+import VendorOrders from './pages/vendor/Orders';
+import VendorWallet from './pages/vendor/Wallet';
+import VendorRecycling from './pages/vendor/Recycling';
+import VendorMessages from './pages/vendor/Messages';
+import VendorSettings from './pages/vendor/Settings';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { FloatingWhatsApp } from './components/FloatingWhatsApp';
@@ -142,10 +147,50 @@ function App() {
             
             {/* Protected vendor routes */}
             <Route 
-              path="/vendor/*" 
+              path="/vendor" 
               element={
                 <ProtectedRoute allowedRoles={['vendor']}>
                   <VendorDashboard />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/vendor/orders" 
+              element={
+                <ProtectedRoute allowedRoles={['vendor']}>
+                  <VendorOrders />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/vendor/wallet" 
+              element={
+                <ProtectedRoute allowedRoles={['vendor']}>
+                  <VendorWallet />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/vendor/recycling" 
+              element={
+                <ProtectedRoute allowedRoles={['vendor']}>
+                  <VendorRecycling />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/vendor/messages" 
+              element={
+                <ProtectedRoute allowedRoles={['vendor']}>
+                  <VendorMessages />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/vendor/settings" 
+              element={
+                <ProtectedRoute allowedRoles={['vendor']}>
+                  <VendorSettings />
                 </ProtectedRoute>
               } 
             />
