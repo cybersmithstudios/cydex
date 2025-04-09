@@ -27,14 +27,18 @@ import {
   CalendarDays,
   Check,
   ChevronRight,
-  Check,
   AlertCircle,
   Car,
   Bike,
   CreditCard,
   Building,
   Clipboard,
-  Edit
+  Edit,
+  Mail,
+  MessageSquare,
+  Info,
+  Award,
+  Camera
 } from 'lucide-react';
 import {
   Dialog,

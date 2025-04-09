@@ -1,802 +1,518 @@
 
 import React, { useState } from 'react';
-import { useAuth } from '@/contexts/AuthContext';
 import DashboardLayout from '@/components/layout/DashboardLayout';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
-import { 
-  Wallet, Download, ArrowUpRight, BarChart, 
-  TrendingUp, Calendar, Clock, ChevronDown, ChevronUp, Filter, 
-  ArrowDownUp, FileText, DollarSign, Leaf, Gift
-} from 'lucide-react';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
-  AreaChart,
-  Area,
-  BarChart as RechartsBarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-  Legend
-} from 'recharts';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Calendar as CalendarIcon, Download, ChevronDown, ArrowUp, ArrowDown, ChevronRight } from 'lucide-react';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Calendar } from '@/components/ui/calendar';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { format } from 'date-fns';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line } from 'recharts';
 
-// Sample data for charts and tables
-const weeklyEarningsData = [
-  { day: 'Mon', deliveryFee: 12500, ecoBonus: 2500, tips: 1200, total: 16200 },
-  { day: 'Tue', deliveryFee: 15300, ecoBonus: 3100, tips: 2500, total: 20900 },
-  { day: 'Wed', deliveryFee: 9800, ecoBonus: 1900, tips: 800, total: 12500 },
-  { day: 'Thu', deliveryFee: 16700, ecoBonus: 3400, tips: 3000, total: 23100 },
-  { day: 'Fri', deliveryFee: 18200, ecoBonus: 3700, tips: 3200, total: 25100 },
-  { day: 'Sat', deliveryFee: 22500, ecoBonus: 4500, tips: 4100, total: 31100 },
-  { day: 'Sun', deliveryFee: 10500, ecoBonus: 2100, tips: 1800, total: 14400 }
-];
+const RiderEarnings = () => {
+  // States for date pickers
+  const [startDate, setStartDate] = useState<Date | undefined>(new Date());
+  const [endDate, setEndDate] = useState<Date | undefined>(new Date());
+  const [period, setPeriod] = useState('weekly');
 
-const monthlyEarningsData = [
-  { week: 'Week 1', deliveryFee: 78500, ecoBonus: 15700, tips: 12000, total: 106200 },
-  { week: 'Week 2', deliveryFee: 83200, ecoBonus: 16600, tips: 14500, total: 114300 },
-  { week: 'Week 3', deliveryFee: 92100, ecoBonus: 18400, tips: 16800, total: 127300 },
-  { week: 'Week 4', deliveryFee: 88700, ecoBonus: 17700, tips: 15900, total: 122300 }
-];
+  // Daily earnings data (mock data)
+  const dailyEarningsData = [
+    { date: 'Apr 1', earnings: 5200, deliveries: 8 },
+    { date: 'Apr 2', earnings: 6700, deliveries: 10 },
+    { date: 'Apr 3', earnings: 4900, deliveries: 7 },
+    { date: 'Apr 4', earnings: 7300, deliveries: 12 },
+    { date: 'Apr 5', earnings: 8400, deliveries: 14 },
+    { date: 'Apr 6', earnings: 5600, deliveries: 9 },
+    { date: 'Apr 7', earnings: 3800, deliveries: 6 },
+    { date: 'Apr 8', earnings: 6200, deliveries: 11 },
+    { date: 'Apr 9', earnings: 7500, deliveries: 13 }
+  ];
 
-const recentTransactions = [
-  { 
-    id: 'TR-7842', 
-    type: 'Earnings', 
-    description: 'Weekly earnings payout',
-    amount: 143500,
-    status: 'completed',
-    date: 'Apr 8, 2025',
-    time: '09:15 AM'
-  },
-  { 
-    id: 'TR-7830', 
-    type: 'Withdrawal', 
-    description: 'Bank withdrawal - Zenith Bank',
-    amount: -125000,
-    status: 'completed',
-    date: 'Apr 7, 2025',
-    time: '02:30 PM'
-  },
-  { 
-    id: 'TR-7813', 
-    type: 'Bonus', 
-    description: 'Sustainability achievement bonus',
-    amount: 25000,
-    status: 'completed',
-    date: 'Apr 5, 2025',
-    time: '11:20 AM'
-  },
-  { 
-    id: 'TR-7798', 
-    type: 'Tip', 
-    description: 'Customer tip - Order #ORD-2339',
-    amount: 5000,
-    status: 'completed',
-    date: 'Apr 5, 2025',
-    time: '10:45 AM'
-  },
-  { 
-    id: 'TR-7785', 
-    type: 'Earnings', 
-    description: 'Daily delivery earnings',
-    amount: 37500,
-    status: 'completed',
-    date: 'Apr 4, 2025',
-    time: '08:30 PM'
-  },
-  { 
-    id: 'TR-7766', 
-    type: 'Withdrawal', 
-    description: 'Bank withdrawal - GTBank',
-    amount: -100000,
-    status: 'completed',
-    date: 'Apr 2, 2025',
-    time: '03:15 PM'
-  }
-];
+  // Weekly earnings data (mock data)
+  const weeklyEarningsData = [
+    { week: 'Week 1', earnings: 42000, deliveries: 67 },
+    { week: 'Week 2', earnings: 38500, deliveries: 58 },
+    { week: 'Week 3', earnings: 45200, deliveries: 72 },
+    { week: 'Week 4', earnings: 51000, deliveries: 81 }
+  ];
 
-// Delivery history data
-const deliveryHistory = [
-  {
-    id: 'ORD-2339',
-    date: 'Apr 9, 2025',
-    vendor: 'Zero Waste Store',
-    customer: 'Michael Brown',
-    deliveryFee: 8500.75,
-    ecoBonus: 1200.25,
-    tip: 2000,
-    total: 11701.00,
-    location: 'Ikoyi'
-  },
-  {
-    id: 'ORD-2337',
-    date: 'Apr 9, 2025',
-    vendor: 'Green Earth Groceries',
-    customer: 'Sarah Okafor',
-    deliveryFee: 10800.25,
-    ecoBonus: 1650.75,
-    tip: 2000,
-    total: 14451.00,
-    location: 'Victoria Island'
-  },
-  {
-    id: 'ORD-2334',
-    date: 'Apr 9, 2025',
-    vendor: 'Fresh Farm Produce',
-    customer: 'Emmanuel Adegoke',
-    deliveryFee: 15620.00,
-    ecoBonus: 2200.50,
-    tip: 1500,
-    total: 19320.50,
-    location: 'Lekki'
-  },
-  {
-    id: 'ORD-2328',
-    date: 'Apr 8, 2025',
-    vendor: 'Tech Gadgets Store',
-    customer: 'Chidi Okonkwo',
-    deliveryFee: 9500.75,
-    ecoBonus: 950.25,
-    tip: 500,
-    total: 10951.00,
-    location: 'Ikeja'
-  },
-  {
-    id: 'ORD-2325',
-    date: 'Apr 8, 2025',
-    vendor: 'Health Essentials',
-    customer: 'Fatima Ahmed',
-    deliveryFee: 7250.50,
-    ecoBonus: 725.05,
-    tip: 0,
-    total: 7975.55,
-    location: 'Surulere'
-  }
-];
+  // Monthly earnings data (mock data)
+  const monthlyEarningsData = [
+    { month: 'Jan', earnings: 184000, deliveries: 290 },
+    { month: 'Feb', earnings: 176500, deliveries: 275 },
+    { month: 'Mar', earnings: 195200, deliveries: 310 },
+    { month: 'Apr', earnings: 172000, deliveries: 270 }
+  ];
 
-const earningsStats = {
-  daily: {
-    deliveryFees: 35720.50,
-    ecoBonus: 6150.25,
-    tips: 5500.00,
-    total: 47370.75
-  },
-  weekly: {
-    deliveryFees: 234178.25,
-    ecoBonus: 43693.35,
-    tips: 64390.20,
-    total: 342261.80
-  },
-  monthly: {
-    deliveryFees: 869588.83,
-    ecoBonus: 137211.45,
-    tips: 234564.30,
-    total: 1241364.58
-  }
-};
-
-const formatCurrency = (amount) => {
-  return amount.toLocaleString('en-NG', {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2
-  });
-};
-
-const Earnings = () => {
-  const { user } = useAuth();
-  const [dateRange, setDateRange] = useState('week');
-  const [walletBalance, setWalletBalance] = useState(285679.45);
-  const [transactionSortOrder, setTransactionSortOrder] = useState('desc');
-  const [showTransactionFilters, setShowTransactionFilters] = useState(false);
-  const [chartType, setChartType] = useState('area');
-
-  const getStatusBadge = (status) => {
-    switch (status) {
-      case 'completed':
-        return <Badge className="bg-green-500">Completed</Badge>;
-      case 'pending':
-        return <Badge className="bg-amber-500">Pending</Badge>;
-      case 'failed':
-        return <Badge className="bg-red-500">Failed</Badge>;
-      default:
-        return <Badge>Unknown</Badge>;
+  // Recent transactions (mock data)
+  const recentTransactions = [
+    {
+      id: 'TRX-001',
+      date: 'Apr 9, 2025',
+      amount: 3800,
+      status: 'completed',
+      customer: 'Sarah Johnson',
+      orderType: 'Food Delivery'
+    },
+    {
+      id: 'TRX-002',
+      date: 'Apr 9, 2025',
+      amount: 4200,
+      status: 'completed',
+      customer: 'Michael Brown',
+      orderType: 'Package Delivery'
+    },
+    {
+      id: 'TRX-003',
+      date: 'Apr 8, 2025',
+      amount: 2900,
+      status: 'completed',
+      customer: 'David Wilson',
+      orderType: 'Food Delivery'
+    },
+    {
+      id: 'TRX-004',
+      date: 'Apr 8, 2025',
+      amount: 5100,
+      status: 'completed',
+      customer: 'Emily Taylor',
+      orderType: 'Grocery Delivery'
+    },
+    {
+      id: 'TRX-005',
+      date: 'Apr 7, 2025',
+      amount: 3400,
+      status: 'completed',
+      customer: 'Daniel Martinez',
+      orderType: 'Package Delivery'
     }
-  };
+  ];
 
-  const getTransactionTypeIcon = (type) => {
-    switch (type) {
-      case 'Earnings':
-        return <DollarSign className="h-4 w-4 text-green-600" />;
-      case 'Withdrawal':
-        return <Wallet className="h-4 w-4 text-amber-600" />;
-      case 'Bonus':
-        return <Gift className="h-4 w-4 text-blue-600" />;
-      case 'Tip':
-        return <Leaf className="h-4 w-4 text-purple-600" />;
-      default:
-        return <FileText className="h-4 w-4" />;
+  // Withdrawal history (mock data)
+  const withdrawalHistory = [
+    {
+      id: 'WDR-001',
+      date: 'Apr 5, 2025',
+      amount: 35000,
+      status: 'completed',
+      accountNumber: '****4587',
+      bank: 'Zenith Bank'
+    },
+    {
+      id: 'WDR-002',
+      date: 'Mar 29, 2025',
+      amount: 42000,
+      status: 'completed',
+      accountNumber: '****4587',
+      bank: 'Zenith Bank'
+    },
+    {
+      id: 'WDR-003',
+      date: 'Mar 22, 2025',
+      amount: 38500,
+      status: 'completed',
+      accountNumber: '****4587',
+      bank: 'Zenith Bank'
     }
-  };
+  ];
 
-  const sortedTransactions = [...recentTransactions].sort((a, b) => {
-    if (transactionSortOrder === 'desc') {
-      return new Date(`${b.date} ${b.time}`) - new Date(`${a.date} ${a.time}`);
-    } else {
-      return new Date(`${a.date} ${a.time}`) - new Date(`${b.date} ${b.time}`);
-    }
-  });
+  // Calculate total earnings
+  const totalEarnings = recentTransactions.reduce((sum, tx) => sum + tx.amount, 0);
+  
+  // Calculate total withdrawals
+  const totalWithdrawals = withdrawalHistory.reduce((sum, wdr) => sum + wdr.amount, 0);
 
-  const areaColors = {
-    deliveryFee: '#9b87f5',
-    ecoBonus: '#4ade80',
-    tips: '#60a5fa'
+  // Helper function to determine if earnings are up or down
+  const earningsChange = () => {
+    // In a real app, this would compare current period with previous period
+    // For this demo, we'll just hardcode a value
+    return {
+      percentage: 12.5,
+      isUp: true
+    };
   };
 
   return (
     <DashboardLayout userRole="rider">
       <div className="p-4 md:p-6 max-w-7xl mx-auto">
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
-          <div>
-            <h1 className="text-2xl font-bold">Earnings & Wallet</h1>
-            <p className="text-gray-600">Track your income and manage your finances</p>
-          </div>
-          <div className="flex gap-2">
-            <Button variant="outline" className="flex items-center gap-2">
-              <Download className="h-4 w-4" />
-              <span className="hidden sm:inline">Download Report</span>
-            </Button>
-            <Button className="bg-primary hover:bg-primary-hover text-black" onClick={() => console.log('Withdraw clicked')}>
-              <Wallet className="mr-2 h-4 w-4" />
-              <span>Withdraw</span>
-            </Button>
-          </div>
-        </div>
-
-        {/* Wallet Card */}
         <div className="mb-6">
-          <Card className="bg-gradient-to-br from-primary-light to-white overflow-hidden relative">
-            <CardContent className="p-6">
-              <div className="flex flex-col md:flex-row justify-between">
+          <h1 className="text-2xl font-bold">Earnings Dashboard</h1>
+          <p className="text-gray-600">Track your earnings, transactions, and withdrawals</p>
+        </div>
+
+        {/* Earnings Overview Cards */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+          <Card>
+            <CardContent className="p-4">
+              <div className="flex justify-between items-start">
                 <div>
-                  <h3 className="text-lg font-medium mb-2">Wallet Balance</h3>
-                  <p className="text-3xl font-bold">₦{formatCurrency(walletBalance)}</p>
-                  <div className="flex items-center mt-2 text-sm">
-                    <TrendingUp className="h-4 w-4 mr-1 text-green-600" />
-                    <span className="text-green-600">+₦{formatCurrency(earningsStats.daily.total)} today</span>
-                  </div>
+                  <p className="text-sm text-gray-500">Available Balance</p>
+                  <h3 className="text-2xl font-bold mt-1">₦{(45600).toLocaleString()}</h3>
                 </div>
-                
-                <div className="mt-4 md:mt-0 flex flex-col items-start md:items-end">
-                  <div className="flex items-center mb-2">
-                    <Badge className="bg-green-100 text-green-800 hover:bg-green-200">Active</Badge>
-                    <span className="ml-2 text-sm text-gray-600">Auto-deposit: Off</span>
-                  </div>
-                  <Button className="bg-primary hover:bg-primary-hover text-black mt-2" onClick={() => console.log('Withdraw clicked')}>
-                    <Wallet className="mr-2 h-4 w-4" />
-                    <span>Withdraw Funds</span>
-                  </Button>
+                <div className="bg-primary/10 p-2 rounded-full">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    <path d="M15 9H9V15H15V9Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
                 </div>
               </div>
-              
-              <div className="absolute right-0 bottom-0 opacity-10">
-                <Wallet className="h-32 w-32" />
+              <div className="mt-4 flex items-center">
+                <Button size="sm" variant="outline" className="text-xs w-full">
+                  Withdraw
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardContent className="p-4">
+              <div className="flex justify-between items-start">
+                <div>
+                  <p className="text-sm text-gray-500">Today's Earnings</p>
+                  <h3 className="text-2xl font-bold mt-1">₦{(8000).toLocaleString()}</h3>
+                </div>
+                <div className="bg-green-100 text-green-700 p-2 rounded-full">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    <path d="M16 8L8 16" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    <path d="M8 8L16 8V16" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                </div>
+              </div>
+              <div className="mt-4 flex items-center text-green-600">
+                <ArrowUp className="h-3 w-3 mr-1" />
+                <span className="text-xs font-medium">23% vs yesterday</span>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardContent className="p-4">
+              <div className="flex justify-between items-start">
+                <div>
+                  <p className="text-sm text-gray-500">This Week</p>
+                  <h3 className="text-2xl font-bold mt-1">₦{(32400).toLocaleString()}</h3>
+                </div>
+                <div className="bg-blue-100 text-blue-700 p-2 rounded-full">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M8 2V5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    <path d="M16 2V5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    <path d="M3 9H21" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    <path d="M19 5H5C3.89543 5 3 5.89543 3 7V19C3 20.1046 3.89543 21 5 21H19C20.1046 21 21 20.1046 21 19V7C21 5.89543 20.1046 5 19 5Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                </div>
+              </div>
+              <div className="mt-4 flex items-center text-green-600">
+                <ArrowUp className="h-3 w-3 mr-1" />
+                <span className="text-xs font-medium">8% vs last week</span>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardContent className="p-4">
+              <div className="flex justify-between items-start">
+                <div>
+                  <p className="text-sm text-gray-500">This Month</p>
+                  <h3 className="text-2xl font-bold mt-1">₦{(172000).toLocaleString()}</h3>
+                </div>
+                <div className="bg-amber-100 text-amber-700 p-2 rounded-full">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M8 2V5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    <path d="M16 2V5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    <path d="M3 9H21" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    <path d="M19 5H5C3.89543 5 3 5.89543 3 7V19C3 20.1046 3.89543 21 5 21H19C20.1046 21 21 20.1046 21 19V7C21 5.89543 20.1046 5 19 5Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    <path d="M12 13H16" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    <path d="M8 17H16" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                </div>
+              </div>
+              <div className="mt-4 flex items-center text-red-600">
+                <ArrowDown className="h-3 w-3 mr-1" />
+                <span className="text-xs font-medium">5% vs last month</span>
               </div>
             </CardContent>
           </Card>
         </div>
 
-        {/* Earnings Summary Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex justify-between items-start">
-                <div>
-                  <p className="text-sm text-gray-600">Today's Earnings</p>
-                  <p className="text-2xl font-bold mt-1">₦{formatCurrency(earningsStats.daily.total)}</p>
-                  <div className="mt-2 space-y-1">
-                    <div className="flex items-center text-sm">
-                      <span className="w-3 h-3 bg-primary rounded-full mr-2"></span>
-                      <span>Delivery Fees: ₦{formatCurrency(earningsStats.daily.deliveryFees)}</span>
-                    </div>
-                    <div className="flex items-center text-sm">
-                      <span className="w-3 h-3 bg-green-500 rounded-full mr-2"></span>
-                      <span>Eco Bonus: ₦{formatCurrency(earningsStats.daily.ecoBonus)}</span>
-                    </div>
-                    <div className="flex items-center text-sm">
-                      <span className="w-3 h-3 bg-blue-500 rounded-full mr-2"></span>
-                      <span>Tips: ₦{formatCurrency(earningsStats.daily.tips)}</span>
-                    </div>
-                  </div>
-                </div>
-                <Calendar className="h-8 w-8 text-gray-400" />
-              </div>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex justify-between items-start">
-                <div>
-                  <p className="text-sm text-gray-600">This Week's Earnings</p>
-                  <p className="text-2xl font-bold mt-1">₦{formatCurrency(earningsStats.weekly.total)}</p>
-                  <div className="mt-2 space-y-1">
-                    <div className="flex items-center text-sm">
-                      <span className="w-3 h-3 bg-primary rounded-full mr-2"></span>
-                      <span>Delivery Fees: ₦{formatCurrency(earningsStats.weekly.deliveryFees)}</span>
-                    </div>
-                    <div className="flex items-center text-sm">
-                      <span className="w-3 h-3 bg-green-500 rounded-full mr-2"></span>
-                      <span>Eco Bonus: ₦{formatCurrency(earningsStats.weekly.ecoBonus)}</span>
-                    </div>
-                    <div className="flex items-center text-sm">
-                      <span className="w-3 h-3 bg-blue-500 rounded-full mr-2"></span>
-                      <span>Tips: ₦{formatCurrency(earningsStats.weekly.tips)}</span>
-                    </div>
-                  </div>
-                </div>
-                <BarChart className="h-8 w-8 text-gray-400" />
-              </div>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex justify-between items-start">
-                <div>
-                  <p className="text-sm text-gray-600">This Month's Earnings</p>
-                  <p className="text-2xl font-bold mt-1">₦{formatCurrency(earningsStats.monthly.total)}</p>
-                  <div className="mt-2 space-y-1">
-                    <div className="flex items-center text-sm">
-                      <span className="w-3 h-3 bg-primary rounded-full mr-2"></span>
-                      <span>Delivery Fees: ₦{formatCurrency(earningsStats.monthly.deliveryFees)}</span>
-                    </div>
-                    <div className="flex items-center text-sm">
-                      <span className="w-3 h-3 bg-green-500 rounded-full mr-2"></span>
-                      <span>Eco Bonus: ₦{formatCurrency(earningsStats.monthly.ecoBonus)}</span>
-                    </div>
-                    <div className="flex items-center text-sm">
-                      <span className="w-3 h-3 bg-blue-500 rounded-full mr-2"></span>
-                      <span>Tips: ₦{formatCurrency(earningsStats.monthly.tips)}</span>
-                    </div>
-                  </div>
-                </div>
-                <TrendingUp className="h-8 w-8 text-gray-400" />
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Earnings Chart */}
+        {/* Filter and Chart Section */}
         <Card className="mb-6">
-          <CardHeader>
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center">
-              <div>
-                <CardTitle>Earnings Breakdown</CardTitle>
-                <CardDescription>View your earnings by category over time</CardDescription>
-              </div>
-              <div className="flex gap-2 mt-2 sm:mt-0">
-                <Select value={dateRange} onValueChange={setDateRange}>
-                  <SelectTrigger className="w-[120px]">
-                    <SelectValue placeholder="This Week" />
+          <CardHeader className="pb-2">
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+              <CardTitle>Earnings Overview</CardTitle>
+              <div className="flex flex-wrap gap-2">
+                <Select value={period} onValueChange={setPeriod}>
+                  <SelectTrigger className="w-[140px]">
+                    <SelectValue placeholder="Select period" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="week">This Week</SelectItem>
-                    <SelectItem value="month">This Month</SelectItem>
-                    <SelectItem value="quarter">This Quarter</SelectItem>
+                    <SelectItem value="daily">Daily</SelectItem>
+                    <SelectItem value="weekly">Weekly</SelectItem>
+                    <SelectItem value="monthly">Monthly</SelectItem>
                   </SelectContent>
                 </Select>
-                
-                <Select value={chartType} onValueChange={setChartType}>
-                  <SelectTrigger className="w-[120px]">
-                    <SelectValue placeholder="Chart Type" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="area">Area Chart</SelectItem>
-                    <SelectItem value="bar">Bar Chart</SelectItem>
-                  </SelectContent>
-                </Select>
+
+                <div className="flex gap-2">
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button variant="outline" size="sm" className="w-[120px] pl-3 text-left font-normal">
+                        {startDate ? format(startDate, 'PPP') : 'Start date'}
+                        <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <Calendar
+                        mode="single"
+                        selected={startDate}
+                        onSelect={setStartDate}
+                        initialFocus
+                      />
+                    </PopoverContent>
+                  </Popover>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button variant="outline" size="sm" className="w-[120px] pl-3 text-left font-normal">
+                        {endDate ? format(endDate, 'PPP') : 'End date'}
+                        <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <Calendar
+                        mode="single"
+                        selected={endDate}
+                        onSelect={setEndDate}
+                        initialFocus
+                      />
+                    </PopoverContent>
+                  </Popover>
+                </div>
+
+                <Button variant="outline" size="sm">
+                  <Download className="mr-2 h-4 w-4" /> Export
+                </Button>
               </div>
             </div>
           </CardHeader>
           <CardContent>
-            <div className="h-80">
+            <div className="h-[350px] mt-4">
               <ResponsiveContainer width="100%" height="100%">
-                {chartType === 'area' ? (
-                  <AreaChart 
-                    data={dateRange === 'week' ? weeklyEarningsData : monthlyEarningsData}
-                    margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
-                  >
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis 
-                      dataKey={dateRange === 'week' ? 'day' : 'week'} 
-                      fontSize={12}
-                    />
-                    <YAxis 
-                      fontSize={12}
-                      tickFormatter={(value) => `₦${value/1000}k`}
-                    />
-                    <Tooltip 
-                      formatter={(value) => `₦${formatCurrency(value)}`} 
-                      labelFormatter={(label) => dateRange === 'week' ? label : `${label}`}
-                    />
-                    <Legend />
-                    <Area 
-                      type="monotone" 
-                      dataKey="deliveryFee" 
-                      name="Delivery Fee"
-                      stackId="1" 
-                      stroke={areaColors.deliveryFee} 
-                      fill={areaColors.deliveryFee} 
-                    />
-                    <Area 
-                      type="monotone" 
-                      dataKey="ecoBonus" 
-                      name="Eco Bonus"
-                      stackId="1" 
-                      stroke={areaColors.ecoBonus} 
-                      fill={areaColors.ecoBonus} 
-                    />
-                    <Area 
-                      type="monotone" 
-                      dataKey="tips" 
-                      name="Tips"
-                      stackId="1" 
-                      stroke={areaColors.tips} 
-                      fill={areaColors.tips} 
-                    />
-                  </AreaChart>
-                ) : (
-                  <RechartsBarChart
-                    data={dateRange === 'week' ? weeklyEarningsData : monthlyEarningsData}
-                    margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
-                  >
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis 
-                      dataKey={dateRange === 'week' ? 'day' : 'week'} 
-                      fontSize={12}
-                    />
-                    <YAxis 
-                      fontSize={12} 
-                      tickFormatter={(value) => `₦${value/1000}k`}
-                    />
-                    <Tooltip 
-                      formatter={(value) => `₦${formatCurrency(value)}`}
-                      labelFormatter={(label) => dateRange === 'week' ? label : `${label}`}
-                    />
-                    <Legend />
-                    <Bar 
-                      dataKey="deliveryFee" 
-                      name="Delivery Fee" 
-                      stackId="a" 
-                      fill={areaColors.deliveryFee} 
-                    />
-                    <Bar 
-                      dataKey="ecoBonus" 
-                      name="Eco Bonus" 
-                      stackId="a" 
-                      fill={areaColors.ecoBonus} 
-                    />
-                    <Bar 
-                      dataKey="tips" 
-                      name="Tips" 
-                      stackId="a" 
-                      fill={areaColors.tips} 
-                    />
-                  </RechartsBarChart>
-                )}
+                <BarChart
+                  data={period === 'daily' ? dailyEarningsData : period === 'weekly' ? weeklyEarningsData : monthlyEarningsData}
+                  margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
+                >
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                  <XAxis 
+                    dataKey={period === 'daily' ? 'date' : period === 'weekly' ? 'week' : 'month'} 
+                    axisLine={false} 
+                    tickLine={false} 
+                  />
+                  <YAxis 
+                    axisLine={false} 
+                    tickLine={false} 
+                    tickFormatter={(value) => `₦${value}`} 
+                  />
+                  <Tooltip 
+                    formatter={(value: number) => [`₦${value}`, 'Earnings']}
+                    labelFormatter={(value) => `${value}`}
+                  />
+                  <Bar dataKey="earnings" fill="#22c55e" radius={[4, 4, 0, 0]} />
+                </BarChart>
               </ResponsiveContainer>
             </div>
           </CardContent>
         </Card>
 
-        {/* Tabs for Transactions and Delivery History */}
-        <Tabs defaultValue="transactions" className="mb-6">
-          <TabsList className="mb-4">
-            <TabsTrigger value="transactions">Transactions</TabsTrigger>
-            <TabsTrigger value="deliveries">Delivery History</TabsTrigger>
-          </TabsList>
-          
-          <TabsContent value="transactions">
-            <Card>
-              <CardHeader>
-                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center">
-                  <div>
-                    <CardTitle>Recent Transactions</CardTitle>
-                    <CardDescription>Your recent financial activity</CardDescription>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+          {/* Recent Transactions Card */}
+          <Card className="lg:col-span-2">
+            <CardHeader className="pb-2">
+              <div className="flex items-center justify-between">
+                <CardTitle>Recent Transactions</CardTitle>
+                <Button variant="ghost" size="sm" className="flex items-center gap-1 text-primary">
+                  View All <ChevronRight className="h-4 w-4" />
+                </Button>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {recentTransactions.map(transaction => (
+                  <div key={transaction.id} className="flex items-center justify-between p-3 border rounded-lg hover:bg-gray-50">
+                    <div className="flex items-center gap-3">
+                      <div className="h-10 w-10 rounded-full bg-green-100 flex items-center justify-center text-green-600">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <polyline points="9 11 12 14 22 4"></polyline>
+                          <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
+                        </svg>
+                      </div>
+                      <div>
+                        <p className="font-medium">{transaction.orderType}</p>
+                        <p className="text-xs text-gray-500">{transaction.date}</p>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <p className="font-bold text-green-600">+₦{transaction.amount.toLocaleString()}</p>
+                      <p className="text-xs text-gray-500">ID: {transaction.id}</p>
+                    </div>
                   </div>
-                  <div className="flex gap-2 mt-2 sm:mt-0">
-                    <Button 
-                      variant="outline" 
-                      size="sm" 
-                      className="flex items-center gap-1"
-                      onClick={() => setShowTransactionFilters(!showTransactionFilters)}
-                    >
-                      <Filter className="h-4 w-4" />
-                      <span className="hidden sm:inline">Filter</span>
-                    </Button>
-                    <Button 
-                      variant="outline" 
-                      size="sm" 
-                      className="flex items-center gap-1"
-                      onClick={() => setTransactionSortOrder(transactionSortOrder === 'desc' ? 'asc' : 'desc')}
-                    >
-                      <ArrowDownUp className="h-4 w-4" />
-                      <span className="hidden sm:inline">
-                        Sort {transactionSortOrder === 'desc' ? 'Oldest' : 'Newest'}
-                      </span>
-                    </Button>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+          
+          {/* Withdrawal History Card */}
+          <Card>
+            <CardHeader className="pb-2">
+              <div className="flex items-center justify-between">
+                <CardTitle>Withdrawal History</CardTitle>
+                <Button variant="ghost" size="sm" className="flex items-center gap-1 text-primary">
+                  View All <ChevronRight className="h-4 w-4" />
+                </Button>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                {withdrawalHistory.map(withdrawal => (
+                  <div key={withdrawal.id} className="flex flex-col p-3 border rounded-lg hover:bg-gray-50">
+                    <div className="flex justify-between">
+                      <p className="font-medium">{withdrawal.bank}</p>
+                      <Badge variant="outline">{withdrawal.status}</Badge>
+                    </div>
+                    <div className="flex justify-between mt-1">
+                      <p className="text-gray-500">{withdrawal.accountNumber}</p>
+                      <p className="font-bold">-₦{withdrawal.amount.toLocaleString()}</p>
+                    </div>
+                    <p className="text-xs text-gray-500 mt-1">{withdrawal.date}</p>
+                  </div>
+                ))}
+              </div>
+              <div className="mt-4">
+                <Button className="w-full bg-primary hover:bg-primary-hover text-black">
+                  Withdraw Funds
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Earnings Stats */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Delivery Performance */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Delivery Performance</CardTitle>
+              <CardDescription>Your delivery metrics this month</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div className="flex justify-between items-center">
+                  <p className="text-sm text-gray-500">Completed Deliveries</p>
+                  <p className="font-bold">75</p>
+                </div>
+                <div className="flex justify-between items-center">
+                  <p className="text-sm text-gray-500">On-Time Rate</p>
+                  <p className="font-bold">97%</p>
+                </div>
+                <div className="flex justify-between items-center">
+                  <p className="text-sm text-gray-500">Cancelled Orders</p>
+                  <p className="font-bold">2</p>
+                </div>
+                <div className="flex justify-between items-center">
+                  <p className="text-sm text-gray-500">Average Delivery Time</p>
+                  <p className="font-bold">23 mins</p>
+                </div>
+                <div className="flex justify-between items-center">
+                  <p className="text-sm text-gray-500">Customer Rating</p>
+                  <div className="flex items-center">
+                    <p className="font-bold mr-1">4.9</p>
+                    <div className="flex">
+                      {[1,2,3,4,5].map(star => (
+                        <svg key={star} xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill={star <= 5 ? "gold" : "none"} stroke="gold" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                        </svg>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className="mt-6">
+                <Button variant="outline" className="w-full">
+                  View Detailed Performance
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+          
+          {/* Payment Methods */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Payment Settings</CardTitle>
+              <CardDescription>Manage your payout preferences</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div className="border rounded-lg p-3">
+                  <div className="flex justify-between">
+                    <div className="flex items-center">
+                      <div className="h-10 w-10 rounded-md bg-blue-100 flex items-center justify-center text-blue-600 mr-3">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <rect x="2" y="5" width="20" height="14" rx="2"></rect>
+                          <line x1="2" y1="10" x2="22" y2="10"></line>
+                        </svg>
+                      </div>
+                      <div>
+                        <p className="font-medium">Zenith Bank</p>
+                        <p className="text-xs text-gray-500">****4587</p>
+                      </div>
+                    </div>
+                    <Badge>Default</Badge>
                   </div>
                 </div>
                 
-                {showTransactionFilters && (
-                  <div className="mt-4 pt-4 border-t">
-                    <div className="grid grid-cols-1 sm:grid-cols-4 gap-2 mb-3">
-                      <Select defaultValue="all">
-                        <SelectTrigger>
-                          <SelectValue placeholder="Transaction Type" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="all">All Types</SelectItem>
-                          <SelectItem value="earnings">Earnings</SelectItem>
-                          <SelectItem value="withdrawal">Withdrawals</SelectItem>
-                          <SelectItem value="bonus">Bonuses</SelectItem>
-                          <SelectItem value="tip">Tips</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      
-                      <Select defaultValue="all">
-                        <SelectTrigger>
-                          <SelectValue placeholder="Status" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="all">All Statuses</SelectItem>
-                          <SelectItem value="completed">Completed</SelectItem>
-                          <SelectItem value="pending">Pending</SelectItem>
-                          <SelectItem value="failed">Failed</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      
-                      <Select defaultValue="7days">
-                        <SelectTrigger>
-                          <SelectValue placeholder="Date Range" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="7days">Last 7 Days</SelectItem>
-                          <SelectItem value="30days">Last 30 Days</SelectItem>
-                          <SelectItem value="90days">Last 90 Days</SelectItem>
-                          <SelectItem value="custom">Custom Range</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      
-                      <Select defaultValue="all">
-                        <SelectTrigger>
-                          <SelectValue placeholder="Amount" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="all">All Amounts</SelectItem>
-                          <SelectItem value="lt10k">Under ₦10,000</SelectItem>
-                          <SelectItem value="10k-50k">₦10,000 - ₦50,000</SelectItem>
-                          <SelectItem value="gt50k">Over ₦50,000</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    
-                    <div className="flex justify-end gap-2">
-                      <Button variant="outline" size="sm">Reset</Button>
-                      <Button size="sm" className="bg-primary hover:bg-primary-hover text-black">Apply Filters</Button>
-                    </div>
+                <div className="flex items-center">
+                  <div className="flex-1">
+                    <p className="font-medium">Auto Withdrawal</p>
+                    <p className="text-xs text-gray-500">Withdraw earnings every week</p>
                   </div>
-                )}
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {sortedTransactions.map((transaction) => (
-                    <div 
-                      key={transaction.id} 
-                      className="flex flex-col sm:flex-row sm:items-center justify-between p-4 border rounded-lg hover:bg-gray-50 transition-colors"
-                    >
-                      <div className="flex items-start sm:items-center">
-                        <div className={`p-2 rounded-full mr-3 ${
-                          transaction.amount > 0 ? 'bg-green-100' : 'bg-gray-100'
-                        }`}>
-                          {getTransactionTypeIcon(transaction.type)}
-                        </div>
-                        <div>
-                          <div className="flex items-center">
-                            <h3 className="font-medium">{transaction.description}</h3>
-                            <span className="mx-2 text-gray-300 hidden sm:inline">•</span>
-                            <span className="text-sm text-gray-500 hidden sm:inline">{transaction.id}</span>
-                          </div>
-                          <div className="flex items-center mt-1">
-                            <span className="text-xs sm:text-sm text-gray-500">
-                              {transaction.date} {transaction.time}
-                            </span>
-                            <span className="mx-2 text-gray-300">•</span>
-                            {getStatusBadge(transaction.status)}
-                          </div>
-                        </div>
-                      </div>
-                      <div className="mt-3 sm:mt-0 flex flex-col items-end">
-                        <p className={`font-medium ${transaction.amount > 0 ? 'text-green-600' : 'text-gray-700'}`}>
-                          {transaction.amount > 0 ? '+' : ''}₦{formatCurrency(Math.abs(transaction.amount))}
-                        </p>
-                        <p className="text-sm text-gray-500">Balance: ₦{formatCurrency(285679.45)}</p>
-                      </div>
-                    </div>
-                  ))}
+                  <Switch />
                 </div>
-              </CardContent>
-              <CardFooter className="flex justify-center">
-                <Button variant="outline" className="w-full sm:w-auto">
-                  <ArrowUpRight className="mr-2 h-4 w-4" />
-                  View All Transactions
-                </Button>
-              </CardFooter>
-            </Card>
-          </TabsContent>
-          
-          <TabsContent value="deliveries">
-            <Card>
-              <CardHeader>
-                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center">
-                  <div>
-                    <CardTitle>Delivery History</CardTitle>
-                    <CardDescription>Your recent completed deliveries</CardDescription>
+                
+                <div className="flex items-center">
+                  <div className="flex-1">
+                    <p className="font-medium">Payment Notifications</p>
+                    <p className="text-xs text-gray-500">Get alerts for new payments</p>
                   </div>
-                  <div className="flex gap-2 mt-2 sm:mt-0">
-                    <Select defaultValue="7days">
-                      <SelectTrigger className="w-[130px]">
-                        <SelectValue placeholder="Time Period" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="today">Today</SelectItem>
-                        <SelectItem value="yesterday">Yesterday</SelectItem>
-                        <SelectItem value="7days">Last 7 Days</SelectItem>
-                        <SelectItem value="30days">Last 30 Days</SelectItem>
-                      </SelectContent>
-                    </Select>
+                  <Switch checked />
+                </div>
+                
+                <div className="flex items-center">
+                  <div className="flex-1">
+                    <p className="font-medium">Minimum Withdrawal</p>
+                    <p className="text-xs text-gray-500">Threshold for auto withdrawal</p>
                   </div>
+                  <div className="font-bold">₦10,000</div>
                 </div>
-              </CardHeader>
-              <CardContent>
-                <div className="overflow-x-auto">
-                  <table className="min-w-full divide-y divide-gray-200">
-                    <thead className="bg-gray-50">
-                      <tr>
-                        <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Order ID
-                        </th>
-                        <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Date
-                        </th>
-                        <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Vendor/Customer
-                        </th>
-                        <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Location
-                        </th>
-                        <th scope="col" className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Delivery Fee
-                        </th>
-                        <th scope="col" className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Eco Bonus
-                        </th>
-                        <th scope="col" className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Tip
-                        </th>
-                        <th scope="col" className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Total
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody className="bg-white divide-y divide-gray-200">
-                      {deliveryHistory.map((delivery) => (
-                        <tr key={delivery.id} className="hover:bg-gray-50">
-                          <td className="px-4 py-4 whitespace-nowrap text-sm font-medium text-blue-600">
-                            {delivery.id}
-                          </td>
-                          <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500">
-                            {delivery.date}
-                          </td>
-                          <td className="px-4 py-4 whitespace-nowrap text-sm">
-                            <div>{delivery.vendor}</div>
-                            <div className="text-gray-500">{delivery.customer}</div>
-                          </td>
-                          <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500">
-                            {delivery.location}
-                          </td>
-                          <td className="px-4 py-4 whitespace-nowrap text-sm text-right">
-                            ₦{formatCurrency(delivery.deliveryFee)}
-                          </td>
-                          <td className="px-4 py-4 whitespace-nowrap text-sm text-right text-green-600">
-                            ₦{formatCurrency(delivery.ecoBonus)}
-                          </td>
-                          <td className="px-4 py-4 whitespace-nowrap text-sm text-right">
-                            ₦{formatCurrency(delivery.tip)}
-                          </td>
-                          <td className="px-4 py-4 whitespace-nowrap text-sm font-medium text-right">
-                            ₦{formatCurrency(delivery.total)}
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </CardContent>
-              <CardFooter className="flex justify-center">
-                <Button variant="outline" className="w-full sm:w-auto">
-                  <ArrowUpRight className="mr-2 h-4 w-4" />
-                  View Complete History
-                </Button>
-              </CardFooter>
-            </Card>
-          </TabsContent>
-        </Tabs>
-
-        {/* Goal Progress */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Earnings Goals</CardTitle>
-            <CardDescription>Track your progress towards your financial targets</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-6">
-              <div>
-                <div className="flex justify-between mb-2">
-                  <p className="font-medium">Daily Target</p>
-                  <p className="text-sm">₦{formatCurrency(earningsStats.daily.total)} / ₦50,000.00</p>
-                </div>
-                <Progress value={Math.min(earningsStats.daily.total / 50000 * 100, 100)} className="h-2" />
-                <p className="text-sm text-gray-500 mt-1">
-                  {Math.round(earningsStats.daily.total / 50000 * 100)}% complete
-                </p>
               </div>
               
-              <div>
-                <div className="flex justify-between mb-2">
-                  <p className="font-medium">Weekly Target</p>
-                  <p className="text-sm">₦{formatCurrency(earningsStats.weekly.total)} / ₦350,000.00</p>
-                </div>
-                <Progress value={Math.min(earningsStats.weekly.total / 350000 * 100, 100)} className="h-2" />
-                <p className="text-sm text-gray-500 mt-1">
-                  {Math.round(earningsStats.weekly.total / 350000 * 100)}% complete
-                </p>
+              <div className="mt-6 grid grid-cols-2 gap-3">
+                <Button variant="outline">
+                  Add Bank Account
+                </Button>
+                <Button className="bg-primary hover:bg-primary-hover text-black">
+                  Update Settings
+                </Button>
               </div>
-              
-              <div>
-                <div className="flex justify-between mb-2">
-                  <p className="font-medium">Monthly Target</p>
-                  <p className="text-sm">₦{formatCurrency(earningsStats.monthly.total)} / ₦1,500,000.00</p>
-                </div>
-                <Progress value={Math.min(earningsStats.monthly.total / 1500000 * 100, 100)} className="h-2" />
-                <p className="text-sm text-gray-500 mt-1">
-                  {Math.round(earningsStats.monthly.total / 1500000 * 100)}% complete
-                </p>
-              </div>
-            </div>
-          </CardContent>
-          <CardFooter>
-            <Button className="w-full sm:w-auto flex items-center justify-center bg-primary hover:bg-primary-hover text-black">
-              <span>Adjust Earnings Goals</span>
-              <ChevronRight className="ml-2 h-4 w-4" />
-            </Button>
-          </CardFooter>
-        </Card>
+            </CardContent>
+          </Card>
+        </div>
       </div>
     </DashboardLayout>
   );
 };
 
-export default Earnings;
+export default RiderEarnings;
