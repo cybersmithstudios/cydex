@@ -48,7 +48,7 @@ const conversations = [
     id: 3,
     name: 'Eco Grocery Store',
     avatar: null,
-    lastMessage: 'Thank you for your order! We've added a free sample.',
+    lastMessage: "Thank you for your order! We've added a free sample.",
     time: 'Jul 10',
     unread: 0,
     online: true,
@@ -86,7 +86,7 @@ const messages = [
   {
     id: 2,
     senderId: 'me',
-    text: 'Hi, I'm wondering about the status of my order #ORD-1234',
+    text: "Hi, I'm wondering about the status of my order #ORD-1234",
     time: '10:05 AM',
     status: 'read'
   },
@@ -107,21 +107,21 @@ const messages = [
   {
     id: 5,
     senderId: 'me',
-    text: 'That's great news! Thank you for the update.',
+    text: "That's great news! Thank you for the update.",
     time: '10:12 AM',
     status: 'read'
   },
   {
     id: 6,
     senderId: 1,
-    text: 'You're welcome! Is there anything else you'd like to know about your order?',
+    text: "You're welcome! Is there anything else you'd like to know about your order?",
     time: '10:15 AM',
     status: 'read'
   },
   {
     id: 7,
     senderId: 'me',
-    text: 'No, that's all I needed. Have a great day!',
+    text: "No, that's all I needed. Have a great day!",
     time: '10:16 AM',
     status: 'read'
   },
