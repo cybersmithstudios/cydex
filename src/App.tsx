@@ -12,6 +12,11 @@ import Recycling from './pages/customer/Recycling';
 import Messages from './pages/customer/Messages';
 import Profile from './pages/customer/Profile';
 import RiderDashboard from './pages/rider/RiderDashboard';
+import AvailableOrders from './pages/rider/AvailableOrders';
+import CurrentDeliveries from './pages/rider/CurrentDeliveries';
+import RiderEarnings from './pages/rider/Earnings';
+import RiderMessages from './pages/rider/Messages';
+import RiderProfile from './pages/rider/Profile';
 import VendorDashboard from './pages/vendor/VendorDashboard';
 import VendorOrders from './pages/vendor/Orders';
 import VendorWallet from './pages/vendor/Wallet';
@@ -137,10 +142,55 @@ function App() {
             
             {/* Protected rider routes */}
             <Route 
-              path="/rider/*" 
+              path="/rider" 
               element={
                 <ProtectedRoute allowedRoles={['rider']}>
                   <RiderDashboard />
+                </ProtectedRoute>
+              } 
+            />
+
+            <Route 
+              path="/rider/available" 
+              element={
+                <ProtectedRoute allowedRoles={['rider']}>
+                  <AvailableOrders />
+                </ProtectedRoute>
+              } 
+            />
+
+            <Route 
+              path="/rider/current" 
+              element={
+                <ProtectedRoute allowedRoles={['rider']}>
+                  <CurrentDeliveries />
+                </ProtectedRoute>
+              } 
+            />
+
+            <Route 
+              path="/rider/earnings" 
+              element={
+                <ProtectedRoute allowedRoles={['rider']}>
+                  <RiderEarnings />
+                </ProtectedRoute>
+              } 
+            />
+
+            <Route 
+              path="/rider/messages" 
+              element={
+                <ProtectedRoute allowedRoles={['rider']}>
+                  <RiderMessages />
+                </ProtectedRoute>
+              } 
+            />
+
+            <Route 
+              path="/rider/profile" 
+              element={
+                <ProtectedRoute allowedRoles={['rider']}>
+                  <RiderProfile />
                 </ProtectedRoute>
               } 
             />

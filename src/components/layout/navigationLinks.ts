@@ -1,7 +1,8 @@
 
 import { 
   Home, Package, Wallet, Recycle, MessageSquare, User, 
-  MapPin, Settings, Users, BarChart, ShieldCheck 
+  MapPin, Settings, Users, BarChart, ShieldCheck,
+  Bike, Navigation, Calendar, Clock
 } from 'lucide-react';
 
 interface SidebarLink {
@@ -28,7 +29,7 @@ export const getNavLinks = (userRole: 'customer' | 'rider' | 'vendor' | 'admin')
       return [
         { name: 'Dashboard', href: '/rider', icon: Home },
         { name: 'Available Orders', href: '/rider/available', icon: Package },
-        { name: 'Current Deliveries', href: '/rider/current', icon: MapPin },
+        { name: 'Current Deliveries', href: '/rider/current', icon: Navigation },
         { name: 'Earnings', href: '/rider/earnings', icon: Wallet },
         { name: 'Messages', href: '/rider/messages', icon: MessageSquare },
         { name: 'Profile', href: '/rider/profile', icon: User },
