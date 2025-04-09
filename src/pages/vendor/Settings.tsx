@@ -29,7 +29,11 @@ import {
   Upload,
   CheckCircle,
   Info,
-  AlertTriangle
+  AlertTriangle,
+  MoreVertical,
+  Download,
+  MessageSquare,
+  Video
 } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
 
