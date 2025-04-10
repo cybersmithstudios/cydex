@@ -1,4 +1,3 @@
-
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Index from './pages/Index';
 import Auth from './pages/Auth';
@@ -32,6 +31,14 @@ import HowItWorks from './pages/HowItWorks';
 import AboutUs from './pages/AboutUs';
 import Faq from './pages/Faq';
 import Contact from './pages/Contact';
+import AdminLogin from './components/admin/AdminLogin';
+import AdminProtectedRoute from './components/admin/AdminProtectedRoute';
+import Dashboard from './pages/admin/Dashboard';
+import IncomingOrders from './pages/admin/IncomingOrders';
+import RiderAssignment from './pages/admin/RiderAssignment';
+import FleetTracking from './pages/admin/FleetTracking';
+import DeliveryLogs from './pages/admin/DeliveryLogs';
+import Escalations from './pages/admin/Escalations';
 
 // Protected route wrapper
 const ProtectedRoute = ({ 
@@ -75,6 +82,41 @@ function App() {
             <Route path="/about" element={<AboutUs />} />
             <Route path="/faq" element={<Faq />} />
             <Route path="/contact" element={<Contact />} />
+            
+            {/* Admin Login */}
+            <Route path="/admin/login" element={<AdminLogin />} />
+            
+            {/* Admin Dashboard Pages */}
+            <Route path="/admin" element={
+              <AdminProtectedRoute>
+                <Dashboard />
+              </AdminProtectedRoute>
+            } />
+            <Route path="/admin/orders" element={
+              <AdminProtectedRoute>
+                <IncomingOrders />
+              </AdminProtectedRoute>
+            } />
+            <Route path="/admin/riders" element={
+              <AdminProtectedRoute>
+                <RiderAssignment />
+              </AdminProtectedRoute>
+            } />
+            <Route path="/admin/tracking" element={
+              <AdminProtectedRoute>
+                <FleetTracking />
+              </AdminProtectedRoute>
+            } />
+            <Route path="/admin/logs" element={
+              <AdminProtectedRoute>
+                <DeliveryLogs />
+              </AdminProtectedRoute>
+            } />
+            <Route path="/admin/escalations" element={
+              <AdminProtectedRoute>
+                <Escalations />
+              </AdminProtectedRoute>
+            } />
             
             {/* Protected customer routes */}
             <Route 
@@ -250,7 +292,7 @@ function App() {
               } 
             />
             
-            {/* Protected admin routes */}
+            {/* Protected admin routes - keeping old routes for compatibility */}
             <Route 
               path="/admin/*" 
               element={
