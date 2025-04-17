@@ -1,3 +1,4 @@
+
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Index from './pages/Index';
 import Auth from './pages/Auth';
@@ -17,7 +18,6 @@ import RiderEarnings from './pages/rider/Earnings';
 import RiderMessages from './pages/rider/Messages';
 import RiderProfile from './pages/rider/Profile';
 import VendorDashboard from './pages/vendor/VendorDashboard';
-import AddProduct from './pages/vendor/AddProduct';
 import VendorOrders from './pages/vendor/Orders';
 import VendorWallet from './pages/vendor/Wallet';
 import VendorRecycling from './pages/vendor/Recycling';
@@ -32,15 +32,8 @@ import HowItWorks from './pages/HowItWorks';
 import AboutUs from './pages/AboutUs';
 import Faq from './pages/Faq';
 import Contact from './pages/Contact';
-import AdminLogin from './components/admin/AdminLogin';
-import AdminProtectedRoute from './components/admin/AdminProtectedRoute';
-import Dashboard from './pages/admin/Dashboard';
-import IncomingOrders from './pages/admin/IncomingOrders';
-import RiderAssignment from './pages/admin/RiderAssignment';
-import FleetTracking from './pages/admin/FleetTracking';
-import DeliveryLogs from './pages/admin/DeliveryLogs';
-import Escalations from './pages/admin/Escalations';
 
+// Protected route wrapper
 const ProtectedRoute = ({ 
   children, 
   allowedRoles = [] 
@@ -51,10 +44,16 @@ const ProtectedRoute = ({
   const { isAuthenticated, user } = useAuth();
   
   if (!isAuthenticated) {
+    // Redirect them to the auth page, but save the current location they were
+    // trying to go to when they were redirected. This allows us to send them
+    // along to that page after they login, which is a nicer user experience
+    // than dropping them off on the home page.
     return <Navigate to="/auth" state={{ from: window.location }} replace />;
   }
   
+  // Check role if allowedRoles is provided and not empty
   if (allowedRoles.length > 0 && user && !allowedRoles.includes(user.role)) {
+    // Redirect to dashboard specific to their role
     return <Navigate to={`/${user.role}`} replace />;
   }
   
@@ -71,44 +70,13 @@ function App() {
             <Route path="/auth" element={<Auth />} />
             <Route path="/auth/reset-password" element={<ResetPassword />} />
             
+            {/* Public pages */}
             <Route path="/how-it-works" element={<HowItWorks />} />
             <Route path="/about" element={<AboutUs />} />
             <Route path="/faq" element={<Faq />} />
             <Route path="/contact" element={<Contact />} />
             
-            <Route path="/admin/login" element={<AdminLogin />} />
-            
-            <Route path="/admin" element={
-              <AdminProtectedRoute>
-                <Dashboard />
-              </AdminProtectedRoute>
-            } />
-            <Route path="/admin/orders" element={
-              <AdminProtectedRoute>
-                <IncomingOrders />
-              </AdminProtectedRoute>
-            } />
-            <Route path="/admin/riders" element={
-              <AdminProtectedRoute>
-                <RiderAssignment />
-              </AdminProtectedRoute>
-            } />
-            <Route path="/admin/tracking" element={
-              <AdminProtectedRoute>
-                <FleetTracking />
-              </AdminProtectedRoute>
-            } />
-            <Route path="/admin/logs" element={
-              <AdminProtectedRoute>
-                <DeliveryLogs />
-              </AdminProtectedRoute>
-            } />
-            <Route path="/admin/escalations" element={
-              <AdminProtectedRoute>
-                <Escalations />
-              </AdminProtectedRoute>
-            } />
-            
+            {/* Protected customer routes */}
             <Route 
               path="/customer/new-order" 
               element={
@@ -172,6 +140,7 @@ function App() {
               } 
             />
             
+            {/* Protected rider routes */}
             <Route 
               path="/rider" 
               element={
@@ -226,20 +195,12 @@ function App() {
               } 
             />
             
+            {/* Protected vendor routes */}
             <Route 
               path="/vendor" 
               element={
                 <ProtectedRoute allowedRoles={['vendor']}>
                   <VendorDashboard />
-                </ProtectedRoute>
-              } 
-            />
-
-            <Route 
-              path="/vendor/add-product" 
-              element={
-                <ProtectedRoute allowedRoles={['vendor']}>
-                  <AddProduct />
                 </ProtectedRoute>
               } 
             />
@@ -289,6 +250,7 @@ function App() {
               } 
             />
             
+            {/* Protected admin routes */}
             <Route 
               path="/admin/*" 
               element={
@@ -298,6 +260,7 @@ function App() {
               } 
             />
             
+            {/* Catch-all route for 404 */}
             <Route path="*" element={<NotFound />} />
           </Routes>
           
