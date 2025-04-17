@@ -17,6 +17,7 @@ import RiderEarnings from './pages/rider/Earnings';
 import RiderMessages from './pages/rider/Messages';
 import RiderProfile from './pages/rider/Profile';
 import VendorDashboard from './pages/vendor/VendorDashboard';
+import AddProduct from './pages/vendor/AddProduct';
 import VendorOrders from './pages/vendor/Orders';
 import VendorWallet from './pages/vendor/Wallet';
 import VendorRecycling from './pages/vendor/Recycling';
@@ -40,7 +41,6 @@ import FleetTracking from './pages/admin/FleetTracking';
 import DeliveryLogs from './pages/admin/DeliveryLogs';
 import Escalations from './pages/admin/Escalations';
 
-// Protected route wrapper
 const ProtectedRoute = ({ 
   children, 
   allowedRoles = [] 
@@ -51,16 +51,10 @@ const ProtectedRoute = ({
   const { isAuthenticated, user } = useAuth();
   
   if (!isAuthenticated) {
-    // Redirect them to the auth page, but save the current location they were
-    // trying to go to when they were redirected. This allows us to send them
-    // along to that page after they login, which is a nicer user experience
-    // than dropping them off on the home page.
     return <Navigate to="/auth" state={{ from: window.location }} replace />;
   }
   
-  // Check role if allowedRoles is provided and not empty
   if (allowedRoles.length > 0 && user && !allowedRoles.includes(user.role)) {
-    // Redirect to dashboard specific to their role
     return <Navigate to={`/${user.role}`} replace />;
   }
   
@@ -77,16 +71,13 @@ function App() {
             <Route path="/auth" element={<Auth />} />
             <Route path="/auth/reset-password" element={<ResetPassword />} />
             
-            {/* Public pages */}
             <Route path="/how-it-works" element={<HowItWorks />} />
             <Route path="/about" element={<AboutUs />} />
             <Route path="/faq" element={<Faq />} />
             <Route path="/contact" element={<Contact />} />
             
-            {/* Admin Login */}
             <Route path="/admin/login" element={<AdminLogin />} />
             
-            {/* Admin Dashboard Pages */}
             <Route path="/admin" element={
               <AdminProtectedRoute>
                 <Dashboard />
@@ -118,7 +109,6 @@ function App() {
               </AdminProtectedRoute>
             } />
             
-            {/* Protected customer routes */}
             <Route 
               path="/customer/new-order" 
               element={
@@ -182,7 +172,6 @@ function App() {
               } 
             />
             
-            {/* Protected rider routes */}
             <Route 
               path="/rider" 
               element={
@@ -237,12 +226,20 @@ function App() {
               } 
             />
             
-            {/* Protected vendor routes */}
             <Route 
               path="/vendor" 
               element={
                 <ProtectedRoute allowedRoles={['vendor']}>
                   <VendorDashboard />
+                </ProtectedRoute>
+              } 
+            />
+
+            <Route 
+              path="/vendor/add-product" 
+              element={
+                <ProtectedRoute allowedRoles={['vendor']}>
+                  <AddProduct />
                 </ProtectedRoute>
               } 
             />
@@ -292,7 +289,6 @@ function App() {
               } 
             />
             
-            {/* Protected admin routes - keeping old routes for compatibility */}
             <Route 
               path="/admin/*" 
               element={
@@ -302,7 +298,6 @@ function App() {
               } 
             />
             
-            {/* Catch-all route for 404 */}
             <Route path="*" element={<NotFound />} />
           </Routes>
           
