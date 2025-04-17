@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import DashboardLayout from '@/components/layout/DashboardLayout';
@@ -12,6 +11,7 @@ import {
   TrendingUp, BarChart3, UserCheck, ShoppingBag, RecycleIcon
 } from 'lucide-react';
 import LoadingDisplay from '@/components/ui/LoadingDisplay';
+import { Link } from 'react-router-dom';
 
 // Mock data with updated Naira values (1 USD = 1,533.10 NGN)
 const pendingOrders = [
@@ -115,9 +115,11 @@ const VendorDashboard = () => {
               Manage your store and eco-friendly deliveries
             </p>
           </div>
-          <Button className="bg-primary hover:bg-primary-hover text-black">
-            <Package className="mr-2 h-4 w-4" />
-            New Order
+          <Button className="bg-primary hover:bg-primary-hover text-black" asChild>
+            <Link to="/vendor/add-product">
+              <Package className="mr-2 h-4 w-4" />
+              Add Product
+            </Link>
           </Button>
         </div>
 

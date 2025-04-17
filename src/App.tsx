@@ -23,6 +23,7 @@ import VendorWallet from './pages/vendor/Wallet';
 import VendorRecycling from './pages/vendor/Recycling';
 import VendorMessages from './pages/vendor/Messages';
 import VendorSettings from './pages/vendor/Settings';
+import AddProduct from './pages/vendor/AddProduct';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { FloatingWhatsApp } from './components/FloatingWhatsApp';
@@ -246,6 +247,15 @@ function App() {
               element={
                 <ProtectedRoute allowedRoles={['vendor']}>
                   <VendorSettings />
+                </ProtectedRoute>
+              } 
+            />
+
+            <Route 
+              path="/vendor/add-product" 
+              element={
+                <ProtectedRoute allowedRoles={['vendor']}>
+                  <AddProduct />
                 </ProtectedRoute>
               } 
             />
