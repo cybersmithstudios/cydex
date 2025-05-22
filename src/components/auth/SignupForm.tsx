@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -20,7 +19,7 @@ const SignupForm = () => {
   const [signupEmail, setSignupEmail] = useState("");
   const [signupPassword, setSignupPassword] = useState("");
   const [signupConfirmPassword, setSignupConfirmPassword] = useState("");
-  const [role, setRole] = useState<UserRole>("customer");
+  const [role, setRole] = useState<UserRole>("CUSTOMER");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -48,16 +47,17 @@ const SignupForm = () => {
     setIsSubmitting(true);
     try {
       await register(signupName, signupEmail, signupPassword, role);
+      toast.success("Account created successfully!");
       
       // Reset form
       setSignupName("");
       setSignupEmail("");
       setSignupPassword("");
       setSignupConfirmPassword("");
-      setRole("customer");
+      setRole("CUSTOMER");
     } catch (error) {
       console.error("Signup failed:", error);
-      // Error toast is already shown in the register function
+      toast.error(error instanceof Error ? error.message : "Registration failed. Please try again.");
     } finally {
       setIsSubmitting(false);
     }
@@ -148,9 +148,9 @@ const SignupForm = () => {
               <SelectValue placeholder="Select your role" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="customer">Customer</SelectItem>
-              <SelectItem value="rider">Rider</SelectItem>
-              <SelectItem value="vendor">Vendor</SelectItem>
+              <SelectItem value="CUSTOMER">Customer</SelectItem>
+              <SelectItem value="RIDER">Rider</SelectItem>
+              <SelectItem value="VENDOR">Vendor</SelectItem>
             </SelectContent>
           </Select>
         </div>

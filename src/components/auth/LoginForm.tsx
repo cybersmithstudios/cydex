@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -22,7 +21,7 @@ const LoginForm = () => {
   useEffect(() => {
     if (isAuthenticated && user) {
       // If user is authenticated, redirect to their role-specific dashboard
-      navigate(`/${user.role}`);
+      navigate(`/${user.role.toLowerCase()}`);
     }
   }, [isAuthenticated, user, navigate]);
   
@@ -36,13 +35,12 @@ const LoginForm = () => {
     setIsSubmitting(true);
     
     try {
-      console.log("Attempting login with:", { email: loginEmail });
       await login(loginEmail, loginPassword);
-      
+      toast.success("Login successful!");
       // The useEffect above will handle redirection if login is successful
-    } catch (error: any) {
+    } catch (error) {
       console.error("Login failed:", error);
-      toast.error(error.message || "Login failed. Please try again.");
+      toast.error(error instanceof Error ? error.message : "Login failed. Please try again.");
     } finally {
       setIsSubmitting(false);
     }

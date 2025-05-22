@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
@@ -28,9 +27,10 @@ const ResetPassword = () => {
     try {
       await resetPassword(email);
       setIsSubmitted(true);
+      toast.success("Password reset instructions sent to your email");
     } catch (error) {
       console.error("Password reset request failed:", error);
-      // Error toast is already shown in the resetPassword function
+      toast.error(error instanceof Error ? error.message : "Password reset request failed. Please try again.");
     } finally {
       setIsSubmitting(false);
     }
