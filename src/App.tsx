@@ -1,3 +1,4 @@
+
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Index from './pages/Index';
 import Auth from './pages/Auth';
@@ -17,6 +18,8 @@ import RiderEarnings from './pages/rider/Earnings';
 import RiderProfile from './pages/rider/Profile';
 import VendorDashboard from './pages/vendor/VendorDashboard';
 import VendorOrders from './pages/vendor/Orders';
+import VendorOrderDetail from './pages/vendor/OrderDetail'; // New import
+import ProcessOrder from './pages/vendor/ProcessOrder'; // New import
 import VendorWallet from './pages/vendor/Wallet';
 import VendorRecycling from './pages/vendor/Recycling';
 import VendorSettings from './pages/vendor/Settings';
@@ -199,6 +202,24 @@ function App() {
               element={
                 <ProtectedRoute allowedRoles={['vendor']}>
                   <VendorOrders />
+                </ProtectedRoute>
+              } 
+            />
+
+            <Route 
+              path="/vendor/orders/:orderId" 
+              element={
+                <ProtectedRoute allowedRoles={['vendor']}>
+                  <VendorOrderDetail />
+                </ProtectedRoute>
+              } 
+            />
+
+            <Route 
+              path="/vendor/process-order" 
+              element={
+                <ProtectedRoute allowedRoles={['vendor']}>
+                  <ProcessOrder />
                 </ProtectedRoute>
               } 
             />

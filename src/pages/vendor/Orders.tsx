@@ -1,5 +1,6 @@
 
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import DashboardLayout from '@/components/layout/DashboardLayout';
 import { useAuth } from '@/contexts/AuthContext';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -9,6 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Separator } from '@/components/ui/separator';
+import { toast } from 'sonner';
 import { 
   Package, 
   Search, 
@@ -110,6 +112,7 @@ const orders = [
 const OrdersPage = () => {
   const { user } = useAuth();
   const isMobile = useIsMobile();
+  const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   
@@ -147,6 +150,12 @@ const OrdersPage = () => {
       style: 'currency',
       currency: 'NGN',
       minimumFractionDigits: 2
+    });
+  };
+
+  const handleRejectOrder = (orderId) => {
+    toast.error('Order rejected', {
+      description: `Order ${orderId} has been rejected.`
     });
   };
   
@@ -273,10 +282,18 @@ const OrdersPage = () => {
                           <div className="flex md:items-center gap-2">
                             {order.status === 'pending' && (
                               <>
-                                <Button variant="outline" size="sm" className="border-red-300 text-red-600 hover:bg-red-50">
+                                <Button 
+                                  variant="outline" 
+                                  size="sm" 
+                                  className="border-red-300 text-red-600 hover:bg-red-50"
+                                  onClick={() => handleRejectOrder(order.id)}
+                                >
                                   Cancel
                                 </Button>
-                                <Button className="bg-primary hover:bg-primary-hover text-black">
+                                <Button 
+                                  className="bg-primary hover:bg-primary-hover text-black"
+                                  onClick={() => navigate('/vendor/process-order', { state: { order } })}
+                                >
                                   Process
                                 </Button>
                               </>
@@ -287,14 +304,22 @@ const OrdersPage = () => {
                                 <Button variant="outline" size="sm">
                                   Contact Rider
                                 </Button>
-                                <Button className="bg-primary hover:bg-primary-hover text-black">
+                                <Button 
+                                  className="bg-primary hover:bg-primary-hover text-black"
+                                  onClick={() => navigate(`/vendor/orders/${order.id}`)}
+                                >
                                   Details
                                 </Button>
                               </>
                             )}
                             
                             {(order.status === 'delivered' || order.status === 'cancelled') && (
-                              <Button variant="ghost" size="sm" className="ml-auto">
+                              <Button 
+                                variant="ghost" 
+                                size="sm" 
+                                className="ml-auto"
+                                onClick={() => navigate(`/vendor/orders/${order.id}`)}
+                              >
                                 <ChevronRight className="h-5 w-5" />
                               </Button>
                             )}
