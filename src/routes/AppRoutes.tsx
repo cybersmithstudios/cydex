@@ -1,6 +1,12 @@
-
-import { Routes } from 'react-router-dom';
-import PublicRoutes from './PublicRoutes';
+import { Route, Routes } from 'react-router-dom';
+import Index from '../pages/Index';
+import Auth from '../pages/Auth';
+import ResetPassword from '../pages/Auth/ResetPassword';
+import NotFound from '../pages/NotFound';
+import HowItWorks from '../pages/HowItWorks';
+import AboutUs from '../pages/AboutUs';
+import Faq from '../pages/Faq';
+import Contact from '../pages/Contact';
 import CustomerRoutes from './CustomerRoutes';
 import VendorRoutes from './VendorRoutes';
 import RiderRoutes from './RiderRoutes';
@@ -10,19 +16,22 @@ const AppRoutes = () => {
   return (
     <Routes>
       {/* Public Routes */}
-      <PublicRoutes />
+      <Route path="/" element={<Index />} />
+      <Route path="/auth" element={<Auth />} />
+      <Route path="/auth/reset-password" element={<ResetPassword />} />
+      <Route path="/how-it-works" element={<HowItWorks />} />
+      <Route path="/about" element={<AboutUs />} />
+      <Route path="/faq" element={<Faq />} />
+      <Route path="/contact" element={<Contact />} />
       
-      {/* Customer Routes */}
-      <CustomerRoutes />
+      {/* Protected Routes */}
+      <Route path="/customer/*" element={<CustomerRoutes />} />
+      <Route path="/vendor/*" element={<VendorRoutes />} />
+      <Route path="/rider/*" element={<RiderRoutes />} />
+      <Route path="/admin/*" element={<AdminRoutes />} />
       
-      {/* Vendor Routes */}
-      <VendorRoutes />
-      
-      {/* Rider Routes */}
-      <RiderRoutes />
-      
-      {/* Admin Routes */}
-      <AdminRoutes />
+      {/* Catch-all route for 404 */}
+      <Route path="*" element={<NotFound />} />
     </Routes>
   );
 };
