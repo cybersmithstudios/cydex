@@ -1,21 +1,12 @@
-
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import DashboardLayout from '@/components/layout/DashboardLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
-import { 
-  Truck, Box, Clock, Leaf, ChevronRight, Search, 
-  Calendar, Package, Filter, ArrowUpRight 
-} from 'lucide-react';
-import { 
-  Table, TableBody, TableCaption, TableCell, 
-  TableHead, TableHeader, TableRow 
-} from '@/components/ui/table';
-import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import ActiveOrderCard from '@/components/customer/ActiveOrderCard';
+import OrderHistoryFilters from '@/components/customer/OrderHistoryFilters';
+import OrderHistoryTable from '@/components/customer/OrderHistoryTable';
 
 // Mock data
 const activeOrders = [
@@ -113,36 +104,6 @@ const OrdersPage = () => {
   const [statusFilter, setStatusFilter] = useState('all');
   const [dateFilter, setDateFilter] = useState('all');
 
-  const getStatusBadge = (status: string) => {
-    switch (status) {
-      case 'processing':
-        return <Badge className="bg-blue-500">Processing</Badge>;
-      case 'in-transit':
-        return <Badge className="bg-amber-500">In Transit</Badge>;
-      case 'delivered':
-        return <Badge className="bg-green-500">Delivered</Badge>;
-      case 'cancelled':
-        return <Badge className="bg-red-500">Cancelled</Badge>;
-      case 'pending':
-        return <Badge className="bg-purple-500">Pending</Badge>;
-      default:
-        return <Badge>Unknown</Badge>;
-    }
-  };
-
-  const getPaymentStatusBadge = (status: string) => {
-    switch (status) {
-      case 'paid':
-        return <Badge className="bg-green-500">Paid</Badge>;
-      case 'pending':
-        return <Badge className="bg-amber-500">Pending</Badge>;
-      case 'refunded':
-        return <Badge className="bg-blue-500">Refunded</Badge>;
-      default:
-        return <Badge>Unknown</Badge>;
-    }
-  };
-
   const filteredPastOrders = pastOrders.filter(order => {
     if (searchQuery && !order.id.toLowerCase().includes(searchQuery.toLowerCase()) && 
         !order.vendor.toLowerCase().includes(searchQuery.toLowerCase())) {
@@ -153,10 +114,6 @@ const OrdersPage = () => {
     }
     return true;
   });
-
-  const handleOrderClick = (orderId: string) => {
-    navigate(`/customer/orders/${orderId}`);
-  };
 
   return (
     <DashboardLayout userRole="customer">
@@ -191,157 +148,21 @@ const OrdersPage = () => {
               <TabsContent value="active">
                 <div className="space-y-4">
                   {activeOrders.map((order) => (
-                    <div 
-                      key={order.id} 
-                      className="bg-white border rounded-lg p-3 md:p-4 hover:shadow-md transition-shadow cursor-pointer"
-                      onClick={() => handleOrderClick(order.id)}
-                    >
-                      <div className="flex flex-col md:flex-row justify-between">
-                        <div className="flex items-start space-x-3 md:space-x-4">
-                          <div className="p-2 bg-primary-light rounded-full">
-                            {order.status === 'in-transit' ? (
-                              <Truck className="h-5 w-5 md:h-6 md:w-6 text-primary" />
-                            ) : (
-                              <Box className="h-5 w-5 md:h-6 md:w-6 text-primary" />
-                            )}
-                          </div>
-                          <div>
-                            <div className="flex items-center flex-wrap gap-2">
-                              <h3 className="font-medium">{order.vendor}</h3>
-                              <span className="text-sm text-gray-500">{order.id}</span>
-                            </div>
-                            <div className="flex items-center mt-1 flex-wrap gap-2">
-                              {getStatusBadge(order.status)}
-                              {getPaymentStatusBadge(order.paymentStatus)}
-                              {order.eta && (
-                                <div className="flex items-center text-sm text-gray-600">
-                                  <Clock className="h-4 w-4 mr-1" />
-                                  <span>ETA: {order.eta}</span>
-                                </div>
-                              )}
-                            </div>
-                            <div className="mt-2 text-sm text-gray-600">
-                              <span>{order.items} items</span>
-                              <span className="mx-2 text-gray-300">•</span>
-                              <span>Updated {order.updatedAt}</span>
-                              <span className="mx-2 text-gray-300">•</span>
-                              <span>{order.totalAmount}</span>
-                            </div>
-                          </div>
-                        </div>
-                        
-                        <div className="flex items-center mt-4 md:mt-0 justify-between md:justify-end w-full md:w-auto gap-4">
-                          <div className="flex items-center text-sm bg-green-50 text-green-700 px-2 py-1 rounded">
-                            <Leaf className="h-4 w-4 mr-1" />
-                            <span>{order.carbonSaved} kg CO₂ saved</span>
-                          </div>
-                          <Button 
-                            variant="ghost" 
-                            size="sm" 
-                            className="p-1 h-auto"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleOrderClick(order.id);
-                            }}
-                          >
-                            <ChevronRight className="h-5 w-5" />
-                          </Button>
-                        </div>
-                      </div>
-                    </div>
+                    <ActiveOrderCard key={order.id} order={order} />
                   ))}
                 </div>
               </TabsContent>
               
               <TabsContent value="past">
-                <div className="flex flex-col sm:flex-row gap-4 mb-6">
-                  <div className="relative flex-grow">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-                    <Input
-                      className="pl-10"
-                      placeholder="Search orders..."
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                    />
-                  </div>
-                  <div className="flex gap-2">
-                    <Select value={statusFilter} onValueChange={setStatusFilter}>
-                      <SelectTrigger className="w-[150px]">
-                        <div className="flex items-center">
-                          <Filter className="mr-2 h-4 w-4" />
-                          <span>Status</span>
-                        </div>
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="all">All Statuses</SelectItem>
-                        <SelectItem value="delivered">Delivered</SelectItem>
-                        <SelectItem value="cancelled">Cancelled</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <Select value={dateFilter} onValueChange={setDateFilter}>
-                      <SelectTrigger className="w-[150px]">
-                        <div className="flex items-center">
-                          <Calendar className="mr-2 h-4 w-4" />
-                          <span>Time Period</span>
-                        </div>
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="all">All Time</SelectItem>
-                        <SelectItem value="week">Last Week</SelectItem>
-                        <SelectItem value="month">Last Month</SelectItem>
-                        <SelectItem value="year">Last Year</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-                
-                <div className="overflow-x-auto">
-                  <Table>
-                    <TableCaption>A list of your past orders</TableCaption>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Order ID</TableHead>
-                        <TableHead>Vendor</TableHead>
-                        <TableHead>Date</TableHead>
-                        <TableHead>Status</TableHead>
-                        <TableHead>Payment</TableHead>
-                        <TableHead>Amount</TableHead>
-                        <TableHead>CO₂ Saved</TableHead>
-                        <TableHead className="text-right">Actions</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {filteredPastOrders.map((order) => (
-                        <TableRow key={order.id} className="hover:bg-gray-50 cursor-pointer" onClick={() => handleOrderClick(order.id)}>
-                          <TableCell className="font-medium">{order.id}</TableCell>
-                          <TableCell>{order.vendor}</TableCell>
-                          <TableCell>{order.date}</TableCell>
-                          <TableCell>{getStatusBadge(order.status)}</TableCell>
-                          <TableCell>{getPaymentStatusBadge(order.paymentStatus)}</TableCell>
-                          <TableCell>{order.totalAmount}</TableCell>
-                          <TableCell>
-                            <div className="flex items-center text-sm text-green-700">
-                              <Leaf className="h-4 w-4 mr-1" />
-                              <span>{order.carbonSaved} kg</span>
-                            </div>
-                          </TableCell>
-                          <TableCell className="text-right">
-                            <Button 
-                              variant="ghost" 
-                              size="sm"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleOrderClick(order.id);
-                              }}
-                            >
-                              View
-                            </Button>
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </div>
+                <OrderHistoryFilters 
+                  searchQuery={searchQuery}
+                  setSearchQuery={setSearchQuery}
+                  statusFilter={statusFilter}
+                  setStatusFilter={setStatusFilter}
+                  dateFilter={dateFilter}
+                  setDateFilter={setDateFilter}
+                />
+                <OrderHistoryTable orders={filteredPastOrders} />
               </TabsContent>
             </Tabs>
           </CardContent>

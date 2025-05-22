@@ -2,12 +2,13 @@
 import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import DashboardLayout from '@/components/layout/DashboardLayout';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Separator } from '@/components/ui/separator';
 import { toast } from 'sonner';
-import { Package, Clock, Leaf, CheckCircle, X, ChevronLeft } from 'lucide-react';
+import { CheckCircle, X, ChevronLeft } from 'lucide-react';
+import OrderInformation from '@/components/vendor/OrderInformation';
+import OrderItems from '@/components/vendor/OrderItems';
+import DeliveryInformation from '@/components/vendor/DeliveryInformation';
 
 const ProcessOrderPage = () => {
   const navigate = useNavigate();
@@ -50,14 +51,6 @@ const ProcessOrderPage = () => {
     }, 1500);
   };
 
-  const formatPrice = (price) => {
-    return price.toLocaleString('en-NG', {
-      style: 'currency',
-      currency: 'NGN',
-      minimumFractionDigits: 2
-    });
-  };
-
   return (
     <DashboardLayout userRole="vendor">
       <div className="p-6 max-w-4xl mx-auto">
@@ -71,125 +64,9 @@ const ProcessOrderPage = () => {
         </div>
 
         <div className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Order Information</CardTitle>
-              <CardDescription>Basic information about this order</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="flex flex-col md:flex-row justify-between">
-                <div className="space-y-4">
-                  <div>
-                    <h3 className="text-sm font-medium text-gray-500">Order ID</h3>
-                    <p className="font-medium">{order.id}</p>
-                  </div>
-                  <div>
-                    <h3 className="text-sm font-medium text-gray-500">Customer</h3>
-                    <p className="font-medium">{order.customer}</p>
-                  </div>
-                  <div>
-                    <h3 className="text-sm font-medium text-gray-500">Order Date</h3>
-                    <div className="flex items-center">
-                      <Clock className="h-4 w-4 mr-2 text-gray-400" />
-                      <span>{new Date(order.createdAt).toLocaleString('en-US', {
-                        year: 'numeric',
-                        month: 'short',
-                        day: 'numeric',
-                        hour: 'numeric',
-                        minute: 'numeric',
-                        hour12: true
-                      })}</span>
-                    </div>
-                  </div>
-                </div>
-                
-                <div className="mt-4 md:mt-0 space-y-4">
-                  <div>
-                    <h3 className="text-sm font-medium text-gray-500">Status</h3>
-                    <Badge className="bg-amber-500 text-white">Pending</Badge>
-                  </div>
-                  <div>
-                    <h3 className="text-sm font-medium text-gray-500">Payment Method</h3>
-                    <p>{order.paymentMethod}</p>
-                  </div>
-                  <div>
-                    <h3 className="text-sm font-medium text-gray-500">Delivery Type</h3>
-                    <p>{order.deliveryType}</p>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>Order Items</CardTitle>
-              <CardDescription>Items included in this order</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead>
-                    <tr className="text-left border-b">
-                      <th className="pb-2 font-medium text-gray-500">Item</th>
-                      <th className="pb-2 font-medium text-gray-500">Quantity</th>
-                      <th className="pb-2 font-medium text-gray-500 text-right">Price</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {order.items.map((item, index) => (
-                      <tr key={index} className="border-b last:border-0">
-                        <td className="py-3">{item.name}</td>
-                        <td className="py-3">{item.quantity}</td>
-                        <td className="py-3 text-right">{formatPrice(item.price)}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                  <tfoot>
-                    <tr className="border-t">
-                      <td colSpan={2} className="pt-2 font-medium text-right">Subtotal:</td>
-                      <td className="pt-2 text-right">{formatPrice(order.items.reduce((sum, item) => sum + item.price, 0))}</td>
-                    </tr>
-                    {order.deliveryFee && (
-                      <tr>
-                        <td colSpan={2} className="pt-2 font-medium text-right">Delivery Fee:</td>
-                        <td className="pt-2 text-right">{formatPrice(order.deliveryFee)}</td>
-                      </tr>
-                    )}
-                    <tr>
-                      <td colSpan={2} className="pt-2 font-bold text-right">Total:</td>
-                      <td className="pt-2 font-bold text-right">{formatPrice(order.total)}</td>
-                    </tr>
-                  </tfoot>
-                </table>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>Delivery Information</CardTitle>
-              <CardDescription>Where this order will be delivered</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div>
-                  <h3 className="text-sm font-medium text-gray-500">Delivery Address</h3>
-                  <p className="mt-1">{order.address}</p>
-                </div>
-                {order.timeSlot && (
-                  <div>
-                    <h3 className="text-sm font-medium text-gray-500">Delivery Time Slot</h3>
-                    <p className="mt-1">{order.timeSlot}</p>
-                  </div>
-                )}
-                <div className="flex items-center pt-2">
-                  <Leaf className="h-4 w-4 mr-2 text-green-500" />
-                  <span className="text-sm text-green-600">Eco-friendly packaging selected</span>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+          <OrderInformation order={order} />
+          <OrderItems items={order.items} total={order.total} deliveryFee={order.deliveryFee} />
+          <DeliveryInformation address={order.address} timeSlot={order.timeSlot} />
 
           <div className="flex flex-col md:flex-row gap-4 justify-end">
             <Button 
