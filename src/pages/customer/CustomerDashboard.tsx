@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import DashboardLayout from '@/components/layout/DashboardLayout';
@@ -61,6 +62,10 @@ const pastOrders = [
 const CustomerDashboard = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
+
+  const handleOrderClick = (orderId: string) => {
+    navigate(`/customer/orders/${orderId}`);
+  };
 
   const getStatusBadge = (status: string) => {
     switch (status) {
@@ -153,7 +158,11 @@ const CustomerDashboard = () => {
                 {activeOrders.length > 0 ? (
                   <div className="space-y-4">
                     {activeOrders.map((order) => (
-                      <div key={order.id} className="bg-white border rounded-lg p-3 md:p-4 hover:shadow-md transition-shadow">
+                      <div 
+                        key={order.id} 
+                        className="bg-white border rounded-lg p-3 md:p-4 hover:shadow-md transition-shadow cursor-pointer" 
+                        onClick={() => handleOrderClick(order.id)}
+                      >
                         <div className="flex flex-col md:flex-row justify-between">
                           <div className="flex items-start space-x-3 md:space-x-4">
                             <div className="p-2 bg-primary-light rounded-full">
@@ -191,7 +200,15 @@ const CustomerDashboard = () => {
                               <Leaf className="h-4 w-4 mr-1" />
                               <span>{order.carbonSaved} kg CO₂ saved</span>
                             </div>
-                            <Button variant="ghost" size="sm" className="p-1 h-auto">
+                            <Button 
+                              variant="ghost" 
+                              size="sm" 
+                              className="p-1 h-auto"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleOrderClick(order.id);
+                              }}
+                            >
                               <ChevronRight className="h-5 w-5" />
                             </Button>
                           </div>
@@ -212,7 +229,11 @@ const CustomerDashboard = () => {
               <TabsContent value="past">
                 <div className="space-y-4">
                   {pastOrders.map((order) => (
-                    <div key={order.id} className="bg-white border rounded-lg p-3 md:p-4 hover:shadow-md transition-shadow">
+                    <div 
+                      key={order.id} 
+                      className="bg-white border rounded-lg p-3 md:p-4 hover:shadow-md transition-shadow cursor-pointer"
+                      onClick={() => handleOrderClick(order.id)}
+                    >
                       <div className="flex flex-col md:flex-row justify-between">
                         <div className="flex items-start space-x-3 md:space-x-4">
                           <div className="p-2 bg-gray-100 rounded-full">
@@ -241,7 +262,15 @@ const CustomerDashboard = () => {
                             <Leaf className="h-4 w-4 mr-1" />
                             <span>{order.carbonSaved} kg CO₂ saved</span>
                           </div>
-                          <Button variant="ghost" size="sm" className="p-1 h-auto">
+                          <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            className="p-1 h-auto"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleOrderClick(order.id);
+                            }}
+                          >
                             <ChevronRight className="h-5 w-5" />
                           </Button>
                         </div>
@@ -284,7 +313,10 @@ const CustomerDashboard = () => {
                   <Progress value={70} className="w-20 h-2" />
                 </div>
                 
-                <Button className="w-full flex items-center justify-center bg-primary hover:bg-primary-hover text-black">
+                <Button 
+                  className="w-full flex items-center justify-center bg-primary hover:bg-primary-hover text-black"
+                  onClick={() => navigate('/customer/recycling')}
+                >
                   <span>View All Badges</span>
                   <ArrowUpRight className="ml-2 h-4 w-4" />
                 </Button>
@@ -331,7 +363,10 @@ const CustomerDashboard = () => {
                 </div>
               </div>
               
-              <Button className="w-full mt-4 flex items-center justify-center bg-primary hover:bg-primary-hover text-black">
+              <Button 
+                className="w-full mt-4 flex items-center justify-center bg-primary hover:bg-primary-hover text-black"
+                onClick={() => navigate('/customer/wallet')}
+              >
                 <span>Go to Wallet</span>
                 <ArrowUpRight className="ml-2 h-4 w-4" />
               </Button>

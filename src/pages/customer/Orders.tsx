@@ -154,6 +154,10 @@ const OrdersPage = () => {
     return true;
   });
 
+  const handleOrderClick = (orderId: string) => {
+    navigate(`/customer/orders/${orderId}`);
+  };
+
   return (
     <DashboardLayout userRole="customer">
       <div className="p-2 sm:p-4 md:p-6 max-w-full mx-auto space-y-4 md:space-y-6">
@@ -187,7 +191,11 @@ const OrdersPage = () => {
               <TabsContent value="active">
                 <div className="space-y-4">
                   {activeOrders.map((order) => (
-                    <div key={order.id} className="bg-white border rounded-lg p-3 md:p-4 hover:shadow-md transition-shadow">
+                    <div 
+                      key={order.id} 
+                      className="bg-white border rounded-lg p-3 md:p-4 hover:shadow-md transition-shadow cursor-pointer"
+                      onClick={() => handleOrderClick(order.id)}
+                    >
                       <div className="flex flex-col md:flex-row justify-between">
                         <div className="flex items-start space-x-3 md:space-x-4">
                           <div className="p-2 bg-primary-light rounded-full">
@@ -231,7 +239,10 @@ const OrdersPage = () => {
                             variant="ghost" 
                             size="sm" 
                             className="p-1 h-auto"
-                            onClick={() => navigate(`/customer/orders/${order.id}`)}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleOrderClick(order.id);
+                            }}
                           >
                             <ChevronRight className="h-5 w-5" />
                           </Button>
@@ -301,7 +312,7 @@ const OrdersPage = () => {
                     </TableHeader>
                     <TableBody>
                       {filteredPastOrders.map((order) => (
-                        <TableRow key={order.id} className="hover:bg-gray-50">
+                        <TableRow key={order.id} className="hover:bg-gray-50 cursor-pointer" onClick={() => handleOrderClick(order.id)}>
                           <TableCell className="font-medium">{order.id}</TableCell>
                           <TableCell>{order.vendor}</TableCell>
                           <TableCell>{order.date}</TableCell>
@@ -318,7 +329,10 @@ const OrdersPage = () => {
                             <Button 
                               variant="ghost" 
                               size="sm"
-                              onClick={() => navigate(`/customer/orders/${order.id}`)}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleOrderClick(order.id);
+                              }}
                             >
                               View
                             </Button>

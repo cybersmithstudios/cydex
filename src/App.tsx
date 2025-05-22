@@ -1,4 +1,3 @@
-
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Index from './pages/Index';
 import Auth from './pages/Auth';
@@ -7,21 +6,19 @@ import NotFound from './pages/NotFound';
 import CustomerDashboard from './pages/customer/CustomerDashboard';
 import NewOrder from './pages/customer/NewOrder';
 import Orders from './pages/customer/Orders';
+import OrderDetail from './pages/customer/OrderDetail';
 import Wallet from './pages/customer/Wallet';
 import Recycling from './pages/customer/Recycling';
-import Messages from './pages/customer/Messages';
 import Profile from './pages/customer/Profile';
 import RiderDashboard from './pages/rider/RiderDashboard';
 import AvailableOrders from './pages/rider/AvailableOrders';
 import CurrentDeliveries from './pages/rider/CurrentDeliveries';
 import RiderEarnings from './pages/rider/Earnings';
-import RiderMessages from './pages/rider/Messages';
 import RiderProfile from './pages/rider/Profile';
 import VendorDashboard from './pages/vendor/VendorDashboard';
 import VendorOrders from './pages/vendor/Orders';
 import VendorWallet from './pages/vendor/Wallet';
 import VendorRecycling from './pages/vendor/Recycling';
-import VendorMessages from './pages/vendor/Messages';
 import VendorSettings from './pages/vendor/Settings';
 import AddProduct from './pages/vendor/AddProduct';
 import AdminDashboard from './pages/admin/AdminDashboard';
@@ -97,6 +94,15 @@ function App() {
             />
             
             <Route 
+              path="/customer/orders/:orderId" 
+              element={
+                <ProtectedRoute allowedRoles={['customer']}>
+                  <OrderDetail />
+                </ProtectedRoute>
+              } 
+            />
+            
+            <Route 
               path="/customer/wallet" 
               element={
                 <ProtectedRoute allowedRoles={['customer']}>
@@ -110,15 +116,6 @@ function App() {
               element={
                 <ProtectedRoute allowedRoles={['customer']}>
                   <Recycling />
-                </ProtectedRoute>
-              } 
-            />
-            
-            <Route 
-              path="/customer/messages" 
-              element={
-                <ProtectedRoute allowedRoles={['customer']}>
-                  <Messages />
                 </ProtectedRoute>
               } 
             />
@@ -179,15 +176,6 @@ function App() {
             />
 
             <Route 
-              path="/rider/messages" 
-              element={
-                <ProtectedRoute allowedRoles={['rider']}>
-                  <RiderMessages />
-                </ProtectedRoute>
-              } 
-            />
-
-            <Route 
               path="/rider/profile" 
               element={
                 <ProtectedRoute allowedRoles={['rider']}>
@@ -229,15 +217,6 @@ function App() {
               element={
                 <ProtectedRoute allowedRoles={['vendor']}>
                   <VendorRecycling />
-                </ProtectedRoute>
-              } 
-            />
-
-            <Route 
-              path="/vendor/messages" 
-              element={
-                <ProtectedRoute allowedRoles={['vendor']}>
-                  <VendorMessages />
                 </ProtectedRoute>
               } 
             />
