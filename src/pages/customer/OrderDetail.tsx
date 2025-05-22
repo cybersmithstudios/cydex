@@ -1,15 +1,23 @@
-
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import DashboardLayout from '@/components/layout/DashboardLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Separator } from '@/components/ui/separator';
-import { Progress } from '@/components/ui/progress';
-import { ArrowLeft, Truck, Package, MapPin, Calendar, Clock, Leaf, Receipt, CreditCard } from 'lucide-react';
+import { ArrowLeft, Leaf } from 'lucide-react';
+import { toast } from 'sonner';
 
-// Mock data - in a real app, you would fetch this from an API
+// Import reusable components
+import OrderTrackingTimeline from '@/components/customer/OrderTrackingTimeline';
+import OrderInfoCards from '@/components/customer/OrderInfoCards';
+import DeliveryAgentCard from '@/components/customer/DeliveryAgentCard';
+import OrderItemsList from '@/components/customer/OrderItemsList';
+import OrderSummary from '@/components/customer/OrderSummary';
+import OrderActions from '@/components/customer/OrderActions';
+
+// Import utils
+import { getOrderStatusBadge, getPaymentStatusBadge } from '@/utils/StatusUtils';
+
+// Mock data function - in a real app, you would fetch this from an API
 const getOrderById = (id) => {
   // This is mock data - in a real app, you would fetch from an API based on the ID
   return {
@@ -92,34 +100,20 @@ const OrderDetailPage = () => {
     }
   }, [orderId]);
 
-  const getStatusBadge = (status) => {
-    switch (status) {
-      case 'processing':
-        return <Badge className="bg-blue-500">Processing</Badge>;
-      case 'in-transit':
-        return <Badge className="bg-amber-500">In Transit</Badge>;
-      case 'delivered':
-        return <Badge className="bg-green-500">Delivered</Badge>;
-      case 'cancelled':
-        return <Badge className="bg-red-500">Cancelled</Badge>;
-      case 'pending':
-        return <Badge className="bg-purple-500">Pending</Badge>;
-      default:
-        return <Badge>Unknown</Badge>;
-    }
+  const handleCancelOrder = () => {
+    toast.success('Your order has been cancelled successfully');
+    // In a real app, you would make an API call to cancel the order
   };
 
-  const getPaymentStatusBadge = (status) => {
-    switch (status) {
-      case 'paid':
-        return <Badge className="bg-green-500">Paid</Badge>;
-      case 'pending':
-        return <Badge className="bg-amber-500">Pending</Badge>;
-      case 'refunded':
-        return <Badge className="bg-blue-500">Refunded</Badge>;
-      default:
-        return <Badge>Unknown</Badge>;
-    }
+  const handleDownloadReceipt = () => {
+    toast.success('Receipt downloaded successfully');
+    // In a real app, you would generate and download a receipt
+  };
+
+  const handleReorder = () => {
+    toast.success('Items added to cart');
+    navigate('/customer/new-order');
+    // In a real app, you would add the items to the cart
   };
 
   if (loading) {
@@ -171,7 +165,7 @@ const OrderDetailPage = () => {
               </div>
               <div className="flex flex-col items-end">
                 <div className="flex space-x-2 mb-2">
-                  {getStatusBadge(order.status)}
+                  {getOrderStatusBadge(order.status)}
                   {getPaymentStatusBadge(order.paymentStatus)}
                 </div>
                 <div className="flex items-center text-sm bg-green-50 text-green-700 px-2 py-1 rounded">
@@ -183,167 +177,43 @@ const OrderDetailPage = () => {
           </CardHeader>
           <CardContent className="space-y-6">
             {/* Order Timeline */}
-            <div className="border rounded-lg p-4 bg-gray-50">
-              <h3 className="font-medium mb-4">Order Tracking</h3>
-              <div className="relative">
-                <div className="absolute left-4 top-0 bottom-0 w-1 bg-gray-200"></div>
-                {order.trackingSteps.map((step, index) => (
-                  <div key={step.id} className="flex mb-6 relative">
-                    <div className={`h-8 w-8 rounded-full flex items-center justify-center z-10 ${
-                      step.completed ? 'bg-green-500 text-white' : 'bg-gray-200'
-                    }`}>
-                      {step.completed ? (
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                        </svg>
-                      ) : (
-                        <span>{index + 1}</span>
-                      )}
-                    </div>
-                    <div className="ml-4">
-                      <p className="font-medium">{step.title}</p>
-                      {step.time && <p className="text-sm text-gray-500">{step.time}</p>}
-                    </div>
-                  </div>
-                ))}
-              </div>
-              
-              {order.status === 'in-transit' && (
-                <div className="mt-4">
-                  <p className="text-sm text-gray-500 mb-2">Estimated Time of Arrival</p>
-                  <div className="flex items-center">
-                    <Clock className="h-5 w-5 mr-2 text-primary" />
-                    <span className="font-medium">{order.eta}</span>
-                  </div>
-                </div>
-              )}
-            </div>
+            <OrderTrackingTimeline 
+              steps={order.trackingSteps} 
+              eta={order.eta} 
+              status={order.status}
+            />
 
             {/* Order Info */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="border rounded-lg p-4">
-                <h3 className="font-medium mb-2 flex items-center">
-                  <MapPin className="h-5 w-5 mr-2" /> Delivery Address
-                </h3>
-                <p className="text-gray-600">{order.deliveryAddress}</p>
-              </div>
-              
-              <div className="border rounded-lg p-4">
-                <h3 className="font-medium mb-2 flex items-center">
-                  <Calendar className="h-5 w-5 mr-2" /> Order Information
-                </h3>
-                <div className="text-sm text-gray-600 space-y-1">
-                  <p>Order Date: {order.orderDate}</p>
-                  <p>Last Updated: {order.updatedAt}</p>
-                  <p>Items: {order.items}</p>
-                </div>
-              </div>
-            </div>
+            <OrderInfoCards 
+              deliveryAddress={order.deliveryAddress}
+              orderDate={order.orderDate}
+              updatedAt={order.updatedAt}
+              items={order.items}
+            />
 
             {/* Rider Info (if in transit) */}
             {order.status === 'in-transit' && (
-              <div className="border rounded-lg p-4">
-                <h3 className="font-medium mb-3">Delivery Agent</h3>
-                <div className="flex items-center">
-                  <div className="h-12 w-12 bg-gray-200 rounded-full flex items-center justify-center">
-                    {order.rider.photo ? (
-                      <img src={order.rider.photo} alt={order.rider.name} className="h-12 w-12 rounded-full" />
-                    ) : (
-                      <Truck className="h-6 w-6 text-gray-400" />
-                    )}
-                  </div>
-                  <div className="ml-3">
-                    <p className="font-medium">{order.rider.name}</p>
-                    <div className="flex items-center text-sm text-gray-500">
-                      <span className="flex items-center mr-3">
-                        <svg className="h-4 w-4 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
-                          <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                        </svg>
-                        {order.rider.rating}
-                      </span>
-                      <span>{order.rider.phone}</span>
-                    </div>
-                  </div>
-                  <div className="ml-auto">
-                    <Button variant="outline">Contact</Button>
-                  </div>
-                </div>
-              </div>
+              <DeliveryAgentCard rider={order.rider} />
             )}
 
             {/* Order Items */}
-            <div>
-              <h3 className="font-medium mb-3 flex items-center">
-                <Package className="h-5 w-5 mr-2" /> Order Items
-              </h3>
-              <div className="border rounded-lg overflow-hidden">
-                <div className="divide-y">
-                  {order.products
-                    .filter(product => product.quantity > 0)
-                    .map((product) => (
-                      <div key={product.id} className="p-4 flex items-center">
-                        <div className="h-16 w-16 bg-gray-100 rounded flex items-center justify-center flex-shrink-0">
-                          {product.image ? (
-                            <img src={product.image} alt={product.name} className="h-14 w-14 object-cover" />
-                          ) : (
-                            <Package className="h-8 w-8 text-gray-400" />
-                          )}
-                        </div>
-                        <div className="ml-4 flex-grow">
-                          <p className="font-medium">{product.name}</p>
-                          <p className="text-sm text-gray-500">Qty: {product.quantity}</p>
-                        </div>
-                        <div className="text-right">
-                          <p className="font-medium">{product.price}</p>
-                        </div>
-                      </div>
-                    ))}
-                </div>
-              </div>
-            </div>
+            <OrderItemsList products={order.products} />
 
             {/* Order Summary */}
-            <div>
-              <h3 className="font-medium mb-3 flex items-center">
-                <Receipt className="h-5 w-5 mr-2" /> Order Summary
-              </h3>
-              <div className="border rounded-lg p-4">
-                <div className="space-y-2 border-b pb-2">
-                  <div className="flex justify-between text-sm">
-                    <span className="text-gray-600">Subtotal</span>
-                    <span>{order.totalAmount}</span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-gray-600">Delivery Fee</span>
-                    <span>{order.deliveryFee}</span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-gray-600">Discount</span>
-                    <span className="text-green-600">-{order.discount}</span>
-                  </div>
-                </div>
-                <div className="flex justify-between mt-2 font-bold">
-                  <span>Total</span>
-                  <span>{order.totalAmount}</span>
-                </div>
-                <div className="mt-3 flex items-center text-sm">
-                  <CreditCard className="h-4 w-4 mr-2" />
-                  <span className="text-gray-600">Payment Method: </span>
-                  <span className="ml-1">Credit Card</span>
-                </div>
-              </div>
-            </div>
+            <OrderSummary 
+              totalAmount={order.totalAmount}
+              deliveryFee={order.deliveryFee}
+              discount={order.discount}
+              paymentMethod="Credit Card" // This should come from the order data in a real app
+            />
 
             {/* Action Buttons */}
-            <div className="flex flex-wrap gap-3">
-              {order.status !== 'delivered' && order.status !== 'cancelled' && (
-                <Button variant="outline" className="border-red-500 text-red-500 hover:bg-red-50">
-                  Cancel Order
-                </Button>
-              )}
-              <Button variant="outline">Download Receipt</Button>
-              <Button className="bg-primary hover:bg-primary-hover text-black">Reorder</Button>
-            </div>
+            <OrderActions 
+              status={order.status}
+              onCancelOrder={handleCancelOrder}
+              onDownloadReceipt={handleDownloadReceipt}
+              onReorder={handleReorder}
+            />
           </CardContent>
         </Card>
       </div>
