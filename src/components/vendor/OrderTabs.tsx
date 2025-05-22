@@ -3,6 +3,7 @@ import React from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import OrdersList from './OrdersList';
 
+// Use a consistent Order type that matches what's used in OrdersList
 interface Order {
   id: string;
   customer: string;
@@ -10,6 +11,13 @@ interface Order {
   createdAt: string;
   items: Array<any>;
   total: number;
+  paymentMethod: string;
+  deliveryType?: string;
+  timeSlot?: string;
+  rider?: {
+    name: string;
+    contact: string;
+  };
   [key: string]: any;
 }
 
