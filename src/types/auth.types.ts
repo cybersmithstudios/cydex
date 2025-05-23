@@ -22,11 +22,12 @@ export interface AuthContextType {
   register: (name: string, email: string, password: string, role: UserRole, additionalInfo?: any) => Promise<void>;
   logout: () => void;
   isAuthenticated: boolean;
-  verifyEmail: (token: string) => Promise<boolean>;
+  verifyEmail: (token: string) => Promise<void>;
   resetPassword: (email: string) => Promise<void>;
   updatePassword: (token: string, newPassword: string) => Promise<boolean>;
   enableMFA: () => Promise<void>;
   verifyMFA: (code: string) => Promise<boolean>;
   isSessionExpired: () => boolean;
   refreshSession: () => void;
+  changePassword: (email: string, code: string, password: string) => Promise<void>;
 }

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { toast } from "sonner";
 import { AuthContext } from './AuthContext';
-import { User, UserRole } from '../types/auth.types';
+import { User, UserRole, AuthContextType } from '../types/auth.types';
 import { SESSION_TIMEOUT } from '../constants/auth.constants';
 import { supabase } from '../lib/supabase';
 import LoadingDisplay from '@/components/ui/LoadingDisplay';
@@ -382,10 +382,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const value = {
+  const value: AuthContextType = {
     user,
     loading,
-    loggingOut,
     login,
     register,
     logout,

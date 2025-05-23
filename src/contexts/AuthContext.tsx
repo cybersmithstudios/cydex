@@ -1,20 +1,9 @@
+
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import AuthService, { LoginCredentials, RegisterData } from '@/services/authService';
-import { User, UserRole } from '@/types/auth.types';
-
-interface AuthContextType {
-  user: User | null;
-  isAuthenticated: boolean;
-  login: (email: string, password: string) => Promise<void>;
-  register: (name: string, email: string, password: string, role: UserRole) => Promise<void>;
-  logout: () => void;
-  resetPassword: (email: string) => Promise<void>;
-  changePassword: (email: string, code: string, password: string) => Promise<void>;
-  verifyEmail: (email: string) => Promise<void>;
-}
+import { User, UserRole, AuthContextType } from '@/types/auth.types';
 
 export const AuthContext = createContext<AuthContextType | undefined>(undefined);
-export { UserRole }; // Export UserRole to fix the import issue in SignupForm
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
@@ -120,7 +109,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         logout,
         resetPassword,
         changePassword,
-        verifyEmail
+        verifyEmail,
+        loading: false,
+        updatePassword: async () => false,
+        enableMFA: async () => {},
+        verifyMFA: async () => false,
+        isSessionExpired: () => false,
+        refreshSession: () => {}
       }}
     >
       {children}

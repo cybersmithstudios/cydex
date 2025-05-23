@@ -1,6 +1,6 @@
 
 import axiosInstance from '@/lib/axios';
-import axios from 'axios';
+import axios, { isAxiosError } from 'axios';
 
 const API_URL = 'https://cydex-backend-production-edd3.up.railway.app';
 
@@ -60,7 +60,7 @@ class AuthService {
       
       return data;
     } catch (error) {
-      if (axios.isAxiosError(error)) {
+      if (isAxiosError(error)) {
         throw new Error(error.response?.data?.message || 'Login failed');
       }
       throw new Error('Login failed');
@@ -78,7 +78,7 @@ class AuthService {
       
       return responseData;
     } catch (error) {
-      if (axios.isAxiosError(error)) {
+      if (isAxiosError(error)) {
         throw new Error(error.response?.data?.message || 'Registration failed');
       }
       throw new Error('Registration failed');
@@ -89,7 +89,7 @@ class AuthService {
     try {
       await axiosInstance.post('/auth/otp/send', { email });
     } catch (error) {
-      if (axios.isAxiosError(error)) {
+      if (isAxiosError(error)) {
         throw new Error(error.response?.data?.message || 'Password reset request failed');
       }
       throw new Error('Password reset request failed');
@@ -104,7 +104,7 @@ class AuthService {
         password
       });
     } catch (error) {
-      if (axios.isAxiosError(error)) {
+      if (isAxiosError(error)) {
         throw new Error(error.response?.data?.message || 'Password change failed');
       }
       throw new Error('Password change failed');
@@ -115,7 +115,7 @@ class AuthService {
     try {
       await axiosInstance.post('/auth/email-verification', { email });
     } catch (error) {
-      if (axios.isAxiosError(error)) {
+      if (isAxiosError(error)) {
         throw new Error(error.response?.data?.message || 'Email verification failed');
       }
       throw new Error('Email verification failed');
