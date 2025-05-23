@@ -241,17 +241,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  // Email verification function
-  const verifyEmail = async (token: string): Promise<boolean> => {
+  // Email verification function - Update return type to match interface
+  const verifyEmail = async (token: string): Promise<void> => {
     setLoading(true);
     try {
       // In a real app, we would verify the token with Supabase
-      // For this demo, we'll just return true
+      // For this demo, we'll just show a success message
       toast.success('Email verified successfully! You can now log in.');
-      return true;
     } catch (error) {
       toast.error('Email verification failed. Please try again.');
-      return false;
     } finally {
       setLoading(false);
     }

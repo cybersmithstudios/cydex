@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import AuthService, { LoginCredentials, RegisterData } from '@/services/authService';
 import { User, UserRole } from '@/types/auth.types';
@@ -15,6 +14,7 @@ interface AuthContextType {
 }
 
 export const AuthContext = createContext<AuthContextType | undefined>(undefined);
+export { UserRole }; // Export UserRole to fix the import issue in SignupForm
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
