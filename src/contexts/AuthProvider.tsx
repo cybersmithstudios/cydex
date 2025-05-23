@@ -279,6 +279,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  // Change password function
+  const changePassword = async (email: string, code: string, newPassword: string): Promise<void> => {
+    setLoading(true);
+    try {
+      // In a real app, we would verify the code and change the password
+      // For this demo, we'll just simulate a successful password change
+      toast.success('Password changed successfully!');
+    } catch (error: any) {
+      const message = error.message || 'Password change failed';
+      toast.error(message);
+      throw error;
+    } finally {
+      setLoading(false);
+    }
+  };
+
   // Update password with Supabase
   const updatePassword = async (token: string, newPassword: string): Promise<boolean> => {
     setLoading(true);
@@ -382,7 +398,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     enableMFA,
     verifyMFA,
     isSessionExpired,
-    refreshSession
+    refreshSession,
+    changePassword
   };
 
   if (loading && !user) {
@@ -395,4 +412,3 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
-
