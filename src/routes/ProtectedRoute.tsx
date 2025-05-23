@@ -1,5 +1,5 @@
 
-import { Navigate } from 'react-router-dom';
+import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 
 export const ProtectedRoute = ({ 
@@ -10,13 +10,11 @@ export const ProtectedRoute = ({
   allowedRoles?: Array<string> 
 }) => {
   const { isAuthenticated, user } = useAuth();
+  const location = useLocation();
   
   if (!isAuthenticated) {
-    // Redirect them to the auth page, but save the current location they were
-    // trying to go to when they were redirected. This allows us to send them
-    // along to that page after they login, which is a nicer user experience
-    // than dropping them off on the home page.
-    return <Navigate to="/auth" state={{ from: window.location }} replace />;
+    // Pass only the pathname, search and hash as a string to avoid the Location object serialization issue
+    return <Navigate to="/auth" state={{ from: location.pathname + location.search }} replace />;
   }
   
   // Check role if allowedRoles is provided and not empty
