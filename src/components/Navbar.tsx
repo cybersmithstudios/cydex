@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate, Link } from "react-router-dom";
@@ -12,8 +11,9 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { Shield, LogOut, User, Settings, BarChart, Menu, X, ChevronDown } from "lucide-react";
+import { Shield, LogOut, User as UserIcon, Settings, BarChart, Menu, X, ChevronDown } from "lucide-react";
 import LogoutConfirmationDialog from "@/components/auth/LogoutConfirmationDialog";
+import { UserRole } from "@/types/auth.types";
 
 const Navbar = () => {
   const { user, logout, isAuthenticated } = useAuth();
@@ -174,14 +174,14 @@ const Navbar = () => {
                   <span>Dashboard</span>
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => navigate("/profile")}>
-                  <User className="mr-2 h-4 w-4" />
+                  <UserIcon className="mr-2 h-4 w-4" />
                   <span>Profile</span>
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => navigate("/settings")}>
                   <Settings className="mr-2 h-4 w-4" />
                   <span>Settings</span>
                 </DropdownMenuItem>
-                {user.role === 'admin' && (
+                {user.role === "admin" && (
                   <DropdownMenuItem onClick={() => navigate("/admin")}>
                     <Shield className="mr-2 h-4 w-4" />
                     <span>Admin Panel</span>
@@ -249,7 +249,7 @@ const Navbar = () => {
                   <BarChart className="mr-2 h-4 w-4" />
                   Dashboard
                 </Button>
-                {user.role === 'admin' && (
+                {user.role === "admin" && (
                   <Button 
                     variant="ghost" 
                     className="justify-start p-2" 

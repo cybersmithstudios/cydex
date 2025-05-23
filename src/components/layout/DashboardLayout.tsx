@@ -7,10 +7,11 @@ import Sidebar from './Sidebar';
 import MobileMenu from './MobileMenu';
 import MobileHeader from './MobileHeader';
 import { getNavLinks, getRoleTitle } from './navigationLinks';
+import { UserRole, User } from '@/types/auth.types';
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
-  userRole: 'customer' | 'rider' | 'vendor' | 'admin';
+  userRole: UserRole;
 }
 
 const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, userRole }) => {

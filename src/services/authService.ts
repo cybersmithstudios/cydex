@@ -1,5 +1,6 @@
+
 import axiosInstance from '@/lib/axios';
-import { AxiosError } from 'axios';
+import axios from 'axios';
 
 const API_URL = 'https://cydex-backend-production-edd3.up.railway.app';
 
@@ -13,7 +14,7 @@ export interface RegisterData {
   last_name: string;
   email: string;
   password: string;
-  role: 'CUSTOMER' | 'ADMIN' | 'RIDER' | 'VENDOR';
+  role: 'customer' | 'admin' | 'rider' | 'vendor';
   password_confirmation: string;
 }
 
@@ -51,15 +52,15 @@ class AuthService {
   public async login(credentials: LoginCredentials): Promise<AuthResponse> {
     try {
       const response = await axiosInstance.post('/auth/login', credentials);
-      const { token, user } = response.data;
+      const data = response.data as AuthResponse;
       
-      this.token = token;
-      localStorage.setItem('token', token);
-      localStorage.setItem('user', JSON.stringify(user));
+      this.token = data.token;
+      localStorage.setItem('token', data.token);
+      localStorage.setItem('user', JSON.stringify(data.user));
       
-      return { token, user };
+      return data;
     } catch (error) {
-      if (error instanceof AxiosError) {
+      if (axios.isAxiosError(error)) {
         throw new Error(error.response?.data?.message || 'Login failed');
       }
       throw new Error('Login failed');
@@ -69,15 +70,15 @@ class AuthService {
   public async register(data: RegisterData): Promise<AuthResponse> {
     try {
       const response = await axiosInstance.post('/auth/register', data);
-      const { token, user } = response.data;
+      const responseData = response.data as AuthResponse;
       
-      this.token = token;
-      localStorage.setItem('token', token);
-      localStorage.setItem('user', JSON.stringify(user));
+      this.token = responseData.token;
+      localStorage.setItem('token', responseData.token);
+      localStorage.setItem('user', JSON.stringify(responseData.user));
       
-      return { token, user };
+      return responseData;
     } catch (error) {
-      if (error instanceof AxiosError) {
+      if (axios.isAxiosError(error)) {
         throw new Error(error.response?.data?.message || 'Registration failed');
       }
       throw new Error('Registration failed');
@@ -88,7 +89,7 @@ class AuthService {
     try {
       await axiosInstance.post('/auth/otp/send', { email });
     } catch (error) {
-      if (error instanceof AxiosError) {
+      if (axios.isAxiosError(error)) {
         throw new Error(error.response?.data?.message || 'Password reset request failed');
       }
       throw new Error('Password reset request failed');
@@ -103,7 +104,7 @@ class AuthService {
         password
       });
     } catch (error) {
-      if (error instanceof AxiosError) {
+      if (axios.isAxiosError(error)) {
         throw new Error(error.response?.data?.message || 'Password change failed');
       }
       throw new Error('Password change failed');
@@ -114,7 +115,7 @@ class AuthService {
     try {
       await axiosInstance.post('/auth/email-verification', { email });
     } catch (error) {
-      if (error instanceof AxiosError) {
+      if (axios.isAxiosError(error)) {
         throw new Error(error.response?.data?.message || 'Email verification failed');
       }
       throw new Error('Email verification failed');
@@ -144,4 +145,4 @@ class AuthService {
   }
 }
 
-export default AuthService; 
+export default AuthService;

@@ -1,15 +1,7 @@
+
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import AuthService, { LoginCredentials, RegisterData } from '@/services/authService';
-
-export type UserRole = 'CUSTOMER' | 'ADMIN' | 'RIDER' | 'VENDOR';
-
-interface User {
-  id: string;
-  first_name: string;
-  last_name: string;
-  email: string;
-  role: UserRole;
-}
+import { User, UserRole } from '@/types/auth.types';
 
 interface AuthContextType {
   user: User | null;
@@ -22,7 +14,7 @@ interface AuthContextType {
   verifyEmail: (email: string) => Promise<void>;
 }
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+export const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
@@ -34,8 +26,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const currentUser = authService.getCurrentUser();
     if (currentUser) {
       setUser({
-        ...currentUser,
-        role: currentUser.role as UserRole
+        id: currentUser.id,
+        name: `${currentUser.first_name} ${currentUser.last_name}`,
+        email: currentUser.email,
+        role: currentUser.role as UserRole,
+        verified: true // Default value for existing users
       });
       setIsAuthenticated(true);
     }
@@ -45,8 +40,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       const response = await authService.login({ email, password });
       setUser({
-        ...response.user,
-        role: response.user.role as UserRole
+        id: response.user.id,
+        name: `${response.user.first_name} ${response.user.last_name}`,
+        email: response.user.email,
+        role: response.user.role as UserRole,
+        verified: true // Default for login
       });
       setIsAuthenticated(true);
     } catch (error: any) {
@@ -70,8 +68,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       const response = await authService.register(registerData);
       setUser({
-        ...response.user,
-        role: response.user.role as UserRole
+        id: response.user.id,
+        name: `${response.user.first_name} ${response.user.last_name}`,
+        email: response.user.email,
+        role: response.user.role as UserRole,
+        verified: true // Default for new registrations
       });
       setIsAuthenticated(true);
     } catch (error: any) {
