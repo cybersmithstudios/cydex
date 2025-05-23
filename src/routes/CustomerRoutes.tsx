@@ -1,5 +1,5 @@
 
-import { Route } from 'react-router-dom';
+import { Route, Routes } from 'react-router-dom';
 import { ProtectedRoute } from './ProtectedRoute';
 import CustomerDashboard from '../pages/customer/CustomerDashboard';
 import NewOrder from '../pages/customer/NewOrder';
@@ -11,9 +11,9 @@ import Profile from '../pages/customer/Profile';
 
 const CustomerRoutes = () => {
   return (
-    <>
+    <Routes>
       <Route 
-        path="/customer/new-order" 
+        path="/new-order" 
         element={
           <ProtectedRoute allowedRoles={['customer']}>
             <NewOrder />
@@ -22,7 +22,7 @@ const CustomerRoutes = () => {
       />
       
       <Route 
-        path="/customer/orders" 
+        path="/orders" 
         element={
           <ProtectedRoute allowedRoles={['customer']}>
             <Orders />
@@ -31,7 +31,7 @@ const CustomerRoutes = () => {
       />
       
       <Route 
-        path="/customer/orders/:orderId" 
+        path="/orders/:orderId" 
         element={
           <ProtectedRoute allowedRoles={['customer']}>
             <OrderDetail />
@@ -40,7 +40,7 @@ const CustomerRoutes = () => {
       />
       
       <Route 
-        path="/customer/wallet" 
+        path="/wallet" 
         element={
           <ProtectedRoute allowedRoles={['customer']}>
             <Wallet />
@@ -49,7 +49,7 @@ const CustomerRoutes = () => {
       />
 
       <Route 
-        path="/customer/recycling" 
+        path="/recycling" 
         element={
           <ProtectedRoute allowedRoles={['customer']}>
             <Recycling />
@@ -58,7 +58,7 @@ const CustomerRoutes = () => {
       />
       
       <Route 
-        path="/customer/profile" 
+        path="/profile" 
         element={
           <ProtectedRoute allowedRoles={['customer']}>
             <Profile />
@@ -67,14 +67,14 @@ const CustomerRoutes = () => {
       />
       
       <Route 
-        path="/customer/*" 
+        path="/*" 
         element={
           <ProtectedRoute allowedRoles={['customer']}>
             <CustomerDashboard />
           </ProtectedRoute>
         } 
       />
-    </>
+    </Routes>
   );
 };
 
