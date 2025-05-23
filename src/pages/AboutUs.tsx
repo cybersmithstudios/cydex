@@ -126,7 +126,7 @@ const AboutUs = () => {
               <div className="glass rounded-xl sm:rounded-2xl overflow-hidden relative z-10">
                 <img 
                   src="https://images.unsplash.com/photo-1487887235947-a955ef187fcc" 
-                  alt="Eco-friendly delivery drone" 
+                  alt="Eco-friendly delivery drowe" 
                   className="w-full h-auto"
                 />
               </div>

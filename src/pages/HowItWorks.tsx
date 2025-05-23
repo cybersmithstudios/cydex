@@ -26,7 +26,7 @@ const HowItWorks = () => {
       <Navbar />
       
       {/* Hero Section - Mobile Optimized */}
-      <section className="pt-20 sm:pt-24 md:pt-32 pb-12 sm:pb-16 bg-gradient-to-b from-white to-gray-50 relative overflow-hidden">
+      <section className="pt-30 sm:pt-24 md:pt-32 pb-12 sm:pb-16 bg-gradient-to-b from-white to-gray-50 relative overflow-hidden">
         {/* Background Elements - Responsive */}
         <div className="absolute inset-0 z-0">
           <div className="absolute top-1/4 -right-20 w-72 sm:w-96 h-72 sm:h-96 bg-primary opacity-10 rounded-full filter blur-3xl animate-pulse-soft"></div>
