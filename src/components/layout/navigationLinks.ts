@@ -1,8 +1,6 @@
 
 import { 
-  Home, Package, Wallet, Recycle, MessageSquare, User, 
-  MapPin, Settings, Users, BarChart, ShieldCheck,
-  Bike, Navigation, Calendar, Clock
+  Home, Package, Wallet, Recycle, MessageSquare, User, Settings, Users, BarChart, ShieldCheck, Navigation
 } from 'lucide-react';
 
 interface SidebarLink {

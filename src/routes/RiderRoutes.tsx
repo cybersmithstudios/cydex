@@ -1,4 +1,7 @@
+<<<<<<< HEAD
 
+=======
+>>>>>>> 18b9bac
 import { Route, Routes } from 'react-router-dom';
 import { ProtectedRoute } from './ProtectedRoute';
 import RiderDashboard from '../pages/rider/RiderDashboard';
@@ -11,7 +14,11 @@ const RiderRoutes = () => {
   return (
     <Routes>
       <Route 
+<<<<<<< HEAD
         path="/" 
+=======
+        index
+>>>>>>> 18b9bac
         element={
           <ProtectedRoute allowedRoles={['rider']}>
             <RiderDashboard />
@@ -20,7 +27,11 @@ const RiderRoutes = () => {
       />
 
       <Route 
+<<<<<<< HEAD
         path="/available" 
+=======
+        path="available" 
+>>>>>>> 18b9bac
         element={
           <ProtectedRoute allowedRoles={['rider']}>
             <AvailableOrders />
@@ -29,7 +40,11 @@ const RiderRoutes = () => {
       />
 
       <Route 
+<<<<<<< HEAD
         path="/current" 
+=======
+        path="current" 
+>>>>>>> 18b9bac
         element={
           <ProtectedRoute allowedRoles={['rider']}>
             <CurrentDeliveries />
@@ -38,7 +53,11 @@ const RiderRoutes = () => {
       />
 
       <Route 
+<<<<<<< HEAD
         path="/earnings" 
+=======
+        path="earnings" 
+>>>>>>> 18b9bac
         element={
           <ProtectedRoute allowedRoles={['rider']}>
             <RiderEarnings />
@@ -47,7 +66,11 @@ const RiderRoutes = () => {
       />
 
       <Route 
+<<<<<<< HEAD
         path="/profile" 
+=======
+        path="profile" 
+>>>>>>> 18b9bac
         element={
           <ProtectedRoute allowedRoles={['rider']}>
             <RiderProfile />

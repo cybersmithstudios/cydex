@@ -1,4 +1,3 @@
-
 # Cydex Backend Architecture Documentation
 
 ## 1. System Overview
@@ -82,17 +81,17 @@ The backend system needs to support:
 ### Additional Entities:
 
 ```
-┌───────────────┐     ┌─────────────────┐     ┌───────────────────┐
-│   Messages    │     │   Recycling     │     │   Payments        │
-├───────────────┤     ├─────────────────┤     ├───────────────────┤
-│ id            │     │ id              │     │ id                │
-│ sender_id     │     │ user_id         │     │ order_id          │
-│ receiver_id   │     │ type            │     │ amount            │
-│ content       │     │ weight          │     │ status            │
-│ created_at    │     │ credits_earned  │     │ provider          │
-│ read_at       │     │ status          │     │ transaction_id    │
-└───────────────┘     │ created_at      │     │ created_at        │
-                      └─────────────────┘     └───────────────────┘
+┌─────────────────┐     ┌───────────────────┐
+│   Recycling     │     │   Payments        │
+├─────────────────┤     ├───────────────────┤
+│ id              │     │ id                │
+│ user_id         │     │ order_id          │
+│ type            │     │ amount            │
+│ weight          │     │ status            │
+│ credits_earned  │     │ provider          │
+│ status          │     │ transaction_id    │
+│ created_at      │     │ created_at        │
+└─────────────────┘     └───────────────────┘
 ```
 
 ## 3. Detailed Entity Descriptions
@@ -193,16 +192,6 @@ The backend system needs to support:
   - `distance`: Numeric, in kilometers
   - `carbon_saved`: Numeric, environmental impact
   - `rating`: Numeric, delivery rating (1-5)
-
-### Messages
-- **Description**: Communication between users
-- **Fields**:
-  - `id`: UUID primary key
-  - `sender_id`: Foreign key to Users
-  - `receiver_id`: Foreign key to Users
-  - `content`: Text
-  - `created_at`: DateTime
-  - `read_at`: DateTime
 
 ### Recycling
 - **Description**: Sustainability tracking
@@ -343,23 +332,7 @@ POST   /api/carbon-credits/redeem
 GET    /api/carbon-credits/stats
 ```
 
-### 4.7 Messaging System
-
-**Requirements:**
-- Direct messaging between users
-- Read receipts
-- Notification system
-- Message filtering and search
-
-**API Endpoints:**
-```
-POST   /api/messages
-GET    /api/messages/conversation/:userId1/:userId2
-PUT    /api/messages/:id/read
-GET    /api/messages/user/:userId
-```
-
-### 4.8 Payment Processing
+### 4.7 Payment Processing
 
 **Requirements:**
 - Integration with payment gateways

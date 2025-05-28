@@ -5,6 +5,7 @@ import { User, UserRole, AuthContextType } from '../types/auth.types';
 import { SESSION_TIMEOUT } from '../constants/auth.constants';
 import { supabase } from '../lib/supabase';
 import LoadingDisplay from '@/components/ui/LoadingDisplay';
+import { debugAuthState } from '../utils/debugUtils';
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
@@ -13,23 +14,81 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [sessionExpiry, setSessionExpiry] = useState<number | null>(null);
   const [loginAttempts, setLoginAttempts] = useState<{[key: string]: {count: number, lastAttempt: number}}>({});
 
+  // Global timeout to prevent infinite loading
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      if (loading) {
+        console.warn('Global loading timeout reached after 15 seconds, forcing loading to false');
+        setLoading(false);
+        // Clear any potentially stale auth data
+        if (!user) {
+          localStorage.removeItem('cydexSessionExpiry');
+        }
+      }
+    }, 15000); // 15 second global timeout
+
+    return () => clearTimeout(timeout);
+  }, [loading, user]);
+
+  // Helper function to safely set loading with timeout
+  const safeSetLoading = (isLoading: boolean, timeoutMs = 10000) => {
+    setLoading(isLoading);
+    
+    if (isLoading) {
+      // Set a timeout to prevent infinite loading
+      const timeout = setTimeout(() => {
+        console.warn('Loading timeout reached, forcing loading to false');
+        setLoading(false);
+      }, timeoutMs);
+      
+      return () => clearTimeout(timeout);
+    }
+  };
+
+  // Helper function to clear all auth state
+  const clearAuthState = () => {
+    setUser(null);
+    setSessionExpiry(null);
+    setLoading(false);
+    setLoggingOut(false);
+    localStorage.removeItem('cydexSessionExpiry');
+  };
+
   // Initialize session from Supabase
   useEffect(() => {
     const initSession = async () => {
-      setLoading(true);
-      
-      // Check if we have a session
-      const { data: { session }, error } = await supabase.auth.getSession();
-      
-      if (error) {
-        console.error('Error loading session:', error);
-        setLoading(false);
-        return;
-      }
-      
-      if (session) {
-        await fetchUserProfile(session.user.id);
-      } else {
+      try {
+        safeSetLoading(true, 8000); // 8 second timeout for initial session check
+        
+        // Check if we have a session with timeout
+        const sessionPromise = supabase.auth.getSession();
+        const timeoutPromise = new Promise((_, reject) => 
+          setTimeout(() => reject(new Error('Session check timeout')), 7000)
+        );
+        
+        const { data: { session }, error } = await Promise.race([
+          sessionPromise,
+          timeoutPromise
+        ]) as any;
+        
+        if (error) {
+          console.error('Error loading session:', error);
+          clearAuthState();
+          return;
+        }
+        
+        if (session?.user) {
+          await fetchUserProfile(session.user.id);
+        } else {
+          clearAuthState();
+        }
+      } catch (error) {
+        console.error('Session initialization error:', error);
+        // Debug auth state on errors
+        debugAuthState();
+        // Clear any stale auth data
+        clearAuthState();
+      } finally {
         setLoading(false);
       }
     };
@@ -39,9 +98,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     // Listen for authentication changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       console.log('Auth state changed:', event, session ? 'session exists' : 'no session');
-      if (event === 'SIGNED_IN' && session) {
-        await fetchUserProfile(session.user.id);
-      } else if (event === 'SIGNED_OUT') {
+      
+      try {
+        if (event === 'SIGNED_IN' && session?.user) {
+          await fetchUserProfile(session.user.id);
+        } else if (event === 'SIGNED_OUT' || !session) {
+          setUser(null);
+          setSessionExpiry(null);
+          localStorage.removeItem('cydexSessionExpiry');
+        }
+      } catch (error) {
+        console.error('Auth state change error:', error);
         setUser(null);
         setSessionExpiry(null);
       }
@@ -52,18 +119,37 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
   }, []);
 
-  // Fetch user profile from Supabase
+  // Fetch user profile from Supabase with timeout and error handling
   const fetchUserProfile = async (userId: string) => {
     try {
       console.log('Fetching user profile for:', userId);
-      const { data: profile, error } = await supabase
+      
+      // Add timeout to profile fetch
+      const profilePromise = supabase
         .from('profiles')
         .select('*')
         .eq('id', userId)
         .single();
+        
+      const timeoutPromise = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('Profile fetch timeout')), 5000)
+      );
+      
+      const { data: profile, error } = await Promise.race([
+        profilePromise,
+        timeoutPromise
+      ]) as any;
       
       if (error) {
         console.error('Error fetching profile:', error);
+        
+        // If profile doesn't exist, sign out the user
+        if (error.code === 'PGRST116' || error.message?.includes('No rows returned')) {
+          console.warn('No profile found for user, signing out');
+          await supabase.auth.signOut();
+          return;
+        }
+        
         throw error;
       }
       
@@ -88,17 +174,33 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setSessionExpiry(newExpiry);
         localStorage.setItem('cydexSessionExpiry', newExpiry.toString());
         
-        // Update last active timestamp
-        await supabase
-          .from('profiles')
-          .update({ last_active: new Date().toISOString() })
-          .eq('id', userId);
+        // Update last active timestamp (non-blocking)
+        (async () => {
+          try {
+            await supabase
+              .from('profiles')
+              .update({ last_active: new Date().toISOString() })
+              .eq('id', userId);
+            console.log('Updated last active');
+          } catch (error) {
+            console.warn('Failed to update last active:', error);
+          }
+        })();
       } else {
         console.warn('No profile found for user:', userId);
+        await supabase.auth.signOut();
       }
     } catch (error) {
       console.error('Error fetching user profile:', error);
-      toast.error('Failed to load user profile');
+      
+      // Don't show error toast for timeout errors
+      if (!error.message?.includes('timeout')) {
+        toast.error('Failed to load user profile');
+      }
+      
+      // Clear user state on critical errors
+      setUser(null);
+      setSessionExpiry(null);
     } finally {
       setLoading(false);
     }
@@ -367,18 +469,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       setLoggingOut(true);
       await supabase.auth.signOut();
-      localStorage.removeItem('cydexSessionExpiry');
-      setUser(null);
-      setSessionExpiry(null);
+      clearAuthState();
       toast.info('You have been logged out');
       
       // Force page navigation to home
       window.location.href = '/';
     } catch (error) {
       console.error('Error during logout:', error);
-      toast.error('Failed to log out');
-    } finally {
-      setLoggingOut(false);
+      // Even if logout fails, clear local state
+      clearAuthState();
+      toast.error('Failed to log out completely, but local session cleared');
+      // Still redirect to home
+      window.location.href = '/';
     }
   };
 

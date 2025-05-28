@@ -1,4 +1,7 @@
+<<<<<<< HEAD
 
+=======
+>>>>>>> 18b9bac
 import { Route, Routes } from 'react-router-dom';
 import { ProtectedRoute } from './ProtectedRoute';
 import CustomerDashboard from '../pages/customer/CustomerDashboard';
@@ -13,7 +16,20 @@ const CustomerRoutes = () => {
   return (
     <Routes>
       <Route 
+<<<<<<< HEAD
         path="/new-order" 
+=======
+        index
+        element={
+          <ProtectedRoute allowedRoles={['customer']}>
+            <CustomerDashboard />
+          </ProtectedRoute>
+        } 
+      />
+      
+      <Route 
+        path="new-order" 
+>>>>>>> 18b9bac
         element={
           <ProtectedRoute allowedRoles={['customer']}>
             <NewOrder />
@@ -22,7 +38,11 @@ const CustomerRoutes = () => {
       />
       
       <Route 
+<<<<<<< HEAD
         path="/orders" 
+=======
+        path="orders" 
+>>>>>>> 18b9bac
         element={
           <ProtectedRoute allowedRoles={['customer']}>
             <Orders />
@@ -31,7 +51,11 @@ const CustomerRoutes = () => {
       />
       
       <Route 
+<<<<<<< HEAD
         path="/orders/:orderId" 
+=======
+        path="orders/:orderId" 
+>>>>>>> 18b9bac
         element={
           <ProtectedRoute allowedRoles={['customer']}>
             <OrderDetail />
@@ -40,7 +64,11 @@ const CustomerRoutes = () => {
       />
       
       <Route 
+<<<<<<< HEAD
         path="/wallet" 
+=======
+        path="wallet" 
+>>>>>>> 18b9bac
         element={
           <ProtectedRoute allowedRoles={['customer']}>
             <Wallet />
@@ -49,7 +77,11 @@ const CustomerRoutes = () => {
       />
 
       <Route 
+<<<<<<< HEAD
         path="/recycling" 
+=======
+        path="recycling" 
+>>>>>>> 18b9bac
         element={
           <ProtectedRoute allowedRoles={['customer']}>
             <Recycling />
@@ -58,13 +90,18 @@ const CustomerRoutes = () => {
       />
       
       <Route 
+<<<<<<< HEAD
         path="/profile" 
+=======
+        path="profile" 
+>>>>>>> 18b9bac
         element={
           <ProtectedRoute allowedRoles={['customer']}>
             <Profile />
           </ProtectedRoute>
         } 
       />
+<<<<<<< HEAD
       
       <Route 
         path="/*" 
@@ -74,6 +111,8 @@ const CustomerRoutes = () => {
           </ProtectedRoute>
         } 
       />
+=======
+>>>>>>> 18b9bac
     </Routes>
   );
 };
