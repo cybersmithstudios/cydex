@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
@@ -257,7 +256,7 @@ const NewOrder = () => {
   };
 
   return (
-    <DashboardLayout userRole="customer">
+    <DashboardLayout userRole="CUSTOMER">
       <div className="p-3 md:p-6 max-w-7xl mx-auto">
         {/* Header - Modified for better mobile display */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4 md:mb-6">

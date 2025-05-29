@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import DashboardLayout from '@/components/layout/DashboardLayout';
@@ -35,7 +34,7 @@ const OrderDetailPage = () => {
 
   if (loading) {
     return (
-      <DashboardLayout userRole="customer">
+      <DashboardLayout userRole="CUSTOMER">
         <OrderDetailLoading />
       </DashboardLayout>
     );
@@ -43,14 +42,14 @@ const OrderDetailPage = () => {
 
   if (error || !order) {
     return (
-      <DashboardLayout userRole="customer">
+      <DashboardLayout userRole="CUSTOMER">
         <OrderNotFound message={error || undefined} />
       </DashboardLayout>
     );
   }
 
   return (
-    <DashboardLayout userRole="customer">
+    <DashboardLayout userRole="CUSTOMER">
       <div className="p-2 sm:p-4 md:p-6 max-w-full mx-auto space-y-4 md:space-y-6">
         <Card>
           <CardHeader className="pb-2">
