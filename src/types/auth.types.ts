@@ -1,6 +1,6 @@
 
-// Define user roles
-export type UserRole = 'customer' | 'rider' | 'vendor' | 'admin';
+// Define user roles - matching backend format
+export type UserRole = 'CUSTOMER' | 'RIDER' | 'VENDOR' | 'ADMIN';
 
 // Define user interface
 export interface User {

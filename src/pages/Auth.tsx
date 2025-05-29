@@ -17,7 +17,8 @@ const Auth = () => {
   useEffect(() => {
     if (isAuthenticated && user) {
       console.log("Auth page: User is authenticated, redirecting to dashboard:", user.role);
-      navigate(`/${user.role}`);
+      const rolePath = user.role.toLowerCase();
+      navigate(`/${rolePath}`);
     }
   }, [isAuthenticated, user, navigate]);
   

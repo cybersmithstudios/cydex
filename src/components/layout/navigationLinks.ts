@@ -1,3 +1,4 @@
+
 import { 
   Home, Package, Wallet, Recycle, User, Settings, Users, BarChart, ShieldCheck, Navigation
 } from 'lucide-react';
@@ -11,9 +12,9 @@ interface SidebarLink {
 /**
  * Get navigation links based on user role
  */
-export const getNavLinks = (userRole: 'customer' | 'rider' | 'vendor' | 'admin'): SidebarLink[] => {
+export const getNavLinks = (userRole: 'CUSTOMER' | 'RIDER' | 'VENDOR' | 'ADMIN'): SidebarLink[] => {
   switch (userRole) {
-    case 'customer':
+    case 'CUSTOMER':
       return [
         { name: 'Home', href: '/customer', icon: Home },
         { name: 'Orders', href: '/customer/orders', icon: Package },
@@ -21,7 +22,7 @@ export const getNavLinks = (userRole: 'customer' | 'rider' | 'vendor' | 'admin')
         { name: 'Recycling', href: '/customer/recycling', icon: Recycle },
         { name: 'Profile', href: '/customer/profile', icon: User },
       ];
-    case 'rider':
+    case 'RIDER':
       return [
         { name: 'Dashboard', href: '/rider', icon: Home },
         { name: 'Available Orders', href: '/rider/available', icon: Package },
@@ -29,7 +30,7 @@ export const getNavLinks = (userRole: 'customer' | 'rider' | 'vendor' | 'admin')
         { name: 'Earnings', href: '/rider/earnings', icon: Wallet },
         { name: 'Profile', href: '/rider/profile', icon: User },
       ];
-    case 'vendor':
+    case 'VENDOR':
       return [
         { name: 'Dashboard', href: '/vendor', icon: Home },
         { name: 'Orders', href: '/vendor/orders', icon: Package },
@@ -37,7 +38,7 @@ export const getNavLinks = (userRole: 'customer' | 'rider' | 'vendor' | 'admin')
         { name: 'Recycling', href: '/vendor/recycling', icon: Recycle },
         { name: 'Settings', href: '/vendor/settings', icon: Settings },
       ];
-    case 'admin':
+    case 'ADMIN':
       return [
         { name: 'Dashboard', href: '/admin', icon: Home },
         { name: 'Users', href: '/admin/users', icon: Users },
@@ -58,13 +59,13 @@ export const getNavLinks = (userRole: 'customer' | 'rider' | 'vendor' | 'admin')
  */
 export const getRoleTitle = (userRole: string): string => {
   switch (userRole) {
-    case 'customer':
+    case 'CUSTOMER':
       return 'Customer';
-    case 'rider':
+    case 'RIDER':
       return 'Rider';
-    case 'vendor':
+    case 'VENDOR':
       return 'Vendor';
-    case 'admin':
+    case 'ADMIN':
       return 'Administrator';
     default:
       return '';

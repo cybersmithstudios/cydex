@@ -1,3 +1,4 @@
+
 import { Route, Routes } from 'react-router-dom';
 import { ProtectedRoute } from './ProtectedRoute';
 import AdminDashboard from '../pages/admin/AdminDashboard';
@@ -9,7 +10,7 @@ const AdminRoutes = () => {
 
         path="/"
         element={
-          <ProtectedRoute allowedRoles={['admin']}>
+          <ProtectedRoute allowedRoles={['ADMIN']}>
             <AdminDashboard />
           </ProtectedRoute>
         } 

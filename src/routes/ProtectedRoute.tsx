@@ -1,3 +1,4 @@
+
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import LoadingDisplay from '@/components/ui/LoadingDisplay';
@@ -25,7 +26,8 @@ export const ProtectedRoute = ({
   // Check role if allowedRoles is provided and not empty
   if (allowedRoles.length > 0 && user && !allowedRoles.includes(user.role)) {
     // Redirect to dashboard specific to their role
-    return <Navigate to={`/${user.role}`} replace />;
+    const rolePath = user.role.toLowerCase();
+    return <Navigate to={`/${rolePath}`} replace />;
   }
   
   return children;

@@ -18,7 +18,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         id: currentUser.id,
         name: `${currentUser.first_name} ${currentUser.last_name}`,
         email: currentUser.email,
-        role: currentUser.role as UserRole,
+        role: currentUser.role.toUpperCase() as UserRole,
         verified: true // Default value for existing users
       });
       setIsAuthenticated(true);
@@ -32,7 +32,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         id: response.user.id,
         name: `${response.user.first_name} ${response.user.last_name}`,
         email: response.user.email,
-        role: response.user.role as UserRole,
+        role: response.user.role.toUpperCase() as UserRole,
         verified: true // Default for login
       });
       setIsAuthenticated(true);
@@ -51,7 +51,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         last_name: lastName,
         email,
         password,
-        role,
+        role: role as 'CUSTOMER' | 'ADMIN' | 'RIDER' | 'VENDOR',
         password_confirmation: password
       };
 
@@ -60,7 +60,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         id: response.user.id,
         name: `${response.user.first_name} ${response.user.last_name}`,
         email: response.user.email,
-        role: response.user.role as UserRole,
+        role: response.user.role.toUpperCase() as UserRole,
         verified: true // Default for new registrations
       });
       setIsAuthenticated(true);
