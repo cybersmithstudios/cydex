@@ -1,14 +1,28 @@
 import React, { useState } from 'react';
+import { format } from 'date-fns';
 import DashboardLayout from '@/components/layout/DashboardLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Calendar } from '@/components/ui/calendar';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Switch } from '@/components/ui/switch';
 import { 
-  Wallet, TrendingUp, Calendar, Download, 
-  ArrowUpRight, DollarSign, Leaf, Star
+  Wallet, 
+  TrendingUp, 
+  Calendar as CalendarIcon, 
+  Clock, 
+  MapPin, 
+  Leaf, 
+  Star,
+  ArrowUp,
+  ArrowDown,
+  ChevronRight
 } from 'lucide-react';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
 const EarningsPage = () => {
   // States for date pickers

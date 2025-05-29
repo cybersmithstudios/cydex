@@ -1,20 +1,42 @@
+
 import React, { useState } from 'react';
-import { useAuth } from '@/contexts/AuthContext';
 import DashboardLayout from '@/components/layout/DashboardLayout';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
-import { Switch } from '@/components/ui/switch';
 import { Progress } from '@/components/ui/progress';
+import { Switch } from '@/components/ui/switch';
+import { Textarea } from '@/components/ui/textarea';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import {
-  User, Mail, Phone, MapPin, Calendar, Shield, Bell, Lock,
-  CreditCard, Leaf, Award, Settings, Camera, Bike, Star,
-  TrendingUp, CheckCircle, Clock, Package
+  User,
+  Mail,
+  Phone,
+  MapPin,
+  Calendar,
+  Shield,
+  Bell,
+  Lock,
+  CreditCard,
+  Leaf,
+  Award,
+  Settings,
+  Camera,
+  Edit,
+  Upload,
+  Car,
+  FileText,
+  Check,
+  Smartphone,
+  MessageSquare,
+  Building,
+  Info,
+  AlertCircle,
+  Copy as Clipboard
 } from 'lucide-react';
 
 const RiderProfilePage = () => {
