@@ -1,3 +1,4 @@
+
 import { useAuth } from '../contexts/AuthContext';
 import { useLocation } from 'react-router-dom';
 
@@ -5,17 +6,18 @@ export const useShowWhatsApp = () => {
   const { isAuthenticated } = useAuth();
   const { pathname } = useLocation();
 
-  // List of paths where WhatsApp should be hidden when authenticated
-  const protectedPaths = [
+  // List of paths where WhatsApp should be hidden (all dashboard routes)
+  const dashboardPaths = [
     '/customer',
-    '/vendor',
+    '/vendor', 
     '/rider',
     '/admin'
   ];
 
-  // Check if current path starts with any of the protected paths
-  const isProtectedPath = protectedPaths.some(path => pathname.startsWith(path));
+  // Check if current path starts with any of the dashboard paths
+  const isDashboardPath = dashboardPaths.some(path => pathname.startsWith(path));
 
-  // Show WhatsApp only if user is not authenticated or not on a protected path
-  return !isAuthenticated || !isProtectedPath;
-}; 
+  // Hide WhatsApp on all dashboard pages regardless of authentication status
+  // Show WhatsApp only on public routes
+  return !isDashboardPath;
+};
