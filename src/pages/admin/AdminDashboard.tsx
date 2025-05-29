@@ -1,6 +1,6 @@
 
-import { useState } from 'react';
-import { useNavigate, Routes, Route } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useNavigate, Routes, Route, useLocation } from 'react-router-dom';
 import DashboardLayout from '@/components/layout/DashboardLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -16,6 +16,26 @@ import { Security } from '@/components/admin/Security';
 const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState('overview');
   const navigate = useNavigate();
+  const location = useLocation();
+
+  // Update active tab based on current route
+  useEffect(() => {
+    const path = location.pathname.replace('/admin/', '').replace('/admin', '');
+    if (path === '' || path === '/') {
+      setActiveTab('overview');
+    } else {
+      setActiveTab(path);
+    }
+  }, [location.pathname]);
+
+  const handleTabChange = (value: string) => {
+    setActiveTab(value);
+    if (value === 'overview') {
+      navigate('/admin');
+    } else {
+      navigate(`/admin/${value}`);
+    }
+  };
 
   return (
     <DashboardLayout userRole="ADMIN">
@@ -28,10 +48,7 @@ const AdminDashboard = () => {
           defaultValue="overview" 
           className="space-y-4"
           value={activeTab}
-          onValueChange={(value) => {
-            setActiveTab(value);
-            navigate(`/admin/${value !== 'overview' ? value : ''}`);
-          }}
+          onValueChange={handleTabChange}
         >
           <TabsList className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-2">
             <TabsTrigger value="overview">Overview</TabsTrigger>
@@ -44,16 +61,37 @@ const AdminDashboard = () => {
             <TabsTrigger value="security">Security</TabsTrigger>
           </TabsList>
           
-          <Routes>
-            <Route index element={<Overview />} />
-            <Route path="users" element={<UserManagement />} />
-            <Route path="orders" element={<OrderAnalytics />} />
-            <Route path="payments" element={<PaymentsRefunds />} />
-            <Route path="carbon" element={<CarbonCredits />} />
-            <Route path="partners" element={<Partnerships />} />
-            <Route path="content" element={<ContentControl />} />
-            <Route path="security" element={<Security />} />
-          </Routes>
+          <TabsContent value="overview">
+            <Overview />
+          </TabsContent>
+          
+          <TabsContent value="users">
+            <UserManagement />
+          </TabsContent>
+          
+          <TabsContent value="orders">
+            <OrderAnalytics />
+          </TabsContent>
+          
+          <TabsContent value="payments">
+            <PaymentsRefunds />
+          </TabsContent>
+          
+          <TabsContent value="carbon">
+            <CarbonCredits />
+          </TabsContent>
+          
+          <TabsContent value="partners">
+            <Partnerships />
+          </TabsContent>
+          
+          <TabsContent value="content">
+            <ContentControl />
+          </TabsContent>
+          
+          <TabsContent value="security">
+            <Security />
+          </TabsContent>
         </Tabs>
       </div>
     </DashboardLayout>

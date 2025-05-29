@@ -1,6 +1,6 @@
 
 import { 
-  Home, Package, Wallet, Recycle, User, Settings, Users, BarChart, ShieldCheck, Navigation
+  Home, Package, Wallet, Recycle, User, Settings, Users, BarChart, ShieldCheck, Navigation, CreditCard, FileText, Shield
 } from 'lucide-react';
 
 interface SidebarLink {
@@ -40,14 +40,14 @@ export const getNavLinks = (userRole: 'CUSTOMER' | 'RIDER' | 'VENDOR' | 'ADMIN')
       ];
     case 'ADMIN':
       return [
-        { name: 'Dashboard', href: '/admin', icon: Home },
+        { name: 'Overview', href: '/admin', icon: Home },
         { name: 'Users', href: '/admin/users', icon: Users },
         { name: 'Orders', href: '/admin/orders', icon: Package },
-        { name: 'Payments', href: '/admin/payments', icon: Wallet },
-        { name: 'Sustainability', href: '/admin/sustainability', icon: Recycle },
-        { name: 'Partners', href: '/admin/partners', icon: ShieldCheck },
-        { name: 'Analytics', href: '/admin/analytics', icon: BarChart },
-        { name: 'Settings', href: '/admin/settings', icon: Settings },
+        { name: 'Payments', href: '/admin/payments', icon: CreditCard },
+        { name: 'Carbon Credits', href: '/admin/carbon', icon: Recycle },
+        { name: 'Partnerships', href: '/admin/partners', icon: ShieldCheck },
+        { name: 'Content', href: '/admin/content', icon: FileText },
+        { name: 'Security', href: '/admin/security', icon: Shield },
       ];
     default:
       return [];

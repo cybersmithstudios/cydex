@@ -27,11 +27,13 @@ const AdminLogin = () => {
   // Effect to handle redirect after successful login
   useEffect(() => {
     if (isAuthenticated && user) {
-      if (user.role.toLowerCase() === 'admin') {
-        navigate('/admin');
+      console.log('Admin login - user role:', user.role);
+      if (user.role === 'ADMIN' || user.role === 'admin') {
+        console.log('Redirecting to admin dashboard');
+        navigate('/admin', { replace: true });
       } else {
         toast.error("Access denied. Admin credentials required.");
-        navigate('/');
+        navigate('/', { replace: true });
       }
     }
   }, [isAuthenticated, user, navigate]);
@@ -46,10 +48,11 @@ const AdminLogin = () => {
     setIsSubmitting(true);
     
     try {
+      console.log('Attempting admin login with:', email);
       await login(email, password);
       toast.success("Admin login successful!");
     } catch (error) {
-      console.error("Login failed:", error);
+      console.error("Admin login failed:", error);
       toast.error(error instanceof Error ? error.message : "Login failed. Please try again.");
     } finally {
       setIsSubmitting(false);

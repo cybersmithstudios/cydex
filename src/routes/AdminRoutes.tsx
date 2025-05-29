@@ -7,8 +7,7 @@ const AdminRoutes = () => {
   return (
     <Routes>
       <Route 
-
-        path="/"
+        path="/*"
         element={
           <ProtectedRoute allowedRoles={['ADMIN']}>
             <AdminDashboard />
