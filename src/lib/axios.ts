@@ -1,3 +1,4 @@
+
 import axios from 'axios';
 import AuthService from '@/services/authService';
 
@@ -9,7 +10,7 @@ const axiosInstance = axios.create({
     'Content-Type': 'application/json',
     'Accept': 'application/json',
   },
-  withCredentials: true,
+  timeout: 30000, // 30 second timeout
 });
 
 // Request interceptor
@@ -41,16 +42,16 @@ axiosInstance.interceptors.response.use(
       window.location.href = '/auth';
     }
 
-    // Handle CORS errors
-    if (error.message === 'Network Error' || error.code === 'ERR_NETWORK') {
-      console.error('CORS Error:', error);
+    // Handle network errors
+    if (!error.response) {
+      console.error('Network Error:', error);
       return Promise.reject(new Error('Unable to connect to the server. Please check your internet connection.'));
     }
 
     // Handle other errors
-    const errorMessage = error.response?.data?.message || 'An error occurred';
+    const errorMessage = error.response?.data?.message || error.message || 'An error occurred';
     return Promise.reject(new Error(errorMessage));
   }
 );
 
-export default axiosInstance; 
+export default axiosInstance;

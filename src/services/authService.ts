@@ -1,6 +1,5 @@
 
 import axiosInstance from '@/lib/axios';
-import axios from 'axios';
 
 const API_URL = 'https://cydex-backend-production-edd3.up.railway.app';
 
@@ -14,7 +13,7 @@ export interface RegisterData {
   last_name: string;
   email: string;
   password: string;
-  role: 'customer' | 'admin' | 'rider' | 'vendor';
+  role: 'CUSTOMER' | 'ADMIN' | 'RIDER' | 'VENDOR';
   password_confirmation: string;
 }
 
@@ -49,6 +48,16 @@ class AuthService {
     return this.token ? { Authorization: `Bearer ${this.token}` } : {};
   }
 
+  private handleError(error: any): never {
+    if (error.response?.data?.message) {
+      throw new Error(error.response.data.message);
+    } else if (error.message) {
+      throw new Error(error.message);
+    } else {
+      throw new Error('An unexpected error occurred');
+    }
+  }
+
   public async login(credentials: LoginCredentials): Promise<AuthResponse> {
     try {
       const response = await axiosInstance.post('/auth/login', credentials);
@@ -60,10 +69,7 @@ class AuthService {
       
       return data;
     } catch (error) {
-      if (axios.isAxiosError && axios.isAxiosError(error)) {
-        throw new Error(error.response?.data?.message || 'Login failed');
-      }
-      throw new Error('Login failed');
+      this.handleError(error);
     }
   }
 
@@ -78,10 +84,7 @@ class AuthService {
       
       return responseData;
     } catch (error) {
-      if (axios.isAxiosError && axios.isAxiosError(error)) {
-        throw new Error(error.response?.data?.message || 'Registration failed');
-      }
-      throw new Error('Registration failed');
+      this.handleError(error);
     }
   }
 
@@ -89,10 +92,7 @@ class AuthService {
     try {
       await axiosInstance.post('/auth/otp/send', { email });
     } catch (error) {
-      if (axios.isAxiosError && axios.isAxiosError(error)) {
-        throw new Error(error.response?.data?.message || 'Password reset request failed');
-      }
-      throw new Error('Password reset request failed');
+      this.handleError(error);
     }
   }
 
@@ -104,10 +104,7 @@ class AuthService {
         password
       });
     } catch (error) {
-      if (axios.isAxiosError && axios.isAxiosError(error)) {
-        throw new Error(error.response?.data?.message || 'Password change failed');
-      }
-      throw new Error('Password change failed');
+      this.handleError(error);
     }
   }
 
@@ -115,10 +112,7 @@ class AuthService {
     try {
       await axiosInstance.post('/auth/email-verification', { email });
     } catch (error) {
-      if (axios.isAxiosError && axios.isAxiosError(error)) {
-        throw new Error(error.response?.data?.message || 'Email verification failed');
-      }
-      throw new Error('Email verification failed');
+      this.handleError(error);
     }
   }
 
