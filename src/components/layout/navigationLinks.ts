@@ -1,6 +1,5 @@
-
 import { 
-  Home, Package, Wallet, Recycle, MessageSquare, User, Settings, Users, BarChart, ShieldCheck, Navigation
+  Home, Package, Wallet, Recycle, User, Settings, Users, BarChart, ShieldCheck, Navigation
 } from 'lucide-react';
 
 interface SidebarLink {
@@ -20,7 +19,6 @@ export const getNavLinks = (userRole: 'customer' | 'rider' | 'vendor' | 'admin')
         { name: 'Orders', href: '/customer/orders', icon: Package },
         { name: 'Wallet', href: '/customer/wallet', icon: Wallet },
         { name: 'Recycling', href: '/customer/recycling', icon: Recycle },
-        { name: 'Messages', href: '/customer/messages', icon: MessageSquare },
         { name: 'Profile', href: '/customer/profile', icon: User },
       ];
     case 'rider':
@@ -29,7 +27,6 @@ export const getNavLinks = (userRole: 'customer' | 'rider' | 'vendor' | 'admin')
         { name: 'Available Orders', href: '/rider/available', icon: Package },
         { name: 'Current Deliveries', href: '/rider/current', icon: Navigation },
         { name: 'Earnings', href: '/rider/earnings', icon: Wallet },
-        { name: 'Messages', href: '/rider/messages', icon: MessageSquare },
         { name: 'Profile', href: '/rider/profile', icon: User },
       ];
     case 'vendor':
@@ -38,7 +35,6 @@ export const getNavLinks = (userRole: 'customer' | 'rider' | 'vendor' | 'admin')
         { name: 'Orders', href: '/vendor/orders', icon: Package },
         { name: 'Wallet', href: '/vendor/wallet', icon: Wallet },
         { name: 'Recycling', href: '/vendor/recycling', icon: Recycle },
-        { name: 'Messages', href: '/vendor/messages', icon: MessageSquare },
         { name: 'Settings', href: '/vendor/settings', icon: Settings },
       ];
     case 'admin':

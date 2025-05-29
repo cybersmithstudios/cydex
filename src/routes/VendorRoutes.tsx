@@ -1,7 +1,3 @@
-<<<<<<< HEAD
-
-=======
->>>>>>> 18b9bac
 import { Route, Routes } from 'react-router-dom';
 import { ProtectedRoute } from './ProtectedRoute';
 import VendorDashboard from '../pages/vendor/VendorDashboard';
@@ -17,11 +13,7 @@ const VendorRoutes = () => {
   return (
     <Routes>
       <Route 
-<<<<<<< HEAD
         path="/" 
-=======
-        index
->>>>>>> 18b9bac
         element={
           <ProtectedRoute allowedRoles={['vendor']}>
             <VendorDashboard />
@@ -30,11 +22,7 @@ const VendorRoutes = () => {
       />
 
       <Route 
-<<<<<<< HEAD
         path="/orders" 
-=======
-        path="orders" 
->>>>>>> 18b9bac
         element={
           <ProtectedRoute allowedRoles={['vendor']}>
             <VendorOrders />
@@ -43,11 +31,7 @@ const VendorRoutes = () => {
       />
 
       <Route 
-<<<<<<< HEAD
         path="/orders/:orderId" 
-=======
-        path="orders/:orderId" 
->>>>>>> 18b9bac
         element={
           <ProtectedRoute allowedRoles={['vendor']}>
             <VendorOrderDetail />
@@ -56,11 +40,7 @@ const VendorRoutes = () => {
       />
 
       <Route 
-<<<<<<< HEAD
         path="/process-order" 
-=======
-        path="process-order" 
->>>>>>> 18b9bac
         element={
           <ProtectedRoute allowedRoles={['vendor']}>
             <ProcessOrder />
@@ -69,11 +49,7 @@ const VendorRoutes = () => {
       />
 
       <Route 
-<<<<<<< HEAD
         path="/wallet" 
-=======
-        path="wallet" 
->>>>>>> 18b9bac
         element={
           <ProtectedRoute allowedRoles={['vendor']}>
             <VendorWallet />
@@ -82,11 +58,7 @@ const VendorRoutes = () => {
       />
 
       <Route 
-<<<<<<< HEAD
         path="/recycling" 
-=======
-        path="recycling" 
->>>>>>> 18b9bac
         element={
           <ProtectedRoute allowedRoles={['vendor']}>
             <VendorRecycling />
@@ -95,11 +67,7 @@ const VendorRoutes = () => {
       />
 
       <Route 
-<<<<<<< HEAD
         path="/settings" 
-=======
-        path="settings" 
->>>>>>> 18b9bac
         element={
           <ProtectedRoute allowedRoles={['vendor']}>
             <VendorSettings />
@@ -108,11 +76,7 @@ const VendorRoutes = () => {
       />
 
       <Route 
-<<<<<<< HEAD
         path="/add-product" 
-=======
-        path="add-product" 
->>>>>>> 18b9bac
         element={
           <ProtectedRoute allowedRoles={['vendor']}>
             <AddProduct />
