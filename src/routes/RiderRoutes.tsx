@@ -1,3 +1,4 @@
+
 import { Route, Routes } from 'react-router-dom';
 import { ProtectedRoute } from './ProtectedRoute';
 import RiderDashboard from '../pages/rider/RiderDashboard';
@@ -12,7 +13,7 @@ const RiderRoutes = () => {
       <Route 
         path  ="/" 
         element={
-          <ProtectedRoute allowedRoles={['rider']}>
+          <ProtectedRoute allowedRoles={['RIDER']}>
             <RiderDashboard />
           </ProtectedRoute>
         } 
@@ -21,7 +22,7 @@ const RiderRoutes = () => {
       <Route 
         path="/available" 
         element={
-          <ProtectedRoute allowedRoles={['rider']}>
+          <ProtectedRoute allowedRoles={['RIDER']}>
             <AvailableOrders />
           </ProtectedRoute>
         } 
@@ -30,7 +31,7 @@ const RiderRoutes = () => {
       <Route 
         path="/current" 
         element={
-          <ProtectedRoute allowedRoles={['rider']}>
+          <ProtectedRoute allowedRoles={['RIDER']}>
             <CurrentDeliveries />
           </ProtectedRoute>
         } 
@@ -39,7 +40,7 @@ const RiderRoutes = () => {
       <Route 
         path="/earnings" 
         element={
-          <ProtectedRoute allowedRoles={['rider']}>
+          <ProtectedRoute allowedRoles={['RIDER']}>
             <RiderEarnings />
           </ProtectedRoute>
         } 
@@ -48,7 +49,7 @@ const RiderRoutes = () => {
       <Route 
         path="/profile" 
         element={
-          <ProtectedRoute allowedRoles={['rider']}>
+          <ProtectedRoute allowedRoles={['RIDER']}>
             <RiderProfile />
           </ProtectedRoute>
         } 

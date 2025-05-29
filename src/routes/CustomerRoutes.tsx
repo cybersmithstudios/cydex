@@ -1,3 +1,4 @@
+
 import { Route, Routes } from 'react-router-dom';
 import { ProtectedRoute } from './ProtectedRoute';
 import CustomerDashboard from '../pages/customer/CustomerDashboard';
@@ -14,7 +15,7 @@ const CustomerRoutes = () => {
       <Route 
         path="/new-order" 
         element={
-          <ProtectedRoute allowedRoles={['customer']}>
+          <ProtectedRoute allowedRoles={['CUSTOMER']}>
             <CustomerDashboard />
           </ProtectedRoute>
         } 
@@ -23,7 +24,7 @@ const CustomerRoutes = () => {
       <Route 
         path="new-order" 
         element={
-          <ProtectedRoute allowedRoles={['customer']}>
+          <ProtectedRoute allowedRoles={['CUSTOMER']}>
             <NewOrder />
           </ProtectedRoute>
         } 
@@ -32,7 +33,7 @@ const CustomerRoutes = () => {
       <Route 
         path="/orders" 
         element={
-          <ProtectedRoute allowedRoles={['customer']}>
+          <ProtectedRoute allowedRoles={['CUSTOMER']}>
             <Orders />
           </ProtectedRoute>
         } 
@@ -41,7 +42,7 @@ const CustomerRoutes = () => {
       <Route 
         path="orders/:orderId" 
         element={
-          <ProtectedRoute allowedRoles={['customer']}>
+          <ProtectedRoute allowedRoles={['CUSTOMER']}>
             <OrderDetail />
           </ProtectedRoute>
         } 
@@ -50,7 +51,7 @@ const CustomerRoutes = () => {
       <Route 
         path="wallet" 
         element={
-          <ProtectedRoute allowedRoles={['customer']}>
+          <ProtectedRoute allowedRoles={['CUSTOMER']}>
             <Wallet />
           </ProtectedRoute>
         } 
@@ -59,7 +60,7 @@ const CustomerRoutes = () => {
       <Route 
         path="recycling" 
         element={
-          <ProtectedRoute allowedRoles={['customer']}>
+          <ProtectedRoute allowedRoles={['CUSTOMER']}>
             <Recycling />
           </ProtectedRoute>
         } 
@@ -68,7 +69,7 @@ const CustomerRoutes = () => {
       <Route 
         path="profile" 
         element={
-          <ProtectedRoute allowedRoles={['customer']}>
+          <ProtectedRoute allowedRoles={['CUSTOMER']}>
             <Profile />
           </ProtectedRoute>
         } 
@@ -77,7 +78,7 @@ const CustomerRoutes = () => {
       <Route 
         path="/*" 
         element={
-          <ProtectedRoute allowedRoles={['customer']}>
+          <ProtectedRoute allowedRoles={['CUSTOMER']}>
             <CustomerDashboard />
           </ProtectedRoute>
         } 

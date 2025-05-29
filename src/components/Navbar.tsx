@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate, Link } from "react-router-dom";
@@ -38,7 +39,7 @@ const Navbar = () => {
 
   const goToDashboard = () => {
     if (user) {
-      navigate(`/${user.role}`);
+      navigate(`/${user.role.toLowerCase()}`);
     }
   };
 
@@ -181,7 +182,7 @@ const Navbar = () => {
                   <Settings className="mr-2 h-4 w-4" />
                   <span>Settings</span>
                 </DropdownMenuItem>
-                {user.role === "admin" && (
+                {user.role === "ADMIN" && (
                   <DropdownMenuItem onClick={() => navigate("/admin")}>
                     <Shield className="mr-2 h-4 w-4" />
                     <span>Admin Panel</span>
@@ -249,7 +250,7 @@ const Navbar = () => {
                   <BarChart className="mr-2 h-4 w-4" />
                   Dashboard
                 </Button>
-                {user.role === "admin" && (
+                {user.role === "ADMIN" && (
                   <Button 
                     variant="ghost" 
                     className="justify-start p-2" 
