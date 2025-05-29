@@ -1,5 +1,6 @@
 
 import React, { useState } from 'react';
+import { useAuth } from '@/contexts/AuthContext';
 import DashboardLayout from '@/components/layout/DashboardLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -8,9 +9,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
+import { Separator } from '@/components/ui/separator';
 import { Switch } from '@/components/ui/switch';
-import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import {
   User,
@@ -22,12 +22,10 @@ import {
   Bell,
   Lock,
   CreditCard,
-  Leaf,
-  Award,
   Settings,
   Camera,
-  Edit,
   Upload,
+  Edit,
   Car,
   FileText,
   Check,
@@ -35,8 +33,11 @@ import {
   MessageSquare,
   Building,
   Info,
+  Copy as Clipboard,
   AlertCircle,
-  Copy as Clipboard
+  Clock,
+  Star,
+  Bike
 } from 'lucide-react';
 
 const RiderProfilePage = () => {

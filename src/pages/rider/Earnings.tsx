@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { format } from 'date-fns';
 import DashboardLayout from '@/components/layout/DashboardLayout';
@@ -20,7 +21,8 @@ import {
   Star,
   ArrowUp,
   ArrowDown,
-  ChevronRight
+  ChevronRight,
+  Download
 } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
