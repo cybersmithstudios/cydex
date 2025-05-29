@@ -8,7 +8,7 @@ const OrdersPage = () => {
   const { user } = useAuth();
   
   return (
-    <DashboardLayout userRole="vendor">
+    <DashboardLayout userRole="VENDOR">
       <OrdersPageContent />
     </DashboardLayout>
   );

@@ -1,21 +1,16 @@
 import React, { useState } from 'react';
 import DashboardLayout from '@/components/layout/DashboardLayout';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Calendar as CalendarIcon, Download, ChevronDown, ArrowUp, ArrowDown, ChevronRight } from 'lucide-react';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Calendar } from '@/components/ui/calendar';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { format } from 'date-fns';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line } from 'recharts';
-import { Switch } from '@/components/ui/switch';
+import { Progress } from '@/components/ui/progress';
+import { 
+  Wallet, TrendingUp, Calendar, Download, 
+  ArrowUpRight, DollarSign, Leaf, Star
+} from 'lucide-react';
 
-const RiderEarnings = () => {
+const EarningsPage = () => {
   // States for date pickers
   const [startDate, setStartDate] = useState<Date | undefined>(new Date());
   const [endDate, setEndDate] = useState<Date | undefined>(new Date());
@@ -139,7 +134,7 @@ const RiderEarnings = () => {
   };
 
   return (
-    <DashboardLayout userRole="rider">
+    <DashboardLayout userRole="RIDER">
       <div className="p-4 md:p-6 max-w-7xl mx-auto">
         <div className="mb-6">
           <h1 className="text-2xl font-bold">Earnings Dashboard</h1>
@@ -515,4 +510,4 @@ const RiderEarnings = () => {
   );
 };
 
-export default RiderEarnings;
+export default EarningsPage;

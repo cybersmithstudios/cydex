@@ -1,39 +1,18 @@
-
 import React, { useState } from 'react';
 import DashboardLayout from '@/components/layout/DashboardLayout';
 import { useAuth } from '@/contexts/AuthContext';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Textarea } from '@/components/ui/textarea';
+import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import { 
-  Settings, 
-  User, 
-  Store, 
-  CreditCard, 
-  Bell, 
-  Shield, 
-  Key, 
-  Users, 
-  FileText,
-  HelpCircle,
-  Lock,
-  Mail,
-  Phone,
-  Upload,
-  CheckCircle,
-  Info,
-  AlertTriangle,
-  MoreVertical,
-  Download,
-  MessageSquare,
-  Video
+import {
+  Settings, Store, Bell, Shield, CreditCard, 
+  Users, Package, Clock, Leaf, Save, AlertTriangle
 } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
 
@@ -62,7 +41,7 @@ const notificationSettings = [
   { id: 'marketing', title: 'Marketing Updates', description: 'News and promotional opportunities', enabled: false, email: false, push: false, sms: false }
 ];
 
-const SettingsPage = () => {
+const VendorSettingsPage = () => {
   const { user } = useAuth();
   const isMobile = useIsMobile();
   const [activeTab, setActiveTab] = useState('profile');
@@ -83,7 +62,7 @@ const SettingsPage = () => {
   };
 
   return (
-    <DashboardLayout userRole="vendor">
+    <DashboardLayout userRole="VENDOR">
       <div className="p-4 md:p-6 max-w-7xl mx-auto space-y-6">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <div>
@@ -929,4 +908,4 @@ const SettingsPage = () => {
   );
 };
 
-export default SettingsPage;
+export default VendorSettingsPage;

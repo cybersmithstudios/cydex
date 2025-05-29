@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import DashboardLayout from '@/components/layout/DashboardLayout';
@@ -80,7 +79,7 @@ const RiderDashboard = () => {
   };
 
   return (
-    <DashboardLayout userRole="rider">
+    <DashboardLayout userRole="RIDER">
       <div className="p-6 max-w-7xl mx-auto space-y-6">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <div>

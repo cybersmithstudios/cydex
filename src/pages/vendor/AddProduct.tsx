@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
@@ -115,7 +114,7 @@ const AddProduct = () => {
   ];
 
   return (
-    <DashboardLayout userRole="vendor">
+    <DashboardLayout userRole="VENDOR">
       <div className="p-6 max-w-5xl mx-auto">
         <div className="mb-6">
           <Button 

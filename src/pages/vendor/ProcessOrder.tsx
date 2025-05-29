@@ -9,7 +9,7 @@ const ProcessOrderPage = () => {
   const order = location.state?.order;
   
   return (
-    <DashboardLayout userRole="vendor">
+    <DashboardLayout userRole="VENDOR">
       <ProcessOrderContent order={order} />
     </DashboardLayout>
   );

@@ -10,7 +10,7 @@ const OrderDetailPage = () => {
   const order = orderId ? getOrderById(orderId) : undefined;
   
   return (
-    <DashboardLayout userRole="vendor">
+    <DashboardLayout userRole="VENDOR">
       <OrderDetailContent order={order} orderId={orderId} />
     </DashboardLayout>
   );

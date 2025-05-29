@@ -1,647 +1,326 @@
-
-import React, { useState } from 'react';
+import React from 'react';
 import DashboardLayout from '@/components/layout/DashboardLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Progress } from '@/components/ui/progress';
-import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { 
-  Recycle,
-  Leaf,
-  BarChart,
-  Calendar,
-  CheckCircle,
-  Clock,
-  AlertCircle,
-  PlusCircle,
-  ChevronRight,
-  Download,
-  Scale,
-  Truck,
-  PackageOpen,
-  CircleDollarSign,
-  ArrowRight
+import { Progress } from '@/components/ui/progress';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import {
+  Recycle, Leaf, Package, BarChart4, Calendar, MapPin, ArrowUpRight,
+  TrendingUp, Users, Truck, Award, DollarSign
 } from 'lucide-react';
-import { useIsMobile } from '@/hooks/use-mobile';
 
-// Mock recycling data
+// Mock data
 const recyclingStats = {
-  totalWeight: 2845, // in kilograms
-  carbonSaved: 1422.5, // in kilograms of CO2
-  goalProgress: 71, // percentage of monthly goal
-  recyclingRate: 87, // percentage
-  pointsEarned: 28450, // recycling points
-  carbonCredits: 142, // carbon credits
-  currentStreak: 18, // days
+  totalRecycled: 1250,
+  carbonSaved: 480.5,
+  customerParticipation: 78,
+  vendorRecyclingRate: 92
 };
 
-const recyclingHistory = [
-  {
-    id: 'RCY-1234',
-    date: '2025-04-09T14:30:00Z',
-    type: 'paper',
-    weight: 120.5, // kg
-    status: 'completed',
-    pointsEarned: 1205,
-    carbonSaved: 60.25,
-    pickupDetails: {
-      date: '2025-04-09T14:30:00Z',
-      address: 'Green Grocers Store, 123 Eco Street, Lagos',
-      rider: 'Michael O.'
-    }
-  },
-  {
-    id: 'RCY-1233',
-    date: '2025-04-08T11:15:00Z',
-    type: 'plastic',
-    weight: 85.3, // kg
-    status: 'completed',
-    pointsEarned: 853,
-    carbonSaved: 42.65,
-    pickupDetails: {
-      date: '2025-04-08T11:15:00Z',
-      address: 'Green Grocers Store, 123 Eco Street, Lagos',
-      rider: 'Sarah T.'
-    }
-  },
-  {
-    id: 'RCY-1232',
-    date: '2025-04-06T09:45:00Z',
-    type: 'cardboard',
-    weight: 200.0, // kg
-    status: 'completed',
-    pointsEarned: 2000,
-    carbonSaved: 100.0,
-    pickupDetails: {
-      date: '2025-04-06T09:45:00Z',
-      address: 'Green Grocers Store, 123 Eco Street, Lagos',
-      rider: 'Michael O.'
-    }
-  },
-  {
-    id: 'RCY-1231',
-    date: '2025-04-03T15:20:00Z',
-    type: 'mixed',
-    weight: 150.0, // kg
-    status: 'completed',
-    pointsEarned: 1500,
-    carbonSaved: 75.0,
-    pickupDetails: {
-      date: '2025-04-03T15:20:00Z',
-      address: 'Green Grocers Store, 123 Eco Street, Lagos',
-      rider: 'David W.'
-    }
-  },
-  {
-    id: 'RCY-1230',
-    date: '2025-04-10T10:00:00Z',
-    type: 'cardboard',
-    weight: 0, // kg (not weighed yet)
-    status: 'scheduled',
-    pickupDetails: {
-      date: '2025-04-10T10:00:00Z',
-      address: 'Green Grocers Store, 123 Eco Street, Lagos',
-      notes: 'Please bring packaging materials for collection'
-    }
-  }
+const recentRecycling = [
+  { id: 1, date: '2023-07-15', type: 'Cardboard', weight: 150, points: 30, partner: 'EcoPack Solutions' },
+  { id: 2, date: '2023-07-10', type: 'Plastic', weight: 220, points: 45, partner: 'GreenCycle Ltd' },
+  { id: 3, date: '2023-07-05', type: 'Glass', weight: 180, points: 35, partner: 'EnviroGlass Inc' }
 ];
 
-const ecoGoals = [
-  {
-    id: 1,
-    title: 'Zero-Waste Packaging',
-    currentValue: 92,
-    targetValue: 95,
-    units: '%',
-    dueDate: '2025-04-30'
-  },
-  {
-    id: 2,
-    title: 'Recycle Paper Products',
-    currentValue: 450,
-    targetValue: 500,
-    units: 'kg',
-    dueDate: '2025-04-30'
-  },
-  {
-    id: 3,
-    title: 'Carbon Emissions Reduction',
-    currentValue: 1422.5,
-    targetValue: 2000,
-    units: 'kg CO₂',
-    dueDate: '2025-04-30'
-  }
+const packagingPartners = [
+  { id: 1, name: 'EcoPack Solutions', logo: 'https://example.com/ecopack-logo.png', rating: 4.5, materials: 'Cardboard, Paper' },
+  { id: 2, name: 'GreenCycle Ltd', logo: 'https://example.com/greencycle-logo.png', rating: 4.2, materials: 'Plastic, Aluminum' },
+  { id: 3, name: 'EnviroGlass Inc', logo: 'https://example.com/enviroglass-logo.png', rating: 4.8, materials: 'Glass' }
 ];
 
-const wasteTips = [
-  {
-    id: 1,
-    title: 'Implement a Composting System',
-    description: 'Turn food waste into nutrient-rich soil for your green spaces.',
-    difficulty: 'Medium',
-    impact: 'High'
-  },
-  {
-    id: 2,
-    title: 'Switch to Biodegradable Packaging',
-    description: 'Replace plastic packaging with biodegradable alternatives.',
-    difficulty: 'Medium',
-    impact: 'High'
-  },
-  {
-    id: 3,
-    title: 'Create a Recycling Station',
-    description: 'Set up clearly labeled bins for different recyclable materials.',
-    difficulty: 'Easy',
-    impact: 'Medium'
-  }
-];
-
-const RecyclingPage = () => {
-  const isMobile = useIsMobile();
-  const [activeTab, setActiveTab] = useState('dashboard');
-  
-  const formatDate = (dateString) => {
-    const date = new Date(dateString);
-    return new Intl.DateTimeFormat('en-NG', {
-      day: 'numeric',
-      month: 'short',
-      year: 'numeric',
-      hour: 'numeric',
-      minute: 'numeric',
-      hour12: true
-    }).format(date);
-  };
-  
-  const getStatusBadge = (status) => {
-    switch (status) {
-      case 'completed':
-        return <Badge className="bg-green-500">Completed</Badge>;
-      case 'pending':
-        return <Badge className="bg-amber-500">Pending</Badge>;
-      case 'scheduled':
-        return <Badge className="bg-blue-500">Scheduled</Badge>;
-      default:
-        return <Badge>Unknown</Badge>;
-    }
-  };
-  
-  const getMaterialColor = (type) => {
-    switch (type) {
-      case 'paper':
-        return 'text-amber-600';
-      case 'plastic':
-        return 'text-blue-600';
-      case 'cardboard':
-        return 'text-brown-600';
-      case 'glass':
-        return 'text-teal-600';
-      case 'metal':
-        return 'text-gray-600';
-      case 'mixed':
-        return 'text-purple-600';
-      default:
-        return 'text-gray-600';
-    }
-  };
-
+const VendorRecyclingPage = () => {
   return (
-    <DashboardLayout userRole="vendor">
-      <div className="p-4 md:p-6 max-w-7xl mx-auto space-y-6">
+    <DashboardLayout userRole="VENDOR">
+      <div className="p-2 sm:p-4 md:p-6 max-w-full mx-auto space-y-4 md:space-y-6">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <div>
-            <h1 className="text-2xl font-bold">Recycling & Sustainability</h1>
-            <p className="text-gray-600">Track and manage your eco-friendly initiatives</p>
+            <h1 className="text-2xl font-bold">Recycling Program</h1>
+            <p className="text-gray-600">
+              Manage your recycling efforts and track your impact
+            </p>
           </div>
-          <div className="flex flex-wrap gap-2">
-            <Button variant="outline" className="flex items-center gap-2">
-              <Download className="h-4 w-4" />
-              <span>Export Report</span>
-            </Button>
-            <Button className="bg-primary hover:bg-primary-hover text-black">
-              <PlusCircle className="mr-2 h-4 w-4" />
-              Schedule Pickup
-            </Button>
-          </div>
+          <Button className="bg-primary hover:bg-primary-hover text-black">
+            Manage Partners
+          </Button>
         </div>
-        
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="mb-4 w-full md:w-auto grid grid-cols-2 md:flex">
-            <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
-            <TabsTrigger value="pickups">Recycling Pickups</TabsTrigger>
-            <TabsTrigger value="goals">Eco Goals</TabsTrigger>
-            <TabsTrigger value="tips">Reduce Waste</TabsTrigger>
-          </TabsList>
+
+        {/* Stats Cards */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-base font-medium">Total Recycled</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="flex items-center gap-2">
+                <Package className="h-5 w-5 text-primary" />
+                <span className="text-3xl font-bold">{recyclingStats.totalRecycled} kg</span>
+              </div>
+              <p className="text-sm text-gray-500">Materials this year</p>
+            </CardContent>
+          </Card>
           
-          <TabsContent value="dashboard" className="space-y-6">
-            {/* Stats Overview */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              <Card>
-                <CardHeader className="pb-2">
-                  <CardDescription>Total Recycled</CardDescription>
-                  <CardTitle className="text-2xl">{recyclingStats.totalWeight} kg</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-500">Monthly Goal: 4,000 kg</span>
-                    <Badge variant="outline">{recyclingStats.goalProgress}%</Badge>
-                  </div>
-                  <Progress value={recyclingStats.goalProgress} className="h-2 mt-2" />
-                </CardContent>
-              </Card>
-              
-              <Card>
-                <CardHeader className="pb-2">
-                  <CardDescription>Carbon Saved</CardDescription>
-                  <CardTitle className="text-2xl">{recyclingStats.carbonSaved} kg CO₂</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="flex items-center text-sm text-green-600">
-                    <Leaf className="h-4 w-4 mr-1" />
-                    <span>Equivalent to planting 71 trees</span>
-                  </div>
-                </CardContent>
-              </Card>
-              
-              <Card>
-                <CardHeader className="pb-2">
-                  <CardDescription>Recycling Rate</CardDescription>
-                  <CardTitle className="text-2xl">{recyclingStats.recyclingRate}%</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-500">Goal: 90%</span>
-                    <Badge className="bg-green-500">High</Badge>
-                  </div>
-                  <Progress value={recyclingStats.recyclingRate} className="h-2 mt-2" />
-                </CardContent>
-              </Card>
-              
-              <Card>
-                <CardHeader className="pb-2">
-                  <CardDescription>Recycling Points</CardDescription>
-                  <CardTitle className="text-2xl">{recyclingStats.pointsEarned}</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="flex items-center text-sm text-blue-600">
-                    <CircleDollarSign className="h-4 w-4 mr-1" />
-                    <span>{recyclingStats.carbonCredits} Carbon Credits earned</span>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-            
-            {/* Materials Breakdown */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Recycling Breakdown</CardTitle>
-                <CardDescription>Materials recycled this month</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div className="flex flex-col space-y-3">
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm font-medium">Cardboard</span>
-                      <span className="text-sm">45%</span>
-                    </div>
-                    <Progress value={45} className="h-2" />
-                    <span className="text-xs text-gray-500">1,280 kg recycled</span>
-                  </div>
-                  
-                  <div className="flex flex-col space-y-3">
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm font-medium">Paper</span>
-                      <span className="text-sm">30%</span>
-                    </div>
-                    <Progress value={30} className="h-2" />
-                    <span className="text-xs text-gray-500">853 kg recycled</span>
-                  </div>
-                  
-                  <div className="flex flex-col space-y-3">
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm font-medium">Plastic</span>
-                      <span className="text-sm">25%</span>
-                    </div>
-                    <Progress value={25} className="h-2" />
-                    <span className="text-xs text-gray-500">712 kg recycled</span>
-                  </div>
-                </div>
-                
-                <div className="mt-6 flex flex-col md:flex-row justify-between items-center">
-                  <div className="text-sm text-gray-600">
-                    You're recycling <span className="font-medium">15%</span> more than similar businesses in your area.
-                  </div>
-                  <Button variant="outline" className="mt-4 md:mt-0">
-                    <BarChart className="mr-2 h-4 w-4" />
-                    <span>Detailed Reports</span>
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-            
-            {/* Recent Pickups */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Recent Recycling Activity</CardTitle>
-                <CardDescription>Your last 3 recycling pickups</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {recyclingHistory.filter(item => item.status === 'completed').slice(0, 3).map((pickup) => (
-                    <div key={pickup.id} className="flex items-start justify-between gap-4 p-3 border rounded-lg hover:bg-gray-50 transition-colors">
-                      <div className="flex items-center">
-                        <div className="p-2 bg-green-100 rounded-full">
-                          <Recycle className="h-5 w-5 text-green-600" />
-                        </div>
-                        
-                        <div className="ml-4">
-                          <div className="flex flex-col md:flex-row md:items-center gap-1 md:gap-2">
-                            <span className="font-medium">{pickup.id}</span>
-                            <span className="hidden md:inline-block text-gray-300">•</span>
-                            <span className={`capitalize font-medium ${getMaterialColor(pickup.type)}`}>
-                              {pickup.type}
-                            </span>
-                          </div>
-                          <div className="mt-1 text-sm text-gray-600">
-                            {formatDate(pickup.date)}
-                          </div>
-                        </div>
-                      </div>
-                      
-                      <div className="text-right">
-                        <div className="text-lg font-bold">{pickup.weight} kg</div>
-                        <div className="text-xs text-green-600">
-                          {pickup.carbonSaved} kg CO₂ saved
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-                
-                <div className="mt-4 pt-4 border-t text-center">
-                  <Button variant="ghost" className="w-full justify-center" onClick={() => setActiveTab('pickups')}>
-                    <span>View All Recycling History</span>
-                    <ChevronRight className="ml-2 h-4 w-4" />
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-base font-medium">Carbon Saved</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="flex items-center gap-2">
+                <Leaf className="h-5 w-5 text-green-600" />
+                <span className="text-3xl font-bold">{recyclingStats.carbonSaved} kg</span>
+              </div>
+              <p className="text-sm text-gray-500">CO₂ emissions reduced</p>
+            </CardContent>
+          </Card>
           
-          <TabsContent value="pickups" className="space-y-6">
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-base font-medium">Customer Participation</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="mb-2">
+                <span className="text-3xl font-bold">{recyclingStats.customerParticipation}%</span>
+              </div>
+              <Progress value={recyclingStats.customerParticipation} className="h-2 bg-gray-100" />
+              <p className="text-sm text-gray-500 mt-2">Customers actively recycling</p>
+            </CardContent>
+          </Card>
+          
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-base font-medium">Vendor Recycling Rate</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="flex items-center gap-2">
+                <TrendingUp className="h-5 w-5 text-blue-500" />
+                <span className="text-3xl font-bold">{recyclingStats.vendorRecyclingRate}%</span>
+              </div>
+              <p className="text-sm text-gray-500">Materials recycled by vendor</p>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Main Content */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="col-span-1 lg:col-span-2">
             <Card>
               <CardHeader>
-                <CardTitle>Recycling Pickups</CardTitle>
-                <CardDescription>History of all your recycling activities</CardDescription>
+                <CardTitle>Recycling Activity</CardTitle>
+                <CardDescription>Your recent recycling contributions</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="space-y-4">
-                  {recyclingHistory.map((pickup) => (
-                    <div key={pickup.id} className="bg-white border rounded-lg p-4 hover:shadow-md transition-shadow">
-                      <div className="flex flex-col md:flex-row justify-between gap-4">
-                        <div className="flex items-center">
-                          <div className={`p-2 rounded-full ${
-                            pickup.status === 'completed' ? 'bg-green-100' : 'bg-blue-100'
-                          }`}>
-                            {pickup.status === 'completed' ? (
-                              <CheckCircle className="h-5 w-5 text-green-600" />
-                            ) : (
-                              <Clock className="h-5 w-5 text-blue-600" />
-                            )}
-                          </div>
-                          
-                          <div className="ml-4">
-                            <div className="flex flex-col md:flex-row md:items-center gap-1 md:gap-2">
-                              <span className="font-medium">{pickup.id}</span>
-                              <span className="hidden md:inline-block text-gray-300">•</span>
-                              <span className={`capitalize font-medium ${getMaterialColor(pickup.type)}`}>
-                                {pickup.type}
-                              </span>
+                <Tabs defaultValue="history" className="w-full">
+                  <TabsList className="mb-4">
+                    <TabsTrigger value="history">History</TabsTrigger>
+                    <TabsTrigger value="partners">Packaging Partners</TabsTrigger>
+                    <TabsTrigger value="impact">Environmental Impact</TabsTrigger>
+                  </TabsList>
+                  
+                  <TabsContent value="history">
+                    <div className="space-y-4">
+                      {recentRecycling.map((item) => (
+                        <div 
+                          key={item.id} 
+                          className="bg-white border rounded-lg p-3 md:p-4 hover:shadow-md transition-shadow"
+                        >
+                          <div className="flex flex-col sm:flex-row justify-between">
+                            <div className="flex items-start gap-3">
+                              <div className="p-2 bg-primary-light rounded-full">
+                                <Recycle className="h-5 w-5 md:h-6 md:w-6 text-primary" />
+                              </div>
+                              <div>
+                                <div className="flex flex-wrap items-center gap-2">
+                                  <h3 className="font-medium">{item.type} Recycling</h3>
+                                  <Badge variant="outline">{item.weight} kg</Badge>
+                                </div>
+                                <div className="mt-1 text-sm text-gray-600">{item.date}</div>
+                                <div className="mt-2 flex items-center text-sm text-gray-600">
+                                  <Truck className="h-4 w-4 mr-1" />
+                                  <span>Partner: {item.partner}</span>
+                                </div>
+                              </div>
                             </div>
                             
-                            <div className="mt-1 flex flex-col md:flex-row md:items-center gap-1 md:gap-3">
-                              {getStatusBadge(pickup.status)}
-                              <span className="text-sm text-gray-600">
-                                {formatDate(pickup.date)}
-                              </span>
+                            <div className="mt-3 sm:mt-0 flex items-center">
+                              <div className="flex items-center bg-green-50 text-green-700 px-2 py-1 rounded">
+                                <Leaf className="h-4 w-4 mr-1" />
+                                <span>+{item.points} points</span>
+                              </div>
                             </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                    
+                    <Button variant="outline" className="w-full mt-4">
+                      View All Activity
+                    </Button>
+                  </TabsContent>
+                  
+                  <TabsContent value="partners">
+                    <div className="space-y-4">
+                      {packagingPartners.map((partner) => (
+                        <div 
+                          key={partner.id} 
+                          className="bg-white border rounded-lg p-3 md:p-4 hover:shadow-md transition-shadow"
+                        >
+                          <div className="flex flex-col sm:flex-row justify-between">
+                            <div className="flex items-start gap-3">
+                              <Avatar className="h-10 w-10">
+                                <AvatarImage src={partner.logo} alt={partner.name} />
+                                <AvatarFallback>{partner.name.substring(0, 2)}</AvatarFallback>
+                              </Avatar>
+                              <div>
+                                <h3 className="font-medium">{partner.name}</h3>
+                                <div className="mt-1 text-sm text-gray-600">
+                                  Materials: {partner.materials}
+                                </div>
+                                <div className="mt-2 flex items-center text-sm text-gray-600">
+                                  <Users className="h-4 w-4 mr-1" />
+                                  <span>Rating: {partner.rating}</span>
+                                </div>
+                              </div>
+                            </div>
+                            
+                            <div className="mt-3 sm:mt-0 flex items-center">
+                              <Button variant="outline">Manage</Button>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                    
+                    <Button variant="outline" className="w-full mt-4">
+                      View All Partners
+                    </Button>
+                  </TabsContent>
+                  
+                  <TabsContent value="impact">
+                    <div className="space-y-4">
+                      <div className="bg-white border rounded-lg p-4">
+                        <h3 className="font-medium mb-4">Environmental Impact</h3>
+                        <div className="space-y-4">
+                          <div>
+                            <div className="flex justify-between text-sm mb-1">
+                              <span>CO₂ Saved</span>
+                              <span>{recyclingStats.carbonSaved} kg</span>
+                            </div>
+                            <Progress value={60} className="h-2" />
+                          </div>
+                          
+                          <div>
+                            <div className="flex justify-between text-sm mb-1">
+                              <span>Energy Saved</span>
+                              <span>1240 kWh</span>
+                            </div>
+                            <Progress value={45} className="h-2" />
+                          </div>
+                          
+                          <div>
+                            <div className="flex justify-between text-sm mb-1">
+                              <span>Water Conserved</span>
+                              <span>8600 liters</span>
+                            </div>
+                            <Progress value={70} className="h-2" />
+                          </div>
+                          
+                          <div>
+                            <div className="flex justify-between text-sm mb-1">
+                              <span>Landfill Space Saved</span>
+                              <span>24 m³</span>
+                            </div>
+                            <Progress value={40} className="h-2" />
                           </div>
                         </div>
                         
-                        <div className="flex flex-col items-end justify-between">
-                          {pickup.weight > 0 ? (
-                            <>
-                              <div className="text-lg font-bold">{pickup.weight} kg</div>
-                              <div className="text-xs text-green-600">
-                                {pickup.carbonSaved} kg CO₂ saved
-                              </div>
-                            </>
-                          ) : (
-                            <div className="text-sm italic text-gray-500 mt-1">
-                              Not weighed yet
-                            </div>
-                          )}
-                        </div>
+                        <Button className="w-full mt-6 bg-primary hover:bg-primary-hover text-black">
+                          View Detailed Impact Report
+                        </Button>
                       </div>
-                      
-                      {!isMobile && pickup.pickupDetails && (
-                        <div className="mt-3 pt-3 border-t text-sm">
-                          <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
-                            <div>
-                              <span className="text-gray-500">Pickup Date:</span>{' '}
-                              <span className="font-medium">{formatDate(pickup.pickupDetails.date)}</span>
-                            </div>
-                            <div>
-                              <span className="text-gray-500">Location:</span>{' '}
-                              <span className="font-medium">{pickup.pickupDetails.address}</span>
-                            </div>
-                            {pickup.pickupDetails.rider && (
-                              <div>
-                                <span className="text-gray-500">Rider:</span>{' '}
-                                <span className="font-medium">{pickup.pickupDetails.rider}</span>
-                              </div>
-                            )}
-                            {pickup.pickupDetails.notes && (
-                              <div className="md:col-span-3 mt-1">
-                                <span className="text-gray-500">Notes:</span>{' '}
-                                <span>{pickup.pickupDetails.notes}</span>
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                      )}
-                      
-                      {pickup.status === 'scheduled' && (
-                        <div className="mt-3 flex justify-end">
-                          <Button variant="outline" className="text-red-600 border-red-300 hover:bg-red-50">
-                            Cancel Pickup
-                          </Button>
-                        </div>
-                      )}
                     </div>
-                  ))}
-                </div>
-                
-                <div className="mt-6 flex justify-center">
-                  <Button className="bg-primary hover:bg-primary-hover text-black">
-                    <Truck className="mr-2 h-4 w-4" />
-                    Schedule New Pickup
-                  </Button>
-                </div>
+                  </TabsContent>
+                </Tabs>
               </CardContent>
             </Card>
-          </TabsContent>
+          </div>
           
-          <TabsContent value="goals" className="space-y-6">
+          <div className="col-span-1">
             <Card>
               <CardHeader>
-                <CardTitle>Eco Goals</CardTitle>
-                <CardDescription>Track your environmental sustainability targets</CardDescription>
+                <CardTitle>Recycling Rewards</CardTitle>
+                <CardDescription>Incentives for recycling</CardDescription>
               </CardHeader>
-              <CardContent>
-                <div className="space-y-6">
-                  {ecoGoals.map((goal) => (
-                    <div key={goal.id} className="bg-white border rounded-lg p-4">
-                      <div className="flex flex-col md:flex-row justify-between md:items-center mb-4">
-                        <div>
-                          <h3 className="text-lg font-medium">{goal.title}</h3>
-                          <p className="text-sm text-gray-600">
-                            Due by {new Date(goal.dueDate).toLocaleDateString('en-NG', {
-                              day: 'numeric',
-                              month: 'short',
-                              year: 'numeric'
-                            })}
-                          </p>
-                        </div>
-                        
-                        <div className="mt-2 md:mt-0 md:text-right">
-                          <div className="text-xl font-bold">
-                            {goal.currentValue} / {goal.targetValue} {goal.units}
-                          </div>
-                        </div>
-                      </div>
-                      
-                      <div className="space-y-2">
-                        <div className="flex justify-between items-center">
-                          <span className="text-sm text-gray-600">
-                            Progress: {Math.round((goal.currentValue / goal.targetValue) * 100)}%
-                          </span>
-                          <span className="text-sm text-gray-600">
-                            Remaining: {goal.targetValue - goal.currentValue} {goal.units}
-                          </span>
-                        </div>
-                        <Progress value={(goal.currentValue / goal.targetValue) * 100} className="h-2" />
-                      </div>
-                    </div>
-                  ))}
+              <CardContent className="space-y-4">
+                <div className="flex items-center p-3 border rounded-lg">
+                  <div className="p-2 bg-primary-light rounded-full mr-3">
+                    <Award className="h-5 w-5 text-primary" />
+                  </div>
+                  <div className="flex-grow">
+                    <h4 className="font-medium">Points per kg</h4>
+                    <p className="text-sm text-gray-600">Earn points for every kg recycled</p>
+                  </div>
+                  <span className="font-bold text-lg">2 pts</span>
                 </div>
                 
-                <div className="mt-6 flex justify-center">
-                  <Button className="bg-primary hover:bg-primary-hover text-black">
-                    <PlusCircle className="mr-2 h-4 w-4" />
-                    Add New Eco Goal
-                  </Button>
+                <div className="flex items-center p-3 border rounded-lg">
+                  <div className="p-2 bg-primary-light rounded-full mr-3">
+                    <DollarSign className="h-5 w-5 text-primary" />
+                  </div>
+                  <div className="flex-grow">
+                    <h4 className="font-medium">Discounts</h4>
+                    <p className="text-sm text-gray-600">Get discounts on packaging materials</p>
+                  </div>
                 </div>
+                
+                <Button className="w-full flex items-center justify-center bg-primary hover:bg-primary-hover text-black">
+                  <span>All Rewards</span>
+                  <ArrowUpRight className="ml-2 h-4 w-4" />
+                </Button>
               </CardContent>
             </Card>
             
-            <Card>
+            <Card className="mt-4">
               <CardHeader>
-                <CardTitle>Carbon Credits</CardTitle>
-                <CardDescription>Track and use your earned credits</CardDescription>
+                <CardTitle>Upcoming Events</CardTitle>
+                <CardDescription>Local recycling events</CardDescription>
               </CardHeader>
-              <CardContent>
-                <div className="flex flex-col md:flex-row justify-between items-center p-4 bg-green-50 rounded-lg border border-green-100">
-                  <div>
-                    <h3 className="text-lg font-medium text-green-800">Available Carbon Credits</h3>
-                    <p className="text-sm text-green-700 mt-1">
-                      You can use these credits to offset your carbon footprint or trade them
-                    </p>
-                  </div>
-                  <div className="mt-4 md:mt-0">
-                    <div className="text-3xl font-bold text-green-800">{recyclingStats.carbonCredits}</div>
-                    <p className="text-sm text-green-700 mt-1">Credits</p>
-                  </div>
-                </div>
-                
-                <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <Button className="bg-green-600 hover:bg-green-700 text-white">
-                    <Leaf className="mr-2 h-4 w-4" />
-                    Use Credits for Offset
-                  </Button>
-                  <Button variant="outline" className="border-green-600 text-green-700 hover:bg-green-50">
-                    <ArrowRight className="mr-2 h-4 w-4" />
-                    Trade Carbon Credits
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-          
-          <TabsContent value="tips" className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Reduce Business Waste</CardTitle>
-                <CardDescription>Tips and strategies to improve your sustainability</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  {wasteTips.map((tip) => (
-                    <div key={tip.id} className="bg-white border rounded-lg p-4 hover:shadow-md transition-shadow">
-                      <div className="p-2 bg-primary-light/30 rounded-full inline-block mb-3">
-                        <PackageOpen className="h-5 w-5 text-primary" />
-                      </div>
-                      
-                      <h3 className="text-lg font-medium mb-2">{tip.title}</h3>
-                      <p className="text-sm text-gray-600 mb-4">{tip.description}</p>
-                      
-                      <div className="flex justify-between text-sm text-gray-500">
-                        <div>
-                          <span className="font-medium">Difficulty:</span>{' '}
-                          <Badge variant="outline" className={
-                            tip.difficulty === 'Easy' ? 'bg-green-100 text-green-800 border-green-200' : 
-                            tip.difficulty === 'Medium' ? 'bg-amber-100 text-amber-800 border-amber-200' :
-                            'bg-red-100 text-red-800 border-red-200'
-                          }>
-                            {tip.difficulty}
-                          </Badge>
-                        </div>
-                        <div>
-                          <span className="font-medium">Impact:</span>{' '}
-                          <Badge variant="outline" className={
-                            tip.impact === 'High' ? 'bg-green-100 text-green-800 border-green-200' : 
-                            tip.impact === 'Medium' ? 'bg-amber-100 text-amber-800 border-amber-200' :
-                            'bg-blue-100 text-blue-800 border-blue-200'
-                          }>
-                            {tip.impact}
-                          </Badge>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-                
-                <div className="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-100">
-                  <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-                    <div>
-                      <h3 className="text-lg font-medium text-blue-800">Need personalized advice?</h3>
-                      <p className="text-sm text-blue-700 mt-1">
-                        Our sustainability experts can provide tailored recommendations for your business
-                      </p>
-                    </div>
-                    <Button className="bg-blue-600 hover:bg-blue-700 text-white whitespace-nowrap">
-                      Schedule Consultation
+              <CardContent className="space-y-3">
+                <div className="p-3 border rounded-lg">
+                  <h4 className="font-medium">Community Clean-Up</h4>
+                  <p className="text-sm text-gray-600 mt-1">July 22, 2023</p>
+                  <div className="flex justify-between mt-2">
+                    <span className="text-xs bg-green-50 text-green-700 px-2 py-1 rounded">
+                      Register now
+                    </span>
+                    <Button variant="ghost" size="sm" className="h-auto p-1">
+                      <Calendar className="h-4 w-4" />
                     </Button>
                   </div>
                 </div>
+                
+                <div className="p-3 border rounded-lg">
+                  <h4 className="font-medium">Recycling Workshop</h4>
+                  <p className="text-sm text-gray-600 mt-1">August 5, 2023</p>
+                  <div className="flex justify-between mt-2">
+                    <span className="text-xs bg-blue-50 text-blue-700 px-2 py-1 rounded">
+                      Learn more
+                    </span>
+                    <Button variant="ghost" size="sm" className="h-auto p-1">
+                      <Calendar className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
+                
+                <Button className="w-full">View All Events</Button>
               </CardContent>
             </Card>
-          </TabsContent>
-        </Tabs>
+          </div>
+        </div>
       </div>
     </DashboardLayout>
   );
 };
 
-export default RecyclingPage;
+export default VendorRecyclingPage;

@@ -1,15 +1,15 @@
-
 import React, { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import DashboardLayout from '@/components/layout/DashboardLayout';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Progress } from '@/components/ui/progress';
 import { 
-  MapPin, Package, Clock, Leaf, Phone, MessageSquare,
-  Navigation, CheckCircle, Camera, User, AlertTriangle
+  Package, Clock, MapPin, Leaf, Phone, Navigation, 
+  CheckCircle, AlertCircle, Camera, MessageSquare,
+  Star, TrendingUp, Calendar
 } from 'lucide-react';
 import {
   Dialog,
@@ -23,7 +23,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
 // Mock data for current deliveries
-const currentDeliveries = [
+const mockCurrentDeliveries = [
   {
     id: 'ORD-2339',
     vendor: 'Zero Waste Store',
@@ -73,7 +73,7 @@ const currentDeliveries = [
   }
 ];
 
-const completedDeliveries = [
+const mockCompletedDeliveries = [
   {
     id: 'ORD-2337',
     vendor: 'Green Earth Groceries',
@@ -118,7 +118,7 @@ const completedDeliveries = [
   }
 ];
 
-const CurrentDeliveries = () => {
+const CurrentDeliveriesPage = () => {
   const { user } = useAuth();
   const [selectedDelivery, setSelectedDelivery] = useState(null);
   const [showDeliveryDialog, setShowDeliveryDialog] = useState(false);
@@ -171,11 +171,11 @@ const CurrentDeliveries = () => {
     setSelectedItem(item);
   };
 
-  const pendingCount = currentDeliveries.filter(d => d.status === 'picking-up' || d.status === 'delivering').length;
-  const completedCount = completedDeliveries.length;
+  const pendingCount = mockCurrentDeliveries.filter(d => d.status === 'picking-up' || d.status === 'delivering').length;
+  const completedCount = mockCompletedDeliveries.length;
 
   return (
-    <DashboardLayout userRole="rider">
+    <DashboardLayout userRole="RIDER">
       <div className="p-4 md:p-6 max-w-7xl mx-auto">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
           <div>
@@ -219,7 +219,7 @@ const CurrentDeliveries = () => {
               <div>
                 <p className="text-sm text-gray-500">Earnings Today</p>
                 <p className="text-2xl font-bold">₦{
-                  [...currentDeliveries, ...completedDeliveries].reduce(
+                  [...mockCurrentDeliveries, ...mockCompletedDeliveries].reduce(
                     (sum, delivery) => sum + delivery.fee + delivery.ecoBonus + (delivery.tip || 0), 0
                   ).toLocaleString('en-NG', {maximumFractionDigits: 2})
                 }</p>
@@ -235,7 +235,7 @@ const CurrentDeliveries = () => {
               <div>
                 <p className="text-sm text-gray-500">Carbon Saved</p>
                 <p className="text-2xl font-bold">{
-                  [...currentDeliveries, ...completedDeliveries].reduce(
+                  [...mockCurrentDeliveries, ...mockCompletedDeliveries].reduce(
                     (sum, delivery) => sum + delivery.carbonSaved, 0
                   ).toFixed(1)} kg</p>
               </div>
@@ -254,9 +254,9 @@ const CurrentDeliveries = () => {
           </TabsList>
           
           <TabsContent value="active">
-            {currentDeliveries.length > 0 ? (
+            {mockCurrentDeliveries.length > 0 ? (
               <div className="space-y-6">
-                {currentDeliveries.map((delivery) => (
+                {mockCurrentDeliveries.map((delivery) => (
                   <Card key={delivery.id} className="overflow-hidden border-2 border-primary-light">
                     <CardContent className="p-0">
                       <div className="p-4 border-b bg-gray-50 flex justify-between items-center">
@@ -373,7 +373,7 @@ const CurrentDeliveries = () => {
           
           <TabsContent value="completed">
             <div className="space-y-4">
-              {completedDeliveries.map((delivery) => (
+              {mockCompletedDeliveries.map((delivery) => (
                 <Card key={delivery.id} className="hover:shadow-sm transition-shadow">
                   <CardContent className="p-4">
                     <div className="flex flex-col md:flex-row justify-between">
@@ -551,7 +551,7 @@ const CurrentDeliveries = () => {
                     handleReportIssue(selectedDelivery);
                   }}
                 >
-                  <AlertTriangle className="mr-2 h-4 w-4" />
+                  <AlertCircle className="mr-2 h-4 w-4" />
                   Report Issue
                 </Button>
                 <Button 
@@ -765,4 +765,4 @@ const CurrentDeliveries = () => {
   );
 };
 
-export default CurrentDeliveries;
+export default CurrentDeliveriesPage;

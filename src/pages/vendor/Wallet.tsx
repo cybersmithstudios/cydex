@@ -1,4 +1,3 @@
-
 import React from 'react';
 import DashboardLayout from '@/components/layout/DashboardLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -9,24 +8,9 @@ import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Separator } from '@/components/ui/separator';
 import {
-  Wallet,
-  ArrowUp,
-  ArrowDown,
-  RefreshCw,
-  Download,
-  Plus,
-  Calendar,
-  Search,
-  CreditCard,
-  DollarSign,
-  BarChart4,
-  Filter,
-  ChevronDown,
-  Info,
-  AlertCircle,
-  CheckCircle,
-  XCircle,
-  TrendingUp
+  Wallet, ArrowUp, ArrowDown, RefreshCw, Download, Plus, Calendar,
+  Search, CreditCard, DollarSign, BarChart4, Filter, ChevronDown,
+  Info, AlertCircle, CheckCircle, XCircle, TrendingUp
 } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
 
@@ -189,7 +173,7 @@ const WalletPage = () => {
     .reduce((acc, t) => acc + t.amount, 0);
 
   return (
-    <DashboardLayout userRole="vendor">
+    <DashboardLayout userRole="VENDOR">
       <div className="p-4 md:p-6 max-w-7xl mx-auto space-y-6">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <div>

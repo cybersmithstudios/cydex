@@ -1,57 +1,23 @@
-
 import React, { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import DashboardLayout from '@/components/layout/DashboardLayout';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Progress } from '@/components/ui/progress';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
+import { Switch } from '@/components/ui/switch';
+import { Progress } from '@/components/ui/progress';
 import {
-  User,
-  Settings,
-  Leaf,
-  Star,
-  Clock,
-  Upload,
-  Shield,
-  Lock,
-  Bell,
-  MapPin,
-  Smartphone,
-  FileText,
-  CalendarDays,
-  Check,
-  ChevronRight,
-  AlertCircle,
-  Car,
-  Bike,
-  CreditCard,
-  Building,
-  Clipboard,
-  Edit,
-  Mail,
-  MessageSquare,
-  Info,
-  Award,
-  Camera
+  User, Mail, Phone, MapPin, Calendar, Shield, Bell, Lock,
+  CreditCard, Leaf, Award, Settings, Camera, Bike, Star,
+  TrendingUp, CheckCircle, Clock, Package
 } from 'lucide-react';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { Switch } from "@/components/ui/switch";
-import { ScrollArea } from "@/components/ui/scroll-area";
 
-const ProfilePage = () => {
+const RiderProfilePage = () => {
   const { user } = useAuth();
   const [editing, setEditing] = useState(false);
   const [showVehicleDialog, setShowVehicleDialog] = useState(false);
@@ -210,7 +176,7 @@ const ProfilePage = () => {
   };
 
   return (
-    <DashboardLayout userRole="rider">
+    <DashboardLayout userRole="RIDER">
       <div className="p-4 md:p-6 max-w-7xl mx-auto">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
           <div>
@@ -312,7 +278,7 @@ const ProfilePage = () => {
                   
                   <div className="w-full space-y-3">
                     <div className="flex items-center">
-                      <CalendarDays className="h-4 w-4 text-gray-500" />
+                      <Calendar className="h-4 w-4 text-gray-500" />
                       <span className="ml-2 text-sm">Joined {riderProfile.joinDate}</span>
                     </div>
                     <div className="flex items-start">
@@ -1173,4 +1139,4 @@ const ProfilePage = () => {
   );
 };
 
-export default ProfilePage;
+export default RiderProfilePage;
