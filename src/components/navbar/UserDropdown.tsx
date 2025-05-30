@@ -28,6 +28,23 @@ const UserDropdown = ({ user, onLogoutClick }: UserDropdownProps) => {
     }
   };
 
+  const goToProfile = () => {
+    if (user) {
+      navigate(`/${user.role.toLowerCase()}/profile`);
+    }
+  };
+
+  const goToSettings = () => {
+    if (user) {
+      // Only vendors have settings page, for others redirect to profile
+      if (user.role.toLowerCase() === 'vendor') {
+        navigate(`/${user.role.toLowerCase()}/settings`);
+      } else {
+        navigate(`/${user.role.toLowerCase()}/profile`);
+      }
+    }
+  };
+
   const getInitials = (name: string) => {
     return name
       .split(" ")
@@ -67,13 +84,13 @@ const UserDropdown = ({ user, onLogoutClick }: UserDropdownProps) => {
           <BarChart className="mr-2 h-4 w-4" />
           <span>Dashboard</span>
         </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => navigate("/profile")}>
+        <DropdownMenuItem onClick={goToProfile}>
           <UserIcon className="mr-2 h-4 w-4" />
           <span>Profile</span>
         </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => navigate("/settings")}>
+        <DropdownMenuItem onClick={goToSettings}>
           <Settings className="mr-2 h-4 w-4" />
-          <span>Settings</span>
+          <span>{user.role.toLowerCase() === 'vendor' ? 'Settings' : 'Profile'}</span>
         </DropdownMenuItem>
         {user.role === "ADMIN" && (
           <DropdownMenuItem onClick={() => navigate("/admin")}>
