@@ -1,5 +1,5 @@
 
-import { useAuth } from '../contexts/AuthContext';
+import { useAuth } from '../contexts/SupabaseAuthContext';
 import { useLocation } from 'react-router-dom';
 
 export const useShowWhatsApp = () => {
