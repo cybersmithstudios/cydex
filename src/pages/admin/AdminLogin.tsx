@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -28,7 +27,7 @@ const AdminLogin = () => {
   useEffect(() => {
     if (isAuthenticated && user) {
       console.log('Admin login - user role:', user.role);
-      if (user.role === 'ADMIN' || user.role === 'admin') {
+      if (user.role === 'ADMIN') {
         console.log('Redirecting to admin dashboard');
         navigate('/admin', { replace: true });
       } else {
