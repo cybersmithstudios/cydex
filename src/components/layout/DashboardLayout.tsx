@@ -7,7 +7,7 @@ import Sidebar from './Sidebar';
 import MobileMenu from './MobileMenu';
 import MobileHeader from './MobileHeader';
 import { getNavLinks, getRoleTitle } from './navigationLinks';
-import { UserRole, User } from '@/types/auth.types';
+import { UserRole } from '@/types/auth.types';
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -15,7 +15,7 @@ interface DashboardLayoutProps {
 }
 
 const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, userRole }) => {
-  const { user, logout } = useAuth();
+  const { user, logout, loading } = useAuth();
   const navigate = useNavigate();
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -27,6 +27,24 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, userRole })
     logout();
     navigate('/auth');
   };
+
+  // Show loading state while auth is being determined
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
+          <p className="mt-2 text-gray-600">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Redirect to auth if no user
+  if (!user) {
+    navigate('/auth');
+    return null;
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 flex">

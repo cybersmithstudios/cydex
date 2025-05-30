@@ -18,13 +18,13 @@ export const ProtectedRoute = ({
     return <LoadingDisplay fullScreen message="Checking authentication..." size="md" />;
   }
   
-  if (!isAuthenticated) {
+  if (!isAuthenticated || !user) {
     // Pass only the pathname, search and hash as a string to avoid the Location object serialization issue
     return <Navigate to="/auth" state={{ from: location.pathname + location.search }} replace />;
   }
   
   // Check role if allowedRoles is provided and not empty
-  if (allowedRoles.length > 0 && user && !allowedRoles.includes(user.role)) {
+  if (allowedRoles.length > 0 && !allowedRoles.includes(user.role)) {
     // Redirect to dashboard specific to their role
     const rolePath = user.role.toLowerCase();
     return <Navigate to={`/${rolePath}`} replace />;

@@ -13,7 +13,7 @@ const CustomerRoutes = () => {
   return (
     <Routes>
       <Route 
-        path="/new-order" 
+        path="/" 
         element={
           <ProtectedRoute allowedRoles={['CUSTOMER']}>
             <CustomerDashboard />
@@ -22,7 +22,7 @@ const CustomerRoutes = () => {
       />
       
       <Route 
-        path="new-order" 
+        path="/new-order" 
         element={
           <ProtectedRoute allowedRoles={['CUSTOMER']}>
             <NewOrder />
@@ -40,7 +40,7 @@ const CustomerRoutes = () => {
       />
       
       <Route 
-        path="orders/:orderId" 
+        path="/orders/:orderId" 
         element={
           <ProtectedRoute allowedRoles={['CUSTOMER']}>
             <OrderDetail />
@@ -49,7 +49,7 @@ const CustomerRoutes = () => {
       />
       
       <Route 
-        path="wallet" 
+        path="/wallet" 
         element={
           <ProtectedRoute allowedRoles={['CUSTOMER']}>
             <Wallet />
@@ -58,7 +58,7 @@ const CustomerRoutes = () => {
       />
 
       <Route 
-        path="recycling" 
+        path="/recycling" 
         element={
           <ProtectedRoute allowedRoles={['CUSTOMER']}>
             <Recycling />
@@ -67,19 +67,10 @@ const CustomerRoutes = () => {
       />
       
       <Route 
-        path="profile" 
+        path="/profile" 
         element={
           <ProtectedRoute allowedRoles={['CUSTOMER']}>
             <Profile />
-          </ProtectedRoute>
-        } 
-      />
-      
-      <Route 
-        path="/*" 
-        element={
-          <ProtectedRoute allowedRoles={['CUSTOMER']}>
-            <CustomerDashboard />
           </ProtectedRoute>
         } 
       />
