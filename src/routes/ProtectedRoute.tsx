@@ -1,6 +1,6 @@
 
 import { Navigate, useLocation } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';
+import { useAuth } from '@/contexts/SupabaseAuthContext';
 import LoadingDisplay from '@/components/ui/LoadingDisplay';
 
 export const ProtectedRoute = ({ 

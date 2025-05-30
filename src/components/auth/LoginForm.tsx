@@ -1,8 +1,9 @@
+
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useAuth } from "@/contexts/AuthContext";
+import { useAuth } from "@/contexts/SupabaseAuthContext";
 import { toast } from "sonner";
 import { Link, useNavigate } from "react-router-dom";
 import { Eye, EyeOff, ArrowLeft } from "lucide-react";
@@ -20,8 +21,9 @@ const LoginForm = () => {
   // Effect to handle redirect after successful login
   useEffect(() => {
     if (isAuthenticated && user) {
-      // If user is authenticated, redirect to their role-specific dashboard
-      navigate(`/${user.role.toLowerCase()}`);
+      console.log("Login successful, redirecting to:", user.role);
+      const rolePath = user.role.toLowerCase();
+      navigate(`/${rolePath}`);
     }
   }, [isAuthenticated, user, navigate]);
   
@@ -36,11 +38,8 @@ const LoginForm = () => {
     
     try {
       await login(loginEmail, loginPassword);
-      toast.success("Login successful!");
-      // The useEffect above will handle redirection if login is successful
     } catch (error) {
       console.error("Login failed:", error);
-      toast.error(error instanceof Error ? error.message : "Login failed. Please try again.");
     } finally {
       setIsSubmitting(false);
     }

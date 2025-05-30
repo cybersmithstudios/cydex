@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useAuth } from "@/contexts/AuthContext";
+import { useAuth } from "@/contexts/SupabaseAuthContext";
 import { UserRole } from "@/types/auth.types";
 import { toast } from "sonner";
 import { 
@@ -49,7 +49,6 @@ const SignupForm = () => {
     setIsSubmitting(true);
     try {
       await register(signupName, signupEmail, signupPassword, role);
-      toast.success("Account created successfully!");
       
       // Reset form
       setSignupName("");
@@ -59,7 +58,6 @@ const SignupForm = () => {
       setRole("CUSTOMER");
     } catch (error) {
       console.error("Signup failed:", error);
-      toast.error(error instanceof Error ? error.message : "Registration failed. Please try again.");
     } finally {
       setIsSubmitting(false);
     }

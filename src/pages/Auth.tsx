@@ -1,6 +1,6 @@
 
 import React, { useEffect } from "react";
-import { useAuth } from "@/contexts/AuthContext";
+import { useAuth } from "@/contexts/SupabaseAuthContext";
 import { Navigate, useNavigate, useSearchParams } from "react-router-dom";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import AuthLayout from "@/components/auth/AuthLayout";

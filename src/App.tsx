@@ -1,5 +1,6 @@
+
 import { BrowserRouter as Router } from 'react-router-dom';
-import { AuthProvider } from './contexts/AuthProvider';
+import { AuthProvider } from './contexts/SupabaseAuthContext';
 import { ThemeProvider } from './contexts/ThemeContext';
 import { FloatingWhatsApp } from './components/FloatingWhatsApp';
 import { Toaster } from './components/ui/sonner';
@@ -27,19 +28,19 @@ const AppContent = () => {
           notification={true}
           notificationSound={false}
           notificationDelay={30}
-            notificationLoop={3}
-            style={{ zIndex: 999 }}
-            buttonStyle={{ 
-              backgroundColor: "#21CA1B", 
-              boxShadow: "0 4px 12px rgba(175, 255, 100, 0.4)" 
-            }}
-            chatboxStyle={{ 
-              border: "1px solid #333", 
-              boxShadow: "0 8px 24px rgba(0, 0, 0, 0.2)" 
-            }}
-          />
+          notificationLoop={3}
+          style={{ zIndex: 999 }}
+          buttonStyle={{ 
+            backgroundColor: "#21CA1B", 
+            boxShadow: "0 4px 12px rgba(175, 255, 100, 0.4)" 
+          }}
+          chatboxStyle={{ 
+            border: "1px solid #333", 
+            boxShadow: "0 8px 24px rgba(0, 0, 0, 0.2)" 
+          }}
+        />
       )}
-          <Toaster />
+      <Toaster />
     </>
   );
 };
