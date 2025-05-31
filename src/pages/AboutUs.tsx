@@ -5,6 +5,7 @@ import FooterSection from "@/components/FooterSection";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { Bike, Leaf, Lightbulb, Users, ArrowRight } from "lucide-react";
+import { TracingBeam } from "@/components/ui/tracing-beam";
 
 const AboutUs = () => {
   const navigate = useNavigate();
@@ -133,32 +134,34 @@ const AboutUs = () => {
             </div>
           </div>
           
-          {/* Timeline - Mobile Optimized */}
+          {/* Timeline with TracingBeam */}
           <div className="mt-12 sm:mt-16 md:mt-20">
             <h3 className="text-xl sm:text-2xl font-bold mb-8 sm:mb-10 text-center">Our Journey</h3>
             
-            <div className="relative border-l-2 border-gray-200 ml-4 sm:ml-6 md:ml-0 md:mx-auto md:max-w-3xl pl-6 md:pl-0">
-              <TimelineItem
-                year="2020"
-                description="Cydex founded with a mission to create sustainable deliveries"
-                position="left"
-              />
-              <TimelineItem
-                year="2021"
-                description="Launched carbon credit system and expanded to 5 major cities"
-                position="right"
-              />
-              <TimelineItem
-                year="2022"
-                description="Introduced AI-powered route optimization and sustainable packaging"
-                position="left"
-              />
-              <TimelineItem
-                year="2023-Present"
-                description="Nationwide expansion with over 10,000 riders and 1,000+ partnered businesses"
-                position="right"
-              />
-            </div>
+            <TracingBeam className="px-4">
+              <div className="max-w-3xl pl-5 mx-auto space-y-12 md:space-y-16">
+                <TimelineItem 
+                  year="2020"
+                  title="Cydex Founded"
+                  description="Cydex was founded with a mission to create sustainable deliveries"
+                />
+                <TimelineItem 
+                  year="2021"
+                  title="Expansion & Innovation"
+                  description="Launched carbon credit system and expanded to 5 major cities"
+                />
+                <TimelineItem 
+                  year="2022"
+                  title="Technology Advancements"
+                  description="Introduced AI-powered route optimization and sustainable packaging"
+                />
+                <TimelineItem 
+                  year="2023-Present"
+                  title="Nationwide Presence"
+                  description="Nationwide expansion with over 10,000 riders and 1,000+ partnered businesses"
+                />
+              </div>
+            </TracingBeam>
           </div>
         </div>
       </section>
@@ -282,23 +285,23 @@ const AboutUs = () => {
 };
 
 // Helper Components
-const TimelineItem = ({ year, description, position }: { year: string; description: string; position: "left" | "right" }) => (
-  <div className="md:flex md:items-center mb-8 sm:mb-12">
-    {position === "left" && (
-      <div className="md:w-1/2 md:pr-8 md:text-right">
-        <h4 className="text-lg sm:text-xl font-semibold mb-1">{year}</h4>
-        <p className="text-sm sm:text-base text-gray-600">{description}</p>
+const TimelineItem = ({ 
+  year, 
+  title, 
+  description
+}: { 
+  year: string; 
+  title: string;
+  description: string; 
+}) => (
+  <div className="relative pl-0 group">
+    <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
+      <div className="flex items-center gap-2 mb-1">
+        <span className="text-sm font-medium text-primary">{year}</span>
       </div>
-    )}
-    <div className="absolute left-[-8px] md:left-1/2 md:ml-[-8px] bg-primary w-3 h-3 sm:w-4 sm:h-4 rounded-full border-4 border-white"></div>
-    {position === "right" ? (
-      <div className="md:w-1/2 md:pl-8">
-        <h4 className="text-lg sm:text-xl font-semibold mb-1">{year}</h4>
-        <p className="text-sm sm:text-base text-gray-600">{description}</p>
-      </div>
-    ) : (
-      <div className="md:w-1/2 md:pl-8 hidden md:block"></div>
-    )}
+      <h4 className="text-lg font-semibold mb-2 text-gray-900">{title}</h4>
+      <p className="text-sm sm:text-base text-gray-600">{description}</p>
+    </div>
   </div>
 );
 

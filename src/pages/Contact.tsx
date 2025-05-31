@@ -47,21 +47,21 @@ const Contact = () => {
       <Navbar />
       
       {/* Hero Section */}
-      <section className="pt-32 pb-16 bg-gradient-to-b from-white to-gray-50 relative overflow-hidden">
+      <section className="pt-24 sm:pt-28 md:pt-32 pb-12 sm:pb-16 bg-gradient-to-b from-white to-gray-50 relative overflow-hidden">
         {/* Background Elements */}
         <div className="absolute inset-0 z-0">
           <div className="absolute top-1/4 -right-20 w-96 h-96 bg-primary opacity-10 rounded-full filter blur-3xl"></div>
           <div className="absolute -bottom-20 -left-20 w-96 h-96 bg-primary opacity-10 rounded-full filter blur-3xl"></div>
         </div>
         
-        <div className="container mx-auto px-6 text-center relative z-10">
+        <div className="container mx-auto px-4 sm:px-6 text-center relative z-10">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
             className="inline-block py-1 px-4 rounded-full bg-primary/10 mb-4"
           >
-            <p className="text-primary font-semibold text-sm sm:text-base">
+            <p className="text-primary font-semibold text-xs sm:text-sm md:text-base">
               Get In Touch
             </p>
           </motion.div>
@@ -70,7 +70,7 @@ const Contact = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.1 }}
-            className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6"
+            className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-4 sm:mb-5 md:mb-6"
           >
             We're Here to <span className="text-primary drop-shadow-sm">Help</span>
           </motion.h1>
@@ -79,92 +79,57 @@ const Contact = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.2 }}
-            className="text-lg md:text-xl text-gray-600 max-w-2xl mx-auto mb-8"
+            className="text-base sm:text-lg md:text-xl text-gray-600 max-w-2xl mx-auto mb-6 sm:mb-8"
           >
             Have questions about our services or want to join our mission? Our team is ready to assist you with any inquiries or feedback.
           </motion.p>
           
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.3 }}
-            className="flex flex-wrap justify-center gap-4 mb-6"
-          >
-            <div className="flex items-center bg-white rounded-full px-4 py-2 shadow-sm">
-              <Mail className="h-5 w-5 text-primary mr-2" />
-              <span className="text-gray-700">support@cydex.com.ng</span>
-            </div>
-            
-            <div className="flex items-center bg-white rounded-full px-4 py-2 shadow-sm">
-              <Phone className="h-5 w-5 text-primary mr-2" />
-              <span className="text-gray-700">+234 801 234 5678</span>
-            </div>
-          </motion.div>
           
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.4 }}
-          >
-            <Button 
-              className="primary-button hover:scale-105"
-              size="lg"
-              onClick={() => {
-                const formSection = document.querySelector('.py-20.bg-white');
-                if (formSection) {
-                  formSection.scrollIntoView({ behavior: "smooth" });
-                }
-              }}
-            >
-              Send Us a Message
-              <SendHorizonal className="ml-2 h-5 w-5" />
-            </Button>
-          </motion.div>
         </div>
       </section>
       
       {/* Contact Form & Info */}
-      <section className="py-20 bg-white">
-        <div className="container mx-auto px-6">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+      <section className="py-12 sm:py-16 md:py-20 bg-white">
+        <div className="container mx-auto px-4 sm:px-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-10 md:gap-12">
             {/* Contact Form */}
-            <div className="bg-white rounded-xl p-8 shadow-lg border border-gray-100">
-              <h2 className="text-2xl font-bold mb-6">Send Us a Message</h2>
+            <div className="bg-white rounded-lg sm:rounded-xl p-5 sm:p-6 md:p-8 shadow-md sm:shadow-lg border border-gray-100">
+              <h2 className="text-xl sm:text-2xl font-bold mb-4 sm:mb-6">Send Us a Message</h2>
               
-              <form onSubmit={handleSubmit} className="space-y-6">
+              <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
                 <div className="space-y-2">
-                  <Label htmlFor="name">Your Name</Label>
+                  <Label htmlFor="name" className="text-sm sm:text-base">Your Name</Label>
                   <Input 
                     id="name"
                     type="text"
                     placeholder="Oluwaseun Adeyemi"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    className="h-12"
+                    className="h-10 sm:h-12 text-sm sm:text-base"
                   />
                 </div>
                 
                 <div className="space-y-2">
-                  <Label htmlFor="email">Email Address</Label>
+                  <Label htmlFor="email" className="text-sm sm:text-base">Email Address</Label>
                   <Input 
                     id="email"
                     type="email"
                     placeholder="oluwaseun@example.com"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="h-12"
+                    className="h-10 sm:h-12 text-sm sm:text-base"
                   />
                 </div>
                 
                 <div className="space-y-2">
-                  <Label htmlFor="message">Message</Label>
+                  <Label htmlFor="message" className="text-sm sm:text-base">Message</Label>
                   <Textarea 
                     id="message"
                     placeholder="How can we help you?"
-                    rows={6}
+                    rows={5}
                     value={message}
                     onChange={(e) => setMessage(e.target.value)}
-                    className="resize-none"
+                    className="resize-none text-sm sm:text-base min-h-[120px]"
                   />
                 </div>
                 
@@ -180,90 +145,80 @@ const Contact = () => {
             </div>
             
             {/* Contact Info */}
-            <div className="space-y-8">
+            <div className="space-y-6 sm:space-8">
               <div>
-                <h2 className="text-2xl font-bold mb-6">Contact Information</h2>
-                <p className="text-gray-600 mb-8">
+                <h2 className="text-xl sm:text-2xl font-bold mb-4 sm:mb-6">Contact Information</h2>
+                <p className="text-sm sm:text-base text-gray-600 mb-6 sm:mb-8">
                   Our team is available Monday through Friday from 9:00 AM to 6:00 PM to assist you with any questions or concerns.
                 </p>
               </div>
               
-              <div className="space-y-6">
+              <div className="space-y-4 sm:space-y-6">
                 <div className="flex items-start">
-                  <div className="bg-primary/10 p-3 rounded-full">
-                    <Mail className="h-6 w-6 text-primary" />
+                  <div className="bg-primary/10 p-2 sm:p-3 rounded-full flex-shrink-0 mt-0.5">
+                    <Mail className="h-4 w-4 sm:h-5 sm:w-5 md:h-6 md:w-6 text-primary" />
                   </div>
-                  <div className="ml-4">
-                    <h3 className="text-lg font-bold">Email Us</h3>
-                    <p className="text-gray-600">support@cydex.com.ng</p>
-                    <p className="text-gray-500 text-sm mt-1">We'll respond within 24 hours</p>
+                  <div className="ml-3 sm:ml-4">
+                    <h3 className="text-base sm:text-lg font-bold">Email Us</h3>
+                    <p className="text-sm sm:text-base text-gray-600">support@cydex.com.ng</p>
+                    <p className="text-xs sm:text-sm text-gray-500 mt-0.5">We'll respond within 24 hours</p>
                   </div>
                 </div>
                 
                 <div className="flex items-start">
-                  <div className="bg-primary/10 p-3 rounded-full">
-                    <Phone className="h-6 w-6 text-primary" />
+                  <div className="bg-primary/10 p-2 sm:p-3 rounded-full flex-shrink-0 mt-0.5">
+                    <Phone className="h-4 w-4 sm:h-5 sm:w-5 md:h-6 md:w-6 text-primary" />
                   </div>
-                  <div className="ml-4">
-                    <h3 className="text-lg font-bold">Call Us</h3>
-                    <p className="text-gray-600">+234 801 234 5678</p>
-                    <p className="text-gray-500 text-sm mt-1">Mon-Fri, 9:00 AM - 6:00 PM</p>
+                  <div className="ml-3 sm:ml-4">
+                    <h3 className="text-base sm:text-lg font-bold">Call Us</h3>
+                    <p className="text-sm sm:text-base text-gray-600">+234 801 234 5678</p>
+                    <p className="text-xs sm:text-sm text-gray-500 mt-0.5">Mon-Fri, 9:00 AM - 6:00 PM</p>
                   </div>
                 </div>
                 
                 <div className="flex items-start">
-                  <div className="bg-primary/10 p-3 rounded-full">
-                    <MapPin className="h-6 w-6 text-primary" />
+                  <div className="bg-primary/10 p-2 sm:p-3 rounded-full flex-shrink-0 mt-0.5">
+                    <MapPin className="h-4 w-4 sm:h-5 sm:w-5 md:h-6 md:w-6 text-primary" />
                   </div>
-                  <div className="ml-4">
-                    <h3 className="text-lg font-bold">Headquarters</h3>
-                    <p className="text-gray-600">Plot 12, Ademola Adetokunbo Street</p>
-                    <p className="text-gray-600">Victoria Island, Lagos, Nigeria</p>
+                  <div className="ml-3 sm:ml-4">
+                    <h3 className="text-base sm:text-lg font-bold">Visit Us</h3>
+                    <p className="text-sm sm:text-base text-gray-600">123 Business District, Ikeja,</p>
+                    <p className="text-sm sm:text-base text-gray-600">Lagos, Nigeria</p>
                   </div>
                 </div>
               </div>
               
-              <div className="mt-12">
-                <h3 className="text-lg font-bold mb-4">Connect With Us</h3>
-                <div className="flex space-x-4">
-                  <a 
-                    href="https://facebook.com" 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="bg-gray-100 hover:bg-primary/10 transition-colors p-3 rounded-full"
-                  >
-                    <Facebook className="w-6 h-6 text-gray-600" />
+              <div className="pt-4 sm:pt-6 border-t border-gray-200 mt-6 sm:mt-8">
+                <h3 className="text-base sm:text-lg font-bold mb-3 sm:mb-4">Follow Us</h3>
+                <div className="flex space-x-2 sm:space-x-3 md:space-x-4">
+                  <a href="#" className="bg-gray-100 hover:bg-gray-200 p-2 sm:p-3 rounded-full transition-colors" aria-label="Facebook">
+                    <Facebook className="h-4 w-4 sm:h-5 sm:w-5 text-gray-700" />
                   </a>
-                  <a 
-                    href="https://twitter.com" 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="bg-gray-100 hover:bg-primary/10 transition-colors p-3 rounded-full"
-                  >
-                    <Twitter className="w-6 h-6 text-gray-600" />
+                  <a href="#" className="bg-gray-100 hover:bg-gray-200 p-2 sm:p-3 rounded-full transition-colors" aria-label="Twitter">
+                    <Twitter className="h-4 w-4 sm:h-5 sm:w-5 text-gray-700" />
                   </a>
-                  <a 
-                    href="https://instagram.com" 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="bg-gray-100 hover:bg-primary/10 transition-colors p-3 rounded-full"
-                  >
-                    <Instagram className="w-6 h-6 text-gray-600" />
+                  <a href="#" className="bg-gray-100 hover:bg-gray-200 p-2 sm:p-3 rounded-full transition-colors" aria-label="Instagram">
+                    <Instagram className="h-4 w-4 sm:h-5 sm:w-5 text-gray-700" />
                   </a>
-                  <a 
-                    href="https://linkedin.com" 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="bg-gray-100 hover:bg-primary/10 transition-colors p-3 rounded-full"
-                  >
-                    <Linkedin className="w-6 h-6 text-gray-600" />
+                  <a href="#" className="bg-gray-100 hover:bg-gray-200 p-2 sm:p-3 rounded-full transition-colors" aria-label="LinkedIn">
+                    <Linkedin className="h-4 w-4 sm:h-5 sm:w-5 text-gray-700" />
                   </a>
                 </div>
-              </div>
+              </div>      
             </div>
           </div>
         </div>
       </section>
+      
+      {/* Map Section
+      <section className="py-10 sm:py-12 md:py-16 bg-gray-50">
+        <div className="container mx-auto px-4 sm:px-6">
+          <h2 className="text-xl sm:text-2xl font-bold text-center mb-6 sm:mb-8 md:mb-10">Our Location</h2>
+          <div className="rounded-lg sm:rounded-xl overflow-hidden shadow-lg sm:shadow-xl h-[300px] sm:h-[400px] md:h-[500px] border border-gray-200">
+            <MapComponent />
+          </div>
+        </div>
+      </section> */}
       
       {/* Live Chat Support */}
       <section className="py-16 bg-primary/10">
@@ -282,10 +237,6 @@ const Contact = () => {
         </div>
       </section>
       
-      {/* Map Section */}
-      <section className="h-80">
-        <MapComponent />
-      </section>
       
       <FooterSection />
     </div>
