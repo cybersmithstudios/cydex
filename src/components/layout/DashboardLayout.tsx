@@ -20,6 +20,14 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, userRole })
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
+  console.log('DashboardLayout render:', {
+    userRole,
+    user,
+    loading,
+    isAuthenticated,
+    children: !!children
+  });
+
   const navLinks = getNavLinks(userRole);
   const userRoleTitle = getRoleTitle(userRole);
   
@@ -30,6 +38,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, userRole })
 
   // Show loading state while auth is being determined
   if (loading) {
+    console.log('DashboardLayout: Showing loading state');
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
@@ -42,9 +51,12 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, userRole })
 
   // Redirect to auth if not authenticated
   if (!isAuthenticated) {
+    console.log('DashboardLayout: Not authenticated, redirecting to auth');
     navigate('/auth');
     return null;
   }
+
+  console.log('DashboardLayout: Rendering dashboard content');
 
   return (
     <div className="min-h-screen bg-gray-50 flex">

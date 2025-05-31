@@ -14,6 +14,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [profile, setProfile] = useState<any>(null);
 
   useEffect(() => {
+    console.log('SupabaseAuthContext - Setting up auth listener');
+    
     // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
@@ -22,6 +24,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setUser(session?.user ?? null);
         
         if (session?.user) {
+          console.log('User authenticated, fetching profile...');
           // Fetch user profile without blocking authentication
           setTimeout(async () => {
             try {
@@ -34,29 +37,40 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
               if (error) {
                 console.error('Error fetching profile:', error);
                 // Create a basic profile if none exists
-                setProfile({
+                const fallbackProfile = {
                   id: session.user.id,
                   name: session.user.email?.split('@')[0] || 'User',
                   email: session.user.email,
                   role: 'CUSTOMER',
                   verified: false
-                });
+                };
+                console.log('Creating fallback profile:', fallbackProfile);
+                setProfile(fallbackProfile);
               } else {
-                setProfile(profileData);
+                // Normalize role to uppercase to match expected format
+                const normalizedProfile = {
+                  ...profileData,
+                  role: profileData.role?.toUpperCase() || 'CUSTOMER'
+                };
+                console.log('Profile loaded:', normalizedProfile);
+                setProfile(normalizedProfile);
               }
             } catch (error) {
               console.error('Profile fetch error:', error);
               // Fallback profile
-              setProfile({
+              const fallbackProfile = {
                 id: session.user.id,
                 name: session.user.email?.split('@')[0] || 'User',
                 email: session.user.email,
                 role: 'CUSTOMER',
                 verified: false
-              });
+              };
+              console.log('Creating error fallback profile:', fallbackProfile);
+              setProfile(fallbackProfile);
             }
           }, 0);
         } else {
+          console.log('User signed out, clearing profile');
           setProfile(null);
         }
         
@@ -66,6 +80,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     // Check for existing session
     supabase.auth.getSession().then(({ data: { session } }) => {
+      console.log('Initial session check:', session?.user?.id);
       setSession(session);
       setUser(session?.user ?? null);
       setLoading(false);
@@ -77,6 +92,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const login = async (email: string, password: string) => {
     setLoading(true);
     try {
+      console.log('Attempting login for:', email);
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
@@ -84,6 +100,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       if (error) throw error;
 
+      console.log('Login successful for:', email);
       toast.success('Login successful!');
     } catch (error: any) {
       console.error('Login error:', error);
@@ -123,6 +140,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const logout = async () => {
     try {
+      console.log('Attempting logout');
       const { error } = await supabase.auth.signOut();
       if (error) throw error;
       
@@ -183,6 +201,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     verified: profile.verified || false,
     avatar: profile.avatar,
   } : null;
+
+  console.log('SupabaseAuthContext state:', {
+    sessionExists: !!session,
+    userExists: !!user,
+    profileExists: !!profile,
+    authUserExists: !!authUser,
+    isAuthenticated: !!user,
+    loading
+  });
 
   const value: AuthContextType = {
     user: authUser,
