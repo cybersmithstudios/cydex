@@ -15,7 +15,7 @@ interface DashboardLayoutProps {
 }
 
 const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, userRole }) => {
-  const { user, logout, loading } = useAuth();
+  const { user, logout, loading, isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -40,8 +40,8 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, userRole })
     );
   }
 
-  // Redirect to auth if no user
-  if (!user) {
+  // Redirect to auth if not authenticated
+  if (!isAuthenticated) {
     navigate('/auth');
     return null;
   }

@@ -13,18 +13,28 @@ export const ProtectedRoute = ({
   const { isAuthenticated, user, loading } = useAuth();
   const location = useLocation();
   
-  // Show loading only for a reasonable time
+  // Show loading while determining auth state
   if (loading) {
     return <LoadingDisplay fullScreen message="Checking authentication..." size="md" />;
   }
   
-  if (!isAuthenticated || !user) {
+  if (!isAuthenticated) {
     // Pass only the pathname, search and hash as a string to avoid the Location object serialization issue
     return <Navigate to="/auth" state={{ from: location.pathname + location.search }} replace />;
   }
   
+  // If user exists but no role check needed, allow access
+  if (allowedRoles.length === 0) {
+    return children;
+  }
+  
+  // If user doesn't exist yet but is authenticated, show loading
+  if (!user) {
+    return <LoadingDisplay fullScreen message="Loading user data..." size="md" />;
+  }
+  
   // Check role if allowedRoles is provided and not empty
-  if (allowedRoles.length > 0 && !allowedRoles.includes(user.role)) {
+  if (!allowedRoles.includes(user.role)) {
     // Redirect to dashboard specific to their role
     const rolePath = user.role.toLowerCase();
     return <Navigate to={`/${rolePath}`} replace />;

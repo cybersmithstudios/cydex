@@ -22,7 +22,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setUser(session?.user ?? null);
         
         if (session?.user) {
-          // Fetch user profile
+          // Fetch user profile without blocking authentication
           setTimeout(async () => {
             try {
               const { data: profileData, error } = await supabase
@@ -33,11 +33,27 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
               
               if (error) {
                 console.error('Error fetching profile:', error);
+                // Create a basic profile if none exists
+                setProfile({
+                  id: session.user.id,
+                  name: session.user.email?.split('@')[0] || 'User',
+                  email: session.user.email,
+                  role: 'CUSTOMER',
+                  verified: false
+                });
               } else {
                 setProfile(profileData);
               }
             } catch (error) {
               console.error('Profile fetch error:', error);
+              // Fallback profile
+              setProfile({
+                id: session.user.id,
+                name: session.user.email?.split('@')[0] || 'User',
+                email: session.user.email,
+                role: 'CUSTOMER',
+                verified: false
+              });
             }
           }, 0);
         } else {
@@ -174,7 +190,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     login,
     register,
     logout,
-    isAuthenticated: !!user && !!profile,
+    isAuthenticated: !!user, // Base authentication on session user, not profile
     verifyEmail,
     resetPassword,
     updatePassword: async () => false,
