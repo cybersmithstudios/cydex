@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from "react";
 import Navbar from "@/components/Navbar";
 import FooterSection from "@/components/FooterSection";
@@ -9,7 +8,6 @@ import { Textarea } from "@/components/ui/textarea";
 import { MessageSquare, Mail, Phone, MapPin, SendHorizonal, Facebook, Twitter, Instagram, Linkedin } from "lucide-react";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
-import MapComponent from "@/components/MapComponent";
 
 const Contact = () => {
   const [name, setName] = useState("");
@@ -83,8 +81,6 @@ const Contact = () => {
           >
             Have questions about our services or want to join our mission? Our team is ready to assist you with any inquiries or feedback.
           </motion.p>
-          
-          
         </div>
       </section>
       
@@ -210,16 +206,6 @@ const Contact = () => {
         </div>
       </section>
       
-      {/* Map Section
-      <section className="py-10 sm:py-12 md:py-16 bg-gray-50">
-        <div className="container mx-auto px-4 sm:px-6">
-          <h2 className="text-xl sm:text-2xl font-bold text-center mb-6 sm:mb-8 md:mb-10">Our Location</h2>
-          <div className="rounded-lg sm:rounded-xl overflow-hidden shadow-lg sm:shadow-xl h-[300px] sm:h-[400px] md:h-[500px] border border-gray-200">
-            <MapComponent />
-          </div>
-        </div>
-      </section> */}
-      
       {/* Live Chat Support */}
       <section className="py-16 bg-primary/10">
         <div className="container mx-auto px-6 text-center">
@@ -236,7 +222,6 @@ const Contact = () => {
           </Button>
         </div>
       </section>
-      
       
       <FooterSection />
     </div>
