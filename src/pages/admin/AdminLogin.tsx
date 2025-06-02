@@ -1,170 +1,139 @@
 
-import React, { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { useAuth } from "@/contexts/SupabaseAuthContext";
-import { toast } from "sonner";
-import { Link, useNavigate } from "react-router-dom";
-import { Eye, EyeOff, ArrowLeft } from "lucide-react";
-import LoadingDisplay from "@/components/ui/LoadingDisplay";
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '@/contexts/SupabaseAuthContext';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Loader2, Shield, AlertTriangle } from 'lucide-react';
+import { toast } from 'sonner';
 
 const AdminLogin = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
   
-  const { login, isAuthenticated, user } = useAuth();
+  const { login, user, loading, isAuthenticated } = useAuth();
   const navigate = useNavigate();
-  
-  // Test credentials info
-  const testCredentials = {
-    email: "admin@cydex.com",
-    password: "admin123"
-  };
-  
-  // Effect to handle redirect after successful login
+
   useEffect(() => {
     if (isAuthenticated && user) {
-      console.log('Admin login - user role:', user.role);
       if (user.role === 'ADMIN') {
-        console.log('Redirecting to admin dashboard');
-        navigate('/admin', { replace: true });
+        navigate('/admin');
       } else {
-        toast.error("Access denied. Admin credentials required.");
-        navigate('/', { replace: true });
+        setError('Access denied. Admin privileges required.');
+        toast.error('Access denied. This area is restricted to administrators only.');
       }
     }
   }, [isAuthenticated, user, navigate]);
-  
-  const handleLogin = async (e: React.FormEvent) => {
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email || !password) {
-      toast.error("Please enter both email and password");
-      return;
-    }
-    
-    setIsSubmitting(true);
-    
+    setError('');
+    setIsLoading(true);
+
     try {
-      console.log('Attempting admin login with:', email);
       await login(email, password);
-      toast.success("Admin login successful!");
-    } catch (error) {
-      console.error("Admin login failed:", error);
-      toast.error(error instanceof Error ? error.message : "Login failed. Please try again.");
+      // The useEffect above will handle the redirect based on role
+    } catch (error: any) {
+      console.error('Admin login error:', error);
+      setError('Invalid credentials or insufficient privileges');
+      toast.error('Login failed. Please check your credentials.');
     } finally {
-      setIsSubmitting(false);
+      setIsLoading(false);
     }
   };
-  
-  const toggleShowPassword = () => {
-    setShowPassword(!showPassword);
-  };
 
-  const fillTestCredentials = () => {
-    setEmail(testCredentials.email);
-    setPassword(testCredentials.password);
-  };
-  
-  return (
-    <div className="min-h-screen bg-gradient-to-b from-white to-gray-50 flex flex-col items-center justify-center p-4">
-      <div className="w-full max-w-md">
-        <div className="mb-8 text-center">
-          <img 
-            src="/lovable-uploads/525fd30a-476a-4e14-ae55-ec2b11d54013.png" 
-            alt="Cydex Logo" 
-            className="h-12 mx-auto mb-4" 
-          />
-          <h1 className="text-2xl font-bold">Admin Login</h1>
-          <p className="text-gray-600">Access the admin dashboard</p>
+  // Show loading while checking authentication
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-primary" />
+          <p className="text-gray-600">Verifying credentials...</p>
         </div>
-        
-        <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
-          <div className="space-y-6">
-            <div className="flex items-center mb-4">
-              <Button variant="ghost" size="sm" asChild className="p-0 mr-2">
-                <Link to="/">
-                  <ArrowLeft className="h-4 w-4 mr-1" />
-                  Back to Home
-                </Link>
-              </Button>
-            </div>
-
-            {/* Test Credentials Info */}
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
-              <h3 className="text-sm font-semibold text-blue-800 mb-2">Test Credentials:</h3>
-              <p className="text-sm text-blue-700 mb-1">Email: {testCredentials.email}</p>
-              <p className="text-sm text-blue-700 mb-3">Password: {testCredentials.password}</p>
-              <Button 
-                variant="outline" 
-                size="sm" 
-                onClick={fillTestCredentials}
-                className="text-blue-600 border-blue-300 hover:bg-blue-100"
-              >
-                Use Test Credentials
-              </Button>
-            </div>
-            
-            <form onSubmit={handleLogin} className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="admin@cydex.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                />
-              </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="password">Password</Label>
-                <div className="relative">
-                  <Input
-                    id="password"
-                    type={showPassword ? "text" : "password"}
-                    placeholder="••••••••"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                  />
-                  <button 
-                    type="button"
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500"
-                    onClick={toggleShowPassword}
-                  >
-                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                  </button>
-                </div>
-              </div>
-              
-              <Button
-                type="submit"
-                className="w-full"
-                disabled={isSubmitting}
-              >
-                {isSubmitting ? "Logging in..." : "Login as Admin"}
-              </Button>
-            </form>
-            
-            {isSubmitting && (
-              <div className="mt-4">
-                <div className="flex justify-center">
-                  <LoadingDisplay size="sm" message="Verifying admin credentials..." />
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
-        
-        <p className="text-center mt-6 text-sm text-gray-600">
-          Need regular access?
-          <Link to="/auth" className="text-primary hover:underline mx-1">Go to main login</Link>
-        </p>
       </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+      <Card className="w-full max-w-md">
+        <CardHeader className="text-center">
+          <div className="mx-auto w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mb-4">
+            <Shield className="w-6 h-6 text-red-600" />
+          </div>
+          <CardTitle className="text-2xl font-bold text-gray-900">
+            Administrator Access
+          </CardTitle>
+          <CardDescription>
+            This area is restricted to authorized administrators only
+          </CardDescription>
+        </CardHeader>
+        
+        <CardContent>
+          {error && (
+            <Alert className="mb-6 border-red-200 bg-red-50">
+              <AlertTriangle className="h-4 w-4 text-red-600" />
+              <AlertDescription className="text-red-800">
+                {error}
+              </AlertDescription>
+            </Alert>
+          )}
+          
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="email">Administrator Email</Label>
+              <Input
+                id="email"
+                type="email"
+                placeholder="admin@company.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                className="w-full"
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="password">Password</Label>
+              <Input
+                id="password"
+                type="password"
+                placeholder="Enter your password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                className="w-full"
+              />
+            </div>
+            
+            <Button
+              type="submit"
+              className="w-full"
+              disabled={isLoading}
+            >
+              {isLoading ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Authenticating...
+                </>
+              ) : (
+                'Access Admin Panel'
+              )}
+            </Button>
+          </form>
+          
+          <div className="mt-6 text-center">
+            <p className="text-sm text-gray-500">
+              Only authorized personnel with administrator privileges can access this system.
+            </p>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 };

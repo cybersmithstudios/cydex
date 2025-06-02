@@ -7,13 +7,14 @@ const AdminRoutes = () => {
   return (
     <Routes>
       <Route 
-        path="/*"
+        path="/" 
         element={
           <ProtectedRoute allowedRoles={['ADMIN']}>
             <AdminDashboard />
           </ProtectedRoute>
         } 
       />
+      {/* Add more admin routes here as needed */}
     </Routes>
   );
 };
