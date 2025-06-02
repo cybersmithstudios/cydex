@@ -114,6 +114,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const register = async (name: string, email: string, password: string, role: UserRole) => {
     setLoading(true);
     try {
+      console.log('Attempting registration for:', email, 'with role:', role);
+      
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
@@ -126,9 +128,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
       });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Registration error:', error);
+        throw error;
+      }
 
-      toast.success('Registration successful! Please check your email to verify your account.');
+      console.log('Registration successful for:', email);
+      
+      // Check if email confirmation is required
+      if (data.user && !data.session) {
+        toast.success('Registration successful! Please check your email to verify your account.');
+      } else if (data.session) {
+        toast.success('Registration and login successful!');
+      }
     } catch (error: any) {
       console.error('Registration error:', error);
       toast.error(error.message || 'Registration failed');
@@ -178,16 +190,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const verifyEmail = async (email: string) => {
+  const verifyEmail = async (token: string) => {
     try {
-      const { error } = await supabase.auth.resend({
-        type: 'signup',
-        email,
+      const { error } = await supabase.auth.verifyOtp({
+        token_hash: token,
+        type: 'email'
       });
       if (error) throw error;
-      toast.success('Verification email sent!');
+      toast.success('Email verified successfully!');
     } catch (error: any) {
       console.error('Verify email error:', error);
+      toast.error(error.message || 'Failed to verify email');
       throw error;
     }
   };

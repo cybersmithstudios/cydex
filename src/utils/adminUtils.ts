@@ -25,7 +25,7 @@ export const promoteUserToAdmin = async (userId: string): Promise<boolean> => {
   try {
     const { error } = await supabase
       .from('profiles')
-      .update({ role: 'ADMIN' })
+      .update({ role: 'admin' })
       .eq('id', userId);
     
     if (error) {
@@ -63,7 +63,7 @@ export const updateUserRole = async (userId: string, role: string): Promise<bool
   try {
     const { error } = await supabase
       .from('profiles')
-      .update({ role: role.toUpperCase() })
+      .update({ role: role.toLowerCase() })
       .eq('id', userId);
     
     if (error) {
