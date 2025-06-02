@@ -21,7 +21,6 @@ const AppRoutes = () => {
       <Route path="/" element={<Index />} />
       <Route path="/auth" element={<Auth />} />
       <Route path="/auth/reset-password" element={<ResetPassword />} />
-      <Route path="/admin/login" element={<AdminLogin />} />
       <Route path="/how-it-works" element={<HowItWorks />} />
       <Route path="/about" element={<AboutUs />} />
       <Route path="/faq" element={<Faq />} />
@@ -31,6 +30,7 @@ const AppRoutes = () => {
       <Route path="/customer/*" element={<CustomerRoutes />} />
       <Route path="/vendor/*" element={<VendorRoutes />} />
       <Route path="/rider/*" element={<RiderRoutes />} />
+      <Route path="/admin/login" element={<AdminLogin />} />
       <Route path="/admin/*" element={<AdminRoutes />} />
       
       {/* Catch-all route for 404 */}
