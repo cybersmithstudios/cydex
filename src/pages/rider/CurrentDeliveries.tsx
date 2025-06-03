@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useAuth } from '@/contexts/SupabaseAuthContext';
 import DashboardLayout from '@/components/layout/DashboardLayout';
@@ -132,13 +131,13 @@ const CurrentDeliveriesPage = () => {
   const getStatusBadge = (status) => {
     switch (status) {
       case 'picking-up':
-        return <Badge className="bg-blue-500">Picking Up</Badge>;
+        return <Badge className="bg-blue-500 text-xs">Picking Up</Badge>;
       case 'delivering':
-        return <Badge className="bg-amber-500">Delivering</Badge>;
+        return <Badge className="bg-amber-500 text-xs">Delivering</Badge>;
       case 'completed':
-        return <Badge className="bg-green-500">Completed</Badge>;
+        return <Badge className="bg-green-500 text-xs">Completed</Badge>;
       default:
-        return <Badge>Unknown</Badge>;
+        return <Badge className="text-xs">Unknown</Badge>;
     }
   };
 
@@ -177,175 +176,175 @@ const CurrentDeliveriesPage = () => {
 
   return (
     <DashboardLayout userRole="RIDER">
-      <div className="p-4 md:p-6 max-w-7xl mx-auto">
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+      <div className="p-2 sm:p-4 md:p-6 max-w-7xl mx-auto">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-3 sm:mb-4 md:mb-6 gap-3 sm:gap-4">
           <div>
-            <h1 className="text-2xl font-bold">Current Deliveries</h1>
-            <p className="text-gray-600">Track and manage your active deliveries</p>
+            <h1 className="text-lg sm:text-xl md:text-2xl font-bold">Current Deliveries</h1>
+            <p className="text-sm sm:text-base text-gray-600">Track and manage your active deliveries</p>
           </div>
-          <Button className="bg-primary hover:bg-primary-hover text-black">
-            <Navigation className="mr-2 h-5 w-5" />
+          <Button className="bg-primary hover:bg-primary-hover text-black text-xs sm:text-sm h-8 sm:h-9">
+            <Navigation className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4 md:h-5 md:w-5" />
             Open Navigation
           </Button>
         </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-3 md:gap-4 mb-3 sm:mb-4 md:mb-6">
           <Card>
-            <CardContent className="p-4 flex flex-row items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-500">Active Deliveries</p>
-                <p className="text-2xl font-bold">{pendingCount}</p>
+            <CardContent className="p-2 sm:p-3 md:p-4 flex flex-row items-center justify-between">
+              <div className="min-w-0">
+                <p className="text-xs sm:text-sm text-gray-500 truncate">Active Deliveries</p>
+                <p className="text-lg sm:text-xl md:text-2xl font-bold">{pendingCount}</p>
               </div>
-              <div className="p-3 bg-blue-100 rounded-full">
-                <Package className="h-5 w-5 text-blue-600" />
+              <div className="p-2 sm:p-3 bg-blue-100 rounded-full flex-shrink-0">
+                <Package className="h-3 w-3 sm:h-4 sm:w-4 md:h-5 md:w-5 text-blue-600" />
               </div>
             </CardContent>
           </Card>
           
           <Card>
-            <CardContent className="p-4 flex flex-row items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-500">Today's Completed</p>
-                <p className="text-2xl font-bold">{completedCount}</p>
+            <CardContent className="p-2 sm:p-3 md:p-4 flex flex-row items-center justify-between">
+              <div className="min-w-0">
+                <p className="text-xs sm:text-sm text-gray-500 truncate">Today's Completed</p>
+                <p className="text-lg sm:text-xl md:text-2xl font-bold">{completedCount}</p>
               </div>
-              <div className="p-3 bg-green-100 rounded-full">
-                <CheckCircle className="h-5 w-5 text-green-600" />
+              <div className="p-2 sm:p-3 bg-green-100 rounded-full flex-shrink-0">
+                <CheckCircle className="h-3 w-3 sm:h-4 sm:w-4 md:h-5 md:w-5 text-green-600" />
               </div>
             </CardContent>
           </Card>
           
           <Card>
-            <CardContent className="p-4 flex flex-row items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-500">Earnings Today</p>
-                <p className="text-2xl font-bold">₦{
+            <CardContent className="p-2 sm:p-3 md:p-4 flex flex-row items-center justify-between">
+              <div className="min-w-0">
+                <p className="text-xs sm:text-sm text-gray-500 truncate">Earnings Today</p>
+                <p className="text-lg sm:text-xl md:text-2xl font-bold">₦{
                   [...mockCurrentDeliveries, ...mockCompletedDeliveries].reduce(
                     (sum, delivery) => sum + delivery.fee + delivery.ecoBonus + (delivery.tip || 0), 0
                   ).toLocaleString('en-NG', {maximumFractionDigits: 2})
                 }</p>
               </div>
-              <div className="p-3 bg-amber-100 rounded-full">
-                <Leaf className="h-5 w-5 text-amber-600" />
+              <div className="p-2 sm:p-3 bg-amber-100 rounded-full flex-shrink-0">
+                <Leaf className="h-3 w-3 sm:h-4 sm:w-4 md:h-5 md:w-5 text-amber-600" />
               </div>
             </CardContent>
           </Card>
           
           <Card>
-            <CardContent className="p-4 flex flex-row items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-500">Carbon Saved</p>
-                <p className="text-2xl font-bold">{
+            <CardContent className="p-2 sm:p-3 md:p-4 flex flex-row items-center justify-between">
+              <div className="min-w-0">
+                <p className="text-xs sm:text-sm text-gray-500 truncate">Carbon Saved</p>
+                <p className="text-lg sm:text-xl md:text-2xl font-bold">{
                   [...mockCurrentDeliveries, ...mockCompletedDeliveries].reduce(
                     (sum, delivery) => sum + delivery.carbonSaved, 0
                   ).toFixed(1)} kg</p>
               </div>
-              <div className="p-3 bg-green-100 rounded-full">
-                <Leaf className="h-5 w-5 text-green-600" />
+              <div className="p-2 sm:p-3 bg-green-100 rounded-full flex-shrink-0">
+                <Leaf className="h-3 w-3 sm:h-4 sm:w-4 md:h-5 md:w-5 text-green-600" />
               </div>
             </CardContent>
           </Card>
         </div>
 
         {/* Tabs for deliveries */}
-        <Tabs defaultValue="active" className="mb-6">
-          <TabsList>
-            <TabsTrigger value="active">Active Deliveries ({pendingCount})</TabsTrigger>
-            <TabsTrigger value="completed">Completed Today ({completedCount})</TabsTrigger>
+        <Tabs defaultValue="active" className="mb-3 sm:mb-4 md:mb-6">
+          <TabsList className="w-full">
+            <TabsTrigger value="active" className="text-xs sm:text-sm flex-1">Active Deliveries ({pendingCount})</TabsTrigger>
+            <TabsTrigger value="completed" className="text-xs sm:text-sm flex-1">Completed Today ({completedCount})</TabsTrigger>
           </TabsList>
           
           <TabsContent value="active">
             {mockCurrentDeliveries.length > 0 ? (
-              <div className="space-y-6">
+              <div className="space-y-3 sm:space-y-4 md:space-y-6">
                 {mockCurrentDeliveries.map((delivery) => (
                   <Card key={delivery.id} className="overflow-hidden border-2 border-primary-light">
                     <CardContent className="p-0">
-                      <div className="p-4 border-b bg-gray-50 flex justify-between items-center">
-                        <div className="flex items-center">
-                          <div className="mr-3">
+                      <div className="p-2 sm:p-3 md:p-4 border-b bg-gray-50 flex justify-between items-center">
+                        <div className="flex items-center min-w-0 flex-1">
+                          <div className="mr-2 sm:mr-3 flex-shrink-0">
                             {getStatusBadge(delivery.status)}
                           </div>
-                          <h3 className="font-medium">{delivery.id}</h3>
+                          <h3 className="font-medium text-sm sm:text-base truncate">{delivery.id}</h3>
                         </div>
-                        <p className="text-sm text-gray-600">
+                        <p className="text-xs sm:text-sm text-gray-600 flex-shrink-0">
                           Started at {delivery.startedAt}
                         </p>
                       </div>
 
-                      <div className="p-4">
-                        <div className="flex flex-col md:flex-row justify-between mb-4">
-                          <div className="mb-4 md:mb-0">
+                      <div className="p-2 sm:p-3 md:p-4">
+                        <div className="flex flex-col lg:flex-row justify-between mb-3 sm:mb-4">
+                          <div className="mb-3 sm:mb-4 lg:mb-0">
                             <div className="flex items-center mb-2">
-                              <div className="p-2 bg-primary-light rounded-full">
+                              <div className="p-1.5 sm:p-2 bg-primary-light rounded-full flex-shrink-0">
                                 {delivery.status === 'picking-up' ? (
-                                  <MapPin className="h-5 w-5 text-primary" />
+                                  <MapPin className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
                                 ) : (
-                                  <Package className="h-5 w-5 text-primary" />
+                                  <Package className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
                                 )}
                               </div>
-                              <h3 className="ml-2 font-medium">
+                              <h3 className="ml-2 font-medium text-sm sm:text-base min-w-0">
                                 {delivery.status === 'picking-up' ? (
-                                  <>Picking up from <span className="font-semibold">{delivery.vendor}</span></>
+                                  <>Picking up from <span className="font-semibold truncate">{delivery.vendor}</span></>
                                 ) : (
-                                  <>Delivering to <span className="font-semibold">{delivery.customer}</span></>
+                                  <>Delivering to <span className="font-semibold truncate">{delivery.customer}</span></>
                                 )}
                               </h3>
                             </div>
                             
-                            <p className="text-sm text-gray-600 ml-9">
+                            <p className="text-xs sm:text-sm text-gray-600 ml-7 sm:ml-9 truncate">
                               {delivery.status === 'picking-up' ? delivery.pickupLocation : delivery.dropoffLocation}
                             </p>
                             
-                            <div className="flex items-center mt-3 ml-9">
-                              <Clock className="h-4 w-4 text-gray-500 mr-1" />
-                              <span className="text-sm text-gray-600">ETA: {delivery.eta}</span>
+                            <div className="flex items-center mt-2 sm:mt-3 ml-7 sm:ml-9">
+                              <Clock className="h-3 w-3 sm:h-4 sm:w-4 text-gray-500 mr-1" />
+                              <span className="text-xs sm:text-sm text-gray-600">ETA: {delivery.eta}</span>
                             </div>
                           </div>
                           
-                          <div className="flex flex-col items-start md:items-end">
-                            <p className="font-medium text-lg mb-1">
+                          <div className="flex flex-col items-start lg:items-end">
+                            <p className="font-medium text-base sm:text-lg mb-1">
                               ₦{(delivery.fee + delivery.ecoBonus + (delivery.tip || 0)).toLocaleString('en-NG', {minimumFractionDigits: 2, maximumFractionDigits: 2})}
                             </p>
-                            <div className="text-sm text-green-600 mb-2">
+                            <div className="text-xs sm:text-sm text-green-600 mb-2">
                               +₦{delivery.ecoBonus.toLocaleString('en-NG', {maximumFractionDigits: 2})} eco bonus
                             </div>
-                            <div className="flex space-x-2">
-                              <Button variant="outline" size="sm" className="text-xs" onClick={() => handleViewDelivery(delivery)}>
+                            <div className="flex flex-col sm:flex-row gap-2">
+                              <Button variant="outline" size="sm" className="text-xs h-7 sm:h-8" onClick={() => handleViewDelivery(delivery)}>
                                 View Details
                               </Button>
-                              <Button variant="outline" size="sm" className="text-xs" onClick={() => handleReportIssue(delivery)}>
+                              <Button variant="outline" size="sm" className="text-xs h-7 sm:h-8" onClick={() => handleReportIssue(delivery)}>
                                 Report Issue
                               </Button>
                             </div>
                           </div>
                         </div>
                         
-                        <div className="mb-4">
-                          <div className="flex justify-between items-center text-sm mb-1">
+                        <div className="mb-3 sm:mb-4">
+                          <div className="flex justify-between items-center text-xs sm:text-sm mb-1">
                             <span>{delivery.status === 'picking-up' ? 'On way to pickup' : 'On way to destination'}</span>
                             <span>ETA: {delivery.estimatedArrival}</span>
                           </div>
                           <Progress value={delivery.progress} className="h-2" />
                         </div>
 
-                        <div className="flex flex-wrap gap-2 justify-center md:justify-between">
-                          <Button variant="outline" className="flex-1 max-w-[200px]">
-                            <Phone className="mr-2 h-4 w-4" />
+                        <div className="flex flex-col sm:flex-row gap-2">
+                          <Button variant="outline" className="flex-1 text-xs sm:text-sm h-8 sm:h-9">
+                            <Phone className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" />
                             Call {delivery.status === 'picking-up' ? 'Vendor' : 'Customer'}
                           </Button>
-                          <Button variant="outline" className="flex-1 max-w-[200px]">
-                            <MessageSquare className="mr-2 h-4 w-4" />
+                          <Button variant="outline" className="flex-1 text-xs sm:text-sm h-8 sm:h-9">
+                            <MessageSquare className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" />
                             Message
                           </Button>
-                          <Button className="flex-1 max-w-[200px] bg-primary hover:bg-primary-hover text-black" onClick={() => delivery.status === 'picking-up' ? handleUploadProof(delivery) : handleMarkAsDelivered(delivery)}>
+                          <Button className="flex-1 bg-primary hover:bg-primary-hover text-black text-xs sm:text-sm h-8 sm:h-9" onClick={() => delivery.status === 'picking-up' ? handleUploadProof(delivery) : handleMarkAsDelivered(delivery)}>
                             {delivery.status === 'picking-up' ? (
                               <>
-                                <Camera className="mr-2 h-4 w-4" />
+                                <Camera className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" />
                                 Confirm Pickup
                               </>
                             ) : (
                               <>
-                                <CheckCircle className="mr-2 h-4 w-4" />
+                                <CheckCircle className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" />
                                 Mark Delivered
                               </>
                             )}
@@ -358,13 +357,13 @@ const CurrentDeliveriesPage = () => {
               </div>
             ) : (
               <Card>
-                <CardContent className="flex flex-col items-center justify-center py-10">
-                  <Package className="h-16 w-16 text-gray-300 mb-4" />
-                  <h3 className="text-lg font-medium mb-2">No active deliveries</h3>
-                  <p className="text-gray-500 text-center max-w-md mb-4">
+                <CardContent className="flex flex-col items-center justify-center py-8 sm:py-10">
+                  <Package className="h-12 w-12 sm:h-16 sm:w-16 text-gray-300 mb-3 sm:mb-4" />
+                  <h3 className="text-base sm:text-lg font-medium mb-2">No active deliveries</h3>
+                  <p className="text-gray-500 text-center max-w-md mb-3 sm:mb-4 text-sm sm:text-base">
                     You don't have any active deliveries at the moment. Check the available orders to start delivering!
                   </p>
-                  <Button className="bg-primary hover:bg-primary-hover text-black">
+                  <Button className="bg-primary hover:bg-primary-hover text-black text-xs sm:text-sm h-8 sm:h-9">
                     View Available Orders
                   </Button>
                 </CardContent>
@@ -373,33 +372,33 @@ const CurrentDeliveriesPage = () => {
           </TabsContent>
           
           <TabsContent value="completed">
-            <div className="space-y-4">
+            <div className="space-y-3 sm:space-y-4">
               {mockCompletedDeliveries.map((delivery) => (
                 <Card key={delivery.id} className="hover:shadow-sm transition-shadow">
-                  <CardContent className="p-4">
-                    <div className="flex flex-col md:flex-row justify-between">
+                  <CardContent className="p-3 sm:p-4">
+                    <div className="flex flex-col sm:flex-row justify-between">
                       <div className="flex items-start space-x-3">
-                        <div className="p-3 bg-green-100 rounded-full">
-                          <CheckCircle className="h-5 w-5 text-green-600" />
+                        <div className="p-2 sm:p-3 bg-green-100 rounded-full flex-shrink-0">
+                          <CheckCircle className="h-4 w-4 sm:h-5 sm:w-5 text-green-600" />
                         </div>
                         
-                        <div>
-                          <div className="flex items-center">
-                            <Badge className="bg-green-500">Completed</Badge>
-                            <span className="mx-2 text-gray-500">•</span>
-                            <span className="text-sm font-medium">{delivery.id}</span>
+                        <div className="min-w-0 flex-1">
+                          <div className="flex items-center flex-wrap gap-1 sm:gap-2">
+                            <Badge className="bg-green-500 text-xs">Completed</Badge>
+                            <span className="mx-1 sm:mx-2 text-gray-500 hidden sm:inline">•</span>
+                            <span className="text-xs sm:text-sm font-medium">{delivery.id}</span>
                           </div>
                           
-                          <h3 className="font-medium mt-2">
+                          <h3 className="font-medium mt-2 text-sm sm:text-base truncate">
                             {delivery.vendor} → {delivery.customer}
                           </h3>
                           
-                          <div className="mt-1 flex items-center text-sm text-gray-600">
-                            <MapPin className="h-4 w-4 mr-1" />
-                            <span>{delivery.address}</span>
+                          <div className="mt-1 flex items-center text-xs sm:text-sm text-gray-600">
+                            <MapPin className="h-3 w-3 sm:h-4 sm:w-4 mr-1 flex-shrink-0" />
+                            <span className="truncate">{delivery.address}</span>
                           </div>
                           
-                          <div className="mt-2 flex flex-wrap gap-3 text-sm text-gray-600">
+                          <div className="mt-2 flex flex-wrap gap-2 sm:gap-3 text-xs sm:text-sm text-gray-600">
                             <div>
                               <span className="font-medium">{delivery.items}</span> items
                             </div>
@@ -407,33 +406,33 @@ const CurrentDeliveriesPage = () => {
                               Completed: <span className="font-medium">{delivery.completedAt}</span>
                             </div>
                             <div className="flex items-center text-green-600">
-                              <Leaf className="h-4 w-4 mr-1" />
+                              <Leaf className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
                               <span>{delivery.carbonSaved} kg CO₂ saved</span>
                             </div>
                           </div>
                         </div>
                       </div>
                       
-                      <div className="mt-4 md:mt-0 md:text-right">
-                        <p className="font-medium text-lg">
+                      <div className="mt-3 sm:mt-0 sm:text-right sm:ml-4">
+                        <p className="font-medium text-base sm:text-lg">
                           ₦{(delivery.fee + delivery.ecoBonus + delivery.tip).toLocaleString('en-NG', {minimumFractionDigits: 2, maximumFractionDigits: 2})}
                         </p>
-                        <div className="text-sm text-green-600">
+                        <div className="text-xs sm:text-sm text-green-600">
                           +₦{delivery.ecoBonus.toLocaleString('en-NG', {maximumFractionDigits: 2})} eco bonus
                         </div>
                         {delivery.tip > 0 && (
-                          <div className="text-sm text-blue-600">
+                          <div className="text-xs sm:text-sm text-blue-600">
                             +₦{delivery.tip.toLocaleString('en-NG', {maximumFractionDigits: 2})} tip
                           </div>
                         )}
                         
-                        <div className="flex items-center justify-end mt-2">
-                          <span className="text-sm mr-2">Rating:</span>
+                        <div className="flex items-center justify-start sm:justify-end mt-2">
+                          <span className="text-xs sm:text-sm mr-2">Rating:</span>
                           <div className="flex">
                             {[...Array(5)].map((_, i) => (
                               <svg 
                                 key={i} 
-                                className={`w-4 h-4 ${i < delivery.rating ? 'text-amber-500' : 'text-gray-300'}`} 
+                                className={`w-3 h-3 sm:w-4 sm:h-4 ${i < delivery.rating ? 'text-amber-500' : 'text-gray-300'}`} 
                                 fill="currentColor" 
                                 viewBox="0 0 24 24"
                               >
@@ -453,29 +452,29 @@ const CurrentDeliveriesPage = () => {
 
         {/* Delivery Details Dialog */}
         <Dialog open={showDeliveryDialog} onOpenChange={setShowDeliveryDialog}>
-          <DialogContent className="sm:max-w-md">
+          <DialogContent className="sm:max-w-md max-h-[90vh] overflow-y-auto">
             <DialogHeader>
-              <DialogTitle>Delivery Details</DialogTitle>
-              <DialogDescription>
+              <DialogTitle className="text-base sm:text-lg">Delivery Details</DialogTitle>
+              <DialogDescription className="text-sm">
                 {selectedDelivery?.id} - {selectedDelivery?.status === 'picking-up' ? 'Picking Up' : 'Delivering'}
               </DialogDescription>
             </DialogHeader>
             
             {selectedDelivery && (
-              <div className="space-y-4">
+              <div className="space-y-3 sm:space-y-4">
                 <div>
-                  <h4 className="font-medium mb-2">{selectedDelivery.status === 'picking-up' ? 'Pickup Information' : 'Delivery Information'}</h4>
+                  <h4 className="font-medium mb-2 text-sm sm:text-base">{selectedDelivery.status === 'picking-up' ? 'Pickup Information' : 'Delivery Information'}</h4>
                   <Card className="bg-gray-50">
-                    <CardContent className="p-3">
+                    <CardContent className="p-2 sm:p-3">
                       <div className="flex items-start space-x-3">
-                        <MapPin className="h-5 w-5 text-gray-500 mt-0.5" />
-                        <div>
-                          <p className="font-medium">{selectedDelivery.status === 'picking-up' ? selectedDelivery.vendor : selectedDelivery.customer}</p>
-                          <p className="text-sm text-gray-600">
+                        <MapPin className="h-4 w-4 sm:h-5 sm:w-5 text-gray-500 mt-0.5 flex-shrink-0" />
+                        <div className="min-w-0">
+                          <p className="font-medium text-sm sm:text-base truncate">{selectedDelivery.status === 'picking-up' ? selectedDelivery.vendor : selectedDelivery.customer}</p>
+                          <p className="text-xs sm:text-sm text-gray-600">
                             {selectedDelivery.status === 'picking-up' ? selectedDelivery.pickupLocation : selectedDelivery.dropoffLocation}
                           </p>
                           {selectedDelivery.status === 'delivering' && (
-                            <p className="text-sm text-gray-600 mt-1">
+                            <p className="text-xs sm:text-sm text-gray-600 mt-1">
                               Contact: {selectedDelivery.customerContact}
                             </p>
                           )}
@@ -486,19 +485,19 @@ const CurrentDeliveriesPage = () => {
                 </div>
                 
                 <div>
-                  <h4 className="font-medium mb-2">Items ({selectedDelivery.items.length})</h4>
+                  <h4 className="font-medium mb-2 text-sm sm:text-base">Items ({selectedDelivery.items.length})</h4>
                   <div className="space-y-2">
                     {selectedDelivery.items.map(item => (
                       <div 
                         key={item.id}
-                        className={`p-3 border rounded-lg cursor-pointer transition-colors ${
+                        className={`p-2 sm:p-3 border rounded-lg cursor-pointer transition-colors ${
                           selectedItem?.id === item.id ? 'border-primary bg-primary-light' : 'hover:bg-gray-50'
                         }`}
                         onClick={() => handleItemClick(item)}
                       >
                         <div className="flex justify-between">
-                          <p>{item.name}</p>
-                          <p className="text-gray-600">x{item.quantity}</p>
+                          <p className="text-sm sm:text-base truncate">{item.name}</p>
+                          <p className="text-gray-600 text-sm">x{item.quantity}</p>
                         </div>
                       </div>
                     ))}
@@ -507,16 +506,16 @@ const CurrentDeliveriesPage = () => {
                 
                 {selectedDelivery.customerNotes && (
                   <div>
-                    <h4 className="font-medium mb-2">Customer Notes</h4>
-                    <p className="text-sm bg-amber-50 p-3 rounded-lg border border-amber-100">
+                    <h4 className="font-medium mb-2 text-sm sm:text-base">Customer Notes</h4>
+                    <p className="text-xs sm:text-sm bg-amber-50 p-2 sm:p-3 rounded-lg border border-amber-100">
                       {selectedDelivery.customerNotes}
                     </p>
                   </div>
                 )}
                 
                 <div>
-                  <h4 className="font-medium mb-2">Payment Details</h4>
-                  <div className="space-y-2 text-sm">
+                  <h4 className="font-medium mb-2 text-sm sm:text-base">Payment Details</h4>
+                  <div className="space-y-2 text-xs sm:text-sm">
                     <div className="flex justify-between">
                       <span>Delivery Fee</span>
                       <span>₦{selectedDelivery.fee.toLocaleString('en-NG', {maximumFractionDigits: 2})}</span>
@@ -540,23 +539,24 @@ const CurrentDeliveriesPage = () => {
               </div>
             )}
             
-            <DialogFooter className="flex space-x-2 sm:justify-between">
-              <Button variant="outline" onClick={() => setShowDeliveryDialog(false)}>
+            <DialogFooter className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2 sm:justify-between">
+              <Button variant="outline" onClick={() => setShowDeliveryDialog(false)} className="text-xs sm:text-sm h-8 sm:h-9">
                 Close
               </Button>
-              <div className="flex space-x-2">
+              <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2">
                 <Button 
                   variant="outline"
                   onClick={() => {
                     setShowDeliveryDialog(false);
                     handleReportIssue(selectedDelivery);
                   }}
+                  className="text-xs sm:text-sm h-8 sm:h-9"
                 >
-                  <AlertCircle className="mr-2 h-4 w-4" />
+                  <AlertCircle className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" />
                   Report Issue
                 </Button>
                 <Button 
-                  className="bg-primary hover:bg-primary-hover text-black"
+                  className="bg-primary hover:bg-primary-hover text-black text-xs sm:text-sm h-8 sm:h-9"
                   onClick={() => {
                     setShowDeliveryDialog(false);
                     selectedDelivery?.status === 'picking-up' ? 
@@ -566,12 +566,12 @@ const CurrentDeliveriesPage = () => {
                 >
                   {selectedDelivery?.status === 'picking-up' ? (
                     <>
-                      <Camera className="mr-2 h-4 w-4" />
+                      <Camera className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" />
                       Confirm Pickup
                     </>
                   ) : (
                     <>
-                      <CheckCircle className="mr-2 h-4 w-4" />
+                      <CheckCircle className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" />
                       Mark Delivered
                     </>
                   )}
@@ -583,20 +583,20 @@ const CurrentDeliveriesPage = () => {
         
         {/* Issue Report Dialog */}
         <Dialog open={showIssueDialog} onOpenChange={setShowIssueDialog}>
-          <DialogContent>
+          <DialogContent className="max-h-[90vh] overflow-y-auto">
             <DialogHeader>
-              <DialogTitle>Report an Issue</DialogTitle>
-              <DialogDescription>
+              <DialogTitle className="text-base sm:text-lg">Report an Issue</DialogTitle>
+              <DialogDescription className="text-sm">
                 Describe the issue you're experiencing with order {selectedDelivery?.id}
               </DialogDescription>
             </DialogHeader>
             
-            <div className="space-y-4">
+            <div className="space-y-3 sm:space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="issue-type">Issue Type</Label>
+                <Label htmlFor="issue-type" className="text-sm">Issue Type</Label>
                 <select 
                   id="issue-type"
-                  className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+                  className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary text-sm h-8 sm:h-9"
                 >
                   <option>Unable to find pickup location</option>
                   <option>Customer unavailable at delivery location</option>
@@ -608,10 +608,10 @@ const CurrentDeliveriesPage = () => {
               </div>
               
               <div className="space-y-2">
-                <Label htmlFor="issue-description">Description</Label>
+                <Label htmlFor="issue-description" className="text-sm">Description</Label>
                 <textarea 
                   id="issue-description"
-                  className="w-full h-24 p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+                  className="w-full h-20 sm:h-24 p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary text-sm"
                   placeholder="Provide details about the issue..."
                   value={issueDescription}
                   onChange={(e) => setIssueDescription(e.target.value)}
@@ -619,22 +619,23 @@ const CurrentDeliveriesPage = () => {
               </div>
               
               <div className="space-y-2">
-                <Label htmlFor="issue-photos">Upload Photos (Optional)</Label>
+                <Label htmlFor="issue-photos" className="text-sm">Upload Photos (Optional)</Label>
                 <Input 
                   id="issue-photos"
                   type="file" 
                   accept="image/*"
                   multiple
+                  className="text-sm h-8 sm:h-9"
                 />
               </div>
             </div>
             
-            <DialogFooter>
-              <Button variant="outline" onClick={() => setShowIssueDialog(false)}>
+            <DialogFooter className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2">
+              <Button variant="outline" onClick={() => setShowIssueDialog(false)} className="text-xs sm:text-sm h-8 sm:h-9">
                 Cancel
               </Button>
               <Button 
-                className="bg-primary hover:bg-primary-hover text-black"
+                className="bg-primary hover:bg-primary-hover text-black text-xs sm:text-sm h-8 sm:h-9"
                 onClick={() => {
                   console.log('Issue reported:', {
                     orderId: selectedDelivery?.id,
@@ -652,50 +653,51 @@ const CurrentDeliveriesPage = () => {
         
         {/* Mark as Delivered Dialog */}
         <Dialog open={showCompletionDialog} onOpenChange={setShowCompletionDialog}>
-          <DialogContent>
+          <DialogContent className="max-h-[90vh] overflow-y-auto">
             <DialogHeader>
-              <DialogTitle>Complete Delivery</DialogTitle>
-              <DialogDescription>
+              <DialogTitle className="text-base sm:text-lg">Complete Delivery</DialogTitle>
+              <DialogDescription className="text-sm">
                 Confirm delivery of order {selectedDelivery?.id} to {selectedDelivery?.customer}
               </DialogDescription>
             </DialogHeader>
             
-            <div className="space-y-4">
+            <div className="space-y-3 sm:space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="delivery-photos">Upload Delivery Proof</Label>
+                <Label htmlFor="delivery-photos" className="text-sm">Upload Delivery Proof</Label>
                 <Input 
                   id="delivery-photos"
                   type="file" 
                   accept="image/*"
                   required
+                  className="text-sm h-8 sm:h-9"
                 />
                 <p className="text-xs text-gray-500">Please take a clear photo of the delivered package</p>
               </div>
               
               <div className="space-y-2">
-                <Label htmlFor="delivery-notes">Delivery Notes (Optional)</Label>
+                <Label htmlFor="delivery-notes" className="text-sm">Delivery Notes (Optional)</Label>
                 <textarea 
                   id="delivery-notes"
-                  className="w-full h-24 p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+                  className="w-full h-20 sm:h-24 p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary text-sm"
                   placeholder="Add any notes about this delivery..."
                 />
               </div>
               
               <div className="flex items-center space-x-2">
                 <input type="checkbox" id="contactless" className="rounded text-primary" />
-                <Label htmlFor="contactless">This was a contactless delivery</Label>
+                <Label htmlFor="contactless" className="text-sm">This was a contactless delivery</Label>
               </div>
             </div>
             
-            <DialogFooter>
-              <Button variant="outline" onClick={() => setShowCompletionDialog(false)}>
+            <DialogFooter className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2">
+              <Button variant="outline" onClick={() => setShowCompletionDialog(false)} className="text-xs sm:text-sm h-8 sm:h-9">
                 Cancel
               </Button>
               <Button 
-                className="bg-primary hover:bg-primary-hover text-black"
+                className="bg-primary hover:bg-primary-hover text-black text-xs sm:text-sm h-8 sm:h-9"
                 onClick={handleCompleteDelivery}
               >
-                <CheckCircle className="mr-2 h-4 w-4" />
+                <CheckCircle className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" />
                 Complete Delivery
               </Button>
             </DialogFooter>
@@ -704,58 +706,59 @@ const CurrentDeliveriesPage = () => {
         
         {/* Proof of Pickup Dialog */}
         <Dialog open={showProofDialog} onOpenChange={setShowProofDialog}>
-          <DialogContent>
+          <DialogContent className="max-h-[90vh] overflow-y-auto">
             <DialogHeader>
-              <DialogTitle>Confirm Pickup</DialogTitle>
-              <DialogDescription>
+              <DialogTitle className="text-base sm:text-lg">Confirm Pickup</DialogTitle>
+              <DialogDescription className="text-sm">
                 Verify pickup of order {selectedDelivery?.id} from {selectedDelivery?.vendor}
               </DialogDescription>
             </DialogHeader>
             
-            <div className="space-y-4">
+            <div className="space-y-3 sm:space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="pickup-photos">Upload Pickup Proof</Label>
+                <Label htmlFor="pickup-photos" className="text-sm">Upload Pickup Proof</Label>
                 <Input 
                   id="pickup-photos"
                   type="file" 
                   accept="image/*"
                   required
+                  className="text-sm h-8 sm:h-9"
                 />
                 <p className="text-xs text-gray-500">Please take a clear photo of the picked up items</p>
               </div>
               
               <div className="space-y-2">
-                <Label htmlFor="pickup-notes">Pickup Notes (Optional)</Label>
+                <Label htmlFor="pickup-notes" className="text-sm">Pickup Notes (Optional)</Label>
                 <textarea 
                   id="pickup-notes"
-                  className="w-full h-24 p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+                  className="w-full h-20 sm:h-24 p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary text-sm"
                   placeholder="Add any notes about this pickup..."
                 />
               </div>
               
               <div className="space-y-2">
-                <p className="font-medium">Verify Items:</p>
+                <p className="font-medium text-sm">Verify Items:</p>
                 {selectedDelivery?.items.map(item => (
                   <div key={item.id} className="flex items-center space-x-2">
                     <input type="checkbox" id={`item-${item.id}`} className="rounded text-primary" />
-                    <Label htmlFor={`item-${item.id}`}>{item.name} (x{item.quantity})</Label>
+                    <Label htmlFor={`item-${item.id}`} className="text-sm">{item.name} (x{item.quantity})</Label>
                   </div>
                 ))}
               </div>
             </div>
             
-            <DialogFooter>
-              <Button variant="outline" onClick={() => setShowProofDialog(false)}>
+            <DialogFooter className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2">
+              <Button variant="outline" onClick={() => setShowProofDialog(false)} className="text-xs sm:text-sm h-8 sm:h-9">
                 Cancel
               </Button>
               <Button 
-                className="bg-primary hover:bg-primary-hover text-black"
+                className="bg-primary hover:bg-primary-hover text-black text-xs sm:text-sm h-8 sm:h-9"
                 onClick={() => {
                   console.log('Pickup confirmed:', selectedDelivery?.id);
                   setShowProofDialog(false);
                 }}
               >
-                <CheckCircle className="mr-2 h-4 w-4" />
+                <CheckCircle className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" />
                 Confirm Pickup
               </Button>
             </DialogFooter>
