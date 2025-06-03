@@ -35,7 +35,9 @@ const OrderDetailPage = () => {
   if (loading) {
     return (
       <DashboardLayout userRole="CUSTOMER">
-        <OrderDetailLoading />
+        <div className="p-2 sm:p-4 md:p-6 max-w-full mx-auto">
+          <OrderDetailLoading />
+        </div>
       </DashboardLayout>
     );
   }
@@ -43,16 +45,18 @@ const OrderDetailPage = () => {
   if (error || !order) {
     return (
       <DashboardLayout userRole="CUSTOMER">
-        <OrderNotFound message={error || undefined} />
+        <div className="p-2 sm:p-4 md:p-6 max-w-full mx-auto">
+          <OrderNotFound message={error || undefined} />
+        </div>
       </DashboardLayout>
     );
   }
 
   return (
     <DashboardLayout userRole="CUSTOMER">
-      <div className="p-2 sm:p-4 md:p-6 max-w-full mx-auto space-y-4 md:space-y-6">
-        <Card>
-          <CardHeader className="pb-2">
+      <div className="p-2 sm:p-4 md:p-6 max-w-full mx-auto space-y-3 sm:space-y-4 md:space-y-6">
+        <Card className="overflow-hidden">
+          <CardHeader className="pb-1 sm:pb-2">
             <OrderDetailHeader 
               id={order.id}
               vendor={order.vendor}

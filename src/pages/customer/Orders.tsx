@@ -117,16 +117,16 @@ const OrdersPage = () => {
 
   return (
     <DashboardLayout userRole="CUSTOMER">
-      <div className="p-2 sm:p-4 md:p-6 max-w-full mx-auto space-y-4 md:space-y-6">
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+      <div className="p-2 sm:p-4 md:p-6 max-w-full mx-auto space-y-3 sm:space-y-4 md:space-y-6">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4">
           <div>
-            <h1 className="text-2xl font-bold">Orders</h1>
-            <p className="text-gray-600">
+            <h1 className="text-lg sm:text-xl md:text-2xl font-bold">Orders</h1>
+            <p className="text-sm sm:text-base text-gray-600">
               Manage and track your deliveries
             </p>
           </div>
           <Button 
-            className="bg-primary hover:bg-primary-hover text-black"
+            className="bg-primary hover:bg-primary-hover text-black text-sm sm:text-base w-full sm:w-auto"
             onClick={() => navigate('/customer/new-order')}
           >
             New Order
@@ -134,19 +134,19 @@ const OrdersPage = () => {
         </div>
 
         <Card>
-          <CardHeader>
-            <CardTitle>Your Orders</CardTitle>
-            <CardDescription>View and track all your orders</CardDescription>
+          <CardHeader className="pb-3 sm:pb-4">
+            <CardTitle className="text-base sm:text-lg">Your Orders</CardTitle>
+            <CardDescription className="text-sm">View and track all your orders</CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="pt-0">
             <Tabs defaultValue="active" className="w-full">
-              <TabsList className="mb-4">
-                <TabsTrigger value="active">Active Orders</TabsTrigger>
-                <TabsTrigger value="past">Order History</TabsTrigger>
+              <TabsList className="mb-3 sm:mb-4 w-full">
+                <TabsTrigger value="active" className="text-xs sm:text-sm flex-1">Active Orders</TabsTrigger>
+                <TabsTrigger value="past" className="text-xs sm:text-sm flex-1">Order History</TabsTrigger>
               </TabsList>
               
               <TabsContent value="active">
-                <div className="space-y-4">
+                <div className="space-y-3 sm:space-y-4">
                   {activeOrders.map((order) => (
                     <ActiveOrderCard key={order.id} order={order} />
                   ))}
