@@ -53,249 +53,233 @@ const VendorSettingsPage = () => {
 
   return (
     <DashboardLayout userRole="VENDOR">
-      <div className="p-2 sm:p-4 md:p-6 max-w-full mx-auto space-y-4 md:space-y-6">
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+      <div className="p-3 sm:p-4 md:p-6 max-w-full mx-auto space-y-4 sm:space-y-6">
+        <div className="flex flex-col sm:flex-row justify-between items-start gap-3 sm:gap-4">
           <div>
-            <h1 className="text-2xl font-bold">Settings</h1>
-            <p className="text-gray-600">
+            <h1 className="text-xl sm:text-2xl font-bold">Settings</h1>
+            <p className="text-sm sm:text-base text-gray-600">
               Manage your store settings and profile information
             </p>
           </div>
-          <Button onClick={() => setIsEditing(true)} disabled={isEditing}>
-            <SettingsIcon className="mr-2 h-4 w-4" />
+          <Button 
+            onClick={() => setIsEditing(true)} 
+            disabled={isEditing}
+            className="w-full sm:w-auto text-xs sm:text-sm"
+          >
+            <SettingsIcon className="mr-2 h-3 w-3 sm:h-4 sm:w-4" />
             Edit Profile
           </Button>
         </div>
 
         <Card>
-          <CardHeader>
-            <CardTitle>Store Information</CardTitle>
-            <CardDescription>View and update your store details</CardDescription>
+          <CardHeader className="pb-3 sm:pb-6">
+            <CardTitle className="text-base sm:text-lg">Store Information</CardTitle>
+            <CardDescription className="text-sm">View and update your store details</CardDescription>
           </CardHeader>
           <CardContent>
             <Tabs defaultValue="account" className="w-full">
-              <TabsList className="mb-4">
-                <TabsTrigger value="account">Account</TabsTrigger>
-                <TabsTrigger value="security">Security</TabsTrigger>
-                <TabsTrigger value="preferences">Preferences</TabsTrigger>
+              <TabsList className="mb-3 sm:mb-4 w-full grid grid-cols-3 sm:w-auto sm:flex">
+                <TabsTrigger value="account" className="text-xs sm:text-sm">Account</TabsTrigger>
+                <TabsTrigger value="security" className="text-xs sm:text-sm">Security</TabsTrigger>
+                <TabsTrigger value="preferences" className="text-xs sm:text-sm">Preferences</TabsTrigger>
               </TabsList>
 
-              <TabsContent value="account">
-                <div className="flex flex-col md:flex-row gap-6">
-                  <div className="md:w-1/3 flex flex-col items-center">
-                    <Avatar className="h-32 w-32">
+              <TabsContent value="account" className="mt-3 sm:mt-4">
+                <div className="flex flex-col lg:flex-row gap-4 sm:gap-6">
+                  <div className="lg:w-1/3 flex flex-col items-center">
+                    <Avatar className="h-24 w-24 sm:h-32 sm:w-32">
                       <AvatarImage src="https://api.dicebear.com/7.x/pixel-art/svg?seed=GreenFoods" />
-                      <AvatarFallback>GF</AvatarFallback>
+                      <AvatarFallback className="text-lg sm:text-xl">GF</AvatarFallback>
                     </Avatar>
-                    <Button variant="ghost" size="sm" className="mt-2">
-                      <Camera className="mr-2 h-4 w-4" />
+                    <Button variant="ghost" size="sm" className="mt-2 text-xs sm:text-sm">
+                      <Camera className="mr-2 h-3 w-3 sm:h-4 sm:w-4" />
                       Change Logo
                     </Button>
                   </div>
 
-                  <div className="md:w-2/3 space-y-4">
-                    <div className="space-y-1">
-                      <Label htmlFor="name">Store Name</Label>
-                      <Input
-                        id="name"
-                        placeholder="Your Store Name"
-                        value={profileData.name}
-                        onChange={(e) => handleInputChange('name', e.target.value)}
-                        disabled={!isEditing}
-                      />
-                    </div>
-                    <div className="space-y-1">
-                      <Label htmlFor="email">Email Address</Label>
-                      <Input
-                        id="email"
-                        placeholder="Your Email"
-                        value={profileData.email}
-                        onChange={(e) => handleInputChange('email', e.target.value)}
-                        disabled={!isEditing}
-                      />
-                    </div>
-                    <div className="space-y-1">
-                      <Label htmlFor="phone">Phone Number</Label>
-                      <Input
-                        id="phone"
-                        placeholder="Your Phone"
-                        value={profileData.phone}
-                        onChange={(e) => handleInputChange('phone', e.target.value)}
-                        disabled={!isEditing}
-                      />
-                    </div>
-                    <div className="space-y-1">
-                      <Label htmlFor="address">Address</Label>
-                      <Input
-                        id="address"
-                        placeholder="Your Address"
-                        value={profileData.address}
-                        onChange={(e) => handleInputChange('address', e.target.value)}
-                        disabled={!isEditing}
-                      />
-                    </div>
-                    <div className="space-y-1">
-                      <Label htmlFor="description">Description</Label>
-                      <Textarea
-                        id="description"
-                        placeholder="Your Store Description"
-                        value={profileData.description}
-                        onChange={(e) => handleInputChange('description', e.target.value)}
-                        disabled={!isEditing}
-                      />
-                    </div>
-                    <div className="space-y-1">
-                      <Label htmlFor="businessLicense">Business License</Label>
-                      <Input
-                        id="businessLicense"
-                        placeholder="Your Business License"
-                        value={profileData.businessLicense}
-                        onChange={(e) => handleInputChange('businessLicense', e.target.value)}
-                        disabled={!isEditing}
-                      />
-                    </div>
-                    <div className="space-y-1">
-                      <Label htmlFor="category">Category</Label>
-                      <Input
-                        id="category"
-                        placeholder="Your Category"
-                        value={profileData.category}
-                        onChange={(e) => handleInputChange('category', e.target.value)}
-                        disabled={!isEditing}
-                      />
-                    </div>
+                  <div className="lg:w-2/3 space-y-3 sm:space-y-4">
+                    <FormField
+                      id="name"
+                      label="Store Name"
+                      placeholder="Your Store Name"
+                      value={profileData.name}
+                      onChange={(value) => handleInputChange('name', value)}
+                      disabled={!isEditing}
+                    />
+                    
+                    <FormField
+                      id="email"
+                      label="Email Address"
+                      placeholder="Your Email"
+                      value={profileData.email}
+                      onChange={(value) => handleInputChange('email', value)}
+                      disabled={!isEditing}
+                    />
+                    
+                    <FormField
+                      id="phone"
+                      label="Phone Number"
+                      placeholder="Your Phone"
+                      value={profileData.phone}
+                      onChange={(value) => handleInputChange('phone', value)}
+                      disabled={!isEditing}
+                    />
+                    
+                    <FormField
+                      id="address"
+                      label="Address"
+                      placeholder="Your Address"
+                      value={profileData.address}
+                      onChange={(value) => handleInputChange('address', value)}
+                      disabled={!isEditing}
+                    />
+                    
+                    <FormField
+                      id="description"
+                      label="Description"
+                      placeholder="Your Store Description"
+                      value={profileData.description}
+                      onChange={(value) => handleInputChange('description', value)}
+                      disabled={!isEditing}
+                      isTextarea
+                    />
+                    
+                    <FormField
+                      id="businessLicense"
+                      label="Business License"
+                      placeholder="Your Business License"
+                      value={profileData.businessLicense}
+                      onChange={(value) => handleInputChange('businessLicense', value)}
+                      disabled={!isEditing}
+                    />
+                    
+                    <FormField
+                      id="category"
+                      label="Category"
+                      placeholder="Your Category"
+                      value={profileData.category}
+                      onChange={(value) => handleInputChange('category', value)}
+                      disabled={!isEditing}
+                    />
                   </div>
                 </div>
 
                 {isEditing && (
-                  <div className="flex justify-end mt-4">
-                    <Button variant="secondary" onClick={() => setIsEditing(false)} className="mr-2">
+                  <div className="flex flex-col sm:flex-row justify-end gap-2 sm:gap-0 mt-4 sm:mt-6">
+                    <Button 
+                      variant="secondary" 
+                      onClick={() => setIsEditing(false)} 
+                      className="w-full sm:w-auto sm:mr-2 text-xs sm:text-sm"
+                    >
                       Cancel
                     </Button>
-                    <Button onClick={handleSave}>Save Changes</Button>
+                    <Button 
+                      onClick={handleSave}
+                      className="w-full sm:w-auto text-xs sm:text-sm"
+                    >
+                      Save Changes
+                    </Button>
                   </div>
                 )}
               </TabsContent>
 
-              <TabsContent value="security">
-                <div className="space-y-4">
-                  <Card className="shadow-none">
-                    <CardHeader>
-                      <CardTitle>Password</CardTitle>
-                      <CardDescription>Change your password to keep your account secure.</CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <Button>Change Password</Button>
-                    </CardContent>
-                  </Card>
+              <TabsContent value="security" className="mt-3 sm:mt-4">
+                <div className="space-y-3 sm:space-y-4">
+                  <SecurityCard
+                    title="Password"
+                    description="Change your password to keep your account secure."
+                    action={<Button className="text-xs sm:text-sm">Change Password</Button>}
+                  />
 
-                  <Card className="shadow-none">
-                    <CardHeader>
-                      <CardTitle>Two-Factor Authentication</CardTitle>
-                      <CardDescription>Add an extra layer of security to your account.</CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="flex items-center justify-between">
-                        <span>Enable Two-Factor Authentication</span>
+                  <SecurityCard
+                    title="Two-Factor Authentication"
+                    description="Add an extra layer of security to your account."
+                    action={
+                      <div className="flex items-center justify-between w-full">
+                        <span className="text-sm sm:text-base">Enable Two-Factor Authentication</span>
                         <Switch id="2fa" />
                       </div>
-                    </CardContent>
-                  </Card>
+                    }
+                  />
                 </div>
               </TabsContent>
 
-              <TabsContent value="preferences">
-                <div className="space-y-4">
-                  <Card className="shadow-none">
-                    <CardHeader>
-                      <CardTitle>Notification Preferences</CardTitle>
-                      <CardDescription>Manage your notification settings.</CardDescription>
-                    </CardHeader>
-                    <CardContent>
+              <TabsContent value="preferences" className="mt-3 sm:mt-4">
+                <div className="space-y-3 sm:space-y-4">
+                  <PreferenceCard
+                    title="Notification Preferences"
+                    description="Manage your notification settings."
+                  >
+                    <div className="space-y-3">
                       <div className="flex items-center justify-between">
-                        <span>Email Notifications</span>
+                        <span className="text-sm sm:text-base">Email Notifications</span>
                         <Switch id="email-notifications" />
                       </div>
                       <div className="flex items-center justify-between">
-                        <span>Push Notifications</span>
+                        <span className="text-sm sm:text-base">Push Notifications</span>
                         <Switch id="push-notifications" />
                       </div>
-                    </CardContent>
-                  </Card>
+                    </div>
+                  </PreferenceCard>
 
-                  <Card className="shadow-none">
-                    <CardHeader>
-                      <CardTitle>Appearance</CardTitle>
-                      <CardDescription>Customize the look and feel of your account.</CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <Button>Change Theme</Button>
-                    </CardContent>
-                  </Card>
+                  <PreferenceCard
+                    title="Appearance"
+                    description="Customize the look and feel of your account."
+                  >
+                    <Button className="text-xs sm:text-sm">Change Theme</Button>
+                  </PreferenceCard>
                 </div>
               </TabsContent>
             </Tabs>
           </CardContent>
         </Card>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
           <Card>
-            <CardHeader>
-              <CardTitle>Store Summary</CardTitle>
-              <CardDescription>Your store activity at a glance</CardDescription>
+            <CardHeader className="pb-3 sm:pb-6">
+              <CardTitle className="text-base sm:text-lg">Store Summary</CardTitle>
+              <CardDescription className="text-sm">Your store activity at a glance</CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex items-center space-x-4">
-                <Store className="h-6 w-6 text-green-500" />
-                <div>
-                  <h3 className="text-lg font-medium">125 Products</h3>
-                  <p className="text-sm text-gray-500">Total products in your store</p>
-                </div>
-              </div>
-              <div className="flex items-center space-x-4">
-                <Package className="h-6 w-6 text-blue-500" />
-                <div>
-                  <h3 className="text-lg font-medium">450 Orders</h3>
-                  <p className="text-sm text-gray-500">Orders completed this month</p>
-                </div>
-              </div>
-              <div className="flex items-center space-x-4">
-                <CreditCard className="h-6 w-6 text-amber-500" />
-                <div>
-                  <h3 className="text-lg font-medium">₦1,500,000 Revenue</h3>
-                  <p className="text-sm text-gray-500">Total revenue this month</p>
-                </div>
-              </div>
+            <CardContent className="space-y-3 sm:space-y-4">
+              <SummaryItem
+                icon={<Store className="h-5 w-5 sm:h-6 sm:w-6 text-green-500" />}
+                title="125 Products"
+                description="Total products in your store"
+              />
+              <SummaryItem
+                icon={<Package className="h-5 w-5 sm:h-6 sm:w-6 text-blue-500" />}
+                title="450 Orders"
+                description="Orders completed this month"
+              />
+              <SummaryItem
+                icon={<CreditCard className="h-5 w-5 sm:h-6 sm:w-6 text-amber-500" />}
+                title="₦1,500,000 Revenue"
+                description="Total revenue this month"
+              />
             </CardContent>
           </Card>
 
           <Card>
-            <CardHeader>
-              <CardTitle>Recent Activity</CardTitle>
-              <CardDescription>Your latest actions and updates</CardDescription>
+            <CardHeader className="pb-3 sm:pb-6">
+              <CardTitle className="text-base sm:text-lg">Recent Activity</CardTitle>
+              <CardDescription className="text-sm">Your latest actions and updates</CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex items-center space-x-4">
-                <Bell className="h-6 w-6 text-gray-500" />
-                <div>
-                  <h3 className="text-lg font-medium">New order received!</h3>
-                  <p className="text-sm text-gray-500">Order #12345 placed by John Doe</p>
-                </div>
-              </div>
-              <div className="flex items-center space-x-4">
-                <FileText className="h-6 w-6 text-gray-500" />
-                <div>
-                  <h3 className="text-lg font-medium">Product updated</h3>
-                  <p className="text-sm text-gray-500">Eco-friendly water bottle updated</p>
-                </div>
-              </div>
-              <div className="flex items-center space-x-4">
-                <HelpCircle className="h-6 w-6 text-gray-500" />
-                <div>
-                  <h3 className="text-lg font-medium">Support request</h3>
-                  <p className="text-sm text-gray-500">New support request from Jane Smith</p>
-                </div>
-              </div>
+            <CardContent className="space-y-3 sm:space-y-4">
+              <ActivityItem
+                icon={<Bell className="h-5 w-5 sm:h-6 sm:w-6 text-gray-500" />}
+                title="New order received!"
+                description="Order #12345 placed by John Doe"
+              />
+              <ActivityItem
+                icon={<FileText className="h-5 w-5 sm:h-6 sm:w-6 text-gray-500" />}
+                title="Product updated"
+                description="Eco-friendly water bottle updated"
+              />
+              <ActivityItem
+                icon={<HelpCircle className="h-5 w-5 sm:h-6 sm:w-6 text-gray-500" />}
+                title="Support request"
+                description="New support request from Jane Smith"
+              />
             </CardContent>
           </Card>
         </div>
@@ -303,5 +287,84 @@ const VendorSettingsPage = () => {
     </DashboardLayout>
   );
 };
+
+const FormField = ({ 
+  id, 
+  label, 
+  placeholder, 
+  value, 
+  onChange, 
+  disabled, 
+  isTextarea = false 
+}) => (
+  <div className="space-y-1 sm:space-y-2">
+    <Label htmlFor={id} className="text-sm sm:text-base">{label}</Label>
+    {isTextarea ? (
+      <Textarea
+        id={id}
+        placeholder={placeholder}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        disabled={disabled}
+        className="text-sm sm:text-base"
+      />
+    ) : (
+      <Input
+        id={id}
+        placeholder={placeholder}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        disabled={disabled}
+        className="text-sm sm:text-base"
+      />
+    )}
+  </div>
+);
+
+const SecurityCard = ({ title, description, action }) => (
+  <Card className="shadow-none">
+    <CardHeader className="pb-2 sm:pb-4">
+      <CardTitle className="text-sm sm:text-base">{title}</CardTitle>
+      <CardDescription className="text-xs sm:text-sm">{description}</CardDescription>
+    </CardHeader>
+    <CardContent>
+      {action}
+    </CardContent>
+  </Card>
+);
+
+const PreferenceCard = ({ title, description, children }) => (
+  <Card className="shadow-none">
+    <CardHeader className="pb-2 sm:pb-4">
+      <CardTitle className="text-sm sm:text-base">{title}</CardTitle>
+      <CardDescription className="text-xs sm:text-sm">{description}</CardDescription>
+    </CardHeader>
+    <CardContent>
+      {children}
+    </CardContent>
+  </Card>
+);
+
+const SummaryItem = ({ icon, title, description }) => (
+  <div className="flex items-center space-x-3 sm:space-x-4">
+    {icon}
+    <div>
+      <h3 className="text-base sm:text-lg font-medium">{title}</h3>
+      <p className="text-xs sm:text-sm text-gray-500">{description}</p>
+    </div>
+  </div>
+);
+
+const ActivityItem = ({ icon, title, description }) => (
+  <div className="flex items-start space-x-3 sm:space-x-4">
+    <div className="flex-shrink-0 mt-0.5">
+      {icon}
+    </div>
+    <div className="min-w-0 flex-1">
+      <h3 className="text-sm sm:text-base font-medium">{title}</h3>
+      <p className="text-xs sm:text-sm text-gray-500 truncate">{description}</p>
+    </div>
+  </div>
+);
 
 export default VendorSettingsPage;

@@ -115,52 +115,56 @@ const AddProduct = () => {
 
   return (
     <DashboardLayout userRole="VENDOR">
-      <div className="p-6 max-w-5xl mx-auto">
-        <div className="mb-6">
+      <div className="p-3 sm:p-4 md:p-6 max-w-5xl mx-auto">
+        <div className="mb-4 sm:mb-6">
           <Button 
             variant="ghost" 
             onClick={() => navigate(-1)}
-            className="mb-4"
+            className="mb-3 sm:mb-4 w-full sm:w-auto text-xs sm:text-sm"
           >
-            <ArrowLeft className="mr-2 h-4 w-4" />
+            <ArrowLeft className="mr-2 h-3 w-3 sm:h-4 sm:w-4" />
             Back
           </Button>
-          <h1 className="text-2xl font-bold">Add New Product</h1>
-          <p className="text-gray-600">
+          <h1 className="text-xl sm:text-2xl font-bold">Add New Product</h1>
+          <p className="text-sm sm:text-base text-gray-600">
             Create a new sustainable product for your eco-conscious customers
           </p>
         </div>
 
         <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center">
-              <Package className="mr-2 h-5 w-5 text-primary" />
+          <CardHeader className="pb-3 sm:pb-6">
+            <CardTitle className="flex items-center text-base sm:text-lg">
+              <Package className="mr-2 h-4 w-4 sm:h-5 sm:w-5 text-primary" />
               Product Details
             </CardTitle>
-            <CardDescription>
+            <CardDescription className="text-sm">
               Fill in the details below to add a new product to your inventory
             </CardDescription>
           </CardHeader>
           <CardContent>
             <Tabs defaultValue="basic" className="w-full">
-              <TabsList className="grid grid-cols-3 mb-8">
-                <TabsTrigger value="basic">Basic Info</TabsTrigger>
-                <TabsTrigger value="details">Additional Details</TabsTrigger>
-                <TabsTrigger value="sustainability">Sustainability</TabsTrigger>
+              <TabsList className="grid grid-cols-3 mb-4 sm:mb-8 w-full">
+                <TabsTrigger value="basic" className="text-xs sm:text-sm">Basic Info</TabsTrigger>
+                <TabsTrigger value="details" className="text-xs sm:text-sm">Details</TabsTrigger>
+                <TabsTrigger value="sustainability" className="text-xs sm:text-sm">Sustainability</TabsTrigger>
               </TabsList>
               
               <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-                  <TabsContent value="basic" className="space-y-4">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 sm:space-y-6">
+                  <TabsContent value="basic" className="space-y-3 sm:space-y-4 mt-3 sm:mt-0">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
                       <FormField
                         control={form.control}
                         name="name"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Product Name*</FormLabel>
+                            <FormLabel className="text-sm sm:text-base">Product Name*</FormLabel>
                             <FormControl>
-                              <Input placeholder="Eco-friendly Water Bottle" {...field} />
+                              <Input 
+                                placeholder="Eco-friendly Water Bottle" 
+                                className="text-sm sm:text-base"
+                                {...field} 
+                              />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -172,9 +176,14 @@ const AddProduct = () => {
                         name="price"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Price (₦)*</FormLabel>
+                            <FormLabel className="text-sm sm:text-base">Price (₦)*</FormLabel>
                             <FormControl>
-                              <Input type="number" placeholder="0.00" {...field} />
+                              <Input 
+                                type="number" 
+                                placeholder="0.00" 
+                                className="text-sm sm:text-base"
+                                {...field} 
+                              />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -187,15 +196,15 @@ const AddProduct = () => {
                       name="description"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Description*</FormLabel>
+                          <FormLabel className="text-sm sm:text-base">Description*</FormLabel>
                           <FormControl>
                             <Textarea 
                               placeholder="Enter product description..." 
-                              className="min-h-32"
+                              className="min-h-24 sm:min-h-32 text-sm sm:text-base"
                               {...field} 
                             />
                           </FormControl>
-                          <FormDescription>
+                          <FormDescription className="text-xs sm:text-sm">
                             Describe your product in detail, including materials, usage, and benefits.
                           </FormDescription>
                           <FormMessage />
@@ -208,10 +217,10 @@ const AddProduct = () => {
                       name="category"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Category*</FormLabel>
+                          <FormLabel className="text-sm sm:text-base">Category*</FormLabel>
                           <FormControl>
                             <select
-                              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-base ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm"
+                              className="flex h-9 sm:h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm sm:text-base ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                               {...field}
                             >
                               <option value="" disabled>Select a category</option>
@@ -228,36 +237,34 @@ const AddProduct = () => {
                     />
                     
                     <FormItem>
-                      <FormLabel>Product Image</FormLabel>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                          <div className="border-2 border-dashed border-gray-300 rounded-md p-6 flex flex-col items-center justify-center bg-gray-50 hover:bg-gray-100 transition-colors">
-                            <Upload className="h-10 w-10 text-gray-400 mb-2" />
-                            <Label 
-                              htmlFor="image-upload"
-                              className="cursor-pointer text-blue-500 hover:text-blue-600 font-medium"
-                            >
-                              Click to upload
-                            </Label>
-                            <p className="text-sm text-gray-500 mt-1">
-                              SVG, PNG, JPG or GIF (max. 2MB)
-                            </p>
-                            <Input
-                              id="image-upload"
-                              type="file"
-                              accept="image/*"
-                              className="hidden"
-                              onChange={handleImageUpload}
-                            />
-                          </div>
+                      <FormLabel className="text-sm sm:text-base">Product Image</FormLabel>
+                      <div className="grid grid-cols-1 gap-4">
+                        <div className="border-2 border-dashed border-gray-300 rounded-md p-4 sm:p-6 flex flex-col items-center justify-center bg-gray-50 hover:bg-gray-100 transition-colors">
+                          <Upload className="h-8 w-8 sm:h-10 sm:w-10 text-gray-400 mb-2" />
+                          <Label 
+                            htmlFor="image-upload"
+                            className="cursor-pointer text-blue-500 hover:text-blue-600 font-medium text-sm sm:text-base"
+                          >
+                            Click to upload
+                          </Label>
+                          <p className="text-xs sm:text-sm text-gray-500 mt-1 text-center">
+                            SVG, PNG, JPG or GIF (max. 2MB)
+                          </p>
+                          <Input
+                            id="image-upload"
+                            type="file"
+                            accept="image/*"
+                            className="hidden"
+                            onChange={handleImageUpload}
+                          />
                         </div>
                         
                         {selectedImage && (
-                          <div className="border rounded-md overflow-hidden flex items-center justify-center bg-white">
+                          <div className="border rounded-md overflow-hidden flex items-center justify-center bg-white p-4">
                             <img
                               src={selectedImage}
                               alt="Product preview"
-                              className="max-h-40 object-contain"
+                              className="max-h-32 sm:max-h-40 object-contain"
                             />
                           </div>
                         )}
@@ -265,19 +272,24 @@ const AddProduct = () => {
                     </FormItem>
                   </TabsContent>
                   
-                  <TabsContent value="details" className="space-y-4">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <TabsContent value="details" className="space-y-3 sm:space-y-4 mt-3 sm:mt-0">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
                       <FormField
                         control={form.control}
                         name="weight"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="flex items-center">
-                              <Scale className="h-4 w-4 mr-1" /> 
+                            <FormLabel className="flex items-center text-sm sm:text-base">
+                              <Scale className="h-3 w-3 sm:h-4 sm:w-4 mr-1" /> 
                               Weight (kg)*
                             </FormLabel>
                             <FormControl>
-                              <Input type="number" step="0.01" {...field} />
+                              <Input 
+                                type="number" 
+                                step="0.01" 
+                                className="text-sm sm:text-base"
+                                {...field} 
+                              />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -289,12 +301,16 @@ const AddProduct = () => {
                         name="quantity"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="flex items-center">
-                              <Store className="h-4 w-4 mr-1" /> 
+                            <FormLabel className="flex items-center text-sm sm:text-base">
+                              <Store className="h-3 w-3 sm:h-4 sm:w-4 mr-1" /> 
                               Stock Quantity*
                             </FormLabel>
                             <FormControl>
-                              <Input type="number" {...field} />
+                              <Input 
+                                type="number" 
+                                className="text-sm sm:text-base"
+                                {...field} 
+                              />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -307,14 +323,18 @@ const AddProduct = () => {
                       name="tags"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="flex items-center">
-                            <Tag className="h-4 w-4 mr-1" /> 
+                          <FormLabel className="flex items-center text-sm sm:text-base">
+                            <Tag className="h-3 w-3 sm:h-4 sm:w-4 mr-1" /> 
                             Tags
                           </FormLabel>
                           <FormControl>
-                            <Input placeholder="eco-friendly, reusable, sustainable (comma separated)" {...field} />
+                            <Input 
+                              placeholder="eco-friendly, reusable, sustainable (comma separated)" 
+                              className="text-sm sm:text-base"
+                              {...field} 
+                            />
                           </FormControl>
-                          <FormDescription>
+                          <FormDescription className="text-xs sm:text-sm">
                             Add searchable tags to help customers find your product
                           </FormDescription>
                           <FormMessage />
@@ -323,14 +343,14 @@ const AddProduct = () => {
                     />
                   </TabsContent>
                   
-                  <TabsContent value="sustainability" className="space-y-4">
+                  <TabsContent value="sustainability" className="space-y-3 sm:space-y-4 mt-3 sm:mt-0">
                     <FormField
                       control={form.control}
                       name="sustainabilityScore"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="flex items-center">
-                            <Leaf className="h-4 w-4 mr-1 text-green-500" /> 
+                          <FormLabel className="flex items-center text-sm sm:text-base">
+                            <Leaf className="h-3 w-3 sm:h-4 sm:w-4 mr-1 text-green-500" /> 
                             Sustainability Score (0-100)
                           </FormLabel>
                           <FormControl>
@@ -343,10 +363,10 @@ const AddProduct = () => {
                                 <span>75</span>
                                 <span>100</span>
                               </div>
-                              <p className="text-center text-sm">Current value: {field.value}</p>
+                              <p className="text-center text-xs sm:text-sm">Current value: {field.value}</p>
                             </div>
                           </FormControl>
-                          <FormDescription>
+                          <FormDescription className="text-xs sm:text-sm">
                             Rate how sustainable your product is based on materials, production process, and packaging
                           </FormDescription>
                           <FormMessage />
@@ -354,69 +374,52 @@ const AddProduct = () => {
                       )}
                     />
                     
-                    <div className="space-y-4 bg-green-50 p-4 rounded-md">
-                      <h3 className="font-medium flex items-center">
-                        <Info className="h-4 w-4 mr-2 text-green-600" />
+                    <div className="space-y-3 sm:space-y-4 bg-green-50 p-3 sm:p-4 rounded-md">
+                      <h3 className="font-medium flex items-center text-sm sm:text-base">
+                        <Info className="h-3 w-3 sm:h-4 sm:w-4 mr-2 text-green-600" />
                         Sustainability Features
                       </h3>
                       
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <div className="flex items-start space-x-2">
-                          <input
-                            type="checkbox"
-                            id="recyclablePackaging"
-                            className="mt-1"
-                            checked={form.watch("recyclablePackaging")}
-                            onChange={(e) => form.setValue("recyclablePackaging", e.target.checked)}
-                          />
-                          <div>
-                            <Label htmlFor="recyclablePackaging">Recyclable Packaging</Label>
-                            <p className="text-xs text-gray-500">Product uses recyclable materials</p>
-                          </div>
-                        </div>
+                      <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 sm:gap-4">
+                        <SustainabilityCheckbox
+                          id="recyclablePackaging"
+                          label="Recyclable Packaging"
+                          description="Product uses recyclable materials"
+                          checked={form.watch("recyclablePackaging")}
+                          onChange={(checked) => form.setValue("recyclablePackaging", checked)}
+                        />
                         
-                        <div className="flex items-start space-x-2">
-                          <input
-                            type="checkbox"
-                            id="organicCertified"
-                            className="mt-1"
-                            checked={form.watch("organicCertified")}
-                            onChange={(e) => form.setValue("organicCertified", e.target.checked)}
-                          />
-                          <div>
-                            <Label htmlFor="organicCertified">Organic Certified</Label>
-                            <p className="text-xs text-gray-500">Product is certified organic</p>
-                          </div>
-                        </div>
+                        <SustainabilityCheckbox
+                          id="organicCertified"
+                          label="Organic Certified"
+                          description="Product is certified organic"
+                          checked={form.watch("organicCertified")}
+                          onChange={(checked) => form.setValue("organicCertified", checked)}
+                        />
                         
-                        <div className="flex items-start space-x-2">
-                          <input
-                            type="checkbox"
-                            id="carbonNeutral"
-                            className="mt-1"
-                            checked={form.watch("carbonNeutral")}
-                            onChange={(e) => form.setValue("carbonNeutral", e.target.checked)}
-                          />
-                          <div>
-                            <Label htmlFor="carbonNeutral">Carbon Neutral</Label>
-                            <p className="text-xs text-gray-500">Production is carbon neutral</p>
-                          </div>
-                        </div>
+                        <SustainabilityCheckbox
+                          id="carbonNeutral"
+                          label="Carbon Neutral"
+                          description="Production is carbon neutral"
+                          checked={form.watch("carbonNeutral")}
+                          onChange={(checked) => form.setValue("carbonNeutral", checked)}
+                        />
                       </div>
                     </div>
                   </TabsContent>
                   
-                  <div className="flex justify-end space-x-2 pt-4 border-t">
+                  <div className="flex flex-col sm:flex-row justify-end gap-3 sm:gap-2 pt-4 border-t">
                     <Button
                       type="button"
                       variant="outline"
                       onClick={() => navigate(-1)}
+                      className="w-full sm:w-auto text-xs sm:text-sm"
                     >
                       Cancel
                     </Button>
                     <Button 
                       type="submit"
-                      className="bg-primary hover:bg-primary-hover text-black"
+                      className="bg-primary hover:bg-primary-hover text-black w-full sm:w-auto text-xs sm:text-sm"
                       disabled={isSubmitting}
                     >
                       {isSubmitting ? "Saving..." : "Save Product"}
@@ -431,5 +434,22 @@ const AddProduct = () => {
     </DashboardLayout>
   );
 };
+
+// Mobile-Optimized Sustainability Checkbox Component
+const SustainabilityCheckbox = ({ id, label, description, checked, onChange }) => (
+  <div className="flex items-start space-x-2">
+    <input
+      type="checkbox"
+      id={id}
+      className="mt-1"
+      checked={checked}
+      onChange={(e) => onChange(e.target.checked)}
+    />
+    <div>
+      <Label htmlFor={id} className="text-sm sm:text-base">{label}</Label>
+      <p className="text-xs text-gray-500">{description}</p>
+    </div>
+  </div>
+);
 
 export default AddProduct;

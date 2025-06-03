@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
@@ -21,13 +20,18 @@ const ProcessOrderContent = ({ order }: ProcessOrderContentProps) => {
   
   if (!order) {
     return (
-      <div className="p-6 max-w-4xl mx-auto">
+      <div className="p-3 sm:p-4 md:p-6 max-w-4xl mx-auto">
         <Card>
-          <CardContent className="pt-6 text-center">
-            <h2 className="text-xl font-medium mb-4">Order not found</h2>
-            <p className="text-gray-500 mb-4">The order you're trying to process couldn't be found.</p>
-            <Button onClick={() => navigate('/vendor/orders')}>
-              <ChevronLeft className="mr-2 h-4 w-4" />
+          <CardContent className="pt-4 sm:pt-6 text-center">
+            <h2 className="text-lg sm:text-xl font-medium mb-3 sm:mb-4">Order not found</h2>
+            <p className="text-sm sm:text-base text-gray-500 mb-4">
+              The order you're trying to process couldn't be found.
+            </p>
+            <Button 
+              onClick={() => navigate('/vendor/orders')}
+              className="w-full sm:w-auto text-xs sm:text-sm"
+            >
+              <ChevronLeft className="mr-2 h-3 w-3 sm:h-4 sm:w-4" />
               Back to Orders
             </Button>
           </CardContent>
@@ -53,10 +57,10 @@ const ProcessOrderContent = ({ order }: ProcessOrderContentProps) => {
   };
 
   return (
-    <div className="p-6 max-w-4xl mx-auto">
+    <div className="p-3 sm:p-4 md:p-6 max-w-4xl mx-auto">
       <ProcessOrderHeader orderId={order.id} />
 
-      <div className="space-y-6">
+      <div className="space-y-4 sm:space-y-6">
         <OrderInformation order={order} />
         <OrderItems items={order.items} total={order.total} deliveryFee={order.deliveryFee} />
         <DeliveryInformation address={order.address} timeSlot={order.timeSlot} />

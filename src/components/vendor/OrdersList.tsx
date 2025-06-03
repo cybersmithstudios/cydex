@@ -1,4 +1,3 @@
-
 import React from 'react';
 import OrderCard from './OrderCard';
 import NoOrdersFound from './NoOrdersFound';
@@ -31,7 +30,7 @@ const OrdersList = ({ orders, type = 'all' }: OrdersListProps) => {
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3 sm:space-y-4">
       {orders.map((order) => (
         <OrderCard key={order.id} order={order} />
       ))}

@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import OrdersList from './OrdersList';
@@ -28,21 +27,27 @@ interface OrderTabsProps {
 const OrderTabs = ({ orders }: OrderTabsProps) => {
   return (
     <Tabs defaultValue="all" className="w-full">
-      <TabsList className="mb-4 w-full md:w-auto grid grid-cols-3 md:flex md:gap-2">
-        <TabsTrigger value="all" className="whitespace-nowrap">All Orders</TabsTrigger>
-        <TabsTrigger value="today" className="whitespace-nowrap">Today</TabsTrigger>
-        <TabsTrigger value="pending" className="whitespace-nowrap">Pending</TabsTrigger>
+      <TabsList className="mb-3 sm:mb-4 w-full sm:w-auto grid grid-cols-3 sm:flex sm:gap-2">
+        <TabsTrigger value="all" className="whitespace-nowrap text-xs sm:text-sm">
+          All Orders
+        </TabsTrigger>
+        <TabsTrigger value="today" className="whitespace-nowrap text-xs sm:text-sm">
+          Today
+        </TabsTrigger>
+        <TabsTrigger value="pending" className="whitespace-nowrap text-xs sm:text-sm">
+          Pending
+        </TabsTrigger>
       </TabsList>
       
-      <TabsContent value="all">
+      <TabsContent value="all" className="mt-3 sm:mt-4">
         <OrdersList orders={orders} type="all" />
       </TabsContent>
       
-      <TabsContent value="today">
+      <TabsContent value="today" className="mt-3 sm:mt-4">
         <OrdersList orders={[]} type="today" />
       </TabsContent>
       
-      <TabsContent value="pending">
+      <TabsContent value="pending" className="mt-3 sm:mt-4">
         <OrdersList orders={[]} type="pending" />
       </TabsContent>
     </Tabs>

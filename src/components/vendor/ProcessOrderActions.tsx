@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -15,10 +14,10 @@ const ProcessOrderActions = ({ order, isProcessing, onProcess }: ProcessOrderAct
   const navigate = useNavigate();
   
   return (
-    <div className="flex flex-col md:flex-row gap-4 justify-end">
+    <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-end">
       <Button 
         variant="outline" 
-        className="border-red-300 text-red-600 hover:bg-red-50"
+        className="border-red-300 text-red-600 hover:bg-red-50 w-full sm:w-auto text-xs sm:text-sm"
         onClick={() => {
           navigate('/vendor/orders');
           toast.error('Order rejected', {
@@ -26,12 +25,12 @@ const ProcessOrderActions = ({ order, isProcessing, onProcess }: ProcessOrderAct
           });
         }}
       >
-        <X className="mr-2 h-4 w-4" />
+        <X className="mr-2 h-3 w-3 sm:h-4 sm:w-4" />
         Reject Order
       </Button>
       
       <Button 
-        className="bg-primary hover:bg-primary-hover text-black" 
+        className="bg-primary hover:bg-primary-hover text-black w-full sm:w-auto text-xs sm:text-sm" 
         onClick={onProcess}
         disabled={isProcessing}
       >
@@ -41,7 +40,7 @@ const ProcessOrderActions = ({ order, isProcessing, onProcess }: ProcessOrderAct
           </>
         ) : (
           <>
-            <CheckCircle className="mr-2 h-4 w-4" />
+            <CheckCircle className="mr-2 h-3 w-3 sm:h-4 sm:w-4" />
             Confirm Processing
           </>
         )}

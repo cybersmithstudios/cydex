@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import OrdersHeader from './OrdersHeader';
@@ -20,15 +19,15 @@ const OrdersPageContent = () => {
   });
 
   return (
-    <div className="p-4 md:p-6 max-w-7xl mx-auto space-y-6">
+    <div className="p-3 sm:p-4 md:p-6 max-w-7xl mx-auto space-y-4 sm:space-y-6">
       <OrdersHeader 
         title="Orders" 
         description="Manage and track all your customer orders" 
       />
       
-      <div className="grid grid-cols-1 gap-4">
+      <div className="grid grid-cols-1 gap-3 sm:gap-4">
         <Card>
-          <CardHeader className="pb-2">
+          <CardHeader className="pb-2 sm:pb-3">
             <OrderFilters 
               searchQuery={searchQuery}
               setSearchQuery={setSearchQuery}
@@ -39,7 +38,7 @@ const OrdersPageContent = () => {
             />
           </CardHeader>
           
-          <CardContent>
+          <CardContent className="pt-0">
             <OrderTabs orders={filteredOrders} />
           </CardContent>
         </Card>

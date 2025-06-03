@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -22,21 +21,22 @@ const OrderFilters = ({
   filteredCount
 }: OrderFiltersProps) => {
   return (
-    <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-      <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-4">
-        <div className="relative w-full md:w-64">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+    <div className="flex flex-col gap-3 sm:gap-4">
+      {/* Search and Filter Controls */}
+      <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
+        <div className="relative w-full sm:w-64">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-3 w-3 sm:h-4 sm:w-4" />
           <Input 
             placeholder="Search orders..."
-            className="pl-10"
+            className="pl-8 sm:pl-10 text-sm"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
         </div>
         
-        <div className="w-full md:w-48">
+        <div className="w-full sm:w-48">
           <Select value={statusFilter} onValueChange={setStatusFilter}>
-            <SelectTrigger>
+            <SelectTrigger className="text-sm">
               <SelectValue placeholder="Filter by status" />
             </SelectTrigger>
             <SelectContent>
@@ -50,12 +50,13 @@ const OrderFilters = ({
           </Select>
         </div>
         
-        <div className="w-full md:w-48">
-          <Input type="date" className="w-full" />
+        <div className="w-full sm:w-48">
+          <Input type="date" className="w-full text-sm" />
         </div>
       </div>
       
-      <div className="text-sm text-gray-500">
+      {/* Order Count */}
+      <div className="text-xs sm:text-sm text-gray-500 text-center sm:text-left">
         Showing {filteredCount} of {totalOrders} orders
       </div>
     </div>
