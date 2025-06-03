@@ -67,6 +67,7 @@ export default {
 			},
 			fontFamily: {
 				'clash': ['Clash Display', 'sans-serif'],
+				'sans': ['Clash Display', 'ui-sans-serif', 'system-ui', 'sans-serif'],
 			},
 			borderRadius: {
 				lg: 'var(--radius)',

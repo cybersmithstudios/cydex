@@ -7,6 +7,8 @@ import AdminOrders from '../pages/admin/Orders';
 import AdminPayments from '../pages/admin/Payments';
 import AdminCarbonCredits from '../pages/admin/CarbonCredits';
 import AdminPartnerships from '../pages/admin/Partnerships';
+import AdminContent from '../pages/admin/Content';
+import AdminSecurity from '../pages/admin/Security';
 
 const AdminRoutes = () => {
   return (
@@ -56,6 +58,22 @@ const AdminRoutes = () => {
         element={
           <ProtectedRoute allowedRoles={['ADMIN']}>
             <AdminPartnerships />
+          </ProtectedRoute>
+        } 
+      />
+      <Route 
+        path="/content" 
+        element={
+          <ProtectedRoute allowedRoles={['ADMIN']}>
+            <AdminContent />
+          </ProtectedRoute>
+        } 
+      />
+      <Route 
+        path="/security" 
+        element={
+          <ProtectedRoute allowedRoles={['ADMIN']}>
+            <AdminSecurity />
           </ProtectedRoute>
         } 
       />
