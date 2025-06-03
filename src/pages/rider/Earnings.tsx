@@ -117,10 +117,10 @@ const EarningsPage = () => {
 
   return (
     <DashboardLayout userRole="RIDER">
-      <div className="p-4 md:p-6 max-w-7xl mx-auto">
-        <div className="mb-6">
-          <h1 className="text-2xl font-bold">Earnings Dashboard</h1>
-          <p className="text-gray-600">Track your earnings, transactions, and withdrawals</p>
+      <div className="p-2 sm:p-4 md:p-6 max-w-7xl mx-auto space-y-3 sm:space-y-4 md:space-y-6">
+        <div className="mb-3 sm:mb-4 md:mb-6">
+          <h1 className="text-lg sm:text-xl md:text-2xl font-bold">Earnings Dashboard</h1>
+          <p className="text-sm sm:text-base text-gray-600">Track your earnings, transactions, and withdrawals</p>
         </div>
 
         <EarningsOverviewCards 
@@ -142,12 +142,12 @@ const EarningsPage = () => {
           monthlyData={monthlyEarningsData}
         />
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 sm:gap-4 md:gap-6">
           <TransactionsList transactions={recentTransactions} />
           <WithdrawalHistory withdrawals={withdrawalHistory} />
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4 md:gap-6">
           <DeliveryPerformance 
             completedDeliveries={75}
             onTimeRate={97}
