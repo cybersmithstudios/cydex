@@ -171,32 +171,32 @@ const RiderProfilePage = () => {
 
   return (
     <DashboardLayout userRole="RIDER">
-      <div className="p-4 md:p-6 max-w-7xl mx-auto">
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+      <div className="p-2 sm:p-4 md:p-6 max-w-7xl mx-auto">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-3 sm:mb-4 md:mb-6 gap-3 sm:gap-4">
           <div>
-            <h1 className="text-2xl font-bold">My Profile</h1>
-            <p className="text-gray-600">Manage your account information and settings</p>
+            <h1 className="text-lg sm:text-xl md:text-2xl font-bold">My Profile</h1>
+            <p className="text-sm sm:text-base text-gray-600">Manage your account information and settings</p>
           </div>
           {editing ? (
-            <div className="flex gap-2">
-              <Button variant="outline" onClick={() => setEditing(false)}>Cancel</Button>
-              <Button className="bg-primary hover:bg-primary-hover text-black" onClick={handleSaveProfile}>
+            <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+              <Button variant="outline" onClick={() => setEditing(false)} className="text-xs sm:text-sm h-8 sm:h-9">Cancel</Button>
+              <Button className="bg-primary hover:bg-primary-hover text-black text-xs sm:text-sm h-8 sm:h-9" onClick={handleSaveProfile}>
                 Save Changes
               </Button>
             </div>
           ) : (
-            <Button className="bg-primary hover:bg-primary-hover text-black" onClick={() => setEditing(true)}>
-              <Edit className="mr-2 h-4 w-4" />
+            <Button className="bg-primary hover:bg-primary-hover text-black text-xs sm:text-sm h-8 sm:h-9 w-full sm:w-auto" onClick={() => setEditing(true)}>
+              <Edit className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" />
               Edit Profile
             </Button>
           )}
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 sm:gap-4 md:gap-6">
           {/* Left Column - Profile Info */}
-          <div className="lg:col-span-1 space-y-6">
+          <div className="lg:col-span-1 space-y-3 sm:space-y-4 md:space-y-6">
             <Card>
-              <CardContent className="p-6">
+              <CardContent className="p-3 sm:p-4 md:p-6">
                 <ProfileHeader profile={riderProfile} editing={editing} />
               </CardContent>
             </Card>
@@ -225,21 +225,21 @@ const RiderProfilePage = () => {
         
         {/* Vehicle Dialog */}
         <Dialog open={showVehicleDialog} onOpenChange={setShowVehicleDialog}>
-          <DialogContent className="sm:max-w-md">
+          <DialogContent className="sm:max-w-md max-h-[90vh] overflow-y-auto">
             <DialogHeader>
-              <DialogTitle>Update Vehicle Information</DialogTitle>
-              <DialogDescription>
+              <DialogTitle className="text-base sm:text-lg">Update Vehicle Information</DialogTitle>
+              <DialogDescription className="text-sm">
                 Update your vehicle details for delivery operations
               </DialogDescription>
             </DialogHeader>
-            <div className="space-y-4 py-2">
-              <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-3 sm:space-y-4 py-2">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="vehicle-type">Vehicle Type</Label>
+                  <Label htmlFor="vehicle-type" className="text-sm">Vehicle Type</Label>
                   <select 
                     id="vehicle-type" 
                     defaultValue={riderProfile.vehicle.type}
-                    className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+                    className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary text-sm h-8 sm:h-9"
                   >
                     <option value="bicycle">Bicycle</option>
                     <option value="e-bike">E-Bike</option>
@@ -249,38 +249,38 @@ const RiderProfilePage = () => {
                   </select>
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="vehicle-year">Year</Label>
-                  <Input id="vehicle-year" defaultValue={riderProfile.vehicle.year} />
+                  <Label htmlFor="vehicle-year" className="text-sm">Year</Label>
+                  <Input id="vehicle-year" defaultValue={riderProfile.vehicle.year} className="text-sm h-8 sm:h-9" />
                 </div>
               </div>
               
               <div className="space-y-2">
-                <Label htmlFor="vehicle-model">Model</Label>
-                <Input id="vehicle-model" defaultValue={riderProfile.vehicle.model} />
+                <Label htmlFor="vehicle-model" className="text-sm">Model</Label>
+                <Input id="vehicle-model" defaultValue={riderProfile.vehicle.model} className="text-sm h-8 sm:h-9" />
               </div>
               
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="vehicle-color">Color</Label>
-                  <Input id="vehicle-color" defaultValue={riderProfile.vehicle.color} />
+                  <Label htmlFor="vehicle-color" className="text-sm">Color</Label>
+                  <Input id="vehicle-color" defaultValue={riderProfile.vehicle.color} className="text-sm h-8 sm:h-9" />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="license-plate">License Plate</Label>
-                  <Input id="license-plate" defaultValue={riderProfile.vehicle.licensePlate} />
+                  <Label htmlFor="license-plate" className="text-sm">License Plate</Label>
+                  <Input id="license-plate" defaultValue={riderProfile.vehicle.licensePlate} className="text-sm h-8 sm:h-9" />
                 </div>
               </div>
               
               <div className="space-y-2">
-                <Label htmlFor="vehicle-docs">Upload Vehicle Documentation</Label>
-                <Input id="vehicle-docs" type="file" />
+                <Label htmlFor="vehicle-docs" className="text-sm">Upload Vehicle Documentation</Label>
+                <Input id="vehicle-docs" type="file" className="text-sm h-8 sm:h-9" />
                 <p className="text-xs text-gray-500">Upload registration documents or vehicle insurance</p>
               </div>
             </div>
-            <DialogFooter>
-              <Button variant="outline" onClick={() => setShowVehicleDialog(false)}>
+            <DialogFooter className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2">
+              <Button variant="outline" onClick={() => setShowVehicleDialog(false)} className="text-xs sm:text-sm h-8 sm:h-9">
                 Cancel
               </Button>
-              <Button onClick={handleUpdateVehicle} className="bg-primary hover:bg-primary-hover text-black">
+              <Button onClick={handleUpdateVehicle} className="bg-primary hover:bg-primary-hover text-black text-xs sm:text-sm h-8 sm:h-9">
                 Update Vehicle
               </Button>
             </DialogFooter>
@@ -289,20 +289,20 @@ const RiderProfilePage = () => {
         
         {/* ID Verification Dialog */}
         <Dialog open={showIdVerificationDialog} onOpenChange={setShowIdVerificationDialog}>
-          <DialogContent>
+          <DialogContent className="max-h-[90vh] overflow-y-auto">
             <DialogHeader>
-              <DialogTitle>Document Verification</DialogTitle>
-              <DialogDescription>
+              <DialogTitle className="text-base sm:text-lg">Document Verification</DialogTitle>
+              <DialogDescription className="text-sm">
                 Update your identification documents for verification
               </DialogDescription>
             </DialogHeader>
-            <div className="space-y-4 py-2">
+            <div className="space-y-3 sm:space-y-4 py-2">
               <div className="space-y-2">
-                <Label htmlFor="id-type">ID Type</Label>
+                <Label htmlFor="id-type" className="text-sm">ID Type</Label>
                 <select 
                   id="id-type" 
                   defaultValue="national"
-                  className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+                  className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary text-sm h-8 sm:h-9"
                 >
                   <option value="national">National ID Card</option>
                   <option value="passport">International Passport</option>
@@ -312,44 +312,44 @@ const RiderProfilePage = () => {
               </div>
               
               <div className="space-y-2">
-                <Label htmlFor="id-number">ID Number</Label>
-                <Input id="id-number" />
+                <Label htmlFor="id-number" className="text-sm">ID Number</Label>
+                <Input id="id-number" className="text-sm h-8 sm:h-9" />
               </div>
               
               <div className="space-y-2">
-                <Label htmlFor="expiry-date">Expiry Date</Label>
-                <Input id="expiry-date" type="date" />
+                <Label htmlFor="expiry-date" className="text-sm">Expiry Date</Label>
+                <Input id="expiry-date" type="date" className="text-sm h-8 sm:h-9" />
               </div>
               
               <div className="space-y-2">
-                <Label>Upload ID Document (Front)</Label>
-                <Input type="file" accept="image/*" />
+                <Label className="text-sm">Upload ID Document (Front)</Label>
+                <Input type="file" accept="image/*" className="text-sm h-8 sm:h-9" />
               </div>
               
               <div className="space-y-2">
-                <Label>Upload ID Document (Back)</Label>
-                <Input type="file" accept="image/*" />
+                <Label className="text-sm">Upload ID Document (Back)</Label>
+                <Input type="file" accept="image/*" className="text-sm h-8 sm:h-9" />
               </div>
               
               <div className="space-y-2">
-                <Label>Take Selfie for Verification</Label>
-                <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
-                  <Camera className="h-10 w-10 mx-auto text-gray-400 mb-2" />
-                  <p className="text-sm text-gray-500">
+                <Label className="text-sm">Take Selfie for Verification</Label>
+                <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 sm:p-6 text-center">
+                  <Camera className="h-8 w-8 sm:h-10 sm:w-10 mx-auto text-gray-400 mb-2" />
+                  <p className="text-xs sm:text-sm text-gray-500">
                     Click to take a photo or upload a recent selfie
                   </p>
-                  <Button variant="outline" className="mt-4">
-                    <Camera className="mr-2 h-4 w-4" />
+                  <Button variant="outline" className="mt-3 sm:mt-4 text-xs sm:text-sm h-8 sm:h-9">
+                    <Camera className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" />
                     Take Photo
                   </Button>
                 </div>
               </div>
             </div>
-            <DialogFooter>
-              <Button variant="outline" onClick={() => setShowIdVerificationDialog(false)}>
+            <DialogFooter className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2">
+              <Button variant="outline" onClick={() => setShowIdVerificationDialog(false)} className="text-xs sm:text-sm h-8 sm:h-9">
                 Cancel
               </Button>
-              <Button onClick={handleUploadId} className="bg-primary hover:bg-primary-hover text-black">
+              <Button onClick={handleUploadId} className="bg-primary hover:bg-primary-hover text-black text-xs sm:text-sm h-8 sm:h-9">
                 Submit for Verification
               </Button>
             </DialogFooter>
