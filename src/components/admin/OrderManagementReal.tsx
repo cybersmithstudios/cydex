@@ -10,7 +10,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { getAllOrders, getOrdersByStatus, updateOrderStatus } from '@/utils/adminUtils';
 import { toast } from 'sonner';
 
-// Define the order type to match what we get from Supabase
+// Define the order type to match what we actually get from Supabase
 interface OrderFromSupabase {
   id: string;
   order_number: string;
@@ -22,15 +22,10 @@ interface OrderFromSupabase {
   delivery_fee?: number;
   created_at: string;
   delivered_at?: string;
-  customer?: { name: string; email: string } | null;
-  rider?: { name: string; email: string } | null;
-  vendor?: { name: string; email: string } | null;
-  order_items?: Array<{
-    product_name: string;
-    quantity: number;
-    unit_price: number;
-    total_price: number;
-  }> | null;
+  customer?: any; // Using any to handle Supabase's flexible response
+  rider?: any;
+  vendor?: any;
+  order_items?: any[];
 }
 
 export function OrderManagementReal() {
@@ -53,7 +48,7 @@ export function OrderManagementReal() {
     try {
       const ordersList = await getAllOrders();
       console.log('Loaded orders:', ordersList);
-      setOrders(ordersList as OrderFromSupabase[]);
+      setOrders(ordersList);
     } catch (error) {
       console.error('Error loading orders:', error);
       toast.error('Failed to load orders');
@@ -75,12 +70,36 @@ export function OrderManagementReal() {
       const query = searchQuery.toLowerCase();
       filtered = filtered.filter(order => 
         order.order_number?.toLowerCase().includes(query) ||
-        order.customer?.name?.toLowerCase().includes(query) ||
-        order.customer?.email?.toLowerCase().includes(query)
+        getCustomerName(order.customer)?.toLowerCase().includes(query) ||
+        getCustomerEmail(order.customer)?.toLowerCase().includes(query)
       );
     }
 
     setFilteredOrders(filtered);
+  };
+
+  // Helper function to safely get customer name
+  const getCustomerName = (customer: any): string => {
+    if (!customer || typeof customer === 'string' || customer.error) {
+      return 'Unknown';
+    }
+    return customer.name || 'Unknown';
+  };
+
+  // Helper function to safely get customer email
+  const getCustomerEmail = (customer: any): string => {
+    if (!customer || typeof customer === 'string' || customer.error) {
+      return 'No email';
+    }
+    return customer.email || 'No email';
+  };
+
+  // Helper function to safely get order items count
+  const getOrderItemsCount = (orderItems: any): number => {
+    if (!orderItems || typeof orderItems === 'string' || orderItems.error) {
+      return 0;
+    }
+    return Array.isArray(orderItems) ? orderItems.length : 0;
   };
 
   const handleStatusChange = async (orderId: string, newStatus: string) => {
@@ -208,7 +227,7 @@ export function OrderManagementReal() {
                         <div>
                           <div className="font-medium">{order.order_number}</div>
                           <div className="text-sm text-gray-600">
-                            {order.order_items?.length || 0} items
+                            {getOrderItemsCount(order.order_items)} items
                           </div>
                           <div className="text-xs text-gray-500">
                             {order.delivery_type}
@@ -217,8 +236,8 @@ export function OrderManagementReal() {
                       </td>
                       <td className="py-4">
                         <div>
-                          <div className="font-medium">{order.customer?.name || 'Unknown'}</div>
-                          <div className="text-sm text-gray-600">{order.customer?.email || 'No email'}</div>
+                          <div className="font-medium">{getCustomerName(order.customer)}</div>
+                          <div className="text-sm text-gray-600">{getCustomerEmail(order.customer)}</div>
                         </div>
                       </td>
                       <td className="py-4">
