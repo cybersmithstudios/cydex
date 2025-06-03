@@ -10,7 +10,8 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { getAllOrders, getOrdersByStatus, updateOrderStatus } from '@/utils/adminUtils';
 import { toast } from 'sonner';
 
-interface Order {
+// Define the order type to match what we get from Supabase
+interface OrderFromSupabase {
   id: string;
   order_number: string;
   status: string;
@@ -21,20 +22,20 @@ interface Order {
   delivery_fee?: number;
   created_at: string;
   delivered_at?: string;
-  customer?: { name: string; email: string };
-  rider?: { name: string; email: string };
-  vendor?: { name: string; email: string };
+  customer?: { name: string; email: string } | null;
+  rider?: { name: string; email: string } | null;
+  vendor?: { name: string; email: string } | null;
   order_items?: Array<{
     product_name: string;
     quantity: number;
     unit_price: number;
     total_price: number;
-  }>;
+  }> | null;
 }
 
 export function OrderManagementReal() {
-  const [orders, setOrders] = useState<Order[]>([]);
-  const [filteredOrders, setFilteredOrders] = useState<Order[]>([]);
+  const [orders, setOrders] = useState<OrderFromSupabase[]>([]);
+  const [filteredOrders, setFilteredOrders] = useState<OrderFromSupabase[]>([]);
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [isLoading, setIsLoading] = useState(true);
@@ -51,7 +52,8 @@ export function OrderManagementReal() {
     setIsLoading(true);
     try {
       const ordersList = await getAllOrders();
-      setOrders(ordersList);
+      console.log('Loaded orders:', ordersList);
+      setOrders(ordersList as OrderFromSupabase[]);
     } catch (error) {
       console.error('Error loading orders:', error);
       toast.error('Failed to load orders');
@@ -216,7 +218,7 @@ export function OrderManagementReal() {
                       <td className="py-4">
                         <div>
                           <div className="font-medium">{order.customer?.name || 'Unknown'}</div>
-                          <div className="text-sm text-gray-600">{order.customer?.email}</div>
+                          <div className="text-sm text-gray-600">{order.customer?.email || 'No email'}</div>
                         </div>
                       </td>
                       <td className="py-4">
