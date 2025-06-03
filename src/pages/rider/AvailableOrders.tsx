@@ -117,55 +117,111 @@ const AvailableOrdersPage = () => {
 
   return (
     <DashboardLayout userRole="RIDER">
-      <div className="p-6 max-w-7xl mx-auto space-y-6">
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+      <div className="p-2 sm:p-4 md:p-6 max-w-7xl mx-auto space-y-3 sm:space-y-4 md:space-y-6">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4">
           <div>
-            <h1 className="text-2xl font-bold">Available Orders</h1>
-            <p className="text-gray-600">
+            <h1 className="text-lg sm:text-xl md:text-2xl font-bold">Available Orders</h1>
+            <p className="text-sm sm:text-base text-gray-600">
               Accept eco-friendly deliveries and earn bonuses
             </p>
           </div>
-          <Badge className="text-sm bg-green-500">
-            <TrendingUp className="mr-1 h-4 w-4" />
+          <Badge className="text-xs sm:text-sm bg-green-500">
+            <TrendingUp className="mr-1 h-3 w-3 sm:h-4 sm:w-4" />
             High Demand
           </Badge>
         </div>
 
         <Card>
-          <CardHeader>
-            <CardTitle>Find Your Next Delivery</CardTitle>
-            <CardDescription>
+          <CardHeader className="pb-3 sm:pb-4">
+            <CardTitle className="text-base sm:text-lg">Find Your Next Delivery</CardTitle>
+            <CardDescription className="text-sm">
               Explore available orders and accept the ones that fit your route
             </CardDescription>
           </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <CardContent className="pt-0">
+            <div className="flex flex-col sm:grid sm:grid-cols-1 md:grid-cols-3 gap-3 sm:gap-4">
               <div className="md:col-span-2">
                 <Input
                   type="text"
                   placeholder="Search by vendor or customer..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full"
+                  className="w-full text-sm sm:text-base h-8 sm:h-9"
                 />
               </div>
-              <div className="flex items-center justify-end space-x-2">
+              <div className="flex items-center justify-start sm:justify-end space-x-2">
                 <Button
                   variant="outline"
                   onClick={() => setFilterEco(!filterEco)}
-                  className={filterEco ? 'bg-green-100 text-green-800 hover:bg-green-200' : ''}
+                  className={`text-xs sm:text-sm h-8 sm:h-9 ${filterEco ? 'bg-green-100 text-green-800 hover:bg-green-200' : ''}`}
                 >
-                  <Leaf className="mr-2 h-4 w-4" />
-                  Eco-Friendly
+                  <Leaf className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" />
+                  <span className="hidden sm:inline">Eco-Friendly</span>
+                  <span className="sm:hidden">Eco</span>
                 </Button>
-                <Button variant="outline">
-                  <Filter className="mr-2 h-4 w-4" />
+                <Button variant="outline" className="text-xs sm:text-sm h-8 sm:h-9">
+                  <Filter className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" />
                   Filters
                 </Button>
               </div>
             </div>
 
-            <div className="overflow-x-auto mt-4">
+            {/* Mobile Card View */}
+            <div className="md:hidden mt-4 space-y-3">
+              {orders.map((order) => (
+                <div key={order.id} className="bg-white border rounded-lg p-3 hover:shadow-md transition-shadow">
+                  <div className="flex items-start justify-between mb-2">
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center gap-1">
+                        <h3 className="font-medium text-sm truncate">{order.vendor}</h3>
+                        <span className="text-gray-300">→</span>
+                        <span className="text-sm text-gray-600 truncate">{order.customer}</span>
+                      </div>
+                      <div className="flex items-center mt-1 text-xs text-gray-500">
+                        <span>{order.id}</span>
+                        <span className="mx-2">•</span>
+                        <span>{order.items} items</span>
+                      </div>
+                    </div>
+                    <div className="flex items-center ml-2">
+                      <Star className="h-3 w-3 text-yellow-500 mr-1" />
+                      <span className="text-xs text-gray-500">{order.rating}</span>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center space-x-3 text-xs text-gray-600">
+                      <div className="flex items-center">
+                        <MapPin className="h-3 w-3 mr-1" />
+                        <span>{order.distance}</span>
+                      </div>
+                      <div className="flex items-center">
+                        <Clock className="h-3 w-3 mr-1" />
+                        <span>{order.pickupTime}</span>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-sm font-bold text-green-600">
+                        ₦{order.fee.toLocaleString('en-NG', {minimumFractionDigits: 2, maximumFractionDigits: 2})}
+                      </div>
+                      <div className="text-xs text-green-500">
+                        +₦{order.ecoBonus.toLocaleString('en-NG', {minimumFractionDigits: 2, maximumFractionDigits: 2})} eco
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <Button
+                    className="w-full bg-primary hover:bg-primary-hover text-black text-xs h-7"
+                    onClick={() => handleAcceptOrder(order.id)}
+                  >
+                    Accept Order
+                  </Button>
+                </div>
+              ))}
+            </div>
+
+            {/* Desktop Table View */}
+            <div className="hidden md:block overflow-x-auto mt-4">
               <table className="min-w-full divide-y divide-gray-200">
                 <thead>
                   <tr>
@@ -242,36 +298,36 @@ const AvailableOrdersPage = () => {
         </Card>
 
         <Card>
-          <CardHeader>
-            <CardTitle>Delivery Tips</CardTitle>
-            <CardDescription>
+          <CardHeader className="pb-3 sm:pb-4">
+            <CardTitle className="text-base sm:text-lg">Delivery Tips</CardTitle>
+            <CardDescription className="text-sm">
               Maximize your earnings and sustainability impact
             </CardDescription>
           </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
+          <CardContent className="pt-0">
+            <div className="space-y-2 sm:space-y-3">
               <div className="flex items-center space-x-3">
-                <Navigation className="h-5 w-5 text-blue-500" />
-                <div>
-                  <h3 className="text-sm font-medium">Plan Your Route</h3>
+                <Navigation className="h-4 w-4 sm:h-5 sm:w-5 text-blue-500 flex-shrink-0" />
+                <div className="min-w-0">
+                  <h3 className="text-xs sm:text-sm font-medium">Plan Your Route</h3>
                   <p className="text-xs text-gray-500">
                     Optimize your route to save time and reduce emissions.
                   </p>
                 </div>
               </div>
               <div className="flex items-center space-x-3">
-                <Phone className="h-5 w-5 text-green-500" />
-                <div>
-                  <h3 className="text-sm font-medium">Communicate with Customers</h3>
+                <Phone className="h-4 w-4 sm:h-5 sm:w-5 text-green-500 flex-shrink-0" />
+                <div className="min-w-0">
+                  <h3 className="text-xs sm:text-sm font-medium">Communicate with Customers</h3>
                   <p className="text-xs text-gray-500">
                     Keep customers informed about their delivery status.
                   </p>
                 </div>
               </div>
               <div className="flex items-center space-x-3">
-                <Leaf className="h-5 w-5 text-amber-500" />
-                <div>
-                  <h3 className="text-sm font-medium">Choose Eco-Friendly Options</h3>
+                <Leaf className="h-4 w-4 sm:h-5 sm:w-5 text-amber-500 flex-shrink-0" />
+                <div className="min-w-0">
+                  <h3 className="text-xs sm:text-sm font-medium">Choose Eco-Friendly Options</h3>
                   <p className="text-xs text-gray-500">
                     Prioritize deliveries with eco-friendly vendors for extra bonuses.
                   </p>
