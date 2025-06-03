@@ -5,6 +5,8 @@ import AdminDashboard from '../pages/admin/AdminDashboard';
 import AdminUsers from '../pages/admin/Users';
 import AdminOrders from '../pages/admin/Orders';
 import AdminPayments from '../pages/admin/Payments';
+import AdminCarbonCredits from '../pages/admin/CarbonCredits';
+import AdminPartnerships from '../pages/admin/Partnerships';
 
 const AdminRoutes = () => {
   return (
@@ -38,6 +40,22 @@ const AdminRoutes = () => {
         element={
           <ProtectedRoute allowedRoles={['ADMIN']}>
             <AdminPayments />
+          </ProtectedRoute>
+        } 
+      />
+      <Route 
+        path="/carbon-credits" 
+        element={
+          <ProtectedRoute allowedRoles={['ADMIN']}>
+            <AdminCarbonCredits />
+          </ProtectedRoute>
+        } 
+      />
+      <Route 
+        path="/partnerships" 
+        element={
+          <ProtectedRoute allowedRoles={['ADMIN']}>
+            <AdminPartnerships />
           </ProtectedRoute>
         } 
       />
