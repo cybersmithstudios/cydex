@@ -119,28 +119,28 @@ const WalletPage = () => {
   const getTransactionIcon = (type: string) => {
     switch (type) {
       case 'payment':
-        return <CreditCard className="h-4 w-4 text-red-500" />;
+        return <CreditCard className="h-3 w-3 sm:h-4 sm:w-4 text-red-500" />;
       case 'top-up':
-        return <Plus className="h-4 w-4 text-green-600" />;
+        return <Plus className="h-3 w-3 sm:h-4 sm:w-4 text-green-600" />;
       case 'cashback':
-        return <RefreshCw className="h-4 w-4 text-blue-500" />;
+        return <RefreshCw className="h-3 w-3 sm:h-4 sm:w-4 text-blue-500" />;
       case 'carbon-credit':
-        return <Leaf className="h-4 w-4 text-green-500" />;
+        return <Leaf className="h-3 w-3 sm:h-4 sm:w-4 text-green-500" />;
       default:
-        return <WalletIcon className="h-4 w-4" />;
+        return <WalletIcon className="h-3 w-3 sm:h-4 sm:w-4" />;
     }
   };
 
   const getTransactionStatusBadge = (status: string) => {
     switch (status) {
       case 'completed':
-        return <Badge className="bg-green-500">Completed</Badge>;
+        return <Badge className="bg-green-500 text-xs">Completed</Badge>;
       case 'pending':
-        return <Badge className="bg-amber-500">Pending</Badge>;
+        return <Badge className="bg-amber-500 text-xs">Pending</Badge>;
       case 'failed':
-        return <Badge className="bg-red-500">Failed</Badge>;
+        return <Badge className="bg-red-500 text-xs">Failed</Badge>;
       default:
-        return <Badge>Unknown</Badge>;
+        return <Badge className="text-xs">Unknown</Badge>;
     }
   };
 
@@ -158,54 +158,55 @@ const WalletPage = () => {
 
   return (
     <DashboardLayout userRole="CUSTOMER">
-      <div className="p-2 sm:p-4 md:p-6 max-w-full mx-auto space-y-4 md:space-y-6">
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+      <div className="p-2 sm:p-4 md:p-6 max-w-full mx-auto space-y-3 sm:space-y-4 md:space-y-6">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4">
           <div>
-            <h1 className="text-2xl font-bold">Wallet</h1>
-            <p className="text-gray-600">
+            <h1 className="text-lg sm:text-xl md:text-2xl font-bold">Wallet</h1>
+            <p className="text-sm sm:text-base text-gray-600">
               Manage your balance, payments, and rewards
             </p>
           </div>
           <Button 
-            className="bg-primary hover:bg-primary-hover text-black flex items-center gap-2"
+            className="bg-primary hover:bg-primary-hover text-black flex items-center gap-1 sm:gap-2 text-sm sm:text-base w-full sm:w-auto"
             onClick={() => {}}
           >
-            <Download className="h-4 w-4" />
+            <Download className="h-3 w-3 sm:h-4 sm:w-4" />
             Statement
           </Button>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
-          <Card className="md:col-span-2">
-            <CardHeader>
-              <CardTitle>Balance</CardTitle>
-              <CardDescription>Your current wallet balance</CardDescription>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 sm:gap-4 md:gap-6">
+          <Card className="lg:col-span-2">
+            <CardHeader className="pb-3 sm:pb-4">
+              <CardTitle className="text-base sm:text-lg">Balance</CardTitle>
+              <CardDescription className="text-sm">Your current wallet balance</CardDescription>
             </CardHeader>
-            <CardContent>
+            <CardContent className="pt-0">
               <div className="flex flex-col items-start">
-                <div className="text-4xl font-bold">₦37,560.95</div>
-                <div className="mt-2 text-sm text-gray-600">Last updated: Today at 09:45 AM</div>
+                <div className="text-2xl sm:text-3xl md:text-4xl font-bold">₦37,560.95</div>
+                <div className="mt-1 sm:mt-2 text-xs sm:text-sm text-gray-600">Last updated: Today at 09:45 AM</div>
               </div>
-              <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="mt-4 sm:mt-6 grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4">
                 <div>
-                  <p className="text-sm font-medium mb-2">Top up your wallet</p>
+                  <p className="text-xs sm:text-sm font-medium mb-2">Top up your wallet</p>
                   <div className="flex gap-2">
                     <Input
                       type="text"
                       placeholder="Amount"
                       value={topUpAmount}
                       onChange={(e) => setTopUpAmount(e.target.value)}
+                      className="text-sm h-8 sm:h-9"
                     />
                     <Button 
                       onClick={handleTopUp}
-                      className="bg-primary hover:bg-primary-hover text-black"
+                      className="bg-primary hover:bg-primary-hover text-black text-xs sm:text-sm h-8 sm:h-9 px-3"
                     >
                       Top Up
                     </Button>
                   </div>
                 </div>
                 <div className="flex flex-col justify-center">
-                  <div className="flex justify-between items-center text-sm mb-1">
+                  <div className="flex justify-between items-center text-xs sm:text-sm mb-1">
                     <span className="font-medium">Monthly Spend</span>
                     <span>₦12,450 / ₦50,000</span>
                   </div>
@@ -217,17 +218,17 @@ const WalletPage = () => {
           </Card>
 
           <Card>
-            <CardHeader>
-              <CardTitle>Carbon Credits</CardTitle>
-              <CardDescription>Earn by choosing eco-friendly options</CardDescription>
+            <CardHeader className="pb-3 sm:pb-4">
+              <CardTitle className="text-base sm:text-lg">Carbon Credits</CardTitle>
+              <CardDescription className="text-sm">Earn by choosing eco-friendly options</CardDescription>
             </CardHeader>
-            <CardContent>
+            <CardContent className="pt-0">
               <div className="flex items-center gap-2">
-                <Leaf className="h-6 w-6 text-green-600" />
-                <div className="text-2xl font-bold">240</div>
+                <Leaf className="h-5 w-5 sm:h-6 sm:w-6 text-green-600" />
+                <div className="text-xl sm:text-2xl font-bold">240</div>
               </div>
               
-              <div className="mt-4">
+              <div className="mt-3 sm:mt-4">
                 <div className="flex justify-between items-center text-xs mb-1">
                   <span>Level Progress</span>
                   <span>80%</span>
@@ -236,26 +237,26 @@ const WalletPage = () => {
                 <p className="text-xs text-gray-500 mt-2">60 points until Eco Champion</p>
               </div>
               
-              <Button variant="outline" className="w-full mt-4">
+              <Button variant="outline" className="w-full mt-3 sm:mt-4 text-xs sm:text-sm h-8 sm:h-9">
                 Convert to Cash
               </Button>
             </CardContent>
           </Card>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6">
-          <Card className="lg:col-span-2">
-            <CardHeader>
-              <CardTitle>Transactions</CardTitle>
-              <CardDescription>Recent activity in your wallet</CardDescription>
+        <div className="grid grid-cols-1 xl:grid-cols-3 gap-3 sm:gap-4 md:gap-6">
+          <Card className="xl:col-span-2">
+            <CardHeader className="pb-3 sm:pb-4">
+              <CardTitle className="text-base sm:text-lg">Transactions</CardTitle>
+              <CardDescription className="text-sm">Recent activity in your wallet</CardDescription>
             </CardHeader>
-            <CardContent>
-              <div className="flex flex-col sm:flex-row gap-4 mb-6">
+            <CardContent className="pt-0">
+              <div className="flex flex-col gap-2 sm:gap-4 mb-4 sm:mb-6">
                 <Select value={transactionFilter} onValueChange={setTransactionFilter}>
-                  <SelectTrigger className="w-full sm:w-[180px]">
+                  <SelectTrigger className="w-full h-8 sm:h-9">
                     <div className="flex items-center">
-                      <Filter className="mr-2 h-4 w-4" />
-                      <span>Transaction Type</span>
+                      <Filter className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" />
+                      <span className="text-xs sm:text-sm">Transaction Type</span>
                     </div>
                   </SelectTrigger>
                   <SelectContent>
@@ -267,10 +268,10 @@ const WalletPage = () => {
                   </SelectContent>
                 </Select>
                 <Select value={dateFilter} onValueChange={setDateFilter}>
-                  <SelectTrigger className="w-full sm:w-[180px]">
+                  <SelectTrigger className="w-full h-8 sm:h-9">
                     <div className="flex items-center">
-                      <Calendar className="mr-2 h-4 w-4" />
-                      <span>Time Period</span>
+                      <Calendar className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" />
+                      <span className="text-xs sm:text-sm">Time Period</span>
                     </div>
                   </SelectTrigger>
                   <SelectContent>
@@ -282,32 +283,57 @@ const WalletPage = () => {
                 </Select>
               </div>
               
-              <div className="overflow-x-auto">
+              {/* Mobile-friendly transaction list */}
+              <div className="block sm:hidden space-y-2">
+                {filteredTransactions.map((transaction) => (
+                  <div key={transaction.id} className="border rounded-lg p-3 bg-white">
+                    <div className="flex justify-between items-start mb-2">
+                      <div className="flex items-center">
+                        {getTransactionIcon(transaction.type)}
+                        <span className="ml-2 text-xs font-medium capitalize">{transaction.type.replace('-', ' ')}</span>
+                      </div>
+                      {getTransactionStatusBadge(transaction.status)}
+                    </div>
+                    <div className="space-y-1">
+                      <p className="text-xs text-gray-600 truncate">{transaction.description}</p>
+                      <div className="flex justify-between items-center">
+                        <span className="text-xs text-gray-500">{transaction.date}</span>
+                        <span className={`text-sm font-medium ${transaction.type === 'payment' ? 'text-red-600' : 'text-green-600'}`}>
+                          {transaction.type === 'payment' ? `-${transaction.amount}` : transaction.amount}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              
+              {/* Desktop table view */}
+              <div className="hidden sm:block overflow-x-auto">
                 <Table>
-                  <TableCaption>A list of your recent transactions</TableCaption>
+                  <TableCaption className="text-xs">A list of your recent transactions</TableCaption>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>ID</TableHead>
-                      <TableHead>Type</TableHead>
-                      <TableHead>Description</TableHead>
-                      <TableHead>Date</TableHead>
-                      <TableHead>Amount</TableHead>
-                      <TableHead>Status</TableHead>
+                      <TableHead className="text-xs">ID</TableHead>
+                      <TableHead className="text-xs">Type</TableHead>
+                      <TableHead className="text-xs">Description</TableHead>
+                      <TableHead className="text-xs">Date</TableHead>
+                      <TableHead className="text-xs">Amount</TableHead>
+                      <TableHead className="text-xs">Status</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {filteredTransactions.map((transaction) => (
                       <TableRow key={transaction.id} className="hover:bg-gray-50">
-                        <TableCell className="font-medium">{transaction.id}</TableCell>
+                        <TableCell className="font-medium text-xs">{transaction.id}</TableCell>
                         <TableCell>
                           <div className="flex items-center">
                             {getTransactionIcon(transaction.type)}
-                            <span className="ml-2 capitalize">{transaction.type.replace('-', ' ')}</span>
+                            <span className="ml-2 capitalize text-xs">{transaction.type.replace('-', ' ')}</span>
                           </div>
                         </TableCell>
-                        <TableCell>{transaction.description}</TableCell>
-                        <TableCell>{transaction.date}</TableCell>
-                        <TableCell className={transaction.type === 'payment' ? 'text-red-600' : 'text-green-600'}>
+                        <TableCell className="text-xs">{transaction.description}</TableCell>
+                        <TableCell className="text-xs">{transaction.date}</TableCell>
+                        <TableCell className={`text-xs ${transaction.type === 'payment' ? 'text-red-600' : 'text-green-600'}`}>
                           {transaction.type === 'payment' ? `-${transaction.amount}` : transaction.amount}
                         </TableCell>
                         <TableCell>{getTransactionStatusBadge(transaction.status)}</TableCell>
@@ -317,44 +343,44 @@ const WalletPage = () => {
                 </Table>
               </div>
             </CardContent>
-            <CardFooter className="flex justify-center">
-              <Button variant="outline" className="w-full sm:w-auto">
+            <CardFooter className="flex justify-center pt-2">
+              <Button variant="outline" className="w-full sm:w-auto text-xs sm:text-sm h-8 sm:h-9">
                 View All Transactions
               </Button>
             </CardFooter>
           </Card>
 
           <Card>
-            <CardHeader>
-              <CardTitle>Rewards</CardTitle>
-              <CardDescription>Redeem your carbon credits</CardDescription>
+            <CardHeader className="pb-3 sm:pb-4">
+              <CardTitle className="text-base sm:text-lg">Rewards</CardTitle>
+              <CardDescription className="text-sm">Redeem your carbon credits</CardDescription>
             </CardHeader>
-            <CardContent>
+            <CardContent className="pt-0">
               <Tabs defaultValue="available" className="w-full">
-                <TabsList className="w-full mb-4">
-                  <TabsTrigger value="available" className="flex-1">Available</TabsTrigger>
-                  <TabsTrigger value="redeemed" className="flex-1">Redeemed</TabsTrigger>
+                <TabsList className="w-full mb-3 sm:mb-4 h-8 sm:h-9">
+                  <TabsTrigger value="available" className="flex-1 text-xs sm:text-sm">Available</TabsTrigger>
+                  <TabsTrigger value="redeemed" className="flex-1 text-xs sm:text-sm">Redeemed</TabsTrigger>
                 </TabsList>
                 
                 <TabsContent value="available">
-                  <div className="space-y-3">
+                  <div className="space-y-2 sm:space-y-3">
                     {carbonRewards.map((reward) => (
-                      <div key={reward.id} className="border rounded-lg p-3 hover:bg-gray-50">
-                        <div className="flex justify-between">
-                          <div>
-                            <h4 className="font-medium">{reward.name}</h4>
-                            <div className="flex items-center mt-1 text-sm text-gray-600">
-                              <Leaf className="h-3 w-3 mr-1 text-green-600" />
+                      <div key={reward.id} className="border rounded-lg p-2 sm:p-3 hover:bg-gray-50">
+                        <div className="flex justify-between items-start">
+                          <div className="min-w-0 flex-1">
+                            <h4 className="font-medium text-xs sm:text-sm truncate">{reward.name}</h4>
+                            <div className="flex items-center mt-1 text-xs text-gray-600">
+                              <Leaf className="h-3 w-3 mr-1 text-green-600 flex-shrink-0" />
                               <span>{reward.points} points</span>
                             </div>
                           </div>
-                          <div>
-                            <Button size="sm" variant="outline" className="h-8">
+                          <div className="ml-2">
+                            <Button size="sm" variant="outline" className="h-6 sm:h-8 text-xs px-2 sm:px-3">
                               Redeem
                             </Button>
                           </div>
                         </div>
-                        <div className="mt-2 text-xs text-gray-500">
+                        <div className="mt-1 sm:mt-2 text-xs text-gray-500">
                           Expires: {reward.expiryDate}
                         </div>
                       </div>
@@ -363,10 +389,10 @@ const WalletPage = () => {
                 </TabsContent>
                 
                 <TabsContent value="redeemed">
-                  <div className="text-center py-8 text-gray-500">
-                    <Gift className="mx-auto h-12 w-12 text-gray-300 mb-2" />
-                    <p>No redeemed rewards yet</p>
-                    <Button variant="outline" className="mt-4">
+                  <div className="text-center py-6 sm:py-8 text-gray-500">
+                    <Gift className="mx-auto h-8 w-8 sm:h-12 sm:w-12 text-gray-300 mb-2" />
+                    <p className="text-xs sm:text-sm">No redeemed rewards yet</p>
+                    <Button variant="outline" className="mt-3 sm:mt-4 text-xs sm:text-sm h-8 sm:h-9">
                       Browse Available Rewards
                     </Button>
                   </div>
@@ -377,46 +403,46 @@ const WalletPage = () => {
         </div>
 
         <Card>
-          <CardHeader>
-            <CardTitle>Payment Methods</CardTitle>
-            <CardDescription>Manage your payment options</CardDescription>
+          <CardHeader className="pb-3 sm:pb-4">
+            <CardTitle className="text-base sm:text-lg">Payment Methods</CardTitle>
+            <CardDescription className="text-sm">Manage your payment options</CardDescription>
           </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
+          <CardContent className="pt-0">
+            <div className="space-y-3 sm:space-y-4">
               {paymentMethods.map((method) => (
-                <div key={method.id} className="flex items-center justify-between border rounded-lg p-4">
-                  <div className="flex items-center">
-                    <CreditCard className="h-8 w-8 text-primary mr-4" />
-                    <div>
-                      <div className="flex items-center">
-                        <h4 className="font-medium">{method.name}</h4>
+                <div key={method.id} className="flex items-center justify-between border rounded-lg p-3 sm:p-4">
+                  <div className="flex items-center min-w-0 flex-1">
+                    <CreditCard className="h-6 w-6 sm:h-8 sm:w-8 text-primary mr-3 sm:mr-4 flex-shrink-0" />
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center flex-wrap gap-1 sm:gap-2">
+                        <h4 className="font-medium text-sm sm:text-base truncate">{method.name}</h4>
                         {method.isDefault && (
-                          <Badge className="ml-2 bg-primary text-white">Default</Badge>
+                          <Badge className="bg-primary text-white text-xs px-1.5 py-0.5">Default</Badge>
                         )}
                       </div>
-                      <p className="text-sm text-gray-500">
+                      <p className="text-xs sm:text-sm text-gray-500">
                         {method.type === 'card' ? `Expires: ${method.expiryDate}` : `Account: ${method.accountNumber}`}
                       </p>
                       <p className="text-xs text-gray-400">Last used: {method.lastUsed}</p>
                     </div>
                   </div>
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-1 sm:gap-2 ml-2">
                     {!method.isDefault && (
-                      <Button size="sm" variant="outline">
+                      <Button size="sm" variant="outline" className="text-xs h-7 sm:h-8 px-2 sm:px-3">
                         Set Default
                       </Button>
                     )}
-                    <Button size="sm" variant="ghost" className="text-gray-500">
-                      <ChevronDown className="h-4 w-4" />
+                    <Button size="sm" variant="ghost" className="text-gray-500 h-7 sm:h-8 w-7 sm:w-8 p-0">
+                      <ChevronDown className="h-3 w-3 sm:h-4 sm:w-4" />
                     </Button>
                   </div>
                 </div>
               ))}
               
               <Button 
-                className="w-full bg-gray-100 hover:bg-gray-200 text-gray-800 border border-dashed border-gray-300"
+                className="w-full bg-gray-100 hover:bg-gray-200 text-gray-800 border border-dashed border-gray-300 text-xs sm:text-sm h-8 sm:h-9"
               >
-                <Plus className="h-4 w-4 mr-2" />
+                <Plus className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
                 Add New Payment Method
               </Button>
             </div>

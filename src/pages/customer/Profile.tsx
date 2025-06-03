@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import DashboardLayout from '@/components/layout/DashboardLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -40,35 +39,39 @@ const ProfilePage = () => {
 
   return (
     <DashboardLayout userRole="CUSTOMER">
-      <div className="p-2 sm:p-4 md:p-6 max-w-full mx-auto space-y-4 md:space-y-6">
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+      <div className="p-2 sm:p-4 md:p-6 max-w-full mx-auto space-y-3 sm:space-y-4 md:space-y-6">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4">
           <div>
-            <h1 className="text-2xl font-bold">My Profile</h1>
-            <p className="text-gray-600">
+            <h1 className="text-lg sm:text-xl md:text-2xl font-bold">My Profile</h1>
+            <p className="text-sm sm:text-base text-gray-600">
               Manage your profile information and settings
             </p>
           </div>
-          <Button onClick={() => setIsEditing(true)} disabled={isEditing}>
-            <Settings className="mr-2 h-4 w-4" />
+          <Button 
+            onClick={() => setIsEditing(true)} 
+            disabled={isEditing}
+            className="text-sm sm:text-base w-full sm:w-auto"
+          >
+            <Settings className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" />
             Edit Profile
           </Button>
         </div>
 
         <Card>
-          <CardHeader>
-            <CardTitle>Profile Information</CardTitle>
-            <CardDescription>View and update your personal details</CardDescription>
+          <CardHeader className="pb-3 sm:pb-4">
+            <CardTitle className="text-base sm:text-lg">Profile Information</CardTitle>
+            <CardDescription className="text-sm">View and update your personal details</CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="pt-0">
             <Tabs defaultValue="account" className="w-full">
-              <TabsList className="mb-4">
-                <TabsTrigger value="account">Account</TabsTrigger>
-                <TabsTrigger value="security">Security</TabsTrigger>
-                <TabsTrigger value="preferences">Preferences</TabsTrigger>
+              <TabsList className="mb-3 sm:mb-4 w-full">
+                <TabsTrigger value="account" className="text-xs sm:text-sm flex-1">Account</TabsTrigger>
+                <TabsTrigger value="security" className="text-xs sm:text-sm flex-1">Security</TabsTrigger>
+                <TabsTrigger value="preferences" className="text-xs sm:text-sm flex-1">Preferences</TabsTrigger>
               </TabsList>
 
               <TabsContent value="account">
-                <div className="flex flex-col md:flex-row gap-6">
+                <div className="flex flex-col lg:flex-row gap-4 sm:gap-6">
                   <ProfileAvatar name={profileData.name} />
                   <ProfileForm 
                     profileData={profileData}
@@ -91,7 +94,7 @@ const ProfilePage = () => {
           </CardContent>
         </Card>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
           <AccountSummary profileData={profileData} />
           <RecentActivity />
         </div>
