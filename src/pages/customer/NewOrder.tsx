@@ -257,35 +257,35 @@ const NewOrder = () => {
 
   return (
     <DashboardLayout userRole="CUSTOMER">
-      <div className="p-3 md:p-6 max-w-7xl mx-auto">
-        {/* Header - Modified for better mobile display */}
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4 md:mb-6">
+      <div className="p-2 sm:p-3 md:p-6 max-w-7xl mx-auto">
+        {/* Header - Improved mobile layout */}
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-3 sm:mb-4 md:mb-6">
           <div>
-            <h1 className="text-xl md:text-2xl font-bold">New Order</h1>
-            <p className="text-sm text-gray-600">Browse eco-friendly products and schedule deliveries</p>
+            <h1 className="text-lg sm:text-xl md:text-2xl font-bold">New Order</h1>
+            <p className="text-xs sm:text-sm text-gray-600">Browse eco-friendly products and schedule deliveries</p>
           </div>
           
           <div className="flex items-center gap-2 w-full sm:w-auto">
             <Button 
               variant="outline" 
               size="sm" 
-              className="flex items-center gap-2 flex-1 sm:flex-initial justify-center"
+              className="flex items-center gap-1 sm:gap-2 flex-1 sm:flex-initial justify-center text-xs sm:text-sm h-8 sm:h-9"
               onClick={() => navigate('/customer')}
             >
-              <X className="h-4 w-4" />
-              <span className="sm:inline">Cancel</span>
+              <X className="h-3 w-3 sm:h-4 sm:w-4" />
+              <span>Cancel</span>
             </Button>
             
             <Button 
               variant="default" 
               size="sm" 
-              className="flex items-center gap-2 relative flex-1 sm:flex-initial justify-center"
+              className="flex items-center gap-1 sm:gap-2 relative flex-1 sm:flex-initial justify-center text-xs sm:text-sm h-8 sm:h-9"
               onClick={() => setIsCartOpen(true)}
             >
-              <ShoppingCart className="h-4 w-4" />
-              <span className="sm:inline">Cart</span>
+              <ShoppingCart className="h-3 w-3 sm:h-4 sm:w-4" />
+              <span>Cart</span>
               {cartItemCount > 0 && (
-                <Badge className="absolute -top-2 -right-2 px-1.5 py-0.5 bg-primary text-black text-xs rounded-full">
+                <Badge className="absolute -top-1 -right-1 px-1 py-0 bg-primary text-black text-xs rounded-full min-w-[16px] h-4 flex items-center justify-center">
                   {cartItemCount}
                 </Badge>
               )}
@@ -294,22 +294,22 @@ const NewOrder = () => {
         </div>
         
         {/* Search and Filters - Improved mobile layout */}
-        <div className="bg-white rounded-lg shadow-sm border p-3 md:p-4 mb-4 md:mb-6">
-          <div className="flex flex-col gap-3">
+        <div className="bg-white rounded-lg shadow-sm border p-2 sm:p-3 md:p-4 mb-3 sm:mb-4 md:mb-6">
+          <div className="flex flex-col gap-2 sm:gap-3">
             <div className="relative w-full">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+              <Search className="absolute left-2 sm:left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-3 w-3 sm:h-4 sm:w-4" />
               <Input
                 type="text"
                 placeholder="Search products, vendors..."
-                className="pl-10 w-full"
+                className="pl-8 sm:pl-10 w-full text-xs sm:text-sm h-8 sm:h-9"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
             </div>
             
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-col sm:flex-row gap-2">
               <Select value={sortBy} onValueChange={setSortBy}>
-                <SelectTrigger className="w-full sm:w-[140px]">
+                <SelectTrigger className="w-full sm:w-[140px] h-8 sm:h-9 text-xs sm:text-sm">
                   <SelectValue placeholder="Sort by" />
                 </SelectTrigger>
                 <SelectContent>
@@ -320,20 +320,20 @@ const NewOrder = () => {
                 </SelectContent>
               </Select>
               
-              <Button variant="outline" className="flex items-center gap-2 flex-1 sm:flex-initial justify-center">
-                <Filter className="h-4 w-4" />
+              <Button variant="outline" className="flex items-center gap-1 sm:gap-2 flex-1 sm:flex-initial justify-center text-xs sm:text-sm h-8 sm:h-9">
+                <Filter className="h-3 w-3 sm:h-4 sm:w-4" />
                 <span>Filters</span>
               </Button>
             </div>
           </div>
           
-          <div className="mt-3 md:mt-4">
+          <div className="mt-2 sm:mt-3 md:mt-4">
             <div className="flex flex-wrap items-center gap-y-2">
-              <span className="text-sm text-gray-500 mr-2">Vendors:</span>
-              <div className="flex flex-wrap gap-2">
+              <span className="text-xs sm:text-sm text-gray-500 mr-2">Vendors:</span>
+              <div className="flex flex-wrap gap-1 sm:gap-2">
                 <Badge 
                   variant={selectedVendor === null ? "default" : "outline"}
-                  className="cursor-pointer text-xs md:text-sm"
+                  className="cursor-pointer text-xs px-2 py-1 h-6 sm:h-7"
                   onClick={() => setSelectedVendor(null)}
                 >
                   All
@@ -343,7 +343,7 @@ const NewOrder = () => {
                   <Badge 
                     key={vendor.id} 
                     variant={selectedVendor === vendor.id ? "default" : "outline"}
-                    className="cursor-pointer text-xs md:text-sm"
+                    className="cursor-pointer text-xs px-2 py-1 h-6 sm:h-7"
                     onClick={() => setSelectedVendor(vendor.id)}
                   >
                     {vendor.name}
@@ -355,20 +355,20 @@ const NewOrder = () => {
         </div>
         
         {/* Main Content - Responsive grid layout */}
-        <div className="flex flex-col lg:flex-row gap-4 md:gap-6">
+        <div className="flex flex-col lg:flex-row gap-3 sm:gap-4 md:gap-6">
           {/* Categories Sidebar - Collapsible on mobile */}
           <div className="lg:w-1/4 w-full">
             <Card>
-              <CardHeader className="py-3 md:py-4">
-                <CardTitle className="text-base md:text-lg">Categories</CardTitle>
+              <CardHeader className="py-2 sm:py-3 md:py-4">
+                <CardTitle className="text-sm sm:text-base md:text-lg">Categories</CardTitle>
               </CardHeader>
-              <CardContent className="p-2">
+              <CardContent className="p-1 sm:p-2">
                 <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-1 gap-1">
                   {categories.map(category => (
                     <Button
                       key={category}
                       variant={selectedCategory === category ? "default" : "ghost"}
-                      className={`w-full justify-start text-xs md:text-sm py-1.5 px-2 h-auto ${selectedCategory === category ? 'bg-primary text-black' : ''}`}
+                      className={`w-full justify-start text-xs py-1.5 px-2 h-auto ${selectedCategory === category ? 'bg-primary text-black' : ''}`}
                       onClick={() => setSelectedCategory(category)}
                     >
                       {category}
@@ -382,20 +382,20 @@ const NewOrder = () => {
           {/* Products Grid - Responsive grid */}
           <div className="lg:w-3/4 w-full">
             <Card>
-              <CardHeader className="pb-2 py-3 md:py-4">
+              <CardHeader className="pb-1 sm:pb-2 py-2 sm:py-3 md:py-4">
                 <div className="flex justify-between items-center">
-                  <CardTitle className="text-base md:text-lg">
+                  <CardTitle className="text-sm sm:text-base md:text-lg">
                     {selectedCategory === 'All Products' ? 'All Products' : selectedCategory}
                   </CardTitle>
-                  <span className="text-xs md:text-sm text-gray-500">
-                    {filteredProducts.length} products found
+                  <span className="text-xs text-gray-500">
+                    {filteredProducts.length} products
                   </span>
                 </div>
               </CardHeader>
               
-              <CardContent>
+              <CardContent className="pt-1 sm:pt-2">
                 {currentProducts.length > 0 ? (
-                  <div className="grid grid-cols-1 xs:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 2xl:grid-cols-4 gap-3 md:gap-4">
+                  <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 2xl:grid-cols-4 gap-2 sm:gap-3 md:gap-4">
                     {currentProducts.map(product => (
                       <ProductCard 
                         key={product.id} 
@@ -405,10 +405,11 @@ const NewOrder = () => {
                     ))}
                   </div>
                 ) : (
-                  <div className="text-center py-8">
-                    <p className="text-gray-500">No products found matching your criteria.</p>
+                  <div className="text-center py-6 sm:py-8">
+                    <p className="text-gray-500 text-sm">No products found matching your criteria.</p>
                     <Button 
                       variant="link" 
+                      className="text-xs sm:text-sm"
                       onClick={() => {
                         setSearchQuery('');
                         setSelectedCategory('All Products');
@@ -423,19 +424,19 @@ const NewOrder = () => {
               
               {/* Pagination - Improved for mobile */}
               {totalPages > 1 && (
-                <CardFooter className="flex justify-center pt-2 pb-4">
+                <CardFooter className="flex justify-center pt-1 sm:pt-2 pb-2 sm:pb-4">
                   <div className="flex items-center gap-2">
                     <Button 
                       variant="outline" 
                       size="sm" 
                       disabled={currentPage === 1}
                       onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-                      className="h-8 px-2 md:px-3"
+                      className="h-7 sm:h-8 px-2 text-xs sm:text-sm"
                     >
                       Previous
                     </Button>
                     
-                    <span className="text-xs md:text-sm">
+                    <span className="text-xs">
                       Page {currentPage} of {totalPages}
                     </span>
                     
@@ -444,7 +445,7 @@ const NewOrder = () => {
                       size="sm" 
                       disabled={currentPage === totalPages}
                       onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-                      className="h-8 px-2 md:px-3"
+                      className="h-7 sm:h-8 px-2 text-xs sm:text-sm"
                     >
                       Next
                     </Button>
