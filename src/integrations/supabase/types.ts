@@ -9,41 +9,306 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      audit_logs: {
+        Row: {
+          action: string
+          admin_id: string | null
+          created_at: string
+          id: string
+          ip_address: unknown | null
+          new_values: Json | null
+          old_values: Json | null
+          target_id: string | null
+          target_type: string
+          user_agent: string | null
+        }
+        Insert: {
+          action: string
+          admin_id?: string | null
+          created_at?: string
+          id?: string
+          ip_address?: unknown | null
+          new_values?: Json | null
+          old_values?: Json | null
+          target_id?: string | null
+          target_type: string
+          user_agent?: string | null
+        }
+        Update: {
+          action?: string
+          admin_id?: string | null
+          created_at?: string
+          id?: string
+          ip_address?: unknown | null
+          new_values?: Json | null
+          old_values?: Json | null
+          target_id?: string | null
+          target_type?: string
+          user_agent?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "audit_logs_admin_id_fkey"
+            columns: ["admin_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      notifications: {
+        Row: {
+          created_at: string
+          expires_at: string | null
+          id: string
+          is_read: boolean | null
+          message: string
+          metadata: Json | null
+          priority: string | null
+          title: string
+          type: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          is_read?: boolean | null
+          message: string
+          metadata?: Json | null
+          priority?: string | null
+          title: string
+          type: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          is_read?: boolean | null
+          message?: string
+          metadata?: Json | null
+          priority?: string | null
+          title?: string
+          type?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notifications_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      order_items: {
+        Row: {
+          carbon_impact: number | null
+          created_at: string
+          id: string
+          is_eco_friendly: boolean | null
+          order_id: string
+          product_category: string | null
+          product_description: string | null
+          product_name: string
+          quantity: number
+          total_price: number
+          unit_price: number
+        }
+        Insert: {
+          carbon_impact?: number | null
+          created_at?: string
+          id?: string
+          is_eco_friendly?: boolean | null
+          order_id: string
+          product_category?: string | null
+          product_description?: string | null
+          product_name: string
+          quantity: number
+          total_price: number
+          unit_price: number
+        }
+        Update: {
+          carbon_impact?: number | null
+          created_at?: string
+          id?: string
+          is_eco_friendly?: boolean | null
+          order_id?: string
+          product_category?: string | null
+          product_description?: string | null
+          product_name?: string
+          quantity?: number
+          total_price?: number
+          unit_price?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "order_items_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      orders: {
+        Row: {
+          cancel_reason: string | null
+          cancelled_at: string | null
+          carbon_credits_earned: number | null
+          created_at: string
+          customer_id: string
+          delivered_at: string | null
+          delivery_address: Json
+          delivery_fee: number | null
+          delivery_type: string
+          estimated_delivery_time: string | null
+          id: string
+          order_number: string
+          payment_method: string | null
+          payment_status: string
+          rider_id: string | null
+          special_instructions: string | null
+          status: string
+          subtotal: number
+          time_slot: string | null
+          total_amount: number
+          updated_at: string
+          vendor_id: string | null
+        }
+        Insert: {
+          cancel_reason?: string | null
+          cancelled_at?: string | null
+          carbon_credits_earned?: number | null
+          created_at?: string
+          customer_id: string
+          delivered_at?: string | null
+          delivery_address: Json
+          delivery_fee?: number | null
+          delivery_type?: string
+          estimated_delivery_time?: string | null
+          id?: string
+          order_number: string
+          payment_method?: string | null
+          payment_status?: string
+          rider_id?: string | null
+          special_instructions?: string | null
+          status?: string
+          subtotal: number
+          time_slot?: string | null
+          total_amount: number
+          updated_at?: string
+          vendor_id?: string | null
+        }
+        Update: {
+          cancel_reason?: string | null
+          cancelled_at?: string | null
+          carbon_credits_earned?: number | null
+          created_at?: string
+          customer_id?: string
+          delivered_at?: string | null
+          delivery_address?: Json
+          delivery_fee?: number | null
+          delivery_type?: string
+          estimated_delivery_time?: string | null
+          id?: string
+          order_number?: string
+          payment_method?: string | null
+          payment_status?: string
+          rider_id?: string | null
+          special_instructions?: string | null
+          status?: string
+          subtotal?: number
+          time_slot?: string | null
+          total_amount?: number
+          updated_at?: string
+          vendor_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "orders_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "orders_rider_id_fkey"
+            columns: ["rider_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "orders_vendor_id_fkey"
+            columns: ["vendor_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
+          address: Json | null
           avatar: string | null
           carbon_credits: number | null
           created_at: string | null
+          date_of_birth: string | null
           email: string
+          email_verified_at: string | null
+          gender: string | null
           id: string
           last_active: string | null
+          last_login_at: string | null
+          login_count: number | null
           mfa_enabled: boolean | null
           name: string
+          phone: string | null
           role: string
+          status: string | null
           verified: boolean | null
         }
         Insert: {
+          address?: Json | null
           avatar?: string | null
           carbon_credits?: number | null
           created_at?: string | null
+          date_of_birth?: string | null
           email: string
+          email_verified_at?: string | null
+          gender?: string | null
           id: string
           last_active?: string | null
+          last_login_at?: string | null
+          login_count?: number | null
           mfa_enabled?: boolean | null
           name: string
+          phone?: string | null
           role: string
+          status?: string | null
           verified?: boolean | null
         }
         Update: {
+          address?: Json | null
           avatar?: string | null
           carbon_credits?: number | null
           created_at?: string | null
+          date_of_birth?: string | null
           email?: string
+          email_verified_at?: string | null
+          gender?: string | null
           id?: string
           last_active?: string | null
+          last_login_at?: string | null
+          login_count?: number | null
           mfa_enabled?: boolean | null
           name?: string
+          phone?: string | null
           role?: string
+          status?: string | null
           verified?: boolean | null
         }
         Relationships: []
@@ -53,7 +318,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      generate_order_number: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
     }
     Enums: {
       [_ in never]: never

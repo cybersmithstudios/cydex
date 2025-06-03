@@ -14,9 +14,11 @@ import {
   Shield, 
   TrendingUp,
   AlertTriangle,
-  CheckCircle
+  CheckCircle,
+  DollarSign,
+  Package
 } from 'lucide-react';
-import { getAllUsers, updateUserRole } from '@/utils/adminUtils';
+import { getAllUsers, updateUserRole, getSystemStats, updateUserStatus } from '@/utils/adminUtils';
 import { toast } from 'sonner';
 
 interface UserProfile {
@@ -24,15 +26,46 @@ interface UserProfile {
   name: string;
   email: string;
   role: string;
+  status: string;
   verified: boolean;
   created_at: string;
+  last_login_at?: string;
+  login_count?: number;
+}
+
+interface SystemStats {
+  totalUsers: number;
+  activeUsers: number;
+  admins: number;
+  vendors: number;
+  riders: number;
+  customers: number;
+  totalOrders: number;
+  pendingOrders: number;
+  deliveredOrders: number;
+  totalRevenue: number;
+  monthlyRevenue: number;
 }
 
 const AdminDashboard = () => {
   const { user, loading, isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const [users, setUsers] = useState<UserProfile[]>([]);
+  const [stats, setStats] = useState<SystemStats>({
+    totalUsers: 0,
+    activeUsers: 0,
+    admins: 0,
+    vendors: 0,
+    riders: 0,
+    customers: 0,
+    totalOrders: 0,
+    pendingOrders: 0,
+    deliveredOrders: 0,
+    totalRevenue: 0,
+    monthlyRevenue: 0
+  });
   const [isLoadingUsers, setIsLoadingUsers] = useState(true);
+  const [isLoadingStats, setIsLoadingStats] = useState(true);
 
   useEffect(() => {
     if (!loading && (!isAuthenticated || user?.role !== 'ADMIN')) {
@@ -42,6 +75,7 @@ const AdminDashboard = () => {
 
     if (user?.role === 'ADMIN') {
       loadUsers();
+      loadStats();
     }
   }, [user, loading, isAuthenticated, navigate]);
 
@@ -58,12 +92,26 @@ const AdminDashboard = () => {
     }
   };
 
+  const loadStats = async () => {
+    setIsLoadingStats(true);
+    try {
+      const systemStats = await getSystemStats();
+      setStats(systemStats);
+    } catch (error) {
+      console.error('Error loading stats:', error);
+      toast.error('Failed to load system statistics');
+    } finally {
+      setIsLoadingStats(false);
+    }
+  };
+
   const handleRoleChange = async (userId: string, newRole: string) => {
     try {
       const success = await updateUserRole(userId, newRole);
       if (success) {
         toast.success(`User role updated to ${newRole}`);
-        loadUsers(); // Refresh the users list
+        loadUsers();
+        loadStats(); // Refresh stats after role change
       } else {
         toast.error('Failed to update user role');
       }
@@ -73,23 +121,49 @@ const AdminDashboard = () => {
     }
   };
 
+  const handleStatusChange = async (userId: string, newStatus: string) => {
+    try {
+      const success = await updateUserStatus(userId, newStatus);
+      if (success) {
+        toast.success(`User status updated to ${newStatus}`);
+        loadUsers();
+        loadStats(); // Refresh stats after status change
+      } else {
+        toast.error('Failed to update user status');
+      }
+    } catch (error) {
+      console.error('Error updating status:', error);
+      toast.error('Failed to update user status');
+    }
+  };
+
   const getRoleBadgeColor = (role: string) => {
-    switch (role?.toUpperCase()) {
-      case 'ADMIN': return 'bg-red-100 text-red-800 hover:bg-red-200';
-      case 'VENDOR': return 'bg-blue-100 text-blue-800 hover:bg-blue-200';
-      case 'RIDER': return 'bg-green-100 text-green-800 hover:bg-green-200';
-      case 'CUSTOMER': return 'bg-gray-100 text-gray-800 hover:bg-gray-200';
+    switch (role?.toLowerCase()) {
+      case 'admin': return 'bg-red-100 text-red-800 hover:bg-red-200';
+      case 'vendor': return 'bg-blue-100 text-blue-800 hover:bg-blue-200';
+      case 'rider': return 'bg-green-100 text-green-800 hover:bg-green-200';
+      case 'customer': return 'bg-gray-100 text-gray-800 hover:bg-gray-200';
       default: return 'bg-gray-100 text-gray-800 hover:bg-gray-200';
     }
   };
 
-  const stats = {
-    totalUsers: users.length,
-    admins: users.filter(u => u.role?.toUpperCase() === 'ADMIN').length,
-    vendors: users.filter(u => u.role?.toUpperCase() === 'VENDOR').length,
-    riders: users.filter(u => u.role?.toUpperCase() === 'RIDER').length,
-    customers: users.filter(u => u.role?.toUpperCase() === 'CUSTOMER').length,
-    verifiedUsers: users.filter(u => u.verified).length
+  const getStatusBadgeColor = (status: string) => {
+    switch (status?.toLowerCase()) {
+      case 'active': return 'bg-green-100 text-green-800';
+      case 'inactive': return 'bg-gray-100 text-gray-800';
+      case 'suspended': return 'bg-yellow-100 text-yellow-800';
+      case 'banned': return 'bg-red-100 text-red-800';
+      default: return 'bg-gray-100 text-gray-800';
+    }
+  };
+
+  const formatCurrency = (amount: number) => {
+    return new Intl.NumberFormat('en-NG', {
+      style: 'currency',
+      currency: 'NGN',
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0
+    }).format(amount);
   };
 
   if (loading) {
@@ -132,49 +206,102 @@ const AdminDashboard = () => {
               <Users className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{stats.totalUsers}</div>
+              <div className="text-2xl font-bold">
+                {isLoadingStats ? '...' : stats.totalUsers}
+              </div>
               <p className="text-xs text-muted-foreground">
-                {stats.verifiedUsers} verified accounts
+                {isLoadingStats ? '...' : stats.activeUsers} active accounts
               </p>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Vendors</CardTitle>
-              <ShoppingBag className="h-4 w-4 text-muted-foreground" />
+              <CardTitle className="text-sm font-medium">Total Orders</CardTitle>
+              <Package className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{stats.vendors}</div>
+              <div className="text-2xl font-bold">
+                {isLoadingStats ? '...' : stats.totalOrders}
+              </div>
               <p className="text-xs text-muted-foreground">
-                Active vendor accounts
+                {isLoadingStats ? '...' : stats.pendingOrders} pending orders
               </p>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Riders</CardTitle>
-              <Truck className="h-4 w-4 text-muted-foreground" />
+              <CardTitle className="text-sm font-medium">Monthly Revenue</CardTitle>
+              <DollarSign className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{stats.riders}</div>
+              <div className="text-2xl font-bold">
+                {isLoadingStats ? '...' : formatCurrency(stats.monthlyRevenue)}
+              </div>
               <p className="text-xs text-muted-foreground">
-                Delivery partners
+                {isLoadingStats ? '...' : stats.deliveredOrders} delivered this month
               </p>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Customers</CardTitle>
+              <CardTitle className="text-sm font-medium">Platform Health</CardTitle>
               <TrendingUp className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{stats.customers}</div>
+              <div className="text-2xl font-bold text-green-600">Healthy</div>
               <p className="text-xs text-muted-foreground">
-                Platform users
+                All systems operational
               </p>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Role Distribution */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm">Vendors</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-xl font-bold text-blue-600">
+                {isLoadingStats ? '...' : stats.vendors}
+              </div>
+            </CardContent>
+          </Card>
+          
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm">Riders</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-xl font-bold text-green-600">
+                {isLoadingStats ? '...' : stats.riders}
+              </div>
+            </CardContent>
+          </Card>
+          
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm">Customers</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-xl font-bold text-purple-600">
+                {isLoadingStats ? '...' : stats.customers}
+              </div>
+            </CardContent>
+          </Card>
+          
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm">Admins</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-xl font-bold text-red-600">
+                {isLoadingStats ? '...' : stats.admins}
+              </div>
             </CardContent>
           </Card>
         </div>
@@ -195,7 +322,7 @@ const AdminDashboard = () => {
               </div>
             ) : (
               <div className="space-y-4">
-                {users.map((user) => (
+                {users.slice(0, 10).map((user) => (
                   <div key={user.id} className="flex items-center justify-between p-4 border rounded-lg">
                     <div className="flex items-center space-x-4">
                       <div>
@@ -208,23 +335,33 @@ const AdminDashboard = () => {
                           )}
                         </div>
                         <p className="text-sm text-gray-600">{user.email}</p>
-                        <p className="text-xs text-gray-500">
-                          Joined {new Date(user.created_at).toLocaleDateString()}
-                        </p>
+                        <div className="flex items-center space-x-2 mt-1">
+                          <p className="text-xs text-gray-500">
+                            Joined {new Date(user.created_at).toLocaleDateString()}
+                          </p>
+                          {user.last_login_at && (
+                            <p className="text-xs text-gray-500">
+                              • Last login {new Date(user.last_login_at).toLocaleDateString()}
+                            </p>
+                          )}
+                        </div>
                       </div>
                     </div>
                     <div className="flex items-center space-x-2">
                       <Badge className={getRoleBadgeColor(user.role)}>
                         {user.role}
                       </Badge>
+                      <Badge className={getStatusBadgeColor(user.status)}>
+                        {user.status}
+                      </Badge>
                       <div className="flex space-x-1">
-                        {['CUSTOMER', 'VENDOR', 'RIDER', 'ADMIN'].map((role) => (
+                        {['customer', 'vendor', 'rider', 'admin'].map((role) => (
                           <Button
                             key={role}
-                            variant={user.role?.toUpperCase() === role ? "default" : "outline"}
+                            variant={user.role?.toLowerCase() === role ? "default" : "outline"}
                             size="sm"
                             onClick={() => handleRoleChange(user.id, role)}
-                            disabled={user.role?.toUpperCase() === role}
+                            disabled={user.role?.toLowerCase() === role}
                           >
                             {role}
                           </Button>
@@ -233,6 +370,14 @@ const AdminDashboard = () => {
                     </div>
                   </div>
                 ))}
+                
+                {users.length > 10 && (
+                  <div className="text-center pt-4">
+                    <Button variant="outline" onClick={() => navigate('/admin/users')}>
+                      View All Users ({users.length})
+                    </Button>
+                  </div>
+                )}
               </div>
             )}
           </CardContent>
