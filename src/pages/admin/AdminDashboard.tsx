@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '@/contexts/SupabaseAuthContext';
 import { useNavigate } from 'react-router-dom';
@@ -183,30 +182,30 @@ const AdminDashboard = () => {
 
   return (
     <DashboardLayout userRole="ADMIN">
-      <div className="p-6 max-w-7xl mx-auto space-y-6">
+      <div className="p-2 sm:p-4 md:p-6 max-w-7xl mx-auto space-y-3 sm:space-y-4 md:space-y-6">
         {/* Header */}
-        <div className="flex justify-between items-center">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">System Administration</h1>
-            <p className="text-gray-600 mt-1">
+            <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900">System Administration</h1>
+            <p className="text-sm sm:text-base text-gray-600 mt-1">
               Welcome back, {user?.name}. Manage your platform from here.
             </p>
           </div>
-          <Badge className="bg-red-100 text-red-800 px-3 py-1">
-            <Shield className="w-4 h-4 mr-1" />
+          <Badge className="bg-red-100 text-red-800 px-2 sm:px-3 py-1 text-xs sm:text-sm">
+            <Shield className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
             Administrator
           </Badge>
         </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
           <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Users</CardTitle>
-              <Users className="h-4 w-4 text-muted-foreground" />
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1 sm:pb-2">
+              <CardTitle className="text-xs sm:text-sm font-medium">Total Users</CardTitle>
+              <Users className="h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground" />
             </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">
+            <CardContent className="pt-1 sm:pt-2">
+              <div className="text-lg sm:text-xl md:text-2xl font-bold">
                 {isLoadingStats ? '...' : stats.totalUsers}
               </div>
               <p className="text-xs text-muted-foreground">
@@ -216,12 +215,12 @@ const AdminDashboard = () => {
           </Card>
 
           <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Orders</CardTitle>
-              <Package className="h-4 w-4 text-muted-foreground" />
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1 sm:pb-2">
+              <CardTitle className="text-xs sm:text-sm font-medium">Total Orders</CardTitle>
+              <Package className="h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground" />
             </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">
+            <CardContent className="pt-1 sm:pt-2">
+              <div className="text-lg sm:text-xl md:text-2xl font-bold">
                 {isLoadingStats ? '...' : stats.totalOrders}
               </div>
               <p className="text-xs text-muted-foreground">
@@ -231,12 +230,12 @@ const AdminDashboard = () => {
           </Card>
 
           <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Monthly Revenue</CardTitle>
-              <DollarSign className="h-4 w-4 text-muted-foreground" />
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1 sm:pb-2">
+              <CardTitle className="text-xs sm:text-sm font-medium">Monthly Revenue</CardTitle>
+              <DollarSign className="h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground" />
             </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">
+            <CardContent className="pt-1 sm:pt-2">
+              <div className="text-lg sm:text-xl md:text-2xl font-bold">
                 {isLoadingStats ? '...' : formatCurrency(stats.monthlyRevenue)}
               </div>
               <p className="text-xs text-muted-foreground">
@@ -246,12 +245,12 @@ const AdminDashboard = () => {
           </Card>
 
           <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Platform Health</CardTitle>
-              <TrendingUp className="h-4 w-4 text-muted-foreground" />
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1 sm:pb-2">
+              <CardTitle className="text-xs sm:text-sm font-medium">Platform Health</CardTitle>
+              <TrendingUp className="h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground" />
             </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-green-600">Healthy</div>
+            <CardContent className="pt-1 sm:pt-2">
+              <div className="text-lg sm:text-xl md:text-2xl font-bold text-green-600">Healthy</div>
               <p className="text-xs text-muted-foreground">
                 All systems operational
               </p>
@@ -260,46 +259,46 @@ const AdminDashboard = () => {
         </div>
 
         {/* Role Distribution */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-3 md:gap-4">
           <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm">Vendors</CardTitle>
+            <CardHeader className="pb-1 sm:pb-2">
+              <CardTitle className="text-xs sm:text-sm">Vendors</CardTitle>
             </CardHeader>
-            <CardContent>
-              <div className="text-xl font-bold text-blue-600">
+            <CardContent className="pt-1 sm:pt-2">
+              <div className="text-base sm:text-lg md:text-xl font-bold text-blue-600">
                 {isLoadingStats ? '...' : stats.vendors}
               </div>
             </CardContent>
           </Card>
           
           <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm">Riders</CardTitle>
+            <CardHeader className="pb-1 sm:pb-2">
+              <CardTitle className="text-xs sm:text-sm">Riders</CardTitle>
             </CardHeader>
-            <CardContent>
-              <div className="text-xl font-bold text-green-600">
+            <CardContent className="pt-1 sm:pt-2">
+              <div className="text-base sm:text-lg md:text-xl font-bold text-green-600">
                 {isLoadingStats ? '...' : stats.riders}
               </div>
             </CardContent>
           </Card>
           
           <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm">Customers</CardTitle>
+            <CardHeader className="pb-1 sm:pb-2">
+              <CardTitle className="text-xs sm:text-sm">Customers</CardTitle>
             </CardHeader>
-            <CardContent>
-              <div className="text-xl font-bold text-purple-600">
+            <CardContent className="pt-1 sm:pt-2">
+              <div className="text-base sm:text-lg md:text-xl font-bold text-purple-600">
                 {isLoadingStats ? '...' : stats.customers}
               </div>
             </CardContent>
           </Card>
           
           <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm">Admins</CardTitle>
+            <CardHeader className="pb-1 sm:pb-2">
+              <CardTitle className="text-xs sm:text-sm">Admins</CardTitle>
             </CardHeader>
-            <CardContent>
-              <div className="text-xl font-bold text-red-600">
+            <CardContent className="pt-1 sm:pt-2">
+              <div className="text-base sm:text-lg md:text-xl font-bold text-red-600">
                 {isLoadingStats ? '...' : stats.admins}
               </div>
             </CardContent>
@@ -308,53 +307,55 @@ const AdminDashboard = () => {
 
         {/* User Management */}
         <Card>
-          <CardHeader>
-            <CardTitle>User Management</CardTitle>
-            <CardDescription>
+          <CardHeader className="pb-3 sm:pb-4">
+            <CardTitle className="text-base sm:text-lg">User Management</CardTitle>
+            <CardDescription className="text-sm">
               Manage user roles and permissions across the platform
             </CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="pt-0">
             {isLoadingUsers ? (
-              <div className="text-center py-8">
-                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary mx-auto"></div>
-                <p className="mt-2 text-gray-600">Loading users...</p>
+              <div className="text-center py-6 sm:py-8">
+                <div className="animate-spin rounded-full h-5 w-5 sm:h-6 sm:w-6 border-b-2 border-primary mx-auto"></div>
+                <p className="mt-2 text-gray-600 text-sm">Loading users...</p>
               </div>
             ) : (
-              <div className="space-y-4">
+              <div className="space-y-3 sm:space-y-4">
                 {users.slice(0, 10).map((user) => (
-                  <div key={user.id} className="flex items-center justify-between p-4 border rounded-lg">
-                    <div className="flex items-center space-x-4">
-                      <div>
+                  <div key={user.id} className="flex flex-col sm:flex-row sm:items-center justify-between p-3 sm:p-4 border rounded-lg gap-3 sm:gap-4">
+                    <div className="flex items-center space-x-3 sm:space-x-4 min-w-0">
+                      <div className="min-w-0 flex-1">
                         <div className="flex items-center space-x-2">
-                          <h3 className="font-medium">{user.name}</h3>
+                          <h3 className="font-medium text-sm sm:text-base truncate">{user.name}</h3>
                           {user.verified ? (
-                            <CheckCircle className="h-4 w-4 text-green-500" />
+                            <CheckCircle className="h-3 w-3 sm:h-4 sm:w-4 text-green-500 flex-shrink-0" />
                           ) : (
-                            <AlertTriangle className="h-4 w-4 text-yellow-500" />
+                            <AlertTriangle className="h-3 w-3 sm:h-4 sm:w-4 text-yellow-500 flex-shrink-0" />
                           )}
                         </div>
-                        <p className="text-sm text-gray-600">{user.email}</p>
-                        <div className="flex items-center space-x-2 mt-1">
+                        <p className="text-xs sm:text-sm text-gray-600 truncate">{user.email}</p>
+                        <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-2 mt-1">
                           <p className="text-xs text-gray-500">
                             Joined {new Date(user.created_at).toLocaleDateString()}
                           </p>
                           {user.last_login_at && (
                             <p className="text-xs text-gray-500">
-                              • Last login {new Date(user.last_login_at).toLocaleDateString()}
+                              <span className="hidden sm:inline">• </span>Last login {new Date(user.last_login_at).toLocaleDateString()}
                             </p>
                           )}
                         </div>
                       </div>
                     </div>
-                    <div className="flex items-center space-x-2">
-                      <Badge className={getRoleBadgeColor(user.role)}>
-                        {user.role}
-                      </Badge>
-                      <Badge className={getStatusBadgeColor(user.status)}>
-                        {user.status}
-                      </Badge>
-                      <div className="flex space-x-1">
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-2">
+                      <div className="flex flex-wrap gap-1 sm:gap-2">
+                        <Badge className={`${getRoleBadgeColor(user.role)} text-xs`}>
+                          {user.role}
+                        </Badge>
+                        <Badge className={`${getStatusBadgeColor(user.status)} text-xs`}>
+                          {user.status}
+                        </Badge>
+                      </div>
+                      <div className="flex flex-wrap gap-1 sm:gap-1">
                         {['customer', 'vendor', 'rider', 'admin'].map((role) => (
                           <Button
                             key={role}
@@ -362,6 +363,7 @@ const AdminDashboard = () => {
                             size="sm"
                             onClick={() => handleRoleChange(user.id, role)}
                             disabled={user.role?.toLowerCase() === role}
+                            className="text-xs h-6 sm:h-8 px-2 sm:px-3"
                           >
                             {role}
                           </Button>
@@ -372,8 +374,8 @@ const AdminDashboard = () => {
                 ))}
                 
                 {users.length > 10 && (
-                  <div className="text-center pt-4">
-                    <Button variant="outline" onClick={() => navigate('/admin/users')}>
+                  <div className="text-center pt-3 sm:pt-4">
+                    <Button variant="outline" onClick={() => navigate('/admin/users')} className="text-xs sm:text-sm h-8 sm:h-9">
                       View All Users ({users.length})
                     </Button>
                   </div>
@@ -385,8 +387,8 @@ const AdminDashboard = () => {
 
         {/* Security Notice */}
         <Alert>
-          <Shield className="h-4 w-4" />
-          <AlertDescription>
+          <Shield className="h-3 w-3 sm:h-4 sm:w-4" />
+          <AlertDescription className="text-xs sm:text-sm">
             You are currently logged in with administrator privileges. Please use these permissions responsibly and ensure your account remains secure.
           </AlertDescription>
         </Alert>

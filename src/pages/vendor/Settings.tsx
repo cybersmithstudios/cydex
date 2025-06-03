@@ -99,68 +99,68 @@ const VendorSettingsPage = () => {
 
                   <div className="lg:w-2/3 space-y-3 sm:space-y-4">
                     <FormField
-                      id="name"
+                        id="name"
                       label="Store Name"
-                      placeholder="Your Store Name"
-                      value={profileData.name}
+                        placeholder="Your Store Name"
+                        value={profileData.name}
                       onChange={(value) => handleInputChange('name', value)}
-                      disabled={!isEditing}
-                    />
+                        disabled={!isEditing}
+                      />
                     
                     <FormField
-                      id="email"
+                        id="email"
                       label="Email Address"
-                      placeholder="Your Email"
-                      value={profileData.email}
+                        placeholder="Your Email"
+                        value={profileData.email}
                       onChange={(value) => handleInputChange('email', value)}
-                      disabled={!isEditing}
-                    />
+                        disabled={!isEditing}
+                      />
                     
                     <FormField
-                      id="phone"
+                        id="phone"
                       label="Phone Number"
-                      placeholder="Your Phone"
-                      value={profileData.phone}
+                        placeholder="Your Phone"
+                        value={profileData.phone}
                       onChange={(value) => handleInputChange('phone', value)}
-                      disabled={!isEditing}
-                    />
+                        disabled={!isEditing}
+                      />
                     
                     <FormField
-                      id="address"
+                        id="address"
                       label="Address"
-                      placeholder="Your Address"
-                      value={profileData.address}
+                        placeholder="Your Address"
+                        value={profileData.address}
                       onChange={(value) => handleInputChange('address', value)}
-                      disabled={!isEditing}
-                    />
+                        disabled={!isEditing}
+                      />
                     
                     <FormField
-                      id="description"
+                        id="description"
                       label="Description"
-                      placeholder="Your Store Description"
-                      value={profileData.description}
+                        placeholder="Your Store Description"
+                        value={profileData.description}
                       onChange={(value) => handleInputChange('description', value)}
-                      disabled={!isEditing}
+                        disabled={!isEditing}
                       isTextarea
                     />
                     
                     <FormField
-                      id="businessLicense"
+                        id="businessLicense"
                       label="Business License"
-                      placeholder="Your Business License"
-                      value={profileData.businessLicense}
+                        placeholder="Your Business License"
+                        value={profileData.businessLicense}
                       onChange={(value) => handleInputChange('businessLicense', value)}
-                      disabled={!isEditing}
-                    />
+                        disabled={!isEditing}
+                      />
                     
                     <FormField
-                      id="category"
+                        id="category"
                       label="Category"
-                      placeholder="Your Category"
-                      value={profileData.category}
+                        placeholder="Your Category"
+                        value={profileData.category}
                       onChange={(value) => handleInputChange('category', value)}
-                      disabled={!isEditing}
-                    />
+                        disabled={!isEditing}
+                      />
                   </div>
                 </div>
 

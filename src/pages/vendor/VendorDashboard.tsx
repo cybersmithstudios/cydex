@@ -135,7 +135,7 @@ const VendorDashboard = () => {
           <StatsCard
             title="Today's Sales"
             value={`₦${(pendingOrders.reduce((total, order) => total + order.total, 0) + 
-                      inProgressOrders.reduce((total, order) => total + order.total, 0) + 
+                                                    inProgressOrders.reduce((total, order) => total + order.total, 0) + 
                       completedOrders.reduce((total, order) => total + order.total, 0)).toLocaleString('en-NG', {minimumFractionDigits: 0, maximumFractionDigits: 0})}`}
             subtitle="+12% from yesterday"
             icon={<TrendingUp className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />}
@@ -376,101 +376,101 @@ const OrderCard = ({ order, type }: { order: any; type: 'pending' | 'in-progress
 };
 
 const SustainabilityCard = () => (
-  <Card>
+          <Card>
     <CardHeader className="pb-3 sm:pb-6">
       <CardTitle className="text-base sm:text-lg">Sustainability Status</CardTitle>
       <CardDescription className="text-sm">Track your eco-friendly initiatives</CardDescription>
-    </CardHeader>
-    <CardContent>
+            </CardHeader>
+            <CardContent>
       <div className="space-y-3 sm:space-y-4">
         <div className="bg-primary-light/50 p-3 sm:p-4 rounded-lg">
-          <div className="flex justify-between items-center mb-2">
+                  <div className="flex justify-between items-center mb-2">
             <h4 className="font-medium text-sm sm:text-base">Green Packaging Used</h4>
             <span className="text-base sm:text-lg font-bold">92%</span>
-          </div>
+                  </div>
           <Progress value={92} className="h-1.5 sm:h-2" />
-          <p className="text-xs text-gray-600 mt-2">Goal: 95% by next month</p>
-        </div>
-        
+                  <p className="text-xs text-gray-600 mt-2">Goal: 95% by next month</p>
+                </div>
+                
         <div className="grid grid-cols-2 gap-3 sm:gap-4">
           <div className="p-3 sm:p-4 border rounded-lg">
-            <div className="flex justify-between items-center mb-2">
+                    <div className="flex justify-between items-center mb-2">
               <h4 className="font-medium text-xs sm:text-sm">Carbon Offset</h4>
               <Leaf className="h-4 w-4 sm:h-5 sm:w-5 text-green-600" />
-            </div>
+                    </div>
             <div className="text-lg sm:text-xl font-bold">5.2 tons</div>
-            <p className="text-xs text-gray-600 mt-1">This year</p>
-          </div>
-          
+                    <p className="text-xs text-gray-600 mt-1">This year</p>
+                  </div>
+                  
           <div className="p-3 sm:p-4 border rounded-lg">
-            <div className="flex justify-between items-center mb-2">
+                    <div className="flex justify-between items-center mb-2">
               <h4 className="font-medium text-xs sm:text-sm">Recycling Rate</h4>
               <RecycleIcon className="h-4 w-4 sm:h-5 sm:w-5 text-blue-600" />
-            </div>
+                    </div>
             <div className="text-lg sm:text-xl font-bold">87%</div>
-            <p className="text-xs text-gray-600 mt-1">Packaging returned</p>
-          </div>
-        </div>
-        
+                    <p className="text-xs text-gray-600 mt-1">Packaging returned</p>
+                  </div>
+                </div>
+                
         <Button className="w-full flex items-center justify-center bg-primary hover:bg-primary-hover text-black text-sm">
-          <span>Sustainability Report</span>
+                  <span>Sustainability Report</span>
           <ArrowUpRight className="ml-2 h-3 w-3 sm:h-4 sm:w-4" />
-        </Button>
-      </div>
-    </CardContent>
-  </Card>
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
 );
-
+          
 const CustomerInsightsCard = () => (
-  <Card>
+          <Card>
     <CardHeader className="pb-3 sm:pb-6">
       <CardTitle className="text-base sm:text-lg">Customer Insights</CardTitle>
       <CardDescription className="text-sm">Understanding your eco-conscious customers</CardDescription>
-    </CardHeader>
-    <CardContent>
+            </CardHeader>
+            <CardContent>
       <div className="space-y-3 sm:space-y-4">
-        <div className="flex justify-between items-center p-3 border rounded-lg">
-          <div className="flex items-center">
+                <div className="flex justify-between items-center p-3 border rounded-lg">
+                  <div className="flex items-center">
             <div className="p-1.5 sm:p-2 bg-purple-100 rounded-full mr-2 sm:mr-3">
               <UserCheck className="h-4 w-4 sm:h-5 sm:w-5 text-purple-600" />
-            </div>
-            <div>
+                    </div>
+                    <div>
               <h4 className="font-medium text-sm sm:text-base">Repeat Customers</h4>
               <p className="text-xs sm:text-sm text-gray-600">Last 30 days</p>
-            </div>
-          </div>
+                    </div>
+                  </div>
           <span className="font-bold text-sm sm:text-base">68%</span>
-        </div>
-        
-        <div className="flex justify-between items-center p-3 border rounded-lg">
-          <div className="flex items-center">
+                </div>
+                
+                <div className="flex justify-between items-center p-3 border rounded-lg">
+                  <div className="flex items-center">
             <div className="p-1.5 sm:p-2 bg-blue-100 rounded-full mr-2 sm:mr-3">
               <ShoppingBag className="h-4 w-4 sm:h-5 sm:w-5 text-blue-600" />
-            </div>
-            <div>
+                    </div>
+                    <div>
               <h4 className="font-medium text-sm sm:text-base">Average Order Value</h4>
               <p className="text-xs sm:text-sm text-gray-600">Eco-friendly products</p>
-            </div>
-          </div>
+                    </div>
+                  </div>
           <span className="font-bold text-xs sm:text-sm">₦65,617</span>
-        </div>
-        
+                </div>
+                
         <div className="p-3 sm:p-4 bg-green-50 rounded-lg">
           <h4 className="font-medium mb-2 text-sm sm:text-base">Popular Eco Categories</h4>
-          <div className="space-y-2">
+                  <div className="space-y-2">
             <CategoryProgress label="Organic Produce" value={85} />
             <CategoryProgress label="Zero-Waste Items" value={65} />
             <CategoryProgress label="Plant-Based Foods" value={50} />
-          </div>
-        </div>
-        
+                  </div>
+                </div>
+                
         <Button className="w-full flex items-center justify-center bg-primary hover:bg-primary-hover text-black text-sm">
-          <span>Customer Analytics</span>
+                  <span>Customer Analytics</span>
           <ArrowUpRight className="ml-2 h-3 w-3 sm:h-4 sm:w-4" />
-        </Button>
-      </div>
-    </CardContent>
-  </Card>
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
 );
 
 const CategoryProgress = ({ label, value }: { label: string; value: number }) => (
@@ -478,8 +478,8 @@ const CategoryProgress = ({ label, value }: { label: string; value: number }) =>
     <span className="text-xs sm:text-sm">{label}</span>
     <div className="w-24 sm:w-32">
       <Progress value={value} className="h-1.5 sm:h-2" />
-    </div>
-  </div>
-);
+        </div>
+      </div>
+  );
 
 export default VendorDashboard;

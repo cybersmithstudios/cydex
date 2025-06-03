@@ -241,22 +241,22 @@ const AddProduct = () => {
                       <div className="grid grid-cols-1 gap-4">
                         <div className="border-2 border-dashed border-gray-300 rounded-md p-4 sm:p-6 flex flex-col items-center justify-center bg-gray-50 hover:bg-gray-100 transition-colors">
                           <Upload className="h-8 w-8 sm:h-10 sm:w-10 text-gray-400 mb-2" />
-                          <Label 
-                            htmlFor="image-upload"
+                            <Label 
+                              htmlFor="image-upload"
                             className="cursor-pointer text-blue-500 hover:text-blue-600 font-medium text-sm sm:text-base"
-                          >
-                            Click to upload
-                          </Label>
+                            >
+                              Click to upload
+                            </Label>
                           <p className="text-xs sm:text-sm text-gray-500 mt-1 text-center">
-                            SVG, PNG, JPG or GIF (max. 2MB)
-                          </p>
-                          <Input
-                            id="image-upload"
-                            type="file"
-                            accept="image/*"
-                            className="hidden"
-                            onChange={handleImageUpload}
-                          />
+                              SVG, PNG, JPG or GIF (max. 2MB)
+                            </p>
+                            <Input
+                              id="image-upload"
+                              type="file"
+                              accept="image/*"
+                              className="hidden"
+                              onChange={handleImageUpload}
+                            />
                         </div>
                         
                         {selectedImage && (
@@ -382,28 +382,28 @@ const AddProduct = () => {
                       
                       <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 sm:gap-4">
                         <SustainabilityCheckbox
-                          id="recyclablePackaging"
+                            id="recyclablePackaging"
                           label="Recyclable Packaging"
                           description="Product uses recyclable materials"
-                          checked={form.watch("recyclablePackaging")}
+                            checked={form.watch("recyclablePackaging")}
                           onChange={(checked) => form.setValue("recyclablePackaging", checked)}
-                        />
+                          />
                         
                         <SustainabilityCheckbox
-                          id="organicCertified"
+                            id="organicCertified"
                           label="Organic Certified"
                           description="Product is certified organic"
-                          checked={form.watch("organicCertified")}
+                            checked={form.watch("organicCertified")}
                           onChange={(checked) => form.setValue("organicCertified", checked)}
-                        />
+                          />
                         
                         <SustainabilityCheckbox
-                          id="carbonNeutral"
+                            id="carbonNeutral"
                           label="Carbon Neutral"
                           description="Production is carbon neutral"
-                          checked={form.watch("carbonNeutral")}
+                            checked={form.watch("carbonNeutral")}
                           onChange={(checked) => form.setValue("carbonNeutral", checked)}
-                        />
+                          />
                       </div>
                     </div>
                   </TabsContent>

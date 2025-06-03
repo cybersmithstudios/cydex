@@ -107,7 +107,7 @@ const OrderCard = ({ order }: OrderCardProps) => {
           
           <div className="flex flex-col items-end flex-shrink-0">
             <div className="text-base sm:text-lg font-bold mb-1">{formatPrice(order.total)}</div>
-          </div>
+        </div>
         </div>
         
         {/* Action Buttons */}
@@ -156,31 +156,31 @@ const OrderCard = ({ order }: OrderCardProps) => {
               <ChevronRight className="ml-2 h-3 w-3 sm:h-4 sm:w-4" />
             </Button>
           )}
-        </div>
-        
+      </div>
+      
         {/* Additional Info - Desktop Only */}
-        {!isMobile && (
+      {!isMobile && (
           <div className="pt-3 border-t text-sm text-gray-600 flex flex-wrap gap-x-6 gap-y-1">
-            <div>
-              <span className="font-medium">Payment:</span> {order.paymentMethod}
-            </div>
-            {order.deliveryType && (
-              <div>
-                <span className="font-medium">Delivery:</span> {order.deliveryType}
-              </div>
-            )}
-            {order.timeSlot && (
-              <div>
-                <span className="font-medium">Time Slot:</span> {order.timeSlot}
-              </div>
-            )}
-            {order.rider && (
-              <div>
-                <span className="font-medium">Rider:</span> {order.rider.name}
-              </div>
-            )}
+          <div>
+            <span className="font-medium">Payment:</span> {order.paymentMethod}
           </div>
-        )}
+          {order.deliveryType && (
+            <div>
+              <span className="font-medium">Delivery:</span> {order.deliveryType}
+            </div>
+          )}
+          {order.timeSlot && (
+            <div>
+              <span className="font-medium">Time Slot:</span> {order.timeSlot}
+            </div>
+          )}
+          {order.rider && (
+            <div>
+              <span className="font-medium">Rider:</span> {order.rider.name}
+            </div>
+          )}
+        </div>
+      )}
       </div>
     </div>
   );

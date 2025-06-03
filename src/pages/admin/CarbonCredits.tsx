@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useAuth } from '@/contexts/SupabaseAuthContext';
 import { useNavigate } from 'react-router-dom';
@@ -20,8 +19,8 @@ const AdminCarbonCredits = () => {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
-          <p className="mt-2 text-gray-600">Loading...</p>
+          <div className="animate-spin rounded-full h-6 w-6 sm:h-8 sm:w-8 border-b-2 border-primary mx-auto"></div>
+          <p className="mt-2 text-gray-600 text-sm sm:text-base">Loading...</p>
         </div>
       </div>
     );
@@ -33,7 +32,7 @@ const AdminCarbonCredits = () => {
 
   return (
     <DashboardLayout userRole="ADMIN">
-      <div className="p-6 max-w-7xl mx-auto">
+      <div className="p-2 sm:p-4 md:p-6 max-w-7xl mx-auto">
         <CarbonCreditsComponent />
       </div>
     </DashboardLayout>
