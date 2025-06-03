@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -9,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { getAllOrders, getOrdersByStatus, updateOrderStatus } from '@/utils/adminUtils';
 import { toast } from 'sonner';
+import { Dialog, DialogContent, DialogHeader, DialogFooter, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 
 // Define the order type to match what we actually get from Supabase
 interface OrderFromSupabase {
@@ -34,6 +34,8 @@ export function OrderManagementReal() {
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [isLoading, setIsLoading] = useState(true);
+  const [isDetailDialogOpen, setIsDetailDialogOpen] = useState(false);
+  const [selectedOrder, setSelectedOrder] = useState<OrderFromSupabase | null>(null);
 
   useEffect(() => {
     loadOrders();
@@ -100,6 +102,11 @@ export function OrderManagementReal() {
       return 0;
     }
     return Array.isArray(orderItems) ? orderItems.length : 0;
+  };
+
+  const handleViewDetails = (order: OrderFromSupabase) => {
+    setSelectedOrder(order);
+    setIsDetailDialogOpen(true);
   };
 
   const handleStatusChange = async (orderId: string, newStatus: string) => {
@@ -282,7 +289,7 @@ export function OrderManagementReal() {
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
-                            <DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => handleViewDetails(order)}>
                               <Eye className="h-4 w-4 mr-2" />
                               View Details
                             </DropdownMenuItem>
@@ -319,6 +326,105 @@ export function OrderManagementReal() {
           )}
         </CardContent>
       </Card>
+
+      {/* Order Details Dialog */}
+      <Dialog open={isDetailDialogOpen} onOpenChange={setIsDetailDialogOpen}>
+        <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Order Details</DialogTitle>
+            <DialogDescription>
+              Complete information for order {selectedOrder?.order_number}
+            </DialogDescription>
+          </DialogHeader>
+          {selectedOrder && (
+            <div className="grid gap-6 py-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <h3 className="font-semibold mb-2">Order Information</h3>
+                  <div className="space-y-2 text-sm">
+                    <div><span className="font-medium">Order Number:</span> {selectedOrder.order_number}</div>
+                    <div><span className="font-medium">Status:</span> <Badge className={getStatusBadgeColor(selectedOrder.status)}>{formatStatus(selectedOrder.status)}</Badge></div>
+                    <div><span className="font-medium">Created:</span> {new Date(selectedOrder.created_at).toLocaleString()}</div>
+                    {selectedOrder.delivered_at && (
+                      <div><span className="font-medium">Delivered:</span> {new Date(selectedOrder.delivered_at).toLocaleString()}</div>
+                    )}
+                    <div><span className="font-medium">Delivery Type:</span> {selectedOrder.delivery_type}</div>
+                  </div>
+                </div>
+                <div>
+                  <h3 className="font-semibold mb-2">Customer Information</h3>
+                  <div className="space-y-2 text-sm">
+                    <div><span className="font-medium">Name:</span> {getCustomerName(selectedOrder.customer)}</div>
+                    <div><span className="font-medium">Email:</span> {getCustomerEmail(selectedOrder.customer)}</div>
+                  </div>
+                </div>
+              </div>
+              
+              <div>
+                <h3 className="font-semibold mb-2">Payment Information</h3>
+                <div className="space-y-2 text-sm">
+                  <div><span className="font-medium">Status:</span> <Badge className={getPaymentStatusColor(selectedOrder.payment_status)}>{formatStatus(selectedOrder.payment_status)}</Badge></div>
+                  {selectedOrder.payment_method && (
+                    <div><span className="font-medium">Method:</span> {selectedOrder.payment_method}</div>
+                  )}
+                  <div><span className="font-medium">Total Amount:</span> {formatCurrency(selectedOrder.total_amount)}</div>
+                  {selectedOrder.delivery_fee && selectedOrder.delivery_fee > 0 && (
+                    <div><span className="font-medium">Delivery Fee:</span> {formatCurrency(selectedOrder.delivery_fee)}</div>
+                  )}
+                </div>
+              </div>
+
+              <div>
+                <h3 className="font-semibold mb-2">Order Items ({getOrderItemsCount(selectedOrder.order_items)})</h3>
+                <div className="border rounded-lg">
+                  <table className="w-full text-sm">
+                    <thead className="bg-gray-50">
+                      <tr>
+                        <th className="text-left p-3">Item</th>
+                        <th className="text-right p-3">Quantity</th>
+                        <th className="text-right p-3">Price</th>
+                        <th className="text-right p-3">Total</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {Array.isArray(selectedOrder.order_items) && selectedOrder.order_items.map((item: any, index: number) => (
+                        <tr key={index} className="border-t">
+                          <td className="p-3">{item.product_name || `Item ${index + 1}`}</td>
+                          <td className="text-right p-3">{item.quantity || 1}</td>
+                          <td className="text-right p-3">{formatCurrency(item.unit_price || 0)}</td>
+                          <td className="text-right p-3">{formatCurrency(item.total_price || item.unit_price * item.quantity || 0)}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          )}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsDetailDialogOpen(false)}>
+              Close
+            </Button>
+            {selectedOrder && (
+              <div className="flex gap-2">
+                <Button 
+                  variant="outline" 
+                  onClick={() => handleStatusChange(selectedOrder.id, 'confirmed')}
+                  disabled={selectedOrder.status === 'confirmed'}
+                >
+                  Confirm
+                </Button>
+                <Button 
+                  onClick={() => handleStatusChange(selectedOrder.id, 'delivered')}
+                  disabled={selectedOrder.status === 'delivered'}
+                >
+                  Mark Delivered
+                </Button>
+              </div>
+            )}
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

@@ -2,6 +2,9 @@
 import { Route, Routes } from 'react-router-dom';
 import { ProtectedRoute } from './ProtectedRoute';
 import AdminDashboard from '../pages/admin/AdminDashboard';
+import AdminUsers from '../pages/admin/Users';
+import AdminOrders from '../pages/admin/Orders';
+import AdminPayments from '../pages/admin/Payments';
 
 const AdminRoutes = () => {
   return (
@@ -14,7 +17,30 @@ const AdminRoutes = () => {
           </ProtectedRoute>
         } 
       />
-      {/* Add more admin routes here as needed */}
+      <Route 
+        path="/users" 
+        element={
+          <ProtectedRoute allowedRoles={['ADMIN']}>
+            <AdminUsers />
+          </ProtectedRoute>
+        } 
+      />
+      <Route 
+        path="/orders" 
+        element={
+          <ProtectedRoute allowedRoles={['ADMIN']}>
+            <AdminOrders />
+          </ProtectedRoute>
+        } 
+      />
+      <Route 
+        path="/payments" 
+        element={
+          <ProtectedRoute allowedRoles={['ADMIN']}>
+            <AdminPayments />
+          </ProtectedRoute>
+        } 
+      />
     </Routes>
   );
 };
