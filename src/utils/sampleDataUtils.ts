@@ -3,172 +3,253 @@ import { supabase } from '@/integrations/supabase/client';
 
 export const createSampleUsers = async () => {
   try {
-    // Note: These are sample profiles that would be created when users sign up
-    // In a real application, users would be created through the authentication flow
-    console.log('Sample users should be created through the authentication signup process');
-    
-    // You can use these as reference for the expected data structure
-    const sampleProfiles = [
+    const sampleUsers = [
       {
+        id: '550e8400-e29b-41d4-a716-446655440000',
         name: 'John Customer',
-        email: 'customer@example.com',
+        email: 'john.customer@example.com',
         role: 'customer',
-        status: 'active',
         verified: true,
+        status: 'active',
         carbon_credits: 150
       },
       {
+        id: '550e8400-e29b-41d4-a716-446655440001',
         name: 'Jane Vendor',
-        email: 'vendor@example.com', 
+        email: 'jane.vendor@example.com',
         role: 'vendor',
-        status: 'active',
         verified: true,
+        status: 'active',
         carbon_credits: 200
       },
       {
+        id: '550e8400-e29b-41d4-a716-446655440002',
         name: 'Mike Rider',
-        email: 'rider@example.com',
-        role: 'rider', 
-        status: 'active',
+        email: 'mike.rider@example.com',
+        role: 'rider',
         verified: true,
-        carbon_credits: 120
+        status: 'active',
+        carbon_credits: 100
       },
       {
+        id: '550e8400-e29b-41d4-a716-446655440003',
         name: 'Sarah Admin',
-        email: 'admin@example.com',
+        email: 'sarah.admin@example.com',
         role: 'admin',
-        status: 'active', 
         verified: true,
-        carbon_credits: 300
+        status: 'active',
+        carbon_credits: 500
+      },
+      {
+        id: '550e8400-e29b-41d4-a716-446655440004',
+        name: 'Bob Customer',
+        email: 'bob.customer@example.com',
+        role: 'customer',
+        verified: false,
+        status: 'pending',
+        carbon_credits: 50
       }
     ];
 
-    return sampleProfiles;
+    const { data, error } = await supabase
+      .from('profiles')
+      .upsert(sampleUsers, { onConflict: 'id' });
+
+    if (error) {
+      console.error('Error creating sample users:', error);
+      return false;
+    }
+
+    console.log('Sample users created successfully:', data);
+    return true;
   } catch (error) {
     console.error('Error in createSampleUsers:', error);
-    return [];
+    return false;
   }
 };
 
 export const createSampleOrders = async () => {
   try {
-    // Get existing users to create orders for them
-    const { data: profiles } = await supabase
+    // First ensure we have users to reference
+    const { data: users } = await supabase
       .from('profiles')
       .select('id, role')
-      .limit(10);
+      .in('role', ['customer', 'vendor', 'rider']);
 
-    if (!profiles || profiles.length === 0) {
-      console.log('No users found. Please create users first through authentication.');
-      return [];
+    if (!users || users.length === 0) {
+      console.log('No users found, creating sample users first...');
+      await createSampleUsers();
+      
+      // Re-fetch users
+      const { data: newUsers } = await supabase
+        .from('profiles')
+        .select('id, role')
+        .in('role', ['customer', 'vendor', 'rider']);
+      
+      if (!newUsers || newUsers.length === 0) {
+        console.error('Still no users found after creating sample users');
+        return false;
+      }
     }
 
-    const customers = profiles.filter(p => p.role === 'customer');
-    const vendors = profiles.filter(p => p.role === 'vendor');
-    const riders = profiles.filter(p => p.role === 'rider');
+    const customers = users?.filter(u => u.role === 'customer') || [];
+    const vendors = users?.filter(u => u.role === 'vendor') || [];
+    const riders = users?.filter(u => u.role === 'rider') || [];
 
-    if (customers.length === 0) {
-      console.log('No customers found. Please create customer users first.');
-      return [];
+    if (customers.length === 0 || vendors.length === 0 || riders.length === 0) {
+      console.error('Missing required user types');
+      return false;
     }
 
-    // Sample orders data
     const sampleOrders = [
       {
-        customer_id: customers[0]?.id,
+        customer_id: customers[0].id,
         vendor_id: vendors[0]?.id || null,
         rider_id: riders[0]?.id || null,
+        order_number: `ORD-${Date.now()}-001`,
         status: 'pending',
         payment_status: 'pending',
         delivery_type: 'standard',
         delivery_address: {
           street: '123 Main St',
-          city: 'Lagos',
-          state: 'Lagos',
-          country: 'Nigeria',
-          postal_code: '100001'
+          city: 'New York',
+          state: 'NY',
+          country: 'USA',
+          postal_code: '10001'
         },
-        subtotal: 2500,
-        delivery_fee: 500,
-        total_amount: 3000,
-        carbon_credits_earned: 15,
-        special_instructions: 'Please ring the doorbell twice'
+        subtotal: 45.99,
+        delivery_fee: 5.99,
+        total_amount: 51.98,
+        carbon_credits_earned: 5,
+        payment_method: 'credit_card',
+        special_instructions: 'Leave at front door'
       },
       {
-        customer_id: customers[0]?.id,
+        customer_id: customers[0].id,
         vendor_id: vendors[0]?.id || null,
         rider_id: riders[0]?.id || null,
+        order_number: `ORD-${Date.now()}-002`,
         status: 'delivered',
         payment_status: 'paid',
         delivery_type: 'express',
         delivery_address: {
           street: '456 Oak Ave',
-          city: 'Abuja',
-          state: 'FCT',
-          country: 'Nigeria',
-          postal_code: '900001'
+          city: 'Los Angeles',
+          state: 'CA',
+          country: 'USA',
+          postal_code: '90210'
         },
-        subtotal: 4500,
-        delivery_fee: 800,
-        total_amount: 5300,
-        carbon_credits_earned: 25,
-        delivered_at: new Date().toISOString()
+        subtotal: 78.50,
+        delivery_fee: 9.99,
+        total_amount: 88.49,
+        carbon_credits_earned: 8,
+        payment_method: 'paypal',
+        delivered_at: new Date(Date.now() - 86400000).toISOString(), // 1 day ago
+        special_instructions: 'Ring doorbell'
+      },
+      {
+        customer_id: customers[1]?.id || customers[0].id,
+        vendor_id: vendors[0]?.id || null,
+        rider_id: riders[0]?.id || null,
+        order_number: `ORD-${Date.now()}-003`,
+        status: 'processing',
+        payment_status: 'paid',
+        delivery_type: 'standard',
+        delivery_address: {
+          street: '789 Pine St',
+          city: 'Chicago',
+          state: 'IL',
+          country: 'USA',
+          postal_code: '60601'
+        },
+        subtotal: 32.25,
+        delivery_fee: 4.99,
+        total_amount: 37.24,
+        carbon_credits_earned: 3,
+        payment_method: 'credit_card'
       }
     ];
 
-    const { data: orders, error } = await supabase
+    const { data: orders, error: ordersError } = await supabase
       .from('orders')
       .insert(sampleOrders)
       .select();
 
-    if (error) {
-      console.error('Error creating sample orders:', error);
-      return [];
+    if (ordersError) {
+      console.error('Error creating sample orders:', ordersError);
+      return false;
     }
 
-    // Create order items for the orders
+    // Create sample order items for each order
     if (orders && orders.length > 0) {
-      const sampleOrderItems = [];
+      const orderItems = [];
       
-      for (const order of orders) {
-        sampleOrderItems.push(
+      for (let i = 0; i < orders.length; i++) {
+        const order = orders[i];
+        orderItems.push(
           {
             order_id: order.id,
-            product_name: 'Organic Vegetables Box',
-            product_description: 'Fresh organic vegetables from local farms',
-            product_category: 'Food',
-            quantity: 2,
-            unit_price: 1250,
-            total_price: 2500,
+            product_name: `Organic Product ${i + 1}`,
+            product_description: `Eco-friendly product description ${i + 1}`,
+            product_category: 'organic',
+            quantity: Math.floor(Math.random() * 3) + 1,
+            unit_price: 15.99 + (i * 5),
+            total_price: (15.99 + (i * 5)) * (Math.floor(Math.random() * 3) + 1),
             is_eco_friendly: true,
-            carbon_impact: 5
+            carbon_impact: 2.5
           },
           {
             order_id: order.id,
-            product_name: 'Eco-friendly Cleaning Kit',
-            product_description: 'Biodegradable cleaning supplies',
-            product_category: 'Household',
-            quantity: 1,
-            unit_price: 800,
-            total_price: 800,
+            product_name: `Green Item ${i + 1}`,
+            product_description: `Sustainable product ${i + 1}`,
+            product_category: 'sustainable',
+            quantity: 2,
+            unit_price: 12.50,
+            total_price: 25.00,
             is_eco_friendly: true,
-            carbon_impact: 3
+            carbon_impact: 1.8
           }
         );
       }
 
       const { error: itemsError } = await supabase
         .from('order_items')
-        .insert(sampleOrderItems);
+        .insert(orderItems);
 
       if (itemsError) {
         console.error('Error creating sample order items:', itemsError);
+        return false;
       }
     }
 
-    return orders || [];
+    console.log('Sample orders created successfully:', orders);
+    return true;
   } catch (error) {
     console.error('Error in createSampleOrders:', error);
-    return [];
+    return false;
+  }
+};
+
+export const createAllSampleData = async () => {
+  try {
+    console.log('Creating all sample data...');
+    
+    const usersCreated = await createSampleUsers();
+    if (!usersCreated) {
+      console.error('Failed to create sample users');
+      return false;
+    }
+
+    const ordersCreated = await createSampleOrders();
+    if (!ordersCreated) {
+      console.error('Failed to create sample orders');
+      return false;
+    }
+
+    console.log('All sample data created successfully!');
+    return true;
+  } catch (error) {
+    console.error('Error in createAllSampleData:', error);
+    return false;
   }
 };
