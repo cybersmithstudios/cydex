@@ -14,6 +14,23 @@ import { Handshake, Building, Check, Shield, Plus, Search, Filter, Download, Eye
 import { toast } from 'sonner';
 
 export function Partnerships() {
+  console.log('Partnerships component rendering');
+  const [isMounted, setIsMounted] = React.useState(false);
+  
+  React.useEffect(() => {
+    console.log('Partnerships component mounted');
+    setIsMounted(true);
+    return () => {
+      console.log('Partnerships component unmounted');
+    };
+  }, []);
+  
+  if (!isMounted) {
+    console.log('Partnerships component not mounted yet');
+    return <div>Loading Partnerships...</div>;
+  }
+  
+  console.log('Rendering Partnerships component content');
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [typeFilter, setTypeFilter] = useState('all');

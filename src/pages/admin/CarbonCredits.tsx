@@ -2,7 +2,7 @@ import React from 'react';
 import { useAuth } from '@/contexts/SupabaseAuthContext';
 import { useNavigate } from 'react-router-dom';
 import DashboardLayout from '@/components/layout/DashboardLayout';
-import { CarbonCredits as CarbonCreditsComponent } from '@/components/admin/CarbonCredits';
+import { CarbonCredits } from '@/components/admin/CarbonCredits';
 
 const AdminCarbonCredits = () => {
   const { user, loading, isAuthenticated } = useAuth();
@@ -33,7 +33,7 @@ const AdminCarbonCredits = () => {
   return (
     <DashboardLayout userRole="ADMIN">
       <div className="p-2 sm:p-4 md:p-6 max-w-7xl mx-auto">
-        <CarbonCreditsComponent />
+        <CarbonCredits />
       </div>
     </DashboardLayout>
   );

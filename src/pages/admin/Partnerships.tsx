@@ -2,7 +2,7 @@ import React from 'react';
 import { useAuth } from '@/contexts/SupabaseAuthContext';
 import { useNavigate } from 'react-router-dom';
 import DashboardLayout from '@/components/layout/DashboardLayout';
-import { Partnerships as PartnershipsComponent } from '@/components/admin/Partnerships';
+import { Partnerships } from '@/components/admin/Partnerships';
 
 const AdminPartnerships = () => {
   const { user, loading, isAuthenticated } = useAuth();
@@ -33,7 +33,7 @@ const AdminPartnerships = () => {
   return (
     <DashboardLayout userRole="ADMIN">
       <div className="p-2 sm:p-4 md:p-6 max-w-7xl mx-auto">
-        <PartnershipsComponent />
+        <Partnerships />
       </div>
     </DashboardLayout>
   );

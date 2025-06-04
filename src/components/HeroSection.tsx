@@ -68,7 +68,7 @@ const HeroSection = () => {
 
       <div className="container mx-auto px-4 sm:px-6 z-10">
         <div className="flex flex-col lg:flex-row items-center justify-center gap-8 md:gap-12">
-          <div className="lg:w-1/2 space-y-4 md:space-y-5 text-center lg:text-left max-w-2xl lg:max-w-none mx-auto">
+          <div className="lg:w-1/2 sm:pt-20 space-y-4 md:space-y-5 text-center lg:text-left max-w-2xl lg:max-w-none mx-auto">
             <div className={`transition-all duration-700 transform ${isLoaded ? "translate-y-0 opacity-100" : "translate-y-10 opacity-0"}`}>
               <p className="text-primary font-semibold inline-block py-1 px-3 rounded-full bg-primary/10 text-sm">
                 Eco-Friendly Delivery Platform
