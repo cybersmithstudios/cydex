@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -14,29 +13,33 @@ import { Handshake, Building, Check, Shield, Plus, Search, Filter, Download, Eye
 import { toast } from 'sonner';
 
 export function Partnerships() {
-  console.log('Partnerships component rendering');
+  // All hooks at the top level
   const [isMounted, setIsMounted] = React.useState(false);
-  
-  React.useEffect(() => {
-    console.log('Partnerships component mounted');
-    setIsMounted(true);
-    return () => {
-      console.log('Partnerships component unmounted');
-    };
-  }, []);
-  
-  if (!isMounted) {
-    console.log('Partnerships component not mounted yet');
-    return <div>Loading Partnerships...</div>;
-  }
-  
-  console.log('Rendering Partnerships component content');
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [typeFilter, setTypeFilter] = useState('all');
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [isDetailsDialogOpen, setIsDetailsDialogOpen] = useState(false);
   const [selectedPartner, setSelectedPartner] = useState<any>(null);
+  
+  React.useEffect(() => {
+    setIsMounted(true);
+    return () => {
+      console.log('Partnerships component unmounted');
+    };
+  }, []);
+
+  // If not mounted, show loading state
+  if (!isMounted) {
+    return (
+      <div className="flex items-center justify-center min-h-[200px]">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-6 w-6 sm:h-8 sm:w-8 border-b-2 border-primary mx-auto"></div>
+          <p className="mt-2 text-gray-600 text-sm sm:text-base">Loading partnerships...</p>
+        </div>
+      </div>
+    );
+  }
 
   // Enhanced partners data
   const partners = [
