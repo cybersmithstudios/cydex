@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
@@ -102,6 +101,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       console.log('Login successful for:', email);
       toast.success('Login successful!');
+      
+      // Force reload to ensure clean state
+      setTimeout(() => {
+        window.location.reload();
+      }, 500);
     } catch (error: any) {
       console.error('Login error:', error);
       toast.error(error.message || 'Login failed');
@@ -122,7 +126,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         options: {
           data: {
             name,
-            role: role.toUpperCase(),
+            role: role.toLowerCase(), // Store as lowercase to match database
           },
           emailRedirectTo: `${window.location.origin}/auth`
         }
@@ -160,6 +164,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setSession(null);
       setProfile(null);
       toast.info('Logged out successfully');
+      
+      // Force reload to ensure clean state
+      setTimeout(() => {
+        window.location.href = '/auth';
+      }, 500);
     } catch (error: any) {
       console.error('Logout error:', error);
       toast.error('Failed to logout');

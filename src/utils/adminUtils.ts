@@ -3,18 +3,14 @@ import { supabase } from '@/integrations/supabase/client';
 
 export const checkAdminAccess = async (userId: string): Promise<boolean> => {
   try {
-    const { data: profile, error } = await supabase
-      .from('profiles')
-      .select('role')
-      .eq('id', userId)
-      .single();
+    const { data: result, error } = await supabase.rpc('is_admin');
     
     if (error) {
       console.error('Error checking admin access:', error);
       return false;
     }
     
-    return profile?.role?.toLowerCase() === 'admin';
+    return result === true;
   } catch (error) {
     console.error('Error in checkAdminAccess:', error);
     return false;
@@ -33,7 +29,13 @@ export const getAllUsers = async () => {
       return [];
     }
     
-    return profiles || [];
+    // Normalize the data to match the expected format
+    const normalizedProfiles = profiles?.map(profile => ({
+      ...profile,
+      status: profile.status || 'active' // Ensure status has a default value
+    })) || [];
+    
+    return normalizedProfiles;
   } catch (error) {
     console.error('Error in getAllUsers:', error);
     return [];
@@ -102,7 +104,16 @@ export const getAllOrders = async () => {
       return [];
     }
     
-    return orders || [];
+    // Normalize the data to ensure it matches the expected format
+    const normalizedOrders = orders?.map(order => ({
+      ...order,
+      // Ensure all required fields have default values
+      payment_status: order.payment_status || 'pending',
+      delivery_type: order.delivery_type || 'standard',
+      status: order.status || 'pending'
+    })) || [];
+    
+    return normalizedOrders;
   } catch (error) {
     console.error('Error in getAllOrders:', error);
     return [];
@@ -143,13 +154,21 @@ export const updateOrderStatus = async (orderId: string, status: string): Promis
       .eq('id', orderId)
       .single();
 
+    const updateData: any = { 
+      status,
+      updated_at: new Date().toISOString()
+    };
+
+    // Add timestamp fields based on status
+    if (status === 'delivered') {
+      updateData.delivered_at = new Date().toISOString();
+    } else if (status === 'cancelled') {
+      updateData.cancelled_at = new Date().toISOString();
+    }
+
     const { error } = await supabase
       .from('orders')
-      .update({ 
-        status,
-        ...(status === 'delivered' && { delivered_at: new Date().toISOString() }),
-        ...(status === 'cancelled' && { cancelled_at: new Date().toISOString() })
-      })
+      .update(updateData)
       .eq('id', orderId);
     
     if (error) {
