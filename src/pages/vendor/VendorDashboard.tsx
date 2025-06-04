@@ -10,7 +10,6 @@ import {
   Package, Clock, Leaf, ChevronRight, ArrowUpRight, 
   TrendingUp, BarChart3, UserCheck, ShoppingBag, RecycleIcon
 } from 'lucide-react';
-import LoadingDisplay from '@/components/ui/LoadingDisplay';
 import { Link } from 'react-router-dom';
 
 // Mock data with updated Naira values (1 USD = 1,533.10 NGN)
