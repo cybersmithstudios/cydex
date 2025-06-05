@@ -78,10 +78,20 @@ const AddProduct = () => {
   const onSubmit = async (data: ProductFormValues) => {
     setIsSubmitting(true);
     try {
-      const success = await addProduct({
-        ...data,
-        status: 'active'
-      });
+      // Ensure all required fields are properly typed
+      const productData = {
+        name: data.name,
+        description: data.description || '',
+        price: Number(data.price),
+        category: data.category,
+        stock_quantity: Number(data.stock_quantity),
+        image_url: data.image_url || '',
+        is_eco_friendly: Boolean(data.is_eco_friendly),
+        carbon_impact: Number(data.carbon_impact),
+        status: 'active' as const
+      };
+      
+      const success = await addProduct(productData);
       
       if (success) {
         navigate('/vendor');

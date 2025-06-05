@@ -47,7 +47,13 @@ export const useVendorProducts = () => {
         throw fetchError;
       }
 
-      setProducts(data || []);
+      // Transform the data to ensure proper typing
+      const typedData: VendorProduct[] = (data || []).map(product => ({
+        ...product,
+        status: product.status as 'active' | 'inactive' | 'out_of_stock'
+      }));
+
+      setProducts(typedData);
     } catch (err: any) {
       console.error('Error in fetchProducts:', err);
       setError(err.message || 'Failed to fetch products');
@@ -57,7 +63,17 @@ export const useVendorProducts = () => {
     }
   };
 
-  const addProduct = async (productData: Omit<VendorProduct, 'id' | 'vendor_id' | 'created_at' | 'updated_at'>) => {
+  const addProduct = async (productData: {
+    name: string;
+    description?: string;
+    price: number;
+    category?: string;
+    is_eco_friendly: boolean;
+    carbon_impact: number;
+    stock_quantity: number;
+    image_url?: string;
+    status: 'active' | 'inactive' | 'out_of_stock';
+  }) => {
     if (!user?.id) {
       toast.error('You must be logged in to add products');
       return false;
