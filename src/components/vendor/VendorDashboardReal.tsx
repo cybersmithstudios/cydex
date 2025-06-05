@@ -11,11 +11,13 @@ import {
   Star,
   Clock,
   CheckCircle,
-  AlertCircle
+  AlertCircle,
+  Plus
 } from 'lucide-react';
 import { useVendorStats } from '@/hooks/useVendorStats';
 import { useVendorOrders } from '@/hooks/useVendorOrders';
 import { useNavigate } from 'react-router-dom';
+import ProductsManagement from './ProductsManagement';
 
 const VendorDashboardReal = () => {
   const { stats, loading: statsLoading } = useVendorStats();
@@ -90,9 +92,15 @@ const VendorDashboardReal = () => {
     <div className="p-6 space-y-6">
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-bold">Vendor Dashboard</h1>
-        <Button onClick={() => navigate('/vendor/orders')}>
-          View All Orders
-        </Button>
+        <div className="flex gap-3">
+          <Button onClick={() => navigate('/vendor/add-product')} variant="outline">
+            <Plus className="h-4 w-4 mr-2" />
+            Add Product
+          </Button>
+          <Button onClick={() => navigate('/vendor/orders')}>
+            View All Orders
+          </Button>
+        </div>
       </div>
 
       {/* Stats Cards */}
@@ -155,6 +163,9 @@ const VendorDashboardReal = () => {
           </CardContent>
         </Card>
       </div>
+
+      {/* Products Management Section */}
+      <ProductsManagement />
 
       {/* Recent Orders */}
       <Card>
