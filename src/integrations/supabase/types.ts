@@ -250,6 +250,62 @@ export type Database = {
           },
         ]
       }
+      products: {
+        Row: {
+          carbon_impact: number | null
+          category: string | null
+          created_at: string | null
+          description: string | null
+          id: string
+          image_url: string | null
+          is_eco_friendly: boolean | null
+          name: string
+          price: number
+          status: string | null
+          stock_quantity: number | null
+          updated_at: string | null
+          vendor_id: string
+        }
+        Insert: {
+          carbon_impact?: number | null
+          category?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          is_eco_friendly?: boolean | null
+          name: string
+          price: number
+          status?: string | null
+          stock_quantity?: number | null
+          updated_at?: string | null
+          vendor_id: string
+        }
+        Update: {
+          carbon_impact?: number | null
+          category?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          is_eco_friendly?: boolean | null
+          name?: string
+          price?: number
+          status?: string | null
+          stock_quantity?: number | null
+          updated_at?: string | null
+          vendor_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "products_vendor_id_fkey"
+            columns: ["vendor_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           address: Json | null
@@ -312,6 +368,47 @@ export type Database = {
           verified?: boolean | null
         }
         Relationships: []
+      }
+      vendor_stats: {
+        Row: {
+          id: string
+          rating: number | null
+          recycling_rate: number | null
+          total_carbon_saved: number | null
+          total_orders: number | null
+          total_revenue: number | null
+          updated_at: string | null
+          vendor_id: string
+        }
+        Insert: {
+          id?: string
+          rating?: number | null
+          recycling_rate?: number | null
+          total_carbon_saved?: number | null
+          total_orders?: number | null
+          total_revenue?: number | null
+          updated_at?: string | null
+          vendor_id: string
+        }
+        Update: {
+          id?: string
+          rating?: number | null
+          recycling_rate?: number | null
+          total_carbon_saved?: number | null
+          total_orders?: number | null
+          total_revenue?: number | null
+          updated_at?: string | null
+          vendor_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vendor_stats_vendor_id_fkey"
+            columns: ["vendor_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {
