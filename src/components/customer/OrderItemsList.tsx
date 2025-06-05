@@ -1,9 +1,8 @@
-
 import React from 'react';
 import { Package } from 'lucide-react';
 
 interface OrderProduct {
-  id: number;
+  id: string;
   name: string;
   quantity: number;
   price: string;

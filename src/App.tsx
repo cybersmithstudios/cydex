@@ -4,6 +4,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter } from "react-router-dom";
 import { AuthProvider } from "@/contexts/SupabaseAuthContext";
 import { SupabaseProvider } from "@/contexts/SupabaseContext";
+import { CartProvider } from "@/contexts/CartContext";
 import AppRoutes from "@/routes/AppRoutes";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import { Toaster as ShadcnToaster } from "@/components/ui/toaster";
@@ -20,15 +21,17 @@ function App() {
       <QueryClientProvider client={queryClient}>
         <SupabaseProvider supabaseUrl={supabaseUrl} supabaseKey={supabaseKey}>
           <AuthProvider>
-            <TooltipProvider>
-              <Toaster />
-              <ShadcnToaster />
-              <BrowserRouter>
-                <div className="min-h-screen bg-background font-sans antialiased">
-                  <AppRoutes />
-                </div>
-              </BrowserRouter>
-            </TooltipProvider>
+            <CartProvider>
+              <TooltipProvider>
+                <Toaster />
+                <ShadcnToaster />
+                <BrowserRouter>
+                  <div className="min-h-screen bg-background font-sans antialiased">
+                    <AppRoutes />
+                  </div>
+                </BrowserRouter>
+              </TooltipProvider>
+            </CartProvider>
           </AuthProvider>
         </SupabaseProvider>
       </QueryClientProvider>

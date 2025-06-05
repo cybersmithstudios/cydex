@@ -23,6 +23,9 @@ import { DeliveryScheduler } from '@/components/customer/DeliveryScheduler';
 import { useProducts, Product } from '@/hooks/useProducts';
 import { useSupabase } from '@/contexts/SupabaseContext';
 import { Plus, Minus, Leaf } from 'lucide-react';
+import { PaymentModal } from '@/components/customer/PaymentModal';
+import { useCartContext } from '@/contexts/CartContext';
+import { VendorRatingModal } from '@/components/customer/VendorRatingModal';
 
 // Mock data for vendors
 const vendors = [
@@ -167,14 +170,31 @@ const NewOrder = () => {
   const navigate = useNavigate();
   const { supabase } = useSupabase();
   const { products, loading } = useProducts();
+  const { 
+    cartItems, 
+    isCartOpen, 
+    setIsCartOpen, 
+    addToCart, 
+    removeFromCart, 
+    updateQuantity, 
+    calculateTotal,
+    clearCart 
+  } = useCartContext();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [selectedVendor, setSelectedVendor] = useState<string | null>(null);
-  const [cartItems, setCartItems] = useState<CartItem[]>([]);
-  const [isCartOpen, setIsCartOpen] = useState(false);
   const [isSchedulerOpen, setIsSchedulerOpen] = useState(false);
   const [sortBy, setSortBy] = useState('recommended');
   const [currentPage, setCurrentPage] = useState(1);
+  const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
+  const [currentOrder, setCurrentOrder] = useState<{ id: string; order_number: string; total_amount: number } | null>(null);
+  const [isRatingModalOpen, setIsRatingModalOpen] = useState(false);
+  const [ratingOrderData, setRatingOrderData] = useState<{
+    orderId: string;
+    orderNumber: string;
+    vendorId: string;
+    vendorName: string;
+  } | null>(null);
   const itemsPerPage = 8;
 
   // Get unique categories
@@ -213,48 +233,6 @@ const NewOrder = () => {
     }).format(amount);
   };
 
-  const addToCart = (product: Product) => {
-    setCartItems(prev => {
-      const existingItem = prev.find(item => item.id === product.id);
-      if (existingItem) {
-        return prev.map(item =>
-          item.id === product.id
-            ? { ...item, quantity: item.quantity + 1 }
-            : item
-        );
-      }
-      return [...prev, {
-        id: product.id,
-        name: product.name,
-        price: product.price,
-        quantity: 1,
-        vendor_id: product.vendor_id,
-        vendor_name: product.vendor?.name || 'Unknown Vendor'
-      }];
-    });
-    toast.success('Added to cart');
-  };
-
-  const removeFromCart = (productId: string) => {
-    setCartItems(prev => prev.filter(item => item.id !== productId));
-    toast.success('Removed from cart');
-  };
-
-  const updateQuantity = (productId: string, delta: number) => {
-    setCartItems(prev => prev.map(item => {
-      if (item.id === productId) {
-        const newQuantity = item.quantity + delta;
-        if (newQuantity < 1) return item;
-        return { ...item, quantity: newQuantity };
-      }
-      return item;
-    }));
-  };
-
-  const calculateTotal = () => {
-    return cartItems.reduce((total, item) => total + (item.price * item.quantity), 0);
-  };
-
   const handleCheckout = async () => {
     try {
       if (!user?.id) {
@@ -274,7 +252,9 @@ const NewOrder = () => {
         }
         acc[item.vendor_id].push(item);
         return acc;
-      }, {} as Record<string, CartItem[]>);
+      }, {} as Record<string, typeof cartItems>);
+
+      let lastOrder = null;
 
       // Create an order for each vendor
       for (const [vendorId, items] of Object.entries(itemsByVendor)) {
@@ -324,14 +304,60 @@ const NewOrder = () => {
           .insert(orderItems);
 
         if (itemsError) throw itemsError;
+
+        lastOrder = order;
       }
 
-      toast.success('Orders placed successfully!');
-      navigate('/customer/orders');
+      if (lastOrder) {
+        setCurrentOrder(lastOrder);
+        setIsPaymentModalOpen(true);
+        setIsCartOpen(false);
+      }
     } catch (error) {
       console.error('Error placing order:', error);
       toast.error('Failed to place order. Please try again.');
     }
+  };
+
+  const handlePaymentSuccess = async () => {
+    if (!currentOrder) return;
+
+    try {
+      const { error } = await supabase
+        .from('orders')
+        .update({ payment_status: 'paid', status: 'processing' })
+        .eq('id', currentOrder.id);
+
+      if (error) throw error;
+
+      // Get vendor info for rating modal
+      const vendorItem = cartItems.find(item => item.vendor_id);
+      if (vendorItem) {
+        setRatingOrderData({
+          orderId: currentOrder.id,
+          orderNumber: currentOrder.order_number,
+          vendorId: vendorItem.vendor_id,
+          vendorName: vendorItem.vendor_name
+        });
+        setIsRatingModalOpen(true);
+      }
+
+      clearCart();
+      setIsPaymentModalOpen(false);
+    } catch (error) {
+      console.error('Error updating order status:', error);
+      toast.error('Failed to update order status');
+    }
+  };
+
+  const handlePaymentError = () => {
+    toast.error('Payment failed. Please try again.');
+  };
+
+  const handleRatingModalClose = () => {
+    setIsRatingModalOpen(false);
+    setRatingOrderData(null);
+    navigate('/customer/orders');
   };
 
   if (loading) {
@@ -496,7 +522,13 @@ const NewOrder = () => {
                       <ProductCard 
                         key={product.id} 
                         product={product} 
-                        addToCart={() => addToCart(product)} 
+                        addToCart={() => addToCart({
+                          id: product.id,
+                          name: product.name,
+                          price: product.price,
+                          vendor_id: product.vendor_id,
+                          vendor_name: product.vendor?.name || 'Unknown Vendor'
+                        })} 
                       />
                     ))}
                   </div>
@@ -563,6 +595,30 @@ const NewOrder = () => {
         cartTotal={calculateTotal()}
         proceedToCheckout={handleCheckout}
       />
+      
+      {/* Payment Modal */}
+      {currentOrder && (
+        <PaymentModal 
+          isOpen={isPaymentModalOpen}
+          onClose={() => setIsPaymentModalOpen(false)}
+          amount={currentOrder.total_amount}
+          onSuccess={handlePaymentSuccess}
+          onError={handlePaymentError}
+          orderNumber={currentOrder.order_number}
+        />
+      )}
+      
+      {/* Vendor Rating Modal */}
+      {ratingOrderData && (
+        <VendorRatingModal 
+          isOpen={isRatingModalOpen}
+          onClose={handleRatingModalClose}
+          vendorId={ratingOrderData.vendorId}
+          vendorName={ratingOrderData.vendorName}
+          orderId={ratingOrderData.orderId}
+          orderNumber={ratingOrderData.orderNumber}
+        />
+      )}
       
       {/* Delivery Scheduler Dialog */}
       <DeliveryScheduler 

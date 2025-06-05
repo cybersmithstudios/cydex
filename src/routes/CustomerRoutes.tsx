@@ -1,4 +1,3 @@
-
 import { Route, Routes } from 'react-router-dom';
 import { ProtectedRoute } from './ProtectedRoute';
 import CustomerDashboard from '../pages/customer/CustomerDashboard';
@@ -8,6 +7,7 @@ import OrderDetail from '../pages/customer/OrderDetail';
 import Wallet from '../pages/customer/Wallet';
 import Recycling from '../pages/customer/Recycling';
 import Profile from '../pages/customer/Profile';
+import ProductDetails from '../pages/customer/ProductDetails';
 
 const CustomerRoutes = () => {
   return (
@@ -44,6 +44,15 @@ const CustomerRoutes = () => {
         element={
           <ProtectedRoute allowedRoles={['CUSTOMER']}>
             <OrderDetail />
+          </ProtectedRoute>
+        } 
+      />
+
+      <Route 
+        path="/products/:productId" 
+        element={
+          <ProtectedRoute allowedRoles={['CUSTOMER']}>
+            <ProductDetails />
           </ProtectedRoute>
         } 
       />

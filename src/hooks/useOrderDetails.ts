@@ -1,97 +1,162 @@
+import { useState, useEffect, useCallback } from 'react';
+import { useSupabase } from '@/contexts/SupabaseContext';
+import { useAuth } from '@/contexts/SupabaseAuthContext';
+import { toast } from 'sonner';
 
-import { useState, useEffect } from 'react';
+interface OrderItem {
+  id: string;
+  order_id: string;
+  product_name: string;
+  product_description: string | null;
+  quantity: number;
+  unit_price: number;
+  total_price: number;
+  product_category: string | null;
+  is_eco_friendly: boolean;
+  carbon_impact: number;
+}
 
-// This is a mock data function - in a real app, you would fetch from an API
-const getOrderById = (id: string) => {
-  // This is mock data - in a real app, you would fetch from an API based on the ID
-  return {
-    id: id,
-    vendor: id.includes('1234') ? 'Eco Grocery' : id.includes('1235') ? 'Green Pharmacy' : 'Sustainable Home',
-    status: id.includes('1234') ? 'in-transit' : id.includes('1235') ? 'processing' : 'pending',
-    paymentStatus: id.includes('1219') ? 'refunded' : 'paid',
-    eta: id.includes('1234') ? '15 minutes' : id.includes('1235') ? '40 minutes' : '60 minutes',
-    items: id.includes('1234') ? 3 : id.includes('1235') ? 1 : 5,
-    carbonSaved: id.includes('1234') ? 0.5 : id.includes('1235') ? 0.3 : 0.7,
-    updatedAt: id.includes('1234') ? '10 minutes ago' : id.includes('1235') ? '5 minutes ago' : '2 minutes ago',
-    totalAmount: id.includes('1234') ? '₦4,250.00' : id.includes('1235') ? '₦1,850.75' : '₦7,320.50',
-    orderDate: id.includes('1234') ? '2023-07-10' : id.includes('1235') ? '2023-07-09' : '2023-07-08',
-    deliveryAddress: '123 Sustainable Street, Lagos',
-    rider: {
-      name: 'John Rider',
-      phone: '+234 123 456 7890',
-      rating: 4.8,
-      photo: null
-    },
-    trackingSteps: [
-      { id: 1, title: 'Order Placed', completed: true, time: '10:00 AM' },
-      { id: 2, title: 'Processing', completed: id.includes('1234') || id.includes('1235'), time: '10:15 AM' },
-      { id: 3, title: 'Out for Delivery', completed: id.includes('1234'), time: '10:30 AM' },
-      { id: 4, title: 'Delivered', completed: false, time: null }
-    ],
-    products: [
-      {
-        id: 1,
-        name: 'Organic Bananas',
-        quantity: 1,
-        price: '₦1,200.00',
-        image: null
-      },
-      {
-        id: 2,
-        name: 'Eco-friendly Detergent',
-        quantity: id.includes('1234') ? 2 : 0,
-        price: '₦1,500.00',
-        image: null
-      },
-      {
-        id: 3,
-        name: 'Bamboo Toothbrush',
-        quantity: id.includes('1235') ? 1 : 0,
-        price: '₦850.75',
-        image: null
-      },
-      {
-        id: 4,
-        name: 'Reusable Water Bottle',
-        quantity: id.includes('1236') ? 2 : 0,
-        price: '₦2,500.00',
-        image: null
-      },
-      {
-        id: 5,
-        name: 'Solar Charger',
-        quantity: id.includes('1236') ? 1 : 0,
-        price: '₦3,200.00',
-        image: null
-      }
-    ],
-    deliveryFee: '₦500.00',
-    discount: '₦450.00',
+interface Order {
+  id: string;
+  customer_id: string;
+  rider_id: string | null;
+  vendor_id: string | null;
+  order_number: string;
+  status: 'pending' | 'processing' | 'confirmed' | 'preparing' | 'ready' | 'out_for_delivery' | 'delivered' | 'cancelled' | 'refunded';
+  payment_status: 'pending' | 'paid' | 'failed' | 'refunded';
+  payment_method: 'wallet' | 'card' | 'cash' | 'bank_transfer' | null;
+  delivery_type: 'standard' | 'express' | 'scheduled';
+  delivery_address: {
+    street: string;
+    city: string;
+    state: string;
+    country: string;
+    postal_code?: string;
   };
-};
+  delivery_fee: number;
+  subtotal: number;
+  total_amount: number;
+  carbon_credits_earned: number;
+  time_slot: string | null;
+  special_instructions: string | null;
+  estimated_delivery_time: string | null;
+  delivered_at: string | null;
+  cancelled_at: string | null;
+  cancel_reason: string | null;
+  created_at: string;
+  updated_at: string;
+  order_items?: OrderItem[];
+  vendor?: {
+    name: string;
+    email: string;
+  };
+  rider?: {
+    name: string;
+    email: string;
+    phone: string | null;
+  };
+}
 
 export const useOrderDetails = (orderId: string | undefined) => {
-  const [order, setOrder] = useState(null);
+  const { supabase } = useSupabase();
+  const { user } = useAuth();
+  const [order, setOrder] = useState<Order | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (!orderId) {
-      setError('Order ID is required');
-      setLoading(false);
-      return;
-    }
-
+  const fetchOrderDetails = useCallback(async () => {
     try {
-      // In a real app, this would be an async API call
-      const orderData = getOrderById(orderId);
-      setOrder(orderData);
-      setLoading(false);
+      setLoading(true);
+      setError(null);
+
+      if (!orderId) {
+        throw new Error('Order ID is required');
+      }
+
+      if (!user?.id) {
+        throw new Error('User not authenticated');
+      }
+
+      // Fetch order with related items, vendor, and rider details
+      const { data: orderData, error: orderError } = await supabase
+        .from('orders')
+        .select(`
+          *,
+          order_items (*),
+          vendor:profiles!orders_vendor_id_fkey (
+            name,
+            email
+          ),
+          rider:profiles!orders_rider_id_fkey (
+            name,
+            email,
+            phone
+          )
+        `)
+        .eq('id', orderId)
+        .eq('customer_id', user.id)
+        .single();
+
+      if (orderError) {
+        if (orderError.code === 'PGRST116') {
+          throw new Error('Order not found or you do not have permission to view this order');
+        }
+        throw orderError;
+      }
+
+      setOrder(orderData as Order);
     } catch (err) {
-      setError('Failed to fetch order details');
+      const errorMessage = err instanceof Error ? err.message : 'Failed to fetch order details';
+      setError(errorMessage);
+      console.error('Error fetching order details:', err);
+    } finally {
       setLoading(false);
     }
-  }, [orderId]);
+  }, [orderId, user?.id, supabase]);
 
-  return { order, loading, error };
+  // Subscribe to real-time updates for this order
+  useEffect(() => {
+    if (!orderId || !user?.id) return;
+
+    const channel = supabase
+      .channel(`order_${orderId}_channel`)
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'orders',
+          filter: `id=eq.${orderId}`
+        },
+        () => {
+          fetchOrderDetails();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [orderId, user?.id, supabase, fetchOrderDetails]);
+
+  // Initial fetch
+  useEffect(() => {
+    if (orderId && user?.id) {
+      fetchOrderDetails();
+    } else {
+      setLoading(false);
+      if (!orderId) {
+        setError('Order ID is required');
+      } else if (!user?.id) {
+        setError('User not authenticated');
+      }
+    }
+  }, [orderId, user?.id, fetchOrderDetails]);
+
+  return { 
+    order, 
+    loading, 
+    error,
+    refetch: fetchOrderDetails
+  };
 };

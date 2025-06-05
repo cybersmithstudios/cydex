@@ -1,15 +1,15 @@
-
 import React from 'react';
 import { Receipt, CreditCard } from 'lucide-react';
 
 interface OrderSummaryProps {
+  subtotal: string;
   totalAmount: string;
   deliveryFee: string;
   discount: string;
   paymentMethod: string;
 }
 
-const OrderSummary = ({ totalAmount, deliveryFee, discount, paymentMethod }: OrderSummaryProps) => {
+const OrderSummary = ({ subtotal, totalAmount, deliveryFee, discount, paymentMethod }: OrderSummaryProps) => {
   return (
     <div>
       <h3 className="font-medium mb-3 flex items-center">
@@ -19,7 +19,7 @@ const OrderSummary = ({ totalAmount, deliveryFee, discount, paymentMethod }: Ord
         <div className="space-y-2 border-b pb-2">
           <div className="flex justify-between text-sm">
             <span className="text-gray-600">Subtotal</span>
-            <span>{totalAmount}</span>
+            <span>{subtotal}</span>
           </div>
           <div className="flex justify-between text-sm">
             <span className="text-gray-600">Delivery Fee</span>

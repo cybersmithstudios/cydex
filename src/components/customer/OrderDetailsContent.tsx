@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { CardContent } from '@/components/ui/card';
 
@@ -10,9 +9,24 @@ import OrderSummary from './OrderSummary';
 import OrderActions from './OrderActions';
 
 // Define interfaces
+interface TrackingStep {
+  id: number;
+  title: string;
+  completed: boolean;
+  time: string | null;
+}
+
+interface OrderProduct {
+  id: string;
+  name: string;
+  quantity: number;
+  price: string;
+  image: string | null;
+}
+
 interface OrderDetailsContentProps {
   order: {
-    trackingSteps: any[];
+    trackingSteps: TrackingStep[];
     eta: string;
     status: string;
     deliveryAddress: string;
@@ -25,10 +39,12 @@ interface OrderDetailsContentProps {
       rating: number;
       photo: string | null;
     };
-    products: any[];
+    products: OrderProduct[];
+    subtotal: string;
     totalAmount: string;
     deliveryFee: string;
     discount: string;
+    paymentMethod?: string;
   };
   onCancelOrder: () => void;
   onDownloadReceipt: () => void;
@@ -59,7 +75,7 @@ const OrderDetailsContent = ({
       />
 
       {/* Rider Info (if in transit) */}
-      {order.status === 'in-transit' && order.rider && (
+      {order.status === 'out_for_delivery' && order.rider && (
         <DeliveryAgentCard rider={order.rider} />
       )}
 
@@ -68,10 +84,11 @@ const OrderDetailsContent = ({
 
       {/* Order Summary */}
       <OrderSummary 
+        subtotal={order.subtotal}
         totalAmount={order.totalAmount}
         deliveryFee={order.deliveryFee}
         discount={order.discount}
-        paymentMethod="Credit Card" // This should come from the order data in a real app
+        paymentMethod={order.paymentMethod || "Credit Card"}
       />
 
       {/* Action Buttons */}
