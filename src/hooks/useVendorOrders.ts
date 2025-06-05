@@ -63,8 +63,8 @@ export const useVendorOrders = () => {
         .from('orders')
         .select(`
           *,
-          customer:customer_id(name, email, phone),
-          rider:rider_id(name, email, phone),
+          customer:profiles!orders_customer_id_fkey(name, email, phone),
+          rider:profiles!orders_rider_id_fkey(name, email, phone),
           order_items(*)
         `)
         .eq('vendor_id', user.id)
@@ -75,7 +75,23 @@ export const useVendorOrders = () => {
         throw fetchError;
       }
 
-      setOrders(data || []);
+      // Transform the data to match our interface
+      const transformedOrders: VendorOrder[] = (data || []).map((order: any) => ({
+        ...order,
+        customer: {
+          name: order.customer?.name || 'Unknown Customer',
+          email: order.customer?.email || 'unknown@email.com',
+          phone: order.customer?.phone || undefined,
+        },
+        rider: order.rider ? {
+          name: order.rider.name || 'Unknown Rider',
+          email: order.rider.email || 'unknown@email.com',
+          phone: order.rider.phone || undefined,
+        } : undefined,
+        order_items: order.order_items || [],
+      }));
+
+      setOrders(transformedOrders);
     } catch (err: any) {
       console.error('Error in fetchOrders:', err);
       setError(err.message || 'Failed to fetch orders');
