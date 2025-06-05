@@ -20,6 +20,9 @@ import { toast } from 'sonner';
 import { ProductCard } from '@/components/customer/ProductCard';
 import { ShoppingCartSidebar } from '@/components/customer/ShoppingCartSidebar';
 import { DeliveryScheduler } from '@/components/customer/DeliveryScheduler';
+import { useProducts, Product } from '@/hooks/useProducts';
+import { useSupabase } from '@/contexts/SupabaseContext';
+import { Plus, Minus, Leaf } from 'lucide-react';
 
 // Mock data for vendors
 const vendors = [
@@ -150,25 +153,40 @@ const allProducts = [
   },
 ];
 
+interface CartItem {
+  id: string;
+  name: string;
+  price: number;
+  quantity: number;
+  vendor_id: string;
+  vendor_name: string;
+}
+
 const NewOrder = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const { supabase } = useSupabase();
+  const { products, loading } = useProducts();
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('All Products');
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [selectedVendor, setSelectedVendor] = useState<string | null>(null);
-  const [cartItems, setCartItems] = useState<Array<{product: any, quantity: number}>>([]);
+  const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isSchedulerOpen, setIsSchedulerOpen] = useState(false);
   const [sortBy, setSortBy] = useState('recommended');
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 8;
 
+  // Get unique categories
+  const categories = Array.from(new Set(products.map(p => p.category).filter(Boolean)));
+
   // Filter products based on search, category, and vendor
-  const filteredProducts = allProducts.filter(product => {
+  const filteredProducts = products.filter(product => {
     const matchesSearch = product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                          product.vendor.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesCategory = selectedCategory === 'All Products' || product.category === selectedCategory;
-    const matchesVendor = !selectedVendor || product.vendorId === selectedVendor;
+                          product.description?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                          product.vendor?.name.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesCategory = !selectedCategory || product.category === selectedCategory;
+    const matchesVendor = !selectedVendor || product.vendor_id === selectedVendor;
     
     return matchesSearch && matchesCategory && matchesVendor;
   });
@@ -177,8 +195,8 @@ const NewOrder = () => {
   const sortedProducts = [...filteredProducts].sort((a, b) => {
     if (sortBy === 'price-low') return a.price - b.price;
     if (sortBy === 'price-high') return b.price - a.price;
-    if (sortBy === 'rating') return b.rating - a.rating;
-    // Default sort (recommended)
+    // Default sort (recommended) - by creation date
+    if (sortBy === 'recommended') return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
     return 0;
   });
 
@@ -188,70 +206,151 @@ const NewOrder = () => {
   const currentProducts = sortedProducts.slice(indexOfFirstItem, indexOfLastItem);
   const totalPages = Math.ceil(sortedProducts.length / itemsPerPage);
 
-  // Handle adding product to cart
-  const addToCart = (product: any) => {
-    setCartItems(prevItems => {
-      const existingItem = prevItems.find(item => item.product.id === product.id);
-      
+  const formatCurrency = (amount: number) => {
+    return new Intl.NumberFormat('en-NG', {
+      style: 'currency',
+      currency: 'NGN'
+    }).format(amount);
+  };
+
+  const addToCart = (product: Product) => {
+    setCartItems(prev => {
+      const existingItem = prev.find(item => item.id === product.id);
       if (existingItem) {
-        return prevItems.map(item => 
-          item.product.id === product.id 
-            ? { ...item, quantity: item.quantity + 1 } 
+        return prev.map(item =>
+          item.id === product.id
+            ? { ...item, quantity: item.quantity + 1 }
             : item
         );
-      } else {
-        return [...prevItems, { product, quantity: 1 }];
       }
+      return [...prev, {
+        id: product.id,
+        name: product.name,
+        price: product.price,
+        quantity: 1,
+        vendor_id: product.vendor_id,
+        vendor_name: product.vendor?.name || 'Unknown Vendor'
+      }];
     });
-    
-    toast.success(`Added ${product.name} to cart`);
+    toast.success('Added to cart');
   };
 
-  // Handle removing product from cart
   const removeFromCart = (productId: string) => {
-    setCartItems(prevItems => prevItems.filter(item => item.product.id !== productId));
+    setCartItems(prev => prev.filter(item => item.id !== productId));
+    toast.success('Removed from cart');
   };
 
-  // Update item quantity in cart
-  const updateQuantity = (productId: string, newQuantity: number) => {
-    if (newQuantity < 1) {
-      removeFromCart(productId);
-      return;
+  const updateQuantity = (productId: string, delta: number) => {
+    setCartItems(prev => prev.map(item => {
+      if (item.id === productId) {
+        const newQuantity = item.quantity + delta;
+        if (newQuantity < 1) return item;
+        return { ...item, quantity: newQuantity };
+      }
+      return item;
+    }));
+  };
+
+  const calculateTotal = () => {
+    return cartItems.reduce((total, item) => total + (item.price * item.quantity), 0);
+  };
+
+  const handleCheckout = async () => {
+    try {
+      if (!user?.id) {
+        toast.error('Please log in to place an order');
+        return;
+      }
+
+      if (cartItems.length === 0) {
+        toast.error('Your cart is empty');
+        return;
+      }
+
+      // Group items by vendor
+      const itemsByVendor = cartItems.reduce((acc, item) => {
+        if (!acc[item.vendor_id]) {
+          acc[item.vendor_id] = [];
+        }
+        acc[item.vendor_id].push(item);
+        return acc;
+      }, {} as Record<string, CartItem[]>);
+
+      // Create an order for each vendor
+      for (const [vendorId, items] of Object.entries(itemsByVendor)) {
+        const subtotal = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+        const delivery_fee = 1000; // Example fixed delivery fee
+        const total_amount = subtotal + delivery_fee;
+
+        // Create the order
+        const { data: order, error: orderError } = await supabase
+          .from('orders')
+          .insert({
+            customer_id: user.id,
+            vendor_id: vendorId,
+            order_number: `ORD-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+            status: 'pending',
+            payment_status: 'pending',
+            delivery_type: 'standard',
+            delivery_address: {
+              street: '123 Example Street',
+              city: 'Example City',
+              state: 'Example State',
+              country: 'Nigeria'
+            },
+            subtotal,
+            delivery_fee,
+            total_amount,
+            carbon_credits_earned: items.length // Simplified calculation
+          })
+          .select()
+          .single();
+
+        if (orderError) throw orderError;
+
+        // Create order items
+        const orderItems = items.map(item => ({
+          order_id: order.id,
+          product_name: item.name,
+          quantity: item.quantity,
+          unit_price: item.price,
+          total_price: item.price * item.quantity,
+          is_eco_friendly: true, // Assuming all products are eco-friendly
+          carbon_impact: 1 // Simplified impact
+        }));
+
+        const { error: itemsError } = await supabase
+          .from('order_items')
+          .insert(orderItems);
+
+        if (itemsError) throw itemsError;
+      }
+
+      toast.success('Orders placed successfully!');
+      navigate('/customer/orders');
+    } catch (error) {
+      console.error('Error placing order:', error);
+      toast.error('Failed to place order. Please try again.');
     }
-    
-    setCartItems(prevItems => 
-      prevItems.map(item => 
-        item.product.id === productId 
-          ? { ...item, quantity: newQuantity } 
-          : item
-      )
+  };
+
+  if (loading) {
+    return (
+      <DashboardLayout userRole="CUSTOMER">
+        <div className="p-2 sm:p-4 md:p-6 max-w-7xl mx-auto">
+          <div className="animate-pulse space-y-4">
+            <div className="h-8 bg-gray-200 rounded w-1/4"></div>
+            <div className="h-12 bg-gray-200 rounded"></div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+              {[1, 2, 3, 4, 5, 6].map((i) => (
+                <div key={i} className="h-48 bg-gray-200 rounded"></div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </DashboardLayout>
     );
-  };
-
-  // Calculate cart totals
-  const cartTotal = cartItems.reduce((total, item) => total + (item.product.price * item.quantity), 0);
-  const cartItemCount = cartItems.reduce((count, item) => count + item.quantity, 0);
-
-  // Proceed to checkout
-  const proceedToCheckout = () => {
-    if (cartItems.length === 0) {
-      toast.error("Your cart is empty");
-      return;
-    }
-    
-    setIsSchedulerOpen(true);
-  };
-
-  // Place order
-  const placeOrder = (deliveryDetails: any) => {
-    // Here you would normally send the order to the backend
-    console.log('Placing order with delivery details:', deliveryDetails);
-    console.log('Cart items:', cartItems);
-    
-    toast.success("Order placed successfully!");
-    // Redirect to order tracking page
-    navigate('/customer/orders');
-  };
+  }
 
   return (
     <DashboardLayout userRole="CUSTOMER">
@@ -282,9 +381,9 @@ const NewOrder = () => {
             >
               <ShoppingCart className="h-3 w-3 sm:h-4 sm:w-4" />
               <span>Cart</span>
-              {cartItemCount > 0 && (
+              {cartItems.length > 0 && (
                 <Badge className="absolute -top-1 -right-1 px-1 py-0 bg-primary text-black text-xs rounded-full min-w-[16px] h-4 flex items-center justify-center">
-                  {cartItemCount}
+                  {cartItems.length}
                 </Badge>
               )}
             </Button>
@@ -314,7 +413,6 @@ const NewOrder = () => {
                   <SelectItem value="recommended">Recommended</SelectItem>
                   <SelectItem value="price-low">Price: Low to High</SelectItem>
                   <SelectItem value="price-high">Price: High to Low</SelectItem>
-                  <SelectItem value="rating">Highest Rated</SelectItem>
                 </SelectContent>
               </Select>
               
@@ -462,16 +560,16 @@ const NewOrder = () => {
         cartItems={cartItems}
         updateQuantity={updateQuantity}
         removeFromCart={removeFromCart}
-        cartTotal={cartTotal}
-        proceedToCheckout={proceedToCheckout}
+        cartTotal={calculateTotal()}
+        proceedToCheckout={handleCheckout}
       />
       
       {/* Delivery Scheduler Dialog */}
       <DeliveryScheduler 
         isOpen={isSchedulerOpen}
         onClose={() => setIsSchedulerOpen(false)}
-        cartTotal={cartTotal}
-        onScheduleDelivery={placeOrder}
+        cartTotal={calculateTotal()}
+        onScheduleDelivery={handleCheckout}
       />
     </DashboardLayout>
   );

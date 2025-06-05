@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { X, Minus, Plus, ShoppingBag } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -6,21 +5,19 @@ import { Separator } from '@/components/ui/separator';
 import { ScrollArea } from '@/components/ui/scroll-area';
 
 interface CartItem {
-  product: {
-    id: string;
-    name: string;
-    price: number;
-    image: string;
-    vendor: string;
-  };
+  id: string;
+  name: string;
+  price: number;
   quantity: number;
+  vendor_id: string;
+  vendor_name: string;
 }
 
 interface ShoppingCartSidebarProps {
   isOpen: boolean;
   onClose: () => void;
   cartItems: CartItem[];
-  updateQuantity: (productId: string, quantity: number) => void;
+  updateQuantity: (productId: string, delta: number) => void;
   removeFromCart: (productId: string) => void;
   cartTotal: number;
   proceedToCheckout: () => void;
@@ -61,27 +58,19 @@ export const ShoppingCartSidebar: React.FC<ShoppingCartSidebarProps> = ({
             <ScrollArea className="flex-grow p-4">
               <div className="space-y-4">
                 {cartItems.map(item => (
-                  <div key={item.product.id} className="flex items-center gap-3">
-                    <div className="h-16 w-16 bg-gray-100 rounded overflow-hidden flex-shrink-0">
-                      <img 
-                        src={item.product.image} 
-                        alt={item.product.name} 
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                    
+                  <div key={item.id} className="flex items-center gap-3">
                     <div className="flex-grow">
-                      <h3 className="font-medium line-clamp-1">{item.product.name}</h3>
-                      <p className="text-xs text-gray-500">{item.product.vendor}</p>
+                      <h3 className="font-medium line-clamp-1">{item.name}</h3>
+                      <p className="text-xs text-gray-500">{item.vendor_name}</p>
                       <div className="flex items-center justify-between mt-1">
-                        <span className="font-semibold">₦{item.product.price.toLocaleString()}</span>
+                        <span className="font-semibold">₦{item.price.toLocaleString()}</span>
                         
                         <div className="flex items-center">
                           <Button 
                             variant="outline" 
                             size="sm" 
                             className="h-7 w-7 p-0 rounded-full"
-                            onClick={() => updateQuantity(item.product.id, item.quantity - 1)}
+                            onClick={() => updateQuantity(item.id, -1)}
                           >
                             <Minus className="h-3 w-3" />
                           </Button>
@@ -92,7 +81,7 @@ export const ShoppingCartSidebar: React.FC<ShoppingCartSidebarProps> = ({
                             variant="outline" 
                             size="sm" 
                             className="h-7 w-7 p-0 rounded-full"
-                            onClick={() => updateQuantity(item.product.id, item.quantity + 1)}
+                            onClick={() => updateQuantity(item.id, 1)}
                           >
                             <Plus className="h-3 w-3" />
                           </Button>
@@ -104,7 +93,7 @@ export const ShoppingCartSidebar: React.FC<ShoppingCartSidebarProps> = ({
                       variant="ghost" 
                       size="sm" 
                       className="h-7 w-7 p-0 text-gray-400 hover:text-gray-800"
-                      onClick={() => removeFromCart(item.product.id)}
+                      onClick={() => removeFromCart(item.id)}
                     >
                       <X className="h-4 w-4" />
                     </Button>

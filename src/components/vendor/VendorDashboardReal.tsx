@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -66,7 +65,7 @@ const VendorDashboardReal = () => {
     const Icon = config.icon;
 
     return (
-      <Badge className={config.color}>
+      <Badge className={`${config.color} text-xs`}>
         <Icon className="w-3 h-3 mr-1" />
         {status}
       </Badge>
@@ -75,11 +74,11 @@ const VendorDashboardReal = () => {
 
   if (statsLoading || ordersLoading) {
     return (
-      <div className="p-6">
-        <div className="animate-pulse space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="p-3">
+        <div className="animate-pulse space-y-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
             {[1, 2, 3, 4].map(i => (
-              <div key={i} className="h-32 bg-gray-200 rounded-lg"></div>
+              <div key={i} className="h-24 bg-gray-200 rounded-lg"></div>
             ))}
           </div>
           <div className="h-96 bg-gray-200 rounded-lg"></div>
@@ -89,76 +88,85 @@ const VendorDashboardReal = () => {
   }
 
   return (
-    <div className="p-6 space-y-6">
-      <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold">Vendor Dashboard</h1>
-        <div className="flex gap-3">
-          <Button onClick={() => navigate('/vendor/add-product')} variant="outline">
-            <Plus className="h-4 w-4 mr-2" />
+    <div className="p-3 space-y-3">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+        <h1 className="text-lg sm:text-xl font-bold">Vendor Dashboard</h1>
+        <div className="flex flex-col sm:flex-row w-full sm:w-auto gap-2">
+          <Button 
+            onClick={() => navigate('/vendor/add-product')} 
+            variant="outline"
+            size="sm"
+            className="w-full sm:w-auto justify-center text-xs sm:text-sm"
+          >
+            <Plus className="h-3 w-3 mr-1" />
             Add Product
           </Button>
-          <Button onClick={() => navigate('/vendor/orders')}>
-            View All Orders
+          <Button 
+            onClick={() => navigate('/vendor/orders')}
+            size="sm"
+            className="w-full sm:w-auto justify-center text-xs sm:text-sm"
+          >
+            View Orders
           </Button>
         </div>
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Orders</CardTitle>
-            <Package className="h-4 w-4 text-muted-foreground" />
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+        <Card className="overflow-hidden">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 py-2 px-3">
+            <CardTitle className="text-xs sm:text-sm font-medium">Orders</CardTitle>
+            <Package className="h-3 w-3 text-muted-foreground" />
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{stats?.total_orders || 0}</div>
-            <p className="text-xs text-muted-foreground">
+          <CardContent className="py-2 px-3">
+            <div className="text-base sm:text-lg font-bold">{stats?.total_orders || 0}</div>
+            <p className="text-[10px] sm:text-xs text-muted-foreground">
               {todayOrders.length} today
             </p>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
-            <DollarSign className="h-4 w-4 text-muted-foreground" />
+        <Card className="overflow-hidden">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 py-2 px-3">
+            <CardTitle className="text-xs sm:text-sm font-medium">Revenue</CardTitle>
+            <DollarSign className="h-3 w-3 text-muted-foreground" />
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
+          <CardContent className="py-2 px-3">
+            <div className="text-base sm:text-lg font-bold truncate">
               {formatCurrency(stats?.total_revenue || 0)}
             </div>
-            <p className="text-xs text-muted-foreground">
-              All time earnings
+            <p className="text-[10px] sm:text-xs text-muted-foreground">
+              All time
             </p>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Carbon Saved</CardTitle>
-            <Leaf className="h-4 w-4 text-muted-foreground" />
+        <Card className="overflow-hidden">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 py-2 px-3">
+            <CardTitle className="text-xs sm:text-sm font-medium">Carbon</CardTitle>
+            <Leaf className="h-3 w-3 text-muted-foreground" />
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
+          <CardContent className="py-2 px-3">
+            <div className="text-base sm:text-lg font-bold">
               {(stats?.total_carbon_saved || 0).toFixed(1)}kg
             </div>
-            <p className="text-xs text-muted-foreground">
-              Environmental impact
+            <p className="text-[10px] sm:text-xs text-muted-foreground">
+              Saved
             </p>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Rating</CardTitle>
-            <Star className="h-4 w-4 text-muted-foreground" />
+        <Card className="overflow-hidden">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 py-2 px-3">
+            <CardTitle className="text-xs sm:text-sm font-medium">Rating</CardTitle>
+            <Star className="h-3 w-3 text-muted-foreground" />
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
+          <CardContent className="py-2 px-3">
+            <div className="text-base sm:text-lg font-bold">
               {(stats?.rating || 0).toFixed(1)}
             </div>
-            <p className="text-xs text-muted-foreground">
-              Customer satisfaction
+            <p className="text-[10px] sm:text-xs text-muted-foreground">
+              Satisfaction
             </p>
           </CardContent>
         </Card>
@@ -168,47 +176,47 @@ const VendorDashboardReal = () => {
       <ProductsManagement />
 
       {/* Recent Orders */}
-      <Card>
-        <CardHeader>
+      <Card className="overflow-hidden">
+        <CardHeader className="py-3 px-3">
           <CardTitle className="flex items-center justify-between">
-            Recent Orders
-            <Badge variant="outline">
+            <span className="text-sm sm:text-base">Recent Orders</span>
+            <Badge variant="outline" className="ml-2 text-xs">
               {pendingOrders.length} pending
             </Badge>
           </CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="p-0">
           {recentOrders.length === 0 ? (
-            <div className="text-center py-8 text-gray-500">
-              <Package className="h-12 w-12 mx-auto mb-4 text-gray-300" />
-              <p className="text-lg font-medium mb-2">No orders yet</p>
-              <p className="text-sm">Orders will appear here once customers place them.</p>
+            <div className="text-center py-6 px-3 text-gray-500">
+              <Package className="h-8 w-8 mx-auto mb-2 text-gray-300" />
+              <p className="text-sm font-medium mb-1">No orders yet</p>
+              <p className="text-xs">Orders will appear here once customers place them.</p>
             </div>
           ) : (
-            <div className="space-y-4">
+            <div className="divide-y">
               {recentOrders.map((order) => (
                 <div
                   key={order.id}
-                  className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50 cursor-pointer"
+                  className="flex flex-col sm:flex-row sm:items-center justify-between p-3 hover:bg-gray-50 cursor-pointer"
                   onClick={() => navigate(`/vendor/orders/${order.id}`)}
                 >
-                  <div className="flex-1">
-                    <div className="flex items-center gap-3 mb-2">
-                      <span className="font-medium">#{order.order_number}</span>
+                  <div className="flex-1 min-w-0 space-y-1">
+                    <div className="flex flex-wrap gap-2 items-center">
+                      <span className="text-xs font-medium">#{order.order_number}</span>
                       {getStatusBadge(order.status)}
                     </div>
-                    <div className="text-sm text-gray-600">
-                      Customer: {order.customer?.name || 'Unknown'}
+                    <div className="text-xs text-gray-600 truncate">
+                      {order.customer?.name || 'Unknown'}
                     </div>
-                    <div className="text-xs text-gray-500">
+                    <div className="text-[10px] text-gray-500">
                       {formatDate(order.created_at)}
                     </div>
                   </div>
-                  <div className="text-right">
-                    <div className="font-semibold">
+                  <div className="text-right mt-2 sm:mt-0">
+                    <div className="text-xs font-semibold">
                       {formatCurrency(order.total_amount)}
                     </div>
-                    <div className="text-sm text-gray-500">
+                    <div className="text-[10px] text-gray-500">
                       {order.order_items?.length || 0} items
                     </div>
                   </div>
