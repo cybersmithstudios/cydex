@@ -42,18 +42,12 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({
   const initializePayment = usePaystackPayment(config);
 
   const handlePayment = () => {
-    // Initialize payment with success and error callbacks as arguments
-    initializePayment(
-      () => {
-        toast.success('Payment successful');
-        onSuccess();
-        onClose();
-      },
-      () => {
-        toast.error('Payment cancelled');
-        onError();
-      }
-    );
+    // Initialize payment with only success callback as per react-paystack v6.0.0
+    initializePayment(() => {
+      toast.success('Payment successful');
+      onSuccess();
+      onClose();
+    });
   };
 
   return (

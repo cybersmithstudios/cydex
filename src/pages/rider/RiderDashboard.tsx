@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useAuth } from '@/contexts/SupabaseAuthContext';
 import DashboardLayout from '@/components/layout/DashboardLayout';
@@ -10,72 +11,63 @@ import {
   MapPin, Package, Clock, Leaf, ChevronRight, 
   ArrowUpRight, Wallet, TrendingUp, Calendar 
 } from 'lucide-react';
-
-// Mock data for available orders with updated Naira values
-const availableOrders = [
-  {
-    id: 'ORD-2341',
-    vendor: 'Eco Grocery',
-    customer: 'Sarah Miller',
-    distance: '1.2 miles',
-    pickupTime: '10 minutes',
-    deliveryTime: '25 minutes',
-    fee: 13032.35,
-    ecoBonus: 1839.72,
-    items: 2
-  },
-  {
-    id: 'ORD-2342',
-    vendor: 'Green Pharmacy',
-    customer: 'John Davis',
-    distance: '0.8 miles',
-    pickupTime: '5 minutes',
-    deliveryTime: '15 minutes',
-    fee: 10348.42,
-    ecoBonus: 1149.82,
-    items: 1
-  },
-  {
-    id: 'ORD-2345',
-    vendor: 'Organic Market',
-    customer: 'Lisa Wong',
-    distance: '1.5 miles',
-    pickupTime: '15 minutes',
-    deliveryTime: '30 minutes',
-    fee: 14181.17,
-    ecoBonus: 2299.65,
-    items: 3
-  }
-];
-
-const currentDeliveries = [
-  {
-    id: 'ORD-2339',
-    vendor: 'Zero Waste Store',
-    customer: 'Michael Brown',
-    status: 'picking-up',
-    address: '123 Green St, Ecoville',
-    eta: '5 minutes',
-    items: 2,
-    carbonSaved: 0.6,
-    startedAt: '10 minutes ago'
-  }
-];
+import { useRiderData } from '@/hooks/useRiderData';
 
 const RiderDashboard = () => {
   const { user } = useAuth();
+  const {
+    loading,
+    availableDeliveries,
+    currentDeliveries,
+    todaysEarnings,
+    riderProfile,
+    acceptDelivery,
+    updateDeliveryStatus
+  } = useRiderData();
+
+  if (loading) {
+    return (
+      <DashboardLayout userRole="RIDER">
+        <div className="p-2 sm:p-4 md:p-6 max-w-7xl mx-auto">
+          <div className="animate-pulse space-y-4">
+            <div className="h-8 bg-gray-200 rounded w-1/4"></div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="h-32 bg-gray-200 rounded"></div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </DashboardLayout>
+    );
+  }
+
+  // Calculate earnings totals
+  const totalEarnings = todaysEarnings.reduce((sum, earning) => sum + Number(earning.total_earnings), 0);
+  const totalEcoBonus = todaysEarnings.reduce((sum, earning) => sum + Number(earning.eco_bonus), 0);
+  const deliveriesCompleted = todaysEarnings.length;
+  
+  // Calculate progress (assuming daily goal of 10 deliveries)
+  const dailyGoal = 10;
+  const progressPercentage = Math.min((deliveriesCompleted / dailyGoal) * 100, 100);
 
   const getStatusBadge = (status: string) => {
     switch (status) {
-      case 'picking-up':
+      case 'picking_up':
         return <Badge className="bg-blue-500 text-xs">Picking Up</Badge>;
+      case 'picked_up':
+        return <Badge className="bg-yellow-500 text-xs">Picked Up</Badge>;
       case 'delivering':
         return <Badge className="bg-amber-500 text-xs">Delivering</Badge>;
-      case 'completed':
-        return <Badge className="bg-green-500 text-xs">Completed</Badge>;
+      case 'delivered':
+        return <Badge className="bg-green-500 text-xs">Delivered</Badge>;
       default:
         return <Badge className="text-xs">Unknown</Badge>;
     }
+  };
+
+  const handleAcceptOrder = async (orderId: string) => {
+    await acceptDelivery(orderId);
   };
 
   return (
@@ -88,7 +80,9 @@ const RiderDashboard = () => {
               Manage your deliveries and track your impact
             </p>
           </div>
-          <Badge className="text-xs sm:text-sm bg-green-500">Available for Deliveries</Badge>
+          <Badge className={`text-xs sm:text-sm ${riderProfile?.rider_status === 'available' ? 'bg-green-500' : 'bg-gray-500'}`}>
+            {riderProfile?.rider_status === 'available' ? 'Available for Deliveries' : 'Offline'}
+          </Badge>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4 md:gap-6">
@@ -97,10 +91,10 @@ const RiderDashboard = () => {
               <CardTitle className="text-sm sm:text-base font-medium">Today's Earnings</CardTitle>
             </CardHeader>
             <CardContent className="pt-1 sm:pt-2">
-              <div className="text-xl sm:text-2xl md:text-3xl font-bold">₦69,755.05</div>
+              <div className="text-xl sm:text-2xl md:text-3xl font-bold">₦{totalEarnings.toLocaleString('en-NG', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</div>
               <div className="flex items-center mt-1 text-xs sm:text-sm text-green-600">
                 <TrendingUp className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
-                <span>+₦19,163.75 from eco bonuses</span>
+                <span>+₦{totalEcoBonus.toLocaleString('en-NG', {minimumFractionDigits: 2, maximumFractionDigits: 2})} from eco bonuses</span>
               </div>
             </CardContent>
           </Card>
@@ -110,7 +104,9 @@ const RiderDashboard = () => {
               <CardTitle className="text-sm sm:text-base font-medium">Carbon Impact</CardTitle>
             </CardHeader>
             <CardContent className="pt-1 sm:pt-2">
-              <div className="text-xl sm:text-2xl md:text-3xl font-bold">3.2 kg</div>
+              <div className="text-xl sm:text-2xl md:text-3xl font-bold">
+                {(todaysEarnings.reduce((sum, earning) => sum + Number(earning.carbon_credits_earned || 0), 0) / 1000).toFixed(1)} kg
+              </div>
               <p className="text-xs sm:text-sm text-gray-500">CO₂ emissions prevented today</p>
             </CardContent>
           </Card>
@@ -120,15 +116,15 @@ const RiderDashboard = () => {
               <CardTitle className="text-sm sm:text-base font-medium">Deliveries</CardTitle>
             </CardHeader>
             <CardContent className="pt-1 sm:pt-2">
-              <div className="text-xl sm:text-2xl md:text-3xl font-bold">5</div>
+              <div className="text-xl sm:text-2xl md:text-3xl font-bold">{deliveriesCompleted}</div>
               <div className="mt-2">
                 <div className="flex justify-between items-center text-xs mb-1">
                   <span>Daily Goal Progress</span>
-                  <span>50%</span>
+                  <span>{Math.round(progressPercentage)}%</span>
                 </div>
-                <Progress value={50} className="h-2 bg-gray-100" />
+                <Progress value={progressPercentage} className="h-2 bg-gray-100" />
               </div>
-              <p className="text-xs text-gray-500 mt-2">5 more deliveries to reach your daily goal</p>
+              <p className="text-xs text-gray-500 mt-2">{Math.max(0, dailyGoal - deliveriesCompleted)} more deliveries to reach your daily goal</p>
             </CardContent>
           </Card>
         </div>
@@ -149,24 +145,21 @@ const RiderDashboard = () => {
                       </div>
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center flex-wrap gap-1 sm:gap-0">
-                          <h3 className="font-medium text-sm sm:text-base truncate">{delivery.vendor} → {delivery.customer}</h3>
+                          <h3 className="font-medium text-sm sm:text-base truncate">{delivery.vendor_name} → {delivery.customer_name}</h3>
                           <span className="mx-2 text-gray-300 hidden sm:inline">•</span>
-                          <span className="text-xs sm:text-sm text-gray-500">{delivery.id}</span>
+                          <span className="text-xs sm:text-sm text-gray-500">{delivery.order_id}</span>
                         </div>
                         <div className="flex items-center mt-1 flex-wrap gap-2">
                           {getStatusBadge(delivery.status)}
                           <div className="flex items-center text-xs sm:text-sm text-gray-600">
                             <Clock className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
-                            <span>ETA: {delivery.eta}</span>
+                            <span>ETA: {new Date(delivery.estimated_delivery_time).toLocaleTimeString()}</span>
                           </div>
                         </div>
-                        <p className="mt-1 sm:mt-2 text-xs sm:text-sm text-gray-600 truncate">
-                          {delivery.address}
-                        </p>
                         <div className="mt-1 sm:mt-2 text-xs sm:text-sm text-gray-600">
-                          <span>{delivery.items} items</span>
+                          <span>{delivery.items_count} items</span>
                           <span className="mx-2 text-gray-300">•</span>
-                          <span>Started {delivery.startedAt}</span>
+                          <span>Fee: ₦{Number(delivery.delivery_fee).toLocaleString()}</span>
                         </div>
                       </div>
                     </div>
@@ -174,11 +167,23 @@ const RiderDashboard = () => {
                     <div className="flex flex-col items-start sm:items-end justify-between mt-3 sm:mt-0 sm:ml-4">
                       <div className="flex items-center text-xs sm:text-sm bg-green-50 text-green-700 px-2 py-1 rounded">
                         <Leaf className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
-                        <span>{delivery.carbonSaved} kg CO₂ saved</span>
+                        <span>{Number(delivery.carbon_saved).toFixed(1)} kg CO₂ saved</span>
                       </div>
                       <div className="mt-3 sm:mt-4 flex space-x-2">
                         <Button variant="outline" size="sm" className="text-xs sm:text-sm h-7 sm:h-8">Contact</Button>
-                        <Button className="bg-primary hover:bg-primary-hover text-black text-xs sm:text-sm h-7 sm:h-8">Navigate</Button>
+                        <Button 
+                          className="bg-primary hover:bg-primary-hover text-black text-xs sm:text-sm h-7 sm:h-8"
+                          onClick={() => {
+                            const nextStatus = delivery.status === 'accepted' ? 'picking_up' : 
+                                             delivery.status === 'picking_up' ? 'picked_up' :
+                                             delivery.status === 'picked_up' ? 'delivering' : 'delivered';
+                            updateDeliveryStatus(delivery.id, nextStatus);
+                          }}
+                        >
+                          {delivery.status === 'accepted' ? 'Start Pickup' :
+                           delivery.status === 'picking_up' ? 'Picked Up' :
+                           delivery.status === 'picked_up' ? 'Start Delivery' : 'Complete'}
+                        </Button>
                       </div>
                     </div>
                   </div>
@@ -195,48 +200,58 @@ const RiderDashboard = () => {
           </CardHeader>
           <CardContent className="pt-0">
             <div className="space-y-3 sm:space-y-4">
-              {availableOrders.map((order) => (
-                <div key={order.id} className="bg-white border rounded-lg p-3 sm:p-4 hover:shadow-md transition-shadow">
-                  <div className="flex flex-col sm:flex-row justify-between">
-                    <div className="flex items-start space-x-3 sm:space-x-4">
-                      <div className="p-1.5 sm:p-2 bg-blue-100 rounded-full flex-shrink-0">
-                        <Package className="h-5 w-5 sm:h-6 sm:w-6 text-blue-600" />
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <div className="flex items-center flex-wrap gap-1 sm:gap-0">
-                          <h3 className="font-medium text-sm sm:text-base truncate">{order.vendor} → {order.customer}</h3>
-                          <span className="mx-2 text-gray-300 hidden sm:inline">•</span>
-                          <span className="text-xs sm:text-sm text-gray-500">{order.id}</span>
+              {availableDeliveries.length === 0 ? (
+                <div className="text-center py-8 text-gray-500">
+                  <Package className="h-12 w-12 mx-auto mb-2 opacity-50" />
+                  <p>No available orders at the moment</p>
+                </div>
+              ) : (
+                availableDeliveries.slice(0, 3).map((order) => (
+                  <div key={order.id} className="bg-white border rounded-lg p-3 sm:p-4 hover:shadow-md transition-shadow">
+                    <div className="flex flex-col sm:flex-row justify-between">
+                      <div className="flex items-start space-x-3 sm:space-x-4">
+                        <div className="p-1.5 sm:p-2 bg-blue-100 rounded-full flex-shrink-0">
+                          <Package className="h-5 w-5 sm:h-6 sm:w-6 text-blue-600" />
                         </div>
-                        <div className="flex items-center mt-1 flex-wrap gap-2">
-                          <Badge className="bg-blue-100 text-blue-800 hover:bg-blue-200 text-xs">
-                            {order.distance}
-                          </Badge>
-                          <div className="flex items-center text-xs sm:text-sm text-gray-600">
-                            <Clock className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
-                            <span>Pickup: {order.pickupTime}</span>
+                        <div className="min-w-0 flex-1">
+                          <div className="flex items-center flex-wrap gap-1 sm:gap-0">
+                            <h3 className="font-medium text-sm sm:text-base truncate">{order.vendor_name} → {order.customer_name}</h3>
+                            <span className="mx-2 text-gray-300 hidden sm:inline">•</span>
+                            <span className="text-xs sm:text-sm text-gray-500">{order.order_id}</span>
+                          </div>
+                          <div className="flex items-center mt-1 flex-wrap gap-2">
+                            <Badge className="bg-blue-100 text-blue-800 hover:bg-blue-200 text-xs">
+                              {Number(order.actual_distance || 1.5).toFixed(1)} miles
+                            </Badge>
+                            <div className="flex items-center text-xs sm:text-sm text-gray-600">
+                              <Clock className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
+                              <span>Pickup: {new Date(order.estimated_pickup_time).toLocaleTimeString()}</span>
+                            </div>
+                          </div>
+                          <div className="mt-1 text-xs sm:text-sm text-gray-600">
+                            <span>{order.items_count} items</span>
+                            <span className="mx-2 text-gray-300">•</span>
+                            <span>Est. delivery: {new Date(order.estimated_delivery_time).toLocaleTimeString()}</span>
                           </div>
                         </div>
-                        <div className="mt-1 text-xs sm:text-sm text-gray-600">
-                          <span>{order.items} items</span>
-                          <span className="mx-2 text-gray-300">•</span>
-                          <span>Est. delivery time: {order.deliveryTime}</span>
+                      </div>
+                      
+                      <div className="flex flex-col items-start sm:items-end justify-between mt-3 sm:mt-0 sm:ml-4">
+                        <div className="text-left sm:text-right">
+                          <div className="text-base sm:text-lg font-bold">₦{Number(order.delivery_fee).toLocaleString('en-NG', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</div>
+                          <div className="text-xs sm:text-sm text-green-600">+₦{Number(order.eco_bonus).toLocaleString('en-NG', {minimumFractionDigits: 2, maximumFractionDigits: 2})} eco bonus</div>
                         </div>
+                        <Button 
+                          className="mt-2 bg-primary hover:bg-primary-hover text-black text-xs sm:text-sm h-7 sm:h-8"
+                          onClick={() => handleAcceptOrder(order.id)}
+                        >
+                          Accept Order
+                        </Button>
                       </div>
-                    </div>
-                    
-                    <div className="flex flex-col items-start sm:items-end justify-between mt-3 sm:mt-0 sm:ml-4">
-                      <div className="text-left sm:text-right">
-                        <div className="text-base sm:text-lg font-bold">₦{order.fee.toLocaleString('en-NG', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</div>
-                        <div className="text-xs sm:text-sm text-green-600">+₦{order.ecoBonus.toLocaleString('en-NG', {minimumFractionDigits: 2, maximumFractionDigits: 2})} eco bonus</div>
-                      </div>
-                      <Button className="mt-2 bg-primary hover:bg-primary-hover text-black text-xs sm:text-sm h-7 sm:h-8">
-                        Accept Order
-                      </Button>
                     </div>
                   </div>
-                </div>
-              ))}
+                ))
+              )}
             </div>
           </CardContent>
         </Card>
