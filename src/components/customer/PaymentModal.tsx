@@ -37,23 +37,23 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({
     amount: amount * 100, // Convert to kobo
     publicKey: 'pk_test_b11301f99f310c1a5002e66379e5eaa5906b7e63',
     currency: 'NGN',
+    text: 'Pay Now',
+    onSuccess: () => {
+      toast.success('Payment successful');
+      onSuccess();
+      onClose();
+    },
+    onClose: () => {
+      toast.error('Payment cancelled');
+      onError();
+    },
   };
 
   const initializePayment = usePaystackPayment(config);
 
   const handlePayment = () => {
-    // Initialize payment with success and error callbacks as arguments
-    initializePayment(
-      () => {
-        toast.success('Payment successful');
-        onSuccess();
-        onClose();
-      },
-      () => {
-        toast.error('Payment cancelled');
-        onError();
-      }
-    );
+    // Initialize payment - no arguments needed as callbacks are in config
+    initializePayment();
   };
 
   return (
