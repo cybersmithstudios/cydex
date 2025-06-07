@@ -1,5 +1,4 @@
 
-
 import React from 'react';
 import { usePaystackPayment } from 'react-paystack';
 import {
@@ -38,23 +37,22 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({
     amount: amount * 100, // Convert to kobo
     publicKey: 'pk_test_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx', // Replace with your Paystack public key
     currency: 'NGN',
+    onSuccess: () => {
+      toast.success('Payment successful');
+      onSuccess();
+      onClose();
+    },
+    onClose: () => {
+      toast.error('Payment cancelled');
+      onError();
+    },
   };
 
   const initializePayment = usePaystackPayment(config);
 
   const handlePayment = () => {
-    // Initialize payment with success and error callbacks
-    initializePayment(
-      () => {
-        toast.success('Payment successful');
-        onSuccess();
-        onClose();
-      },
-      () => {
-        toast.error('Payment cancelled');
-        onError();
-      }
-    );
+    // Initialize payment
+    initializePayment();
   };
 
   return (
@@ -86,4 +84,3 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({
     </Dialog>
   );
 };
-
