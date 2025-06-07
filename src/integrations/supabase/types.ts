@@ -56,6 +56,85 @@ export type Database = {
           },
         ]
       }
+      customer_activity: {
+        Row: {
+          activity_description: string
+          activity_type: string
+          created_at: string | null
+          id: string
+          ip_address: unknown | null
+          metadata: Json | null
+          user_agent: string | null
+          user_id: string
+        }
+        Insert: {
+          activity_description: string
+          activity_type: string
+          created_at?: string | null
+          id?: string
+          ip_address?: unknown | null
+          metadata?: Json | null
+          user_agent?: string | null
+          user_id: string
+        }
+        Update: {
+          activity_description?: string
+          activity_type?: string
+          created_at?: string | null
+          id?: string
+          ip_address?: unknown | null
+          metadata?: Json | null
+          user_agent?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "customer_activity_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      customer_preferences: {
+        Row: {
+          created_at: string | null
+          delivery_preferences: Json | null
+          id: string
+          notification_preferences: Json | null
+          privacy_settings: Json | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          delivery_preferences?: Json | null
+          id?: string
+          notification_preferences?: Json | null
+          privacy_settings?: Json | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          delivery_preferences?: Json | null
+          id?: string
+          notification_preferences?: Json | null
+          privacy_settings?: Json | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "customer_preferences_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       notifications: {
         Row: {
           created_at: string
@@ -369,6 +448,67 @@ export type Database = {
         }
         Relationships: []
       }
+      vendor_ratings: {
+        Row: {
+          created_at: string | null
+          customer_id: string
+          delivery_rating: number | null
+          feedback: string | null
+          id: string
+          order_id: string
+          product_quality_rating: number | null
+          rating: number
+          updated_at: string | null
+          vendor_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          customer_id: string
+          delivery_rating?: number | null
+          feedback?: string | null
+          id?: string
+          order_id: string
+          product_quality_rating?: number | null
+          rating: number
+          updated_at?: string | null
+          vendor_id: string
+        }
+        Update: {
+          created_at?: string | null
+          customer_id?: string
+          delivery_rating?: number | null
+          feedback?: string | null
+          id?: string
+          order_id?: string
+          product_quality_rating?: number | null
+          rating?: number
+          updated_at?: string | null
+          vendor_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vendor_ratings_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vendor_ratings_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vendor_ratings_vendor_id_fkey"
+            columns: ["vendor_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       vendor_stats: {
         Row: {
           id: string
@@ -418,6 +558,15 @@ export type Database = {
       generate_order_number: {
         Args: Record<PropertyKey, never>
         Returns: string
+      }
+      get_vendor_average_rating: {
+        Args: { vendor_uuid: string }
+        Returns: {
+          average_rating: number
+          total_ratings: number
+          average_delivery_rating: number
+          average_product_quality_rating: number
+        }[]
       }
       is_admin: {
         Args: Record<PropertyKey, never>

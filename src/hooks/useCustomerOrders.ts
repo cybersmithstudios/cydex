@@ -1,60 +1,47 @@
-import { useEffect, useState } from 'react';
+
+import { useState, useEffect } from 'react';
 import { useSupabase } from '@/contexts/SupabaseContext';
 import { useAuth } from '@/contexts/SupabaseAuthContext';
 import { toast } from 'sonner';
 
-interface OrderItem {
+export interface Order {
   id: string;
-  order_id: string;
-  product_name: string;
-  product_description: string | null;
-  quantity: number;
-  unit_price: number;
-  total_price: number;
-  product_category: string | null;
-  is_eco_friendly: boolean;
-  carbon_impact: number;
-}
-
-interface Order {
-  id: string;
-  customer_id: string;
-  rider_id: string | null;
-  vendor_id: string | null;
   order_number: string;
-  status: 'pending' | 'processing' | 'confirmed' | 'preparing' | 'ready' | 'out_for_delivery' | 'delivered' | 'cancelled' | 'refunded';
-  payment_status: 'pending' | 'paid' | 'failed' | 'refunded';
-  payment_method: 'wallet' | 'card' | 'cash' | 'bank_transfer' | null;
-  delivery_type: 'standard' | 'express' | 'scheduled';
-  delivery_address: {
-    street: string;
-    city: string;
-    state: string;
-    country: string;
-    postal_code?: string;
-  };
-  delivery_fee: number;
+  customer_id: string;
+  vendor_id: string;
+  rider_id?: string;
+  status: string;
+  payment_status: string;
+  payment_method?: string;
+  delivery_type: string;
+  time_slot?: string;
+  delivery_address: any;
   subtotal: number;
+  delivery_fee: number;
   total_amount: number;
-  carbon_credits_earned: number;
-  time_slot: string | null;
-  special_instructions: string | null;
-  estimated_delivery_time: string | null;
-  delivered_at: string | null;
-  cancelled_at: string | null;
-  cancel_reason: string | null;
+  carbon_credits_earned?: number;
+  estimated_delivery_time?: string;
+  delivered_at?: string;
+  cancelled_at?: string;
+  cancel_reason?: string;
+  special_instructions?: string;
   created_at: string;
   updated_at: string;
-  order_items?: OrderItem[];
   vendor?: {
     name: string;
     email: string;
   };
-  rider?: {
-    name: string;
-    email: string;
-    phone: string | null;
-  };
+  order_items?: Array<{
+    id: string;
+    product_name: string;
+    product_description?: string;
+    product_category?: string;
+    quantity: number;
+    unit_price: number;
+    total_price: number;
+    is_eco_friendly: boolean;
+    carbon_impact: number;
+  }>;
 }
 
 export const useCustomerOrders = () => {
@@ -65,28 +52,33 @@ export const useCustomerOrders = () => {
   const [error, setError] = useState<string | null>(null);
 
   const fetchOrders = async () => {
+    if (!user?.id) {
+      setLoading(false);
+      return;
+    }
+
     try {
       setLoading(true);
       setError(null);
 
-      if (!user?.id) {
-        throw new Error('User not authenticated');
-      }
-
-      // Fetch orders with related items and vendor details
       const { data: ordersData, error: ordersError } = await supabase
         .from('orders')
         .select(`
           *,
-          order_items (*),
           vendor:profiles!orders_vendor_id_fkey (
             name,
             email
           ),
-          rider:profiles!orders_rider_id_fkey (
-            name,
-            email,
-            phone
+          order_items (
+            id,
+            product_name,
+            product_description,
+            product_category,
+            quantity,
+            unit_price,
+            total_price,
+            is_eco_friendly,
+            carbon_impact
           )
         `)
         .eq('customer_id', user.id)
@@ -98,6 +90,7 @@ export const useCustomerOrders = () => {
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to fetch orders';
       setError(errorMessage);
+      console.error('Error fetching orders:', err);
       toast.error(errorMessage);
     } finally {
       setLoading(false);
@@ -109,7 +102,7 @@ export const useCustomerOrders = () => {
     if (!user?.id) return;
 
     const channel = supabase
-      .channel('orders_channel')
+      .channel('customer_orders_channel')
       .on(
         'postgres_changes',
         {
@@ -140,4 +133,4 @@ export const useCustomerOrders = () => {
     error,
     refetch: fetchOrders
   };
-}; 
+};

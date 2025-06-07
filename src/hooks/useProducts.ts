@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from 'react';
 import { useSupabase } from '@/contexts/SupabaseContext';
 import { toast } from 'sonner';
@@ -92,4 +93,4 @@ export const useProducts = () => {
     error,
     refetch: fetchProducts
   };
-}; 
+};

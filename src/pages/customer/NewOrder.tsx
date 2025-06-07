@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
@@ -22,148 +23,9 @@ import { ShoppingCartSidebar } from '@/components/customer/ShoppingCartSidebar';
 import { DeliveryScheduler } from '@/components/customer/DeliveryScheduler';
 import { useProducts, Product } from '@/hooks/useProducts';
 import { useSupabase } from '@/contexts/SupabaseContext';
-import { Plus, Minus, Leaf } from 'lucide-react';
 import { PaymentModal } from '@/components/customer/PaymentModal';
 import { useCartContext } from '@/contexts/CartContext';
 import { VendorRatingModal } from '@/components/customer/VendorRatingModal';
-
-// Mock data for vendors
-const vendors = [
-  { id: 'v1', name: 'Green Grocers', rating: 4.8, eco_rating: 5, deliveryTime: '25-35 min' },
-  { id: 'v2', name: 'Organic Delights', rating: 4.6, eco_rating: 4, deliveryTime: '30-45 min' },
-  { id: 'v3', name: 'Farm to Table', rating: 4.9, eco_rating: 5, deliveryTime: '20-30 min' },
-  { id: 'v4', name: 'Fresh Picks', rating: 4.7, eco_rating: 4, deliveryTime: '35-50 min' },
-  { id: 'v5', name: 'Nature\'s Bounty', rating: 4.5, eco_rating: 5, deliveryTime: '25-40 min' },
-];
-
-// Mock data for product categories
-const categories = [
-  'All Products',
-  'Vegetables',
-  'Fruits',
-  'Dairy',
-  'Bakery',
-  'Organic',
-  'Beverages',
-  'Snacks'
-];
-
-// Mock data for products
-const allProducts = [
-  { 
-    id: 'p1', 
-    name: 'Organic Tomatoes', 
-    price: 1500, 
-    image: '/placeholder.svg', 
-    vendor: 'Green Grocers',
-    vendorId: 'v1',
-    rating: 4.7,
-    category: 'Vegetables',
-    eco_friendly: true,
-    description: 'Locally grown organic tomatoes. Perfect for salads and cooking.',
-    weight: '500g'
-  },
-  { 
-    id: 'p2', 
-    name: 'Fresh Avocados', 
-    price: 2000, 
-    image: '/placeholder.svg', 
-    vendor: 'Organic Delights',
-    vendorId: 'v2',
-    rating: 4.8,
-    category: 'Fruits',
-    eco_friendly: true,
-    description: 'Ripe and ready to eat avocados. Rich in nutrients and healthy fats.',
-    weight: '2 pieces'
-  },
-  { 
-    id: 'p3', 
-    name: 'Brown Eggs', 
-    price: 2500, 
-    image: '/placeholder.svg', 
-    vendor: 'Farm to Table',
-    vendorId: 'v3',
-    rating: 4.9,
-    category: 'Dairy',
-    eco_friendly: true,
-    description: 'Free-range brown eggs from locally raised chickens.',
-    weight: '12 pieces'
-  },
-  { 
-    id: 'p4', 
-    name: 'Whole Wheat Bread', 
-    price: 1800, 
-    image: '/placeholder.svg', 
-    vendor: 'Fresh Picks',
-    vendorId: 'v4',
-    rating: 4.6,
-    category: 'Bakery',
-    eco_friendly: false,
-    description: 'Freshly baked whole wheat bread, perfect for sandwiches.',
-    weight: '450g'
-  },
-  { 
-    id: 'p5', 
-    name: 'Organic Spinach', 
-    price: 1200, 
-    image: '/placeholder.svg', 
-    vendor: 'Green Grocers',
-    vendorId: 'v1',
-    rating: 4.7,
-    category: 'Vegetables',
-    eco_friendly: true,
-    description: 'Fresh organic spinach leaves, rich in iron and vitamins.',
-    weight: '250g'
-  },
-  { 
-    id: 'p6', 
-    name: 'Organic Apples', 
-    price: 3000, 
-    image: '/placeholder.svg', 
-    vendor: 'Organic Delights',
-    vendorId: 'v2',
-    rating: 4.8,
-    category: 'Fruits',
-    eco_friendly: true,
-    description: 'Crisp and sweet organic apples, perfect for snacking.',
-    weight: '1kg'
-  },
-  { 
-    id: 'p7', 
-    name: 'Greek Yogurt', 
-    price: 2200, 
-    image: '/placeholder.svg', 
-    vendor: 'Farm to Table',
-    vendorId: 'v3',
-    rating: 4.5,
-    category: 'Dairy',
-    eco_friendly: false,
-    description: 'Creamy Greek yogurt, high in protein and probiotics.',
-    weight: '500g'
-  },
-  { 
-    id: 'p8', 
-    name: 'Sourdough Bread', 
-    price: 3500, 
-    image: '/placeholder.svg', 
-    vendor: 'Fresh Picks',
-    vendorId: 'v4',
-    rating: 4.9,
-    category: 'Bakery',
-    eco_friendly: true,
-    description: 'Artisanal sourdough bread, made with traditional methods.',
-    weight: '500g'
-  },
-];
-
-interface CartItem {
-  id: string;
-  name: string;
-  price: number;
-  quantity: number;
-  vendor_id: string;
-  vendor_name: string;
-}
 
 const NewOrder = () => {
   const { user } = useAuth();
@@ -197,8 +59,14 @@ const NewOrder = () => {
   } | null>(null);
   const itemsPerPage = 8;
 
-  // Get unique categories
+  // Get unique categories from products
   const categories = Array.from(new Set(products.map(p => p.category).filter(Boolean)));
+
+  // Get unique vendors from products
+  const vendors = Array.from(new Set(products.map(p => ({ 
+    id: p.vendor_id, 
+    name: p.vendor?.name || 'Unknown Vendor' 
+  })).filter(v => v.name !== 'Unknown Vendor')));
 
   // Filter products based on search, category, and vendor
   const filteredProducts = products.filter(product => {
@@ -225,13 +93,6 @@ const NewOrder = () => {
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentProducts = sortedProducts.slice(indexOfFirstItem, indexOfLastItem);
   const totalPages = Math.ceil(sortedProducts.length / itemsPerPage);
-
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('en-NG', {
-      style: 'currency',
-      currency: 'NGN'
-    }).format(amount);
-  };
 
   const handleCheckout = async () => {
     try {
@@ -268,7 +129,6 @@ const NewOrder = () => {
           .insert({
             customer_id: user.id,
             vendor_id: vendorId,
-            order_number: `ORD-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
             status: 'pending',
             payment_status: 'pending',
             delivery_type: 'standard',
@@ -486,6 +346,13 @@ const NewOrder = () => {
               </CardHeader>
               <CardContent className="p-1 sm:p-2">
                 <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-1 gap-1">
+                  <Button
+                    variant={selectedCategory === null ? "default" : "ghost"}
+                    className={`w-full justify-start text-xs py-1.5 px-2 h-auto ${selectedCategory === null ? 'bg-primary text-black' : ''}`}
+                    onClick={() => setSelectedCategory(null)}
+                  >
+                    All Products
+                  </Button>
                   {categories.map(category => (
                     <Button
                       key={category}
@@ -507,7 +374,7 @@ const NewOrder = () => {
               <CardHeader className="pb-1 sm:pb-2 py-2 sm:py-3 md:py-4">
                 <div className="flex justify-between items-center">
                   <CardTitle className="text-sm sm:text-base md:text-lg">
-                    {selectedCategory === 'All Products' ? 'All Products' : selectedCategory}
+                    {selectedCategory || 'All Products'}
                   </CardTitle>
                   <span className="text-xs text-gray-500">
                     {filteredProducts.length} products
@@ -540,7 +407,7 @@ const NewOrder = () => {
                       className="text-xs sm:text-sm"
                       onClick={() => {
                         setSearchQuery('');
-                        setSelectedCategory('All Products');
+                        setSelectedCategory(null);
                         setSelectedVendor(null);
                       }}
                     >
