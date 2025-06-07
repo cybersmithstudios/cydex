@@ -90,7 +90,7 @@ const CustomerDashboard = () => {
       <div className="p-2 sm:p-4 md:p-6 max-w-full mx-auto space-y-3 sm:space-y-4 md:space-y-6">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4">
           <div>
-            <h1 className="text-lg sm:text-xl md:text-2xl font-bold">Welcome, {user?.user_metadata?.name || user?.email?.split('@')[0] || 'Customer'}</h1>
+            <h1 className="text-lg sm:text-xl md:text-2xl font-bold">Welcome, {user?.name || user?.email?.split('@')[0] || 'Customer'}</h1>
             <p className="text-sm sm:text-base text-gray-600">
               Track your deliveries and eco-impact
             </p>

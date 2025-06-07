@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { usePaystackPayment } from 'react-paystack';
 import {
@@ -41,7 +42,7 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({
   const initializePayment = usePaystackPayment(config);
 
   const handlePayment = () => {
-    // Initialize payment
+    // Initialize payment with success and error callbacks
     initializePayment(
       () => {
         toast.success('Payment successful');
@@ -83,4 +84,4 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({
       </DialogContent>
     </Dialog>
   );
-}; 
+};

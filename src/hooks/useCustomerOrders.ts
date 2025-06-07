@@ -30,6 +30,14 @@ export interface Order {
   vendor?: {
     name: string;
     email: string;
+    phone?: string;
+    avatar?: string;
+  };
+  rider?: {
+    name: string;
+    email: string;
+    phone?: string;
+    avatar?: string;
   };
   order_items?: Array<{
     id: string;
@@ -67,7 +75,15 @@ export const useCustomerOrders = () => {
           *,
           vendor:profiles!orders_vendor_id_fkey (
             name,
-            email
+            email,
+            phone,
+            avatar
+          ),
+          rider:profiles!orders_rider_id_fkey (
+            name,
+            email,
+            phone,
+            avatar
           ),
           order_items (
             id,
