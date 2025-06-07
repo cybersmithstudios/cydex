@@ -56,6 +56,169 @@ export type Database = {
           },
         ]
       }
+      customer_activity: {
+        Row: {
+          activity_description: string
+          activity_type: string
+          created_at: string | null
+          id: string
+          ip_address: unknown | null
+          metadata: Json | null
+          user_agent: string | null
+          user_id: string
+        }
+        Insert: {
+          activity_description: string
+          activity_type: string
+          created_at?: string | null
+          id?: string
+          ip_address?: unknown | null
+          metadata?: Json | null
+          user_agent?: string | null
+          user_id: string
+        }
+        Update: {
+          activity_description?: string
+          activity_type?: string
+          created_at?: string | null
+          id?: string
+          ip_address?: unknown | null
+          metadata?: Json | null
+          user_agent?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "customer_activity_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      customer_preferences: {
+        Row: {
+          created_at: string | null
+          delivery_preferences: Json | null
+          id: string
+          notification_preferences: Json | null
+          privacy_settings: Json | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          delivery_preferences?: Json | null
+          id?: string
+          notification_preferences?: Json | null
+          privacy_settings?: Json | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          delivery_preferences?: Json | null
+          id?: string
+          notification_preferences?: Json | null
+          privacy_settings?: Json | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "customer_preferences_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      deliveries: {
+        Row: {
+          accepted_at: string | null
+          actual_distance: number | null
+          cancelled_at: string | null
+          carbon_saved: number | null
+          created_at: string | null
+          delivered_at: string | null
+          delivery_fee: number | null
+          delivery_location: Json | null
+          eco_bonus: number | null
+          estimated_delivery_time: string | null
+          estimated_pickup_time: string | null
+          id: string
+          order_id: string | null
+          picked_up_at: string | null
+          pickup_location: Json | null
+          rider_id: string | null
+          special_instructions: string | null
+          status: Database["public"]["Enums"]["delivery_status"] | null
+          tip_amount: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          accepted_at?: string | null
+          actual_distance?: number | null
+          cancelled_at?: string | null
+          carbon_saved?: number | null
+          created_at?: string | null
+          delivered_at?: string | null
+          delivery_fee?: number | null
+          delivery_location?: Json | null
+          eco_bonus?: number | null
+          estimated_delivery_time?: string | null
+          estimated_pickup_time?: string | null
+          id?: string
+          order_id?: string | null
+          picked_up_at?: string | null
+          pickup_location?: Json | null
+          rider_id?: string | null
+          special_instructions?: string | null
+          status?: Database["public"]["Enums"]["delivery_status"] | null
+          tip_amount?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          accepted_at?: string | null
+          actual_distance?: number | null
+          cancelled_at?: string | null
+          carbon_saved?: number | null
+          created_at?: string | null
+          delivered_at?: string | null
+          delivery_fee?: number | null
+          delivery_location?: Json | null
+          eco_bonus?: number | null
+          estimated_delivery_time?: string | null
+          estimated_pickup_time?: string | null
+          id?: string
+          order_id?: string | null
+          picked_up_at?: string | null
+          pickup_location?: Json | null
+          rider_id?: string | null
+          special_instructions?: string | null
+          status?: Database["public"]["Enums"]["delivery_status"] | null
+          tip_amount?: number | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "deliveries_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "deliveries_rider_id_fkey"
+            columns: ["rider_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       notifications: {
         Row: {
           created_at: string
@@ -369,6 +532,218 @@ export type Database = {
         }
         Relationships: []
       }
+      rider_earnings: {
+        Row: {
+          carbon_credits_earned: number | null
+          created_at: string | null
+          delivery_fee: number | null
+          delivery_id: string | null
+          earnings_date: string | null
+          eco_bonus: number | null
+          id: string
+          rider_id: string | null
+          tip_amount: number | null
+          total_earnings: number | null
+        }
+        Insert: {
+          carbon_credits_earned?: number | null
+          created_at?: string | null
+          delivery_fee?: number | null
+          delivery_id?: string | null
+          earnings_date?: string | null
+          eco_bonus?: number | null
+          id?: string
+          rider_id?: string | null
+          tip_amount?: number | null
+          total_earnings?: number | null
+        }
+        Update: {
+          carbon_credits_earned?: number | null
+          created_at?: string | null
+          delivery_fee?: number | null
+          delivery_id?: string | null
+          earnings_date?: string | null
+          eco_bonus?: number | null
+          id?: string
+          rider_id?: string | null
+          tip_amount?: number | null
+          total_earnings?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rider_earnings_delivery_id_fkey"
+            columns: ["delivery_id"]
+            isOneToOne: false
+            referencedRelation: "deliveries"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rider_earnings_rider_id_fkey"
+            columns: ["rider_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      rider_profiles: {
+        Row: {
+          created_at: string | null
+          current_location: Json | null
+          id: string
+          is_verified: boolean | null
+          license_number: string | null
+          rating: number | null
+          rider_status: Database["public"]["Enums"]["rider_status"] | null
+          total_deliveries: number | null
+          updated_at: string | null
+          vehicle_registration: string | null
+          vehicle_type: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          current_location?: Json | null
+          id: string
+          is_verified?: boolean | null
+          license_number?: string | null
+          rating?: number | null
+          rider_status?: Database["public"]["Enums"]["rider_status"] | null
+          total_deliveries?: number | null
+          updated_at?: string | null
+          vehicle_registration?: string | null
+          vehicle_type?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          current_location?: Json | null
+          id?: string
+          is_verified?: boolean | null
+          license_number?: string | null
+          rating?: number | null
+          rider_status?: Database["public"]["Enums"]["rider_status"] | null
+          total_deliveries?: number | null
+          updated_at?: string | null
+          vehicle_registration?: string | null
+          vehicle_type?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rider_profiles_id_fkey"
+            columns: ["id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      rider_schedules: {
+        Row: {
+          created_at: string | null
+          end_time: string
+          id: string
+          is_available: boolean | null
+          rider_id: string | null
+          schedule_date: string
+          start_time: string
+          total_deliveries: number | null
+          total_earnings: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          end_time: string
+          id?: string
+          is_available?: boolean | null
+          rider_id?: string | null
+          schedule_date: string
+          start_time: string
+          total_deliveries?: number | null
+          total_earnings?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          end_time?: string
+          id?: string
+          is_available?: boolean | null
+          rider_id?: string | null
+          schedule_date?: string
+          start_time?: string
+          total_deliveries?: number | null
+          total_earnings?: number | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rider_schedules_rider_id_fkey"
+            columns: ["rider_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      vendor_ratings: {
+        Row: {
+          created_at: string | null
+          customer_id: string
+          delivery_rating: number | null
+          feedback: string | null
+          id: string
+          order_id: string
+          product_quality_rating: number | null
+          rating: number
+          updated_at: string | null
+          vendor_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          customer_id: string
+          delivery_rating?: number | null
+          feedback?: string | null
+          id?: string
+          order_id: string
+          product_quality_rating?: number | null
+          rating: number
+          updated_at?: string | null
+          vendor_id: string
+        }
+        Update: {
+          created_at?: string | null
+          customer_id?: string
+          delivery_rating?: number | null
+          feedback?: string | null
+          id?: string
+          order_id?: string
+          product_quality_rating?: number | null
+          rating?: number
+          updated_at?: string | null
+          vendor_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vendor_ratings_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vendor_ratings_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vendor_ratings_vendor_id_fkey"
+            columns: ["vendor_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       vendor_stats: {
         Row: {
           id: string
@@ -419,13 +794,30 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: string
       }
+      get_vendor_average_rating: {
+        Args: { vendor_uuid: string }
+        Returns: {
+          average_rating: number
+          total_ratings: number
+          average_delivery_rating: number
+          average_product_quality_rating: number
+        }[]
+      }
       is_admin: {
         Args: Record<PropertyKey, never>
         Returns: boolean
       }
     }
     Enums: {
-      [_ in never]: never
+      delivery_status:
+        | "available"
+        | "accepted"
+        | "picking_up"
+        | "picked_up"
+        | "delivering"
+        | "delivered"
+        | "cancelled"
+      rider_status: "offline" | "available" | "busy" | "break"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -540,6 +932,17 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      delivery_status: [
+        "available",
+        "accepted",
+        "picking_up",
+        "picked_up",
+        "delivering",
+        "delivered",
+        "cancelled",
+      ],
+      rider_status: ["offline", "available", "busy", "break"],
+    },
   },
 } as const

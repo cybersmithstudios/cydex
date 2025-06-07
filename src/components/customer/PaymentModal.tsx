@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { usePaystackPayment } from 'react-paystack';
 import {
@@ -34,8 +35,8 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({
   const config = {
     reference: `${orderNumber}-${Date.now()}`,
     email: user?.email || '',
-    amount: amount * 100, // Convert to kobo (Paystack requires amount in kobo)
-    publicKey: 'pk_test_b11301f99f310c1a5002e66379e5eaa5906b7e63', // Your Paystack test public key
+    amount: amount * 100, // Convert to kobo
+    publicKey: 'pk_test_b11301f99f310c1a5002e66379e5eaa5906b7e63',
     currency: 'NGN',
     metadata: {
       custom_fields: [
@@ -61,57 +62,12 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({
   const initializePayment = usePaystackPayment(config);
 
   const handlePayment = () => {
-    if (!user?.email) {
-      toast.error('User email is required for payment');
-      return;
-    }
-
-    if (amount <= 0) {
-      toast.error('Invalid payment amount');
-      return;
-    }
-
-    // Log payment initiation
-    console.log('Initiating Paystack payment:', {
-      reference: config.reference,
-      amount: amount,
-      email: user.email,
-      orderNumber: orderNumber,
+    // Initialize payment with only success callback as per react-paystack v6.0.0
+    initializePayment(() => {
+      toast.success('Payment successful');
+      onSuccess();
+      onClose();
     });
-
-    // Initialize payment
-    initializePayment(
-      (response: any) => {
-        // Payment successful
-        toast.success('Payment successful!');
-        
-        // Log successful payment
-        console.log('Payment completed successfully:', {
-          reference: response.reference,
-          status: response.status,
-          amount: amount,
-          orderNumber: orderNumber,
-          customer: user.email,
-        });
-        
-        onSuccess();
-        onClose();
-      },
-      () => {
-        // Payment failed or cancelled
-        toast.error('Payment failed or was cancelled');
-        
-        // Log payment failure
-        console.log('Payment failed or cancelled:', {
-          reference: config.reference,
-          amount: amount,
-          orderNumber: orderNumber,
-          customer: user.email,
-        });
-        
-        onError();
-      }
-    );
   };
 
   return (
@@ -172,4 +128,4 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({
       </DialogContent>
     </Dialog>
   );
-}; 
+};
