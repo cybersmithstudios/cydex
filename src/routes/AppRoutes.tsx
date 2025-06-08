@@ -9,6 +9,7 @@ import HowItWorks from '../pages/HowItWorks';
 import AboutUs from '../pages/AboutUs';
 import Faq from '../pages/Faq';
 import Contact from '../pages/Contact';
+import PrivacyPolicy from '../pages/PrivacyPolicy';
 import CustomerRoutes from './CustomerRoutes';
 import VendorRoutes from './VendorRoutes';
 import RiderRoutes from './RiderRoutes';
@@ -25,6 +26,7 @@ const AppRoutes = () => {
       <Route path="/about" element={<AboutUs />} />
       <Route path="/faq" element={<Faq />} />
       <Route path="/contact" element={<Contact />} />
+      <Route path="/privacy-policy" element={<PrivacyPolicy />} />
       
       {/* Protected Routes */}
       <Route path="/customer/*" element={<CustomerRoutes />} />

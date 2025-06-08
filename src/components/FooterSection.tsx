@@ -27,17 +27,14 @@ const FooterSection = () => {
               Revolutionary eco-friendly delivery platform transforming logistics with sustainability at its core.
             </p>
             <div className="flex space-x-4">
-              <a href="#" className="transition-colors hover:text-primary">
+              <a href="https://www.instagram.com/cydexlogistics" target="_blank" rel="noopener noreferrer" className="transition-colors hover:text-primary">
                 <Instagram size={20} />
               </a>
-              <a href="#" className="transition-colors hover:text-primary">
+              <a href="https://www.linkedin.com/company/cydexlogistics" target="_blank" rel="noopener noreferrer" className="transition-colors hover:text-primary">
                 <Linkedin size={20} />
               </a>
-              <a href="#" className="transition-colors hover:text-primary">
+              <a href="https://x.com/cydexlogistics" target="_blank" rel="noopener noreferrer" className="transition-colors hover:text-primary">
                 <Twitter size={20} />
-              </a>
-              <a href="#" className="transition-colors hover:text-primary">
-                <Facebook size={20} />
               </a>
             </div>
           </div>
@@ -77,7 +74,7 @@ const FooterSection = () => {
                 </a>
               </li>
               <li>
-                <a href="#" className="text-gray-400 hover:text-primary transition-colors">
+                <a href="/privacy-policy" className="text-gray-400 hover:text-primary transition-colors">
                   Privacy Policy
                 </a>
               </li>

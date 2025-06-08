@@ -206,26 +206,21 @@ const AboutUs = () => {
             </p>
           </div>
           
-          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
             <TeamMember
-              seed={101}
-              name="Alex Taylor"
+              image="/team/david.jpeg"
+              name="Akinrinola David Akinyele"
               role="CEO & Co-Founder"
             />
             <TeamMember
-              seed={102}
-              name="Morgan Chen"
+              image="/team/tobi.jpeg"
+              name="Tobiloba Olugbemi"
               role="CTO & Co-Founder"
             />
             <TeamMember
-              seed={103}
-              name="Jordan Smith"
-              role="Head of Sustainability"
-            />
-            <TeamMember
-              seed={104}
-              name="Sam Rodriguez"
-              role="Operations Director"
+              image="/team/grace.jpeg"
+              name="Grace David"
+              role="Sustainability Director & Co-Founder"
             />
           </div>
         </div>
@@ -315,11 +310,11 @@ const ValueCard = ({ icon, title, description }: { icon: React.ReactNode; title:
   </div>
 );
 
-const TeamMember = ({ seed, name, role }: { seed: number; name: string; role: string }) => (
+const TeamMember = ({ image, name, role }: { image: string; name: string; role: string }) => (
   <div className="text-center">
-    <div className="relative mb-3 sm:mb-4 mx-auto w-28 h-28 sm:w-40 sm:h-40 rounded-full overflow-hidden">
+    <div className="relative mb-3 sm:mb-4 mx-auto w-28 h-28 sm:w-40 sm:h-40 rounded-full overflow-hidden shadow-lg border-4 border-white">
       <img 
-        src={`https://api.dicebear.com/7.x/personas/svg?seed=${seed}`}
+        src={image}
         alt={name}
         className="w-full h-full object-cover"
       />

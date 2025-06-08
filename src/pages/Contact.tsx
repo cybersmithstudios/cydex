@@ -156,7 +156,7 @@ const Contact = () => {
                   </div>
                   <div className="ml-3 sm:ml-4">
                     <h3 className="text-base sm:text-lg font-bold">Email Us</h3>
-                    <p className="text-sm sm:text-base text-gray-600">support@cydex.com.ng</p>
+                    <p className="text-sm sm:text-base text-gray-600">cydexlogistics@gmail.com</p>
                     <p className="text-xs sm:text-sm text-gray-500 mt-0.5">We'll respond within 24 hours</p>
                   </div>
                 </div>
@@ -167,7 +167,7 @@ const Contact = () => {
                   </div>
                   <div className="ml-3 sm:ml-4">
                     <h3 className="text-base sm:text-lg font-bold">Call Us</h3>
-                    <p className="text-sm sm:text-base text-gray-600">+234 801 234 5678</p>
+                    <p className="text-sm sm:text-base text-gray-600">+2348028985352</p>
                     <p className="text-xs sm:text-sm text-gray-500 mt-0.5">Mon-Fri, 9:00 AM - 6:00 PM</p>
                   </div>
                 </div>
@@ -187,16 +187,13 @@ const Contact = () => {
               <div className="pt-4 sm:pt-6 border-t border-gray-200 mt-6 sm:mt-8">
                 <h3 className="text-base sm:text-lg font-bold mb-3 sm:mb-4">Follow Us</h3>
                 <div className="flex space-x-2 sm:space-x-3 md:space-x-4">
-                  <a href="#" className="bg-gray-100 hover:bg-gray-200 p-2 sm:p-3 rounded-full transition-colors" aria-label="Facebook">
-                    <Facebook className="h-4 w-4 sm:h-5 sm:w-5 text-gray-700" />
-                  </a>
-                  <a href="#" className="bg-gray-100 hover:bg-gray-200 p-2 sm:p-3 rounded-full transition-colors" aria-label="Twitter">
-                    <Twitter className="h-4 w-4 sm:h-5 sm:w-5 text-gray-700" />
-                  </a>
-                  <a href="#" className="bg-gray-100 hover:bg-gray-200 p-2 sm:p-3 rounded-full transition-colors" aria-label="Instagram">
+                  <a href="https://www.instagram.com/cydexlogistics" target="_blank" rel="noopener noreferrer" className="bg-gray-100 hover:bg-gray-200 p-2 sm:p-3 rounded-full transition-colors" aria-label="Instagram">
                     <Instagram className="h-4 w-4 sm:h-5 sm:w-5 text-gray-700" />
                   </a>
-                  <a href="#" className="bg-gray-100 hover:bg-gray-200 p-2 sm:p-3 rounded-full transition-colors" aria-label="LinkedIn">
+                  <a href="https://x.com/cydexlogistics" target="_blank" rel="noopener noreferrer" className="bg-gray-100 hover:bg-gray-200 p-2 sm:p-3 rounded-full transition-colors" aria-label="X (Twitter)">
+                    <Twitter className="h-4 w-4 sm:h-5 sm:w-5 text-gray-700" />
+                  </a>
+                  <a href="https://www.linkedin.com/company/cydexlogistics" target="_blank" rel="noopener noreferrer" className="bg-gray-100 hover:bg-gray-200 p-2 sm:p-3 rounded-full transition-colors" aria-label="LinkedIn">
                     <Linkedin className="h-4 w-4 sm:h-5 sm:w-5 text-gray-700" />
                   </a>
                 </div>
