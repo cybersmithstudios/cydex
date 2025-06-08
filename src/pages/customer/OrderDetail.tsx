@@ -228,9 +228,9 @@ const OrderDetailPage = () => {
 
   return (
     <DashboardLayout userRole="CUSTOMER">
-      <div className="p-2 sm:p-4 md:p-6 max-w-full mx-auto space-y-3 sm:space-y-4 md:space-y-6">
-        <Card className="overflow-hidden">
-          <CardHeader className="pb-1 sm:pb-2">
+      <div className="p-2 sm:p-3 md:p-6 max-w-full mx-auto space-y-2 sm:space-y-3 md:space-y-6">
+        <Card className="overflow-hidden shadow-sm">
+          <CardHeader className="pb-2 sm:pb-3 p-3 sm:p-4 md:p-6">
             <OrderDetailHeader 
               id={order.order_number}
               vendor={transformedOrder.vendor}

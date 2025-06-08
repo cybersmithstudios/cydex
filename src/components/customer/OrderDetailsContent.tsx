@@ -58,7 +58,7 @@ const OrderDetailsContent = ({
   onReorder
 }: OrderDetailsContentProps) => {
   return (
-    <CardContent className="space-y-6">
+    <CardContent className="space-y-3 sm:space-y-4 md:space-y-6 p-3 sm:p-4 md:p-6">
       {/* Order Timeline */}
       <OrderTrackingTimeline 
         steps={order.trackingSteps} 

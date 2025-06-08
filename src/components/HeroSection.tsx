@@ -60,7 +60,7 @@ const HeroSection = () => {
   };
 
   return (
-    <section className="relative min-h-[100vh] md:min-h-screen flex items-center pt-16 md:pt-24 pb-12 md:pb-16 overflow-hidden bg-gradient-to-b from-white to-gray-50">
+    <section className="z-10relative min-h-[100vh] md:min-h-screen flex items-center pt-16 md:pt-24 pb-12 md:pb-16 overflow-hidden bg-gradient-to-b from-white to-gray-50">
       <div className="absolute inset-0 z-0">
         <div className="absolute top-1/4 -right-20 w-72 md:w-96 h-72 md:h-96 bg-primary opacity-10 rounded-full filter blur-3xl animate-pulse-soft"></div>
         <div className="absolute -bottom-20 -left-20 w-72 md:w-96 h-72 md:h-96 bg-primary opacity-10 rounded-full filter blur-3xl"></div>

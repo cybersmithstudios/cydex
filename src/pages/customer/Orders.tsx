@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Star, Package, Calendar, MapPin, CreditCard, Truck } from 'lucide-react';
+import { Star, Package, Calendar, MapPin, CreditCard, Truck, Plus } from 'lucide-react';
 import { useCustomerOrders } from '@/hooks/useCustomerOrders';
 import { useVendorRatings } from '@/hooks/useVendorRatings';
 import { VendorRatingModal } from '@/components/customer/VendorRatingModal';
@@ -60,60 +60,75 @@ const OrdersPage = () => {
     
     return (
       <Card key={order.id} className="hover:shadow-md transition-shadow">
-        <CardHeader className="pb-3">
-          <div className="flex justify-between items-start">
-            <div>
-              <CardTitle className="text-lg">{order.order_number}</CardTitle>
-              <CardDescription className="flex items-center gap-2 mt-1">
-                <Calendar className="h-4 w-4" />
-                <span>{formatDistanceToNow(new Date(order.created_at), { addSuffix: true })}</span>
+        <CardHeader className="pb-2 sm:pb-3 p-3 sm:p-6">
+          <div className="flex justify-between items-start gap-2">
+            <div className="flex-1 min-w-0">
+              <CardTitle className="text-sm sm:text-lg font-bold truncate">{order.order_number}</CardTitle>
+              <CardDescription className="flex items-center gap-1 sm:gap-2 mt-1 text-xs sm:text-sm">
+                <Calendar className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
+                <span className="truncate">{formatDistanceToNow(new Date(order.created_at), { addSuffix: true })}</span>
               </CardDescription>
             </div>
-            <Badge className={getStatusColor(order.status)}>
-              {order.status.replace('_', ' ')}
+            <Badge className={`${getStatusColor(order.status)} text-xs px-1.5 py-0.5 whitespace-nowrap`}>
+              {order.status.replace('_', ' ').substring(0, 10)}
             </Badge>
           </div>
         </CardHeader>
         
-        <CardContent className="space-y-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <Package className="h-4 w-4 text-gray-500" />
-              <span className="text-sm">{order.vendor?.name || 'Unknown Vendor'}</span>
+        <CardContent className="space-y-2 sm:space-y-4 p-3 sm:p-6 pt-0">
+          {/* Vendor and Price Row */}
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex items-center gap-1 sm:gap-2 flex-1 min-w-0">
+              <Package className="h-3 w-3 sm:h-4 sm:w-4 text-gray-500 flex-shrink-0" />
+              <span className="text-xs sm:text-sm truncate">{order.vendor?.name || 'Unknown Vendor'}</span>
               {vendorRating.total_ratings > 0 && (
-                <div className="flex items-center gap-1">
-                  <Star className="h-3 w-3 text-yellow-400 fill-yellow-400" />
-                  <span className="text-xs text-gray-600">
+                <div className="flex items-center gap-0.5 sm:gap-1 flex-shrink-0">
+                  <Star className="h-2.5 w-2.5 sm:h-3 sm:w-3 text-yellow-400 fill-yellow-400" />
+                  <span className="text-xs text-gray-600 hidden sm:inline">
                     {vendorRating.average_rating.toFixed(1)}
                   </span>
                 </div>
               )}
             </div>
-            <span className="font-bold">₦{order.total_amount.toLocaleString()}</span>
+            <span className="font-bold text-xs sm:text-sm text-primary whitespace-nowrap">
+              ₦{order.total_amount.toLocaleString()}
+            </span>
           </div>
           
-          <div className="flex items-center gap-2 text-sm text-gray-600">
-            <MapPin className="h-4 w-4" />
-            <span>
+          {/* Address Row - Hide on very small screens */}
+          <div className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm text-gray-600 hidden xs:flex">
+            <MapPin className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
+            <span className="truncate">
               {order.delivery_address?.street}, {order.delivery_address?.city}
             </span>
           </div>
           
-          <div className="flex items-center gap-2 text-sm text-gray-600">
-            <CreditCard className="h-4 w-4" />
-            <span>Payment: {order.payment_status}</span>
-            <Truck className="h-4 w-4 ml-2" />
-            <span>Delivery: {order.delivery_type}</span>
+          {/* Payment and Delivery Status - Compact on mobile */}
+          <div className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm text-gray-600">
+            <div className="flex items-center gap-1 flex-1 min-w-0">
+              <CreditCard className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
+              <span className="truncate">
+                <span className="hidden sm:inline">Payment: </span>
+                {order.payment_status}
+              </span>
+            </div>
+            <div className="flex items-center gap-1 flex-shrink-0">
+              <Truck className="h-3 w-3 sm:h-4 sm:w-4" />
+              <span className="hidden sm:inline">Delivery: </span>
+              <span>{order.delivery_type}</span>
+            </div>
           </div>
           
-          <div className="flex gap-2 pt-2">
+          {/* Action Buttons - Responsive */}
+          <div className="flex gap-2 pt-1 sm:pt-2">
             <Button 
               variant="outline" 
               size="sm" 
               onClick={() => navigate(`/customer/orders/${order.id}`)}
-              className="flex-1"
+              className="flex-1 h-7 sm:h-8 text-xs sm:text-sm"
             >
-              View Details
+              <span className="hidden xs:inline">View Details</span>
+              <span className="xs:hidden">Details</span>
             </Button>
             
             {showRatingButton && order.payment_status === 'paid' && (
@@ -121,10 +136,11 @@ const OrdersPage = () => {
                 variant="default" 
                 size="sm"
                 onClick={() => handleRateVendor(order)}
-                className="flex items-center gap-1"
+                className="flex items-center gap-1 h-7 sm:h-8 text-xs sm:text-sm px-2 sm:px-3"
               >
-                <Star className="h-3 w-3" />
-                Rate Vendor
+                <Star className="h-2.5 w-2.5 sm:h-3 sm:w-3" />
+                <span className="hidden sm:inline">Rate Vendor</span>
+                <span className="sm:hidden">Rate</span>
               </Button>
             )}
           </div>
@@ -136,11 +152,11 @@ const OrdersPage = () => {
   if (loading) {
     return (
       <DashboardLayout userRole="CUSTOMER">
-        <div className="p-6 max-w-4xl mx-auto">
-          <div className="animate-pulse space-y-4">
-            <div className="h-8 bg-gray-200 rounded w-1/4"></div>
+        <div className="p-2 sm:p-4 md:p-6 max-w-4xl mx-auto">
+          <div className="animate-pulse space-y-3 sm:space-y-4">
+            <div className="h-6 sm:h-8 bg-gray-200 rounded w-1/4"></div>
             {[1, 2, 3].map((i) => (
-              <div key={i} className="h-32 bg-gray-200 rounded"></div>
+              <div key={i} className="h-24 sm:h-32 bg-gray-200 rounded"></div>
             ))}
           </div>
         </div>
@@ -151,10 +167,10 @@ const OrdersPage = () => {
   if (error) {
     return (
       <DashboardLayout userRole="CUSTOMER">
-        <div className="p-6 max-w-4xl mx-auto text-center">
-          <h2 className="text-xl font-bold mb-2">Error Loading Orders</h2>
-          <p className="text-gray-600 mb-4">{error}</p>
-          <Button onClick={() => window.location.reload()}>
+        <div className="p-2 sm:p-4 md:p-6 max-w-4xl mx-auto text-center">
+          <h2 className="text-lg sm:text-xl font-bold mb-2">Error Loading Orders</h2>
+          <p className="text-gray-600 mb-4 text-sm sm:text-base">{error}</p>
+          <Button onClick={() => window.location.reload()} size="sm">
             Try Again
           </Button>
         </div>
@@ -164,35 +180,52 @@ const OrdersPage = () => {
 
   return (
     <DashboardLayout userRole="CUSTOMER">
-      <div className="p-6 max-w-4xl mx-auto">
-        <div className="flex justify-between items-center mb-6">
+      <div className="p-2 sm:p-4 md:p-6 max-w-4xl mx-auto space-y-3 sm:space-y-6">
+        {/* Header - Responsive */}
+        <div className="flex flex-col xs:flex-row justify-between items-start xs:items-center gap-3 sm:gap-0">
           <div>
-            <h1 className="text-2xl font-bold">My Orders</h1>
-            <p className="text-gray-600">Track and manage your orders</p>
+            <h1 className="text-lg sm:text-2xl font-bold">My Orders</h1>
+            <p className="text-gray-600 text-xs sm:text-sm hidden sm:block">Track and manage your orders</p>
           </div>
-          <Button onClick={() => navigate('/customer/new-order')}>
-            New Order
+          <Button 
+            onClick={() => navigate('/customer/new-order')}
+            className="w-full xs:w-auto h-8 sm:h-9 text-xs sm:text-sm"
+          >
+            <Plus className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+            <span className="hidden xs:inline">New Order</span>
+            <span className="xs:hidden">New</span>
           </Button>
         </div>
 
-        <Tabs defaultValue="active" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="active">
-              Active Orders ({activeOrders.length})
+        {/* Tabs - Compact */}
+        <Tabs defaultValue="active" className="space-y-3 sm:space-y-6">
+          <TabsList className="grid w-full grid-cols-2 h-8 sm:h-10">
+            <TabsTrigger value="active" className="text-xs sm:text-sm px-1 sm:px-3">
+              <span className="hidden xs:inline">Active Orders</span>
+              <span className="xs:hidden">Active</span>
+              <span className="ml-1">({activeOrders.length})</span>
             </TabsTrigger>
-            <TabsTrigger value="completed">
-              Completed Orders ({completedOrders.length})
+            <TabsTrigger value="completed" className="text-xs sm:text-sm px-1 sm:px-3">
+              <span className="hidden xs:inline">Completed Orders</span>
+              <span className="xs:hidden">Completed</span>
+              <span className="ml-1">({completedOrders.length})</span>
             </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="active" className="space-y-4">
+          <TabsContent value="active" className="space-y-3 sm:space-y-4">
             {activeOrders.length === 0 ? (
               <Card>
-                <CardContent className="text-center py-8">
-                  <Package className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                  <h3 className="text-lg font-medium mb-2">No active orders</h3>
-                  <p className="text-gray-600 mb-4">You don't have any active orders at the moment.</p>
-                  <Button onClick={() => navigate('/customer/new-order')}>
+                <CardContent className="text-center py-6 sm:py-8 p-3 sm:p-6">
+                  <Package className="h-10 w-10 sm:h-12 sm:w-12 text-gray-400 mx-auto mb-3 sm:mb-4" />
+                  <h3 className="text-base sm:text-lg font-medium mb-2">No active orders</h3>
+                  <p className="text-gray-600 mb-3 sm:mb-4 text-sm sm:text-base">
+                    You don't have any active orders at the moment.
+                  </p>
+                  <Button 
+                    onClick={() => navigate('/customer/new-order')}
+                    size="sm"
+                    className="w-full xs:w-auto"
+                  >
                     Place Your First Order
                   </Button>
                 </CardContent>
@@ -204,13 +237,13 @@ const OrdersPage = () => {
             )}
           </TabsContent>
 
-          <TabsContent value="completed" className="space-y-4">
+          <TabsContent value="completed" className="space-y-3 sm:space-y-4">
             {completedOrders.length === 0 ? (
               <Card>
-                <CardContent className="text-center py-8">
-                  <Package className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                  <h3 className="text-lg font-medium mb-2">No completed orders</h3>
-                  <p className="text-gray-600">Your completed orders will appear here.</p>
+                <CardContent className="text-center py-6 sm:py-8 p-3 sm:p-6">
+                  <Package className="h-10 w-10 sm:h-12 sm:w-12 text-gray-400 mx-auto mb-3 sm:mb-4" />
+                  <h3 className="text-base sm:text-lg font-medium mb-2">No completed orders</h3>
+                  <p className="text-gray-600 text-sm sm:text-base">Your completed orders will appear here.</p>
                 </CardContent>
               </Card>
             ) : (

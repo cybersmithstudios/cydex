@@ -1,12 +1,14 @@
 
 import React, { useState } from 'react';
-import { Bell, Menu } from 'lucide-react';
+import { ShoppingCart, Menu } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Link } from 'react-router-dom';
 import { User, MessageSquare, Settings, LogOut } from 'lucide-react';
 import { User as UserType } from '@/types/auth.types';
 import LogoutConfirmationDialog from '@/components/auth/LogoutConfirmationDialog';
+import { useCartContext } from '@/contexts/CartContext';
 
 interface MobileHeaderProps {
   onMenuToggle: () => void;
@@ -22,6 +24,7 @@ const MobileHeader: React.FC<MobileHeaderProps> = ({
   handleLogout 
 }) => {
   const [showLogoutDialog, setShowLogoutDialog] = useState(false);
+  const { cartItems, setIsCartOpen } = useCartContext();
 
   // Get role title for display
   const getRoleTitle = () => {
@@ -66,10 +69,20 @@ const MobileHeader: React.FC<MobileHeaderProps> = ({
         </span>
       </div>
       <div className="flex items-center space-x-2">
-        <button className="p-2 rounded-full hover:bg-gray-100 relative">
-          <Bell className="h-5 w-5" />
-          <span className="absolute top-1 right-1 h-2 w-2 bg-red-500 rounded-full"></span>
-        </button>
+        {userRole === 'customer' && (
+          <button 
+            className="p-2 rounded-full hover:bg-gray-100 relative transition-colors"
+            onClick={() => setIsCartOpen(true)}
+            title="Shopping Cart"
+          >
+            <ShoppingCart className="h-5 w-5" />
+            {cartItems.length > 0 && (
+              <Badge className="absolute -top-1 -right-1 px-1.5 py-0.5 bg-primary text-black text-xs rounded-full min-w-[18px] h-5 flex items-center justify-center">
+                {cartItems.length}
+              </Badge>
+            )}
+          </button>
+        )}
         
         <DropdownMenu>
           <DropdownMenuTrigger asChild>

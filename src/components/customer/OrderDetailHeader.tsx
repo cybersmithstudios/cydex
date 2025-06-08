@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, Leaf } from 'lucide-react';
@@ -18,27 +17,39 @@ const OrderDetailHeader = ({ id, vendor, status, paymentStatus, carbonSaved }: O
   const navigate = useNavigate();
 
   return (
-    <div>
-      <div className="flex items-center">
-        <Button variant="outline" onClick={() => navigate(-1)} className="mr-2">
-          <ArrowLeft className="mr-2 h-4 w-4" /> Back
+    <div className="space-y-3 sm:space-y-4">
+      <div className="flex items-center gap-2">
+        <Button 
+          variant="outline" 
+          onClick={() => navigate(-1)} 
+          size="sm"
+          className="h-8 sm:h-9 px-2 sm:px-3 text-xs sm:text-sm"
+        >
+          <ArrowLeft className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+          <span className="hidden xs:inline">Back</span>
         </Button>
-        <h1 className="text-2xl font-bold">Order Details</h1>
+        <h1 className="text-base sm:text-xl md:text-2xl font-bold">Order Details</h1>
       </div>
 
-      <div className="flex justify-between items-start mt-4">
-        <div>
-          <CardTitle className="text-xl">{vendor}</CardTitle>
-          <CardDescription className="text-gray-500">Order #{id}</CardDescription>
+      <div className="flex flex-col sm:flex-row justify-between items-start gap-3 sm:gap-4">
+        <div className="flex-1 min-w-0">
+          <CardTitle className="text-sm sm:text-lg md:text-xl truncate">{vendor}</CardTitle>
+          <CardDescription className="text-gray-500 text-xs sm:text-sm">
+            Order #{id}
+          </CardDescription>
         </div>
-        <div className="flex flex-col items-end">
-          <div className="flex space-x-2 mb-2">
+        
+        <div className="flex flex-col items-start sm:items-end gap-2 w-full sm:w-auto">
+          <div className="flex flex-wrap gap-1 sm:gap-2">
             {getOrderStatusBadge(status)}
             {getPaymentStatusBadge(paymentStatus)}
           </div>
-          <div className="flex items-center text-sm bg-green-50 text-green-700 px-2 py-1 rounded">
-            <Leaf className="h-4 w-4 mr-1" />
-            <span>{carbonSaved} kg CO₂ saved</span>
+          
+          <div className="flex items-center text-xs sm:text-sm bg-green-50 text-green-700 px-2 py-1 rounded-md">
+            <Leaf className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
+            <span className="whitespace-nowrap">
+              {carbonSaved} kg CO₂ saved
+            </span>
           </div>
         </div>
       </div>
