@@ -83,20 +83,20 @@ export const usePaystack = () => {
       orderNumber: config.orderNumber,
     });
 
-    paystackPayment(
-      (response: PaystackResponse) => {
+    paystackPayment({
+      onSuccess: (response: PaystackResponse) => {
         setIsLoading(false);
         console.log('Payment successful:', response);
         toast.success('Payment completed successfully!');
         config.onSuccess(response);
       },
-      () => {
+      onClose: () => {
         setIsLoading(false);
         console.log('Payment failed or cancelled');
         toast.error('Payment failed or was cancelled');
         config.onError();
       }
-    );
+    });
   };
 
   // Verify payment on the backend (this would typically be called from your backend)
@@ -127,4 +127,4 @@ export const usePaystack = () => {
     verifyPayment,
     isLoading,
   };
-}; 
+};
