@@ -237,4 +237,4 @@ export const PaystackTestPanel = () => {
       </Card>
     </div>
   );
-}; 
+};
