@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
@@ -5,6 +6,23 @@ import { toast } from 'sonner';
 import { UserRole, AuthContextType } from '@/types/auth.types';
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
+// Helper function to clean up auth state
+const cleanupAuthState = () => {
+  // Remove all Supabase auth keys from localStorage
+  Object.keys(localStorage).forEach((key) => {
+    if (key.startsWith('supabase.auth.') || key.includes('sb-')) {
+      localStorage.removeItem(key);
+    }
+  });
+  
+  // Remove from sessionStorage if in use
+  Object.keys(sessionStorage || {}).forEach((key) => {
+    if (key.startsWith('supabase.auth.') || key.includes('sb-')) {
+      sessionStorage.removeItem(key);
+    }
+  });
+};
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
@@ -92,6 +110,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setLoading(true);
     try {
       console.log('Attempting login for:', email);
+      
+      // Clean up any existing auth state first
+      cleanupAuthState();
+      
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
@@ -157,21 +179,47 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const logout = async () => {
     try {
       console.log('Attempting logout');
-      const { error } = await supabase.auth.signOut();
-      if (error) throw error;
       
+      // Clean up auth state first
+      cleanupAuthState();
+      
+      // Try to sign out, but don't fail if session is missing
+      try {
+        const { error } = await supabase.auth.signOut({ scope: 'global' });
+        if (error && error.message !== 'Auth session missing!') {
+          console.error('Logout error:', error);
+        }
+      } catch (error: any) {
+        // Ignore session missing errors as the user is already logged out
+        if (!error.message?.includes('Auth session missing')) {
+          console.error('Logout error:', error);
+        }
+      }
+      
+      // Clear local state regardless of API response
       setUser(null);
       setSession(null);
       setProfile(null);
+      
       toast.info('Logged out successfully');
       
-      // Force reload to ensure clean state
+      // Force redirect to auth page
       setTimeout(() => {
         window.location.href = '/auth';
       }, 500);
     } catch (error: any) {
       console.error('Logout error:', error);
-      toast.error('Failed to logout');
+      
+      // Even if logout fails, clear local state and redirect
+      cleanupAuthState();
+      setUser(null);
+      setSession(null);
+      setProfile(null);
+      
+      toast.info('Logged out successfully');
+      setTimeout(() => {
+        window.location.href = '/auth';
+      }, 500);
     }
   };
 
