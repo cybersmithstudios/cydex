@@ -29,6 +29,7 @@ export interface RiderEarnings {
   tip_amount: number;
   total_earnings: number;
   earnings_date: string;
+  carbon_credits_earned: number;
 }
 
 export interface RiderProfile {
@@ -57,8 +58,8 @@ export const useRiderData = () => {
           orders!inner(
             customer_id,
             vendor_id,
-            profiles!customer_id(name),
-            profiles!vendor_id(name),
+            customer_profile:profiles!customer_id(name),
+            vendor_profile:profiles!vendor_id(name),
             order_items(count)
           )
         `)
@@ -70,8 +71,8 @@ export const useRiderData = () => {
 
       const formattedDeliveries = data?.map(delivery => ({
         ...delivery,
-        vendor_name: delivery.orders?.profiles?.name || 'Unknown Vendor',
-        customer_name: delivery.orders?.profiles?.name || 'Unknown Customer',
+        vendor_name: delivery.orders?.vendor_profile?.name || 'Unknown Vendor',
+        customer_name: delivery.orders?.customer_profile?.name || 'Unknown Customer',
         items_count: delivery.orders?.order_items?.length || 0
       })) || [];
 
@@ -93,8 +94,8 @@ export const useRiderData = () => {
           orders!inner(
             customer_id,
             vendor_id,
-            profiles!customer_id(name),
-            profiles!vendor_id(name),
+            customer_profile:profiles!customer_id(name),
+            vendor_profile:profiles!vendor_id(name),
             order_items(count)
           )
         `)
@@ -106,8 +107,8 @@ export const useRiderData = () => {
 
       const formattedDeliveries = data?.map(delivery => ({
         ...delivery,
-        vendor_name: delivery.orders?.profiles?.name || 'Unknown Vendor',
-        customer_name: delivery.orders?.profiles?.name || 'Unknown Customer',
+        vendor_name: delivery.orders?.vendor_profile?.name || 'Unknown Vendor',
+        customer_name: delivery.orders?.customer_profile?.name || 'Unknown Customer',
         items_count: delivery.orders?.order_items?.length || 0
       })) || [];
 
