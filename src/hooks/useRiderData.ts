@@ -15,7 +15,13 @@ export const useRiderData = () => {
   const { user } = useAuth();
   const [loading, setLoading] = useState(true);
   
-  const { riderProfile, fetchRiderProfile, updateRiderStatus } = useRiderProfile();
+  const { 
+    riderProfile, 
+    loading: profileLoading, 
+    fetchRiderProfile, 
+    updateRiderStatus 
+  } = useRiderProfile();
+  
   const { 
     todaysEarnings, 
     weeklyEarnings, 
@@ -24,6 +30,7 @@ export const useRiderData = () => {
     fetchWeeklyEarnings, 
     fetchMonthlyEarnings 
   } = useRiderEarnings();
+  
   const { 
     availableDeliveries, 
     currentDeliveries, 
@@ -36,67 +43,78 @@ export const useRiderData = () => {
   useEffect(() => {
     const initializeData = async () => {
       if (user?.id && user?.role === 'RIDER') {
+        console.log('Initializing rider data for user:', user.id);
         setLoading(true);
         
-        await Promise.all([
-          fetchRiderProfile(),
-          fetchAvailableDeliveries(),
-          fetchCurrentDeliveries(),
-          fetchTodaysEarnings(),
-          fetchWeeklyEarnings(),
-          fetchMonthlyEarnings()
-        ]);
+        try {
+          await Promise.all([
+            fetchAvailableDeliveries(),
+            fetchCurrentDeliveries(),
+            fetchTodaysEarnings(),
+            fetchWeeklyEarnings(),
+            fetchMonthlyEarnings()
+          ]);
+        } catch (error) {
+          console.error('Error initializing rider data:', error);
+        }
         
+        setLoading(false);
+      } else {
         setLoading(false);
       }
     };
 
     initializeData();
 
-    // Set up real-time subscriptions
-    const deliverySubscription = supabase
-      .channel('deliveries_changes')
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'deliveries'
-        },
-        () => {
-          // Refresh deliveries when changes occur
-          fetchAvailableDeliveries();
-          fetchCurrentDeliveries();
-        }
-      )
-      .subscribe();
+    // Set up real-time subscriptions only if user is a rider
+    if (user?.id && user?.role === 'RIDER') {
+      console.log('Setting up real-time subscriptions for rider:', user.id);
+      
+      const deliverySubscription = supabase
+        .channel('deliveries_changes')
+        .on(
+          'postgres_changes',
+          {
+            event: '*',
+            schema: 'public',
+            table: 'deliveries'
+          },
+          (payload) => {
+            console.log('Delivery change detected:', payload);
+            fetchAvailableDeliveries();
+            fetchCurrentDeliveries();
+          }
+        )
+        .subscribe();
 
-    const earningsSubscription = supabase
-      .channel('earnings_changes')
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'rider_earnings'
-        },
-        () => {
-          // Refresh earnings when changes occur
-          fetchTodaysEarnings();
-          fetchWeeklyEarnings();
-          fetchMonthlyEarnings();
-        }
-      )
-      .subscribe();
+      const earningsSubscription = supabase
+        .channel('earnings_changes')
+        .on(
+          'postgres_changes',
+          {
+            event: '*',
+            schema: 'public',
+            table: 'rider_earnings'
+          },
+          (payload) => {
+            console.log('Earnings change detected:', payload);
+            fetchTodaysEarnings();
+            fetchWeeklyEarnings();
+            fetchMonthlyEarnings();
+          }
+        )
+        .subscribe();
 
-    return () => {
-      deliverySubscription.unsubscribe();
-      earningsSubscription.unsubscribe();
-    };
+      return () => {
+        console.log('Cleaning up real-time subscriptions');
+        deliverySubscription.unsubscribe();
+        earningsSubscription.unsubscribe();
+      };
+    }
   }, [user?.id, user?.role]);
 
   return {
-    loading,
+    loading: loading || profileLoading,
     availableDeliveries,
     currentDeliveries,
     todaysEarnings,

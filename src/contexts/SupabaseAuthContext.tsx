@@ -2,27 +2,17 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
-import { toast } from 'sonner';
 import { UserRole, AuthContextType } from '@/types/auth.types';
+import { 
+  handleLogin, 
+  handleRegister, 
+  handleLogout, 
+  handleResetPassword, 
+  handleVerifyEmail 
+} from './auth/AuthHandlers';
+import { cleanupAuthState } from './auth/AuthCleanup';
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
-
-// Helper function to clean up auth state
-const cleanupAuthState = () => {
-  // Remove all Supabase auth keys from localStorage
-  Object.keys(localStorage).forEach((key) => {
-    if (key.startsWith('supabase.auth.') || key.includes('sb-')) {
-      localStorage.removeItem(key);
-    }
-  });
-  
-  // Remove from sessionStorage if in use
-  Object.keys(sessionStorage || {}).forEach((key) => {
-    if (key.startsWith('supabase.auth.') || key.includes('sb-')) {
-      sessionStorage.removeItem(key);
-    }
-  });
-};
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
@@ -109,29 +99,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const login = async (email: string, password: string) => {
     setLoading(true);
     try {
-      console.log('Attempting login for:', email);
-      
-      // Clean up any existing auth state first
-      cleanupAuthState();
-      
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-
-      if (error) throw error;
-
-      console.log('Login successful for:', email);
-      toast.success('Login successful!');
-      
-      // Force reload to ensure clean state
-      setTimeout(() => {
-        window.location.reload();
-      }, 500);
-    } catch (error: any) {
-      console.error('Login error:', error);
-      toast.error(error.message || 'Login failed');
-      throw error;
+      await handleLogin(email, password);
     } finally {
       setLoading(false);
     }
@@ -140,124 +108,27 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const register = async (name: string, email: string, password: string, role: UserRole) => {
     setLoading(true);
     try {
-      console.log('Attempting registration for:', email, 'with role:', role);
-      
-      const { data, error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          data: {
-            name,
-            role: role.toLowerCase(), // Store as lowercase to match database
-          },
-          emailRedirectTo: `${window.location.origin}/auth`
-        }
-      });
-
-      if (error) {
-        console.error('Registration error:', error);
-        throw error;
-      }
-
-      console.log('Registration successful for:', email);
-      
-      // Check if email confirmation is required
-      if (data.user && !data.session) {
-        toast.success('Registration successful! Please check your email to verify your account.');
-      } else if (data.session) {
-        toast.success('Registration and login successful!');
-      }
-    } catch (error: any) {
-      console.error('Registration error:', error);
-      toast.error(error.message || 'Registration failed');
-      throw error;
+      await handleRegister(name, email, password, role);
     } finally {
       setLoading(false);
     }
   };
 
   const logout = async () => {
-    try {
-      console.log('Attempting logout');
-      
-      // Clean up auth state first
-      cleanupAuthState();
-      
-      // Try to sign out, but don't fail if session is missing
-      try {
-        const { error } = await supabase.auth.signOut({ scope: 'global' });
-        if (error && error.message !== 'Auth session missing!') {
-          console.error('Logout error:', error);
-        }
-      } catch (error: any) {
-        // Ignore session missing errors as the user is already logged out
-        if (!error.message?.includes('Auth session missing')) {
-          console.error('Logout error:', error);
-        }
-      }
-      
-      // Clear local state regardless of API response
-      setUser(null);
-      setSession(null);
-      setProfile(null);
-      
-      toast.info('Logged out successfully');
-      
-      // Force redirect to auth page
-      setTimeout(() => {
-        window.location.href = '/auth';
-      }, 500);
-    } catch (error: any) {
-      console.error('Logout error:', error);
-      
-      // Even if logout fails, clear local state and redirect
-      cleanupAuthState();
-      setUser(null);
-      setSession(null);
-      setProfile(null);
-      
-      toast.info('Logged out successfully');
-      setTimeout(() => {
-        window.location.href = '/auth';
-      }, 500);
-    }
-  };
-
-  const resetPassword = async (email: string) => {
-    try {
-      const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}/auth/reset-password`,
-      });
-      if (error) throw error;
-      toast.success('Password reset email sent!');
-    } catch (error: any) {
-      console.error('Reset password error:', error);
-      toast.error(error.message || 'Failed to send reset email');
-      throw error;
-    }
+    const result = await handleLogout();
+    
+    // Clear local state regardless of API response
+    setUser(null);
+    setSession(null);
+    setProfile(null);
   };
 
   const changePassword = async (email: string, code: string, password: string) => {
     try {
       // This would be handled by Supabase's built-in password reset flow
-      toast.info('Please use the link sent to your email to reset your password');
+      console.info('Please use the link sent to your email to reset your password');
     } catch (error: any) {
       console.error('Change password error:', error);
-      throw error;
-    }
-  };
-
-  const verifyEmail = async (token: string) => {
-    try {
-      const { error } = await supabase.auth.verifyOtp({
-        token_hash: token,
-        type: 'email'
-      });
-      if (error) throw error;
-      toast.success('Email verified successfully!');
-    } catch (error: any) {
-      console.error('Verify email error:', error);
-      toast.error(error.message || 'Failed to verify email');
       throw error;
     }
   };
@@ -288,8 +159,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     register,
     logout,
     isAuthenticated: !!user, // Base authentication on session user, not profile
-    verifyEmail,
-    resetPassword,
+    verifyEmail: handleVerifyEmail,
+    resetPassword: handleResetPassword,
     updatePassword: async () => false,
     enableMFA: async () => {},
     verifyMFA: async () => false,
