@@ -11,6 +11,9 @@ export interface RiderProfile {
   rating: number;
   total_deliveries: number;
   is_verified: boolean;
+  current_location?: any;
+  license_number?: string;
+  vehicle_registration?: string;
 }
 
 export const useRiderProfile = () => {
@@ -57,9 +60,31 @@ export const useRiderProfile = () => {
     }
   };
 
+  const updateRiderStatus = async (status: RiderProfile['rider_status']) => {
+    if (!user?.id) return false;
+
+    try {
+      const { error } = await supabase
+        .from('rider_profiles')
+        .update({ rider_status: status })
+        .eq('id', user.id);
+
+      if (error) throw error;
+
+      setRiderProfile(prev => prev ? { ...prev, rider_status: status } : null);
+      toast.success(`Status updated to ${status}`);
+      return true;
+    } catch (error) {
+      console.error('Error updating rider status:', error);
+      toast.error('Failed to update status');
+      return false;
+    }
+  };
+
   return {
     riderProfile,
     fetchRiderProfile,
+    updateRiderStatus,
     refetchProfile: fetchRiderProfile
   };
 };

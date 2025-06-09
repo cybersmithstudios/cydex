@@ -1,5 +1,7 @@
+
 import React, { useState } from 'react';
 import DashboardLayout from '@/components/layout/DashboardLayout';
+import { useRiderData } from '@/hooks/useRiderData';
 
 import EarningsOverviewCards from '@/components/rider/earnings/EarningsOverviewCards';
 import EarningsChart from '@/components/rider/earnings/EarningsChart';
@@ -9,109 +11,79 @@ import DeliveryPerformance from '@/components/rider/earnings/DeliveryPerformance
 import PaymentSettings from '@/components/rider/earnings/PaymentSettings';
 
 const EarningsPage = () => {
-  // States for date pickers
+  const { todaysEarnings, weeklyEarnings, monthlyEarnings, riderProfile, loading } = useRiderData();
   const [startDate, setStartDate] = useState<Date | undefined>(new Date());
   const [endDate, setEndDate] = useState<Date | undefined>(new Date());
   const [period, setPeriod] = useState('weekly');
 
-  // Daily earnings data (mock data)
-  const dailyEarningsData = [
-    { date: 'Apr 1', earnings: 5200, deliveries: 8 },
-    { date: 'Apr 2', earnings: 6700, deliveries: 10 },
-    { date: 'Apr 3', earnings: 4900, deliveries: 7 },
-    { date: 'Apr 4', earnings: 7300, deliveries: 12 },
-    { date: 'Apr 5', earnings: 8400, deliveries: 14 },
-    { date: 'Apr 6', earnings: 5600, deliveries: 9 },
-    { date: 'Apr 7', earnings: 3800, deliveries: 6 },
-    { date: 'Apr 8', earnings: 6200, deliveries: 11 },
-    { date: 'Apr 9', earnings: 7500, deliveries: 13 }
-  ];
+  if (loading) {
+    return (
+      <DashboardLayout userRole="RIDER">
+        <div className="p-2 sm:p-4 md:p-6 max-w-7xl mx-auto">
+          <div className="animate-pulse space-y-4">
+            <div className="h-8 bg-gray-200 rounded w-1/4"></div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+              {[1, 2, 3, 4].map((i) => (
+                <div key={i} className="h-32 bg-gray-200 rounded"></div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </DashboardLayout>
+    );
+  }
 
-  // Weekly earnings data (mock data)
-  const weeklyEarningsData = [
-    { week: 'Week 1', earnings: 42000, deliveries: 67 },
-    { week: 'Week 2', earnings: 38500, deliveries: 58 },
-    { week: 'Week 3', earnings: 45200, deliveries: 72 },
-    { week: 'Week 4', earnings: 51000, deliveries: 81 }
-  ];
+  // Calculate totals from real data
+  const todaysTotal = todaysEarnings.reduce((sum, earning) => 
+    sum + (earning.delivery_fee + earning.eco_bonus + earning.tip_amount), 0
+  );
+  
+  const weeklyTotal = weeklyEarnings.reduce((sum, earning) => 
+    sum + (earning.delivery_fee + earning.eco_bonus + earning.tip_amount), 0
+  );
+  
+  const monthlyTotal = monthlyEarnings.reduce((sum, earning) => 
+    sum + (earning.delivery_fee + earning.eco_bonus + earning.tip_amount), 0
+  );
 
-  // Monthly earnings data (mock data)
-  const monthlyEarningsData = [
-    { month: 'Jan', earnings: 184000, deliveries: 290 },
-    { month: 'Feb', earnings: 176500, deliveries: 275 },
-    { month: 'Mar', earnings: 195200, deliveries: 310 },
-    { month: 'Apr', earnings: 172000, deliveries: 270 }
-  ];
+  // Transform earnings data for charts
+  const dailyEarningsData = todaysEarnings.map((earning, index) => ({
+    date: `Day ${index + 1}`,
+    earnings: earning.delivery_fee + earning.eco_bonus + earning.tip_amount,
+    deliveries: 1
+  }));
 
-  // Recent transactions (mock data)
-  const recentTransactions = [
-    {
-      id: 'TRX-001',
-      date: 'Apr 9, 2025',
-      amount: 3800,
-      status: 'completed',
-      customer: 'Sarah Johnson',
-      orderType: 'Food Delivery'
-    },
-    {
-      id: 'TRX-002',
-      date: 'Apr 9, 2025',
-      amount: 4200,
-      status: 'completed',
-      customer: 'Michael Brown',
-      orderType: 'Package Delivery'
-    },
-    {
-      id: 'TRX-003',
-      date: 'Apr 8, 2025',
-      amount: 2900,
-      status: 'completed',
-      customer: 'David Wilson',
-      orderType: 'Food Delivery'
-    },
-    {
-      id: 'TRX-004',
-      date: 'Apr 8, 2025',
-      amount: 5100,
-      status: 'completed',
-      customer: 'Emily Taylor',
-      orderType: 'Grocery Delivery'
-    },
-    {
-      id: 'TRX-005',
-      date: 'Apr 7, 2025',
-      amount: 3400,
-      status: 'completed',
-      customer: 'Daniel Martinez',
-      orderType: 'Package Delivery'
-    }
-  ];
+  const weeklyEarningsData = [{
+    week: 'This Week',
+    earnings: weeklyTotal,
+    deliveries: weeklyEarnings.length
+  }];
 
-  // Withdrawal history (mock data)
+  const monthlyEarningsData = [{
+    month: 'This Month',
+    earnings: monthlyTotal,
+    deliveries: monthlyEarnings.length
+  }];
+
+  // Transform earnings to transaction format
+  const recentTransactions = todaysEarnings.map((earning, index) => ({
+    id: `TRX-${String(index + 1).padStart(3, '0')}`,
+    date: new Date(earning.earnings_date).toLocaleDateString(),
+    amount: earning.delivery_fee + earning.eco_bonus + earning.tip_amount,
+    status: 'completed' as const,
+    customer: 'Customer',
+    orderType: 'Delivery'
+  }));
+
+  // Mock withdrawal history for now
   const withdrawalHistory = [
     {
       id: 'WDR-001',
-      date: 'Apr 5, 2025',
-      amount: 35000,
-      status: 'completed',
+      date: 'Last Week',
+      amount: weeklyTotal * 0.8,
+      status: 'completed' as const,
       accountNumber: '****4587',
-      bank: 'Zenith Bank'
-    },
-    {
-      id: 'WDR-002',
-      date: 'Mar 29, 2025',
-      amount: 42000,
-      status: 'completed',
-      accountNumber: '****4587',
-      bank: 'Zenith Bank'
-    },
-    {
-      id: 'WDR-003',
-      date: 'Mar 22, 2025',
-      amount: 38500,
-      status: 'completed',
-      accountNumber: '****4587',
-      bank: 'Zenith Bank'
+      bank: 'Bank'
     }
   ];
 
@@ -124,10 +96,10 @@ const EarningsPage = () => {
         </div>
 
         <EarningsOverviewCards 
-          availableBalance={45600}
-          todaysEarnings={8000}
-          weeklyEarnings={32400}
-          monthlyEarnings={172000}
+          availableBalance={monthlyTotal}
+          todaysEarnings={todaysTotal}
+          weeklyEarnings={weeklyTotal}
+          monthlyEarnings={monthlyTotal}
         />
 
         <EarningsChart 
@@ -149,11 +121,11 @@ const EarningsPage = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4 md:gap-6">
           <DeliveryPerformance 
-            completedDeliveries={75}
+            completedDeliveries={riderProfile?.total_deliveries || 0}
             onTimeRate={97}
-            cancelledOrders={2}
+            cancelledOrders={0}
             averageDeliveryTime={23}
-            customerRating={4.9}
+            customerRating={riderProfile?.rating || 0}
           />
           <PaymentSettings />
         </div>

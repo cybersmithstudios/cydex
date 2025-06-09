@@ -3,6 +3,7 @@ import React from 'react';
 import { useAuth } from '@/contexts/SupabaseAuthContext';
 import DashboardLayout from '@/components/layout/DashboardLayout';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { useRiderData } from '@/hooks/useRiderData';
 import { EarningsOverview } from '@/components/rider/dashboard/EarningsOverview';
 import { CurrentDeliveryCard } from '@/components/rider/dashboard/CurrentDeliveryCard';
@@ -19,7 +20,8 @@ const RiderDashboard = () => {
     todaysEarnings,
     riderProfile,
     acceptDelivery,
-    updateDeliveryStatus
+    updateDeliveryStatus,
+    updateRiderStatus
   } = useRiderData();
 
   if (loading) {
@@ -45,6 +47,10 @@ const RiderDashboard = () => {
     await acceptDelivery(orderId);
   };
 
+  const handleStatusChange = async (status: any) => {
+    await updateRiderStatus(status);
+  };
+
   return (
     <DashboardLayout userRole="RIDER">
       <div className="p-2 sm:p-4 md:p-6 max-w-7xl mx-auto space-y-3 sm:space-y-4 md:space-y-6">
@@ -55,9 +61,20 @@ const RiderDashboard = () => {
               Manage your deliveries and track your impact
             </p>
           </div>
-          <Badge className={`text-xs sm:text-sm ${riderProfile?.rider_status === 'available' ? 'bg-green-500' : 'bg-gray-500'}`}>
-            {riderProfile?.rider_status === 'available' ? 'Available for Deliveries' : 'Offline'}
-          </Badge>
+          <div className="flex items-center gap-2">
+            <Badge className={`text-xs sm:text-sm ${riderProfile?.rider_status === 'available' ? 'bg-green-500' : 'bg-gray-500'}`}>
+              {riderProfile?.rider_status === 'available' ? 'Available for Deliveries' : 'Offline'}
+            </Badge>
+            <Button
+              size="sm"
+              variant={riderProfile?.rider_status === 'available' ? 'destructive' : 'default'}
+              onClick={() => handleStatusChange(
+                riderProfile?.rider_status === 'available' ? 'offline' : 'available'
+              )}
+            >
+              {riderProfile?.rider_status === 'available' ? 'Go Offline' : 'Go Online'}
+            </Button>
+          </div>
         </div>
 
         <EarningsOverview 

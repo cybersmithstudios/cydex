@@ -21,6 +21,12 @@ export interface DeliveryData {
   vendor_name?: string;
   customer_name?: string;
   items_count?: number;
+  order?: {
+    customer_profile?: { name: string };
+    vendor_profile?: { name: string };
+    order_items?: any[];
+    subtotal?: number;
+  };
 }
 
 export const useRiderDeliveries = () => {
@@ -37,6 +43,7 @@ export const useRiderDeliveries = () => {
           orders!inner(
             customer_id,
             vendor_id,
+            subtotal,
             customer_profile:profiles!customer_id(name),
             vendor_profile:profiles!vendor_id(name),
             order_items(count)
@@ -52,7 +59,8 @@ export const useRiderDeliveries = () => {
         ...delivery,
         vendor_name: delivery.orders?.vendor_profile?.name || 'Unknown Vendor',
         customer_name: delivery.orders?.customer_profile?.name || 'Unknown Customer',
-        items_count: delivery.orders?.order_items?.length || 0
+        items_count: delivery.orders?.order_items?.length || 0,
+        order: delivery.orders
       })) || [];
 
       setAvailableDeliveries(formattedDeliveries);
@@ -73,6 +81,7 @@ export const useRiderDeliveries = () => {
           orders!inner(
             customer_id,
             vendor_id,
+            subtotal,
             customer_profile:profiles!customer_id(name),
             vendor_profile:profiles!vendor_id(name),
             order_items(count)
@@ -88,7 +97,8 @@ export const useRiderDeliveries = () => {
         ...delivery,
         vendor_name: delivery.orders?.vendor_profile?.name || 'Unknown Vendor',
         customer_name: delivery.orders?.customer_profile?.name || 'Unknown Customer',
-        items_count: delivery.orders?.order_items?.length || 0
+        items_count: delivery.orders?.order_items?.length || 0,
+        order: delivery.orders
       })) || [];
 
       setCurrentDeliveries(formattedDeliveries);
@@ -114,6 +124,14 @@ export const useRiderDeliveries = () => {
         .is('rider_id', null);
 
       if (error) throw error;
+
+      // Also update the order with rider assignment
+      const { error: orderError } = await supabase
+        .from('orders')
+        .update({ rider_id: user.id })
+        .eq('id', deliveryId);
+
+      if (orderError) throw orderError;
 
       toast.success('Delivery accepted successfully!');
       
@@ -148,6 +166,14 @@ export const useRiderDeliveries = () => {
         .eq('id', deliveryId);
 
       if (error) throw error;
+
+      // Update order status as well
+      const { error: orderError } = await supabase
+        .from('orders')
+        .update({ status })
+        .eq('id', deliveryId);
+
+      if (orderError) throw orderError;
 
       toast.success(`Delivery status updated to ${status}`);
       

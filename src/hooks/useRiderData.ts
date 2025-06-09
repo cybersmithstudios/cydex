@@ -15,8 +15,15 @@ export const useRiderData = () => {
   const { user } = useAuth();
   const [loading, setLoading] = useState(true);
   
-  const { riderProfile, fetchRiderProfile } = useRiderProfile();
-  const { todaysEarnings, fetchTodaysEarnings } = useRiderEarnings();
+  const { riderProfile, fetchRiderProfile, updateRiderStatus } = useRiderProfile();
+  const { 
+    todaysEarnings, 
+    weeklyEarnings, 
+    monthlyEarnings, 
+    fetchTodaysEarnings, 
+    fetchWeeklyEarnings, 
+    fetchMonthlyEarnings 
+  } = useRiderEarnings();
   const { 
     availableDeliveries, 
     currentDeliveries, 
@@ -35,7 +42,9 @@ export const useRiderData = () => {
           fetchRiderProfile(),
           fetchAvailableDeliveries(),
           fetchCurrentDeliveries(),
-          fetchTodaysEarnings()
+          fetchTodaysEarnings(),
+          fetchWeeklyEarnings(),
+          fetchMonthlyEarnings()
         ]);
         
         setLoading(false);
@@ -62,8 +71,27 @@ export const useRiderData = () => {
       )
       .subscribe();
 
+    const earningsSubscription = supabase
+      .channel('earnings_changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'rider_earnings'
+        },
+        () => {
+          // Refresh earnings when changes occur
+          fetchTodaysEarnings();
+          fetchWeeklyEarnings();
+          fetchMonthlyEarnings();
+        }
+      )
+      .subscribe();
+
     return () => {
       deliverySubscription.unsubscribe();
+      earningsSubscription.unsubscribe();
     };
   }, [user?.id, user?.role]);
 
@@ -72,13 +100,18 @@ export const useRiderData = () => {
     availableDeliveries,
     currentDeliveries,
     todaysEarnings,
+    weeklyEarnings,
+    monthlyEarnings,
     riderProfile,
     acceptDelivery,
     updateDeliveryStatus,
+    updateRiderStatus,
     refetch: {
       availableDeliveries: fetchAvailableDeliveries,
       currentDeliveries: fetchCurrentDeliveries,
       todaysEarnings: fetchTodaysEarnings,
+      weeklyEarnings: fetchWeeklyEarnings,
+      monthlyEarnings: fetchMonthlyEarnings,
       riderProfile: fetchRiderProfile
     }
   };

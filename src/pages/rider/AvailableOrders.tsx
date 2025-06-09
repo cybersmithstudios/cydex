@@ -37,6 +37,8 @@ const AvailableOrdersPage = () => {
       filtered.sort((a, b) => Number(a.delivery_fee) - Number(b.delivery_fee));
     } else if (sortBy === 'eco_bonus') {
       filtered.sort((a, b) => Number(b.eco_bonus) - Number(a.eco_bonus));
+    } else if (sortBy === 'time') {
+      filtered.sort((a, b) => new Date(a.estimated_delivery_time).getTime() - new Date(b.estimated_delivery_time).getTime());
     }
 
     setFilteredOrders([...filtered]);
@@ -89,24 +91,34 @@ const AvailableOrdersPage = () => {
           onSortChange={setSortBy}
         />
 
-        {/* Mobile Card View */}
-        <div className="md:hidden space-y-3">
-          {filteredOrders.map((order) => (
-            <OrderCard
-              key={order.id}
-              order={order}
-              onAcceptOrder={handleAcceptOrder}
-            />
-          ))}
-        </div>
+        {filteredOrders.length === 0 ? (
+          <Card>
+            <CardContent className="text-center py-8">
+              <p className="text-gray-500">No available orders found matching your filters.</p>
+            </CardContent>
+          </Card>
+        ) : (
+          <>
+            {/* Mobile Card View */}
+            <div className="md:hidden space-y-3">
+              {filteredOrders.map((order) => (
+                <OrderCard
+                  key={order.id}
+                  order={order}
+                  onAcceptOrder={handleAcceptOrder}
+                />
+              ))}
+            </div>
 
-        {/* Desktop Table View */}
-        <div className="hidden md:block overflow-x-auto">
-          <OrdersTable
-            orders={filteredOrders}
-            onAcceptOrder={handleAcceptOrder}
-          />
-        </div>
+            {/* Desktop Table View */}
+            <div className="hidden md:block overflow-x-auto">
+              <OrdersTable
+                orders={filteredOrders}
+                onAcceptOrder={handleAcceptOrder}
+              />
+            </div>
+          </>
+        )}
 
         <Card>
           <CardHeader className="pb-3 sm:pb-4">
