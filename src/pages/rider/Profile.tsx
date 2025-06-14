@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { useAuth } from '@/contexts/SupabaseAuthContext';
 import DashboardLayout from '@/components/layout/DashboardLayout';
 import { Card, CardContent } from '@/components/ui/card';
+import { LoadingDisplay } from '@/components/ui/LoadingDisplay';
 import RiderProfileHeader from '@/components/rider/profile/RiderProfileHeader';
 import ProfileHeader from '@/components/rider/profile/ProfileHeader';
 import VehicleInfo from '@/components/rider/profile/VehicleInfo';
@@ -11,6 +12,7 @@ import ProfileTabs from '@/components/rider/profile/ProfileTabs';
 import VehicleDialog from '@/components/rider/profile/dialogs/VehicleDialog';
 import DocumentDialog from '@/components/rider/profile/dialogs/DocumentDialog';
 import { useRiderProfileData } from '@/hooks/rider/useRiderProfileData';
+import { toast } from 'sonner';
 
 const RiderProfilePage = () => {
   const { user } = useAuth();
@@ -18,22 +20,63 @@ const RiderProfilePage = () => {
   const [showVehicleDialog, setShowVehicleDialog] = useState(false);
   const [showIdVerificationDialog, setShowIdVerificationDialog] = useState(false);
   
-  const { riderProfile, recentReviews, achievements } = useRiderProfileData();
+  const { 
+    riderProfile, 
+    recentReviews, 
+    achievements, 
+    loading, 
+    error, 
+    updateProfile 
+  } = useRiderProfileData();
 
-  const handleSaveProfile = () => {
-    setEditing(false);
-    console.log("Profile saved");
+  const handleSaveProfile = async () => {
+    if (!riderProfile) return;
+    
+    const success = await updateProfile(riderProfile);
+    if (success) {
+      setEditing(false);
+      toast.success('Profile updated successfully');
+    }
   };
 
   const handleUpdateVehicle = () => {
     setShowVehicleDialog(false);
-    console.log("Vehicle updated");
+    toast.success('Vehicle information updated');
   };
 
   const handleUploadId = () => {
     setShowIdVerificationDialog(false);
-    console.log("ID uploaded");
+    toast.success('Document uploaded successfully');
   };
+
+  if (loading) {
+    return (
+      <DashboardLayout userRole="RIDER">
+        <div className="p-2 sm:p-4 md:p-6 max-w-7xl mx-auto">
+          <LoadingDisplay message="Loading profile..." />
+        </div>
+      </DashboardLayout>
+    );
+  }
+
+  if (error || !riderProfile) {
+    return (
+      <DashboardLayout userRole="RIDER">
+        <div className="p-2 sm:p-4 md:p-6 max-w-7xl mx-auto">
+          <Card>
+            <CardContent className="text-center py-12">
+              <h3 className="text-lg font-medium text-gray-900 mb-2">
+                {error || 'Profile not found'}
+              </h3>
+              <p className="text-gray-500">
+                Please contact support if this issue persists.
+              </p>
+            </CardContent>
+          </Card>
+        </div>
+      </DashboardLayout>
+    );
+  }
 
   return (
     <DashboardLayout userRole="RIDER">

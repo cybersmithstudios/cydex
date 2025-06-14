@@ -15,27 +15,27 @@ interface ProfileTabsProps {
 
 const ProfileTabs = ({ editing, profile, recentReviews, achievements }: ProfileTabsProps) => {
   return (
-    <Tabs defaultValue="personal">
-      <TabsList className="grid grid-cols-4 mb-6">
-        <TabsTrigger value="personal">Personal</TabsTrigger>
-        <TabsTrigger value="bank">Banking</TabsTrigger>
-        <TabsTrigger value="reviews">Reviews</TabsTrigger>
-        <TabsTrigger value="achievements">Achievements</TabsTrigger>
+    <Tabs defaultValue="personal" className="w-full">
+      <TabsList className="grid grid-cols-2 md:grid-cols-4 mb-3 sm:mb-4 md:mb-6 w-full">
+        <TabsTrigger value="personal" className="text-xs sm:text-sm">Personal</TabsTrigger>
+        <TabsTrigger value="bank" className="text-xs sm:text-sm">Banking</TabsTrigger>
+        <TabsTrigger value="reviews" className="text-xs sm:text-sm">Reviews</TabsTrigger>
+        <TabsTrigger value="achievements" className="text-xs sm:text-sm">Achievements</TabsTrigger>
       </TabsList>
       
-      <TabsContent value="personal">
+      <TabsContent value="personal" className="mt-0">
         <PersonalInfoTab editing={editing} profile={profile} />
       </TabsContent>
       
-      <TabsContent value="bank">
+      <TabsContent value="bank" className="mt-0">
         <BankingTab editing={editing} profile={profile} />
       </TabsContent>
       
-      <TabsContent value="reviews">
+      <TabsContent value="reviews" className="mt-0">
         <ReviewsTab profile={profile} recentReviews={recentReviews} />
       </TabsContent>
       
-      <TabsContent value="achievements">
+      <TabsContent value="achievements" className="mt-0">
         <AchievementsTab profile={profile} achievements={achievements} />
       </TabsContent>
     </Tabs>

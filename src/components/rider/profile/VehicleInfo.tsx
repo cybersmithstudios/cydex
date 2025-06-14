@@ -11,48 +11,52 @@ interface VehicleInfoProps {
 }
 
 const VehicleInfo = ({ vehicle, onUpdateVehicle }: VehicleInfoProps) => {
+  if (!vehicle) return null;
+
   return (
     <Card>
-      <CardHeader>
-        <CardTitle className="text-lg flex items-center">
-          <Car className="h-5 w-5 mr-2" />
-          Vehicle Information
+      <CardHeader className="pb-3">
+        <CardTitle className="text-base sm:text-lg flex items-center">
+          <Car className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
+          Vehicle Info
         </CardTitle>
       </CardHeader>
-      <CardContent className="p-6 pt-0">
-        <div className="space-y-3">
+      <CardContent className="p-3 sm:p-6 pt-0">
+        <div className="space-y-2 sm:space-y-3">
           <div className="flex justify-between">
-            <span className="text-sm text-gray-500">Type</span>
-            <span className="text-sm font-medium">{vehicle.type}</span>
+            <span className="text-xs sm:text-sm text-gray-500">Type</span>
+            <span className="text-xs sm:text-sm font-medium capitalize">{vehicle.type}</span>
           </div>
           <div className="flex justify-between">
-            <span className="text-sm text-gray-500">Model</span>
-            <span className="text-sm font-medium">{vehicle.model}</span>
+            <span className="text-xs sm:text-sm text-gray-500">Model</span>
+            <span className="text-xs sm:text-sm font-medium">{vehicle.model}</span>
           </div>
           <div className="flex justify-between">
-            <span className="text-sm text-gray-500">Year</span>
-            <span className="text-sm font-medium">{vehicle.year}</span>
+            <span className="text-xs sm:text-sm text-gray-500">Year</span>
+            <span className="text-xs sm:text-sm font-medium">{vehicle.year}</span>
           </div>
           <div className="flex justify-between">
-            <span className="text-sm text-gray-500">Color</span>
-            <span className="text-sm font-medium">{vehicle.color}</span>
+            <span className="text-xs sm:text-sm text-gray-500">Color</span>
+            <span className="text-xs sm:text-sm font-medium">{vehicle.color}</span>
           </div>
+          {vehicle.licensePlate !== 'N/A' && (
+            <div className="flex justify-between">
+              <span className="text-xs sm:text-sm text-gray-500">License</span>
+              <span className="text-xs sm:text-sm font-medium">{vehicle.licensePlate}</span>
+            </div>
+          )}
           <div className="flex justify-between">
-            <span className="text-sm text-gray-500">License Plate</span>
-            <span className="text-sm font-medium">{vehicle.licensePlate}</span>
-          </div>
-          <div className="flex justify-between">
-            <span className="text-sm text-gray-500">Registration Status</span>
-            <Badge className="bg-green-500">Approved</Badge>
+            <span className="text-xs sm:text-sm text-gray-500">Status</span>
+            <Badge className="bg-green-500 text-xs">Approved</Badge>
           </div>
         </div>
         
         <Button 
           variant="outline" 
-          className="w-full mt-4"
+          className="w-full mt-3 sm:mt-4 text-xs sm:text-sm h-8 sm:h-9"
           onClick={onUpdateVehicle}
         >
-          Update Vehicle Details
+          Update Vehicle
         </Button>
       </CardContent>
     </Card>
