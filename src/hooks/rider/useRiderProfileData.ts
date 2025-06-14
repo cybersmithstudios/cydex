@@ -198,9 +198,9 @@ export const useRiderProfileData = () => {
       const totalDistance = deliveriesData.reduce((sum, d) => sum + (Number(d.actual_distance) || 0), 0);
       const carbonSaved = deliveriesData.reduce((sum, d) => sum + (Number(d.carbon_saved) || 0), 0);
 
-      // Parse preferences safely
-      const deliveryPrefs = riderData?.delivery_preferences || {};
-      const notificationPrefs = riderData?.notification_preferences || {};
+      // Parse preferences safely with type assertions
+      const deliveryPrefs = riderData?.delivery_preferences as any || {};
+      const notificationPrefs = riderData?.notification_preferences as any || {};
 
       const transformedProfile: RiderProfileData = {
         id: profileData.id,
@@ -210,7 +210,7 @@ export const useRiderProfileData = () => {
         address: String(profileData.address || ''),
         avatar: profileData.avatar ? String(profileData.avatar) : undefined,
         joinDate: new Date(profileData.created_at).toLocaleDateString(),
-        isOnline: riderData?.rider_status === 'online',
+        isOnline: riderData?.rider_status === 'available',
         isVerified: riderData?.verification_status === 'verified',
         verificationStatus: String(riderData?.verification_status || 'pending'),
         vehicle: {
@@ -415,7 +415,7 @@ export const useRiderProfileData = () => {
       const { error } = await supabase
         .from('rider_profiles')
         .update({
-          rider_status: isOnline ? 'online' : 'offline',
+          rider_status: isOnline ? 'available' : 'offline',
           updated_at: new Date().toISOString()
         })
         .eq('id', user.id);
