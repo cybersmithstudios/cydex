@@ -4,7 +4,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { Separator } from '@/components/ui/separator';
 import { Smartphone, Mail, MessageSquare, Bell } from 'lucide-react';
@@ -50,9 +49,10 @@ const PersonalInfoTab = ({ editing, profile }: PersonalInfoTabProps) => {
                 <Label htmlFor="phone">Phone Number</Label>
                 <Input 
                   id="phone" 
-                  value={profile.phone} 
+                  value={profile.phone || ''} 
                   readOnly={!editing} 
                   className={editing ? "" : "bg-gray-50"}
+                  placeholder="Add your phone number"
                 />
               </div>
               <div className="space-y-2">
@@ -70,9 +70,10 @@ const PersonalInfoTab = ({ editing, profile }: PersonalInfoTabProps) => {
               <Label htmlFor="address">Address</Label>
               <Input 
                 id="address" 
-                value={profile.address} 
+                value={profile.address || ''} 
                 readOnly={!editing} 
                 className={editing ? "" : "bg-gray-50"}
+                placeholder="Add your address"
               />
             </div>
             
@@ -97,19 +98,13 @@ const PersonalInfoTab = ({ editing, profile }: PersonalInfoTabProps) => {
                 
                 <div className="space-y-2">
                   <Label>Preferred Delivery Zones</Label>
-                  <div className="flex flex-wrap gap-2">
-                    {profile.preferences.deliveryPreferences.preferredZones.map((zone: string, index: number) => (
-                      <Badge key={index} variant={editing ? "outline" : "secondary"}>
-                        {zone}
-                        {editing && <Button size="sm" variant="ghost" className="h-4 w-4 p-0 ml-1">×</Button>}
-                      </Badge>
-                    ))}
-                    {editing && <Button size="sm" variant="outline" className="h-7">+ Add Zone</Button>}
+                  <div className="p-3 border rounded-lg bg-gray-50">
+                    <p className="text-sm text-gray-500">No preferred zones set. All zones available.</p>
                   </div>
                 </div>
                 
                 <div className="space-y-2">
-                  <Label>Available Days</Label>
+                  <Label>Available Days (Read-only)</Label>
                   <div className="flex flex-wrap gap-2">
                     {["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"].map((day) => (
                       <Badge 
@@ -121,6 +116,7 @@ const PersonalInfoTab = ({ editing, profile }: PersonalInfoTabProps) => {
                       </Badge>
                     ))}
                   </div>
+                  <p className="text-xs text-gray-500">Contact support to modify your availability</p>
                 </div>
               </div>
             </div>

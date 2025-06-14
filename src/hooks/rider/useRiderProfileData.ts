@@ -84,7 +84,7 @@ export interface AchievementData {
   description: string;
   progress: number;
   earnedDate?: string;
-  icon: any;
+  icon: string;
 }
 
 const MAX_RETRIES = 3;
@@ -178,41 +178,41 @@ export const useRiderProfileData = () => {
         name: String(profileData.name || 'Rider'),
         email: String(profileData.email || ''),
         phone: String(profileData.phone || ''),
-        address: String(profileData.address || 'Not provided'),
+        address: String(profileData.address || ''),
         avatar: profileData.avatar ? String(profileData.avatar) : undefined,
         joinDate: new Date(profileData.created_at).toLocaleDateString(),
         vehicle: {
-          type: String(riderData?.vehicle_type || 'bicycle'),
-          model: 'Trek FX 3',
+          type: String(riderData?.vehicle_type || 'walking'),
+          model: 'Eco-friendly Transport',
           year: '2023',
-          color: 'Black',
+          color: 'Green',
           licensePlate: String(riderData?.license_number || 'N/A'),
-          registration: String(riderData?.vehicle_registration || 'Pending')
+          registration: String(riderData?.vehicle_registration || 'N/A')
         },
         documents: {
           idCard: {
-            verified: Boolean(riderData?.is_verified || false),
+            verified: false,
             expiryDate: '2025-12-31'
           },
           driverLicense: {
-            verified: Boolean(riderData?.is_verified || false),
+            verified: false,
             expiryDate: '2025-12-31'
           },
           insurance: {
-            verified: Boolean(riderData?.is_verified || false),
+            verified: false,
             expiryDate: '2025-12-31'
           }
         },
         bankDetails: {
-          bank: 'First Bank',
-          accountNumber: '*****1234',
-          accountName: String(profileData.name || 'Rider'),
-          bvn: '*****5678'
+          bank: '',
+          accountNumber: '',
+          accountName: '',
+          bvn: ''
         },
         preferences: {
           deliveryPreferences: {
             maxDistance: 15,
-            preferredZones: ['Victoria Island', 'Ikoyi', 'Lekki'],
+            preferredZones: [],
             availableDays: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
           },
           notifications: {
@@ -223,12 +223,12 @@ export const useRiderProfileData = () => {
           }
         },
         stats: {
-          rating: Number(riderData?.rating) || 0,
-          reviews: Math.floor(totalDeliveries * 0.8),
+          rating: 0,
+          reviews: 0,
           completedDeliveries: totalDeliveries,
           totalDistance: Math.round(totalDistance),
           carbonSaved: Math.round(carbonSaved),
-          sustainabilityScore: Math.min(100, Math.round(carbonSaved / 10))
+          sustainabilityScore: 0
         }
       };
 
@@ -248,25 +248,8 @@ export const useRiderProfileData = () => {
     if (!user?.id) return;
 
     try {
-      // Mock reviews for now - can be replaced with real vendor_ratings data
-      const mockReviews: ReviewData[] = [
-        {
-          id: '1',
-          customer: 'John D.',
-          date: '2 days ago',
-          rating: 5,
-          comment: 'Excellent delivery service! Very professional and on time.'
-        },
-        {
-          id: '2',
-          customer: 'Sarah M.',
-          date: '1 week ago',
-          rating: 4,
-          comment: 'Good service, food arrived warm and well-packaged.'
-        }
-      ];
-
-      setRecentReviews(mockReviews);
+      // Empty reviews for new riders
+      setRecentReviews([]);
     } catch (error) {
       console.error('[RiderProfile] Error fetching reviews:', error);
     }
@@ -276,33 +259,8 @@ export const useRiderProfileData = () => {
     if (!user?.id) return;
 
     try {
-      // Generate achievements based on real stats
-      const mockAchievements: AchievementData[] = [
-        {
-          id: '1',
-          title: 'First Delivery',
-          description: 'Complete your first delivery',
-          progress: 100,
-          earnedDate: '2023-01-15',
-          icon: 'package'
-        },
-        {
-          id: '2',
-          title: 'Speed Demon',
-          description: 'Complete 50 deliveries',
-          progress: 80,
-          icon: 'zap'
-        },
-        {
-          id: '3',
-          title: 'Eco Warrior',
-          description: 'Save 100kg of CO₂',
-          progress: 65,
-          icon: 'leaf'
-        }
-      ];
-
-      setAchievements(mockAchievements);
+      // Empty achievements for new riders
+      setAchievements([]);
     } catch (error) {
       console.error('[RiderProfile] Error fetching achievements:', error);
     }

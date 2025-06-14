@@ -3,7 +3,7 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Car } from 'lucide-react';
+import { Car, Bike } from 'lucide-react';
 
 interface VehicleInfoProps {
   vehicle: any;
@@ -13,11 +13,33 @@ interface VehicleInfoProps {
 const VehicleInfo = ({ vehicle, onUpdateVehicle }: VehicleInfoProps) => {
   if (!vehicle) return null;
 
+  const getVehicleIcon = () => {
+    if (vehicle.type === 'walking' || vehicle.type === 'bicycle') {
+      return <Bike className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />;
+    }
+    return <Car className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />;
+  };
+
+  const getVehicleDisplayName = () => {
+    switch (vehicle.type) {
+      case 'walking':
+        return 'Walking';
+      case 'bicycle':
+        return 'Bicycle';
+      case 'motorcycle':
+        return 'Motorcycle';
+      case 'car':
+        return 'Car';
+      default:
+        return vehicle.type;
+    }
+  };
+
   return (
     <Card>
       <CardHeader className="pb-3">
         <CardTitle className="text-base sm:text-lg flex items-center">
-          <Car className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
+          {getVehicleIcon()}
           Vehicle Info
         </CardTitle>
       </CardHeader>
@@ -25,29 +47,37 @@ const VehicleInfo = ({ vehicle, onUpdateVehicle }: VehicleInfoProps) => {
         <div className="space-y-2 sm:space-y-3">
           <div className="flex justify-between">
             <span className="text-xs sm:text-sm text-gray-500">Type</span>
-            <span className="text-xs sm:text-sm font-medium capitalize">{vehicle.type}</span>
+            <span className="text-xs sm:text-sm font-medium capitalize">{getVehicleDisplayName()}</span>
           </div>
-          <div className="flex justify-between">
-            <span className="text-xs sm:text-sm text-gray-500">Model</span>
-            <span className="text-xs sm:text-sm font-medium">{vehicle.model}</span>
-          </div>
-          <div className="flex justify-between">
-            <span className="text-xs sm:text-sm text-gray-500">Year</span>
-            <span className="text-xs sm:text-sm font-medium">{vehicle.year}</span>
-          </div>
-          <div className="flex justify-between">
-            <span className="text-xs sm:text-sm text-gray-500">Color</span>
-            <span className="text-xs sm:text-sm font-medium">{vehicle.color}</span>
-          </div>
-          {vehicle.licensePlate !== 'N/A' && (
-            <div className="flex justify-between">
-              <span className="text-xs sm:text-sm text-gray-500">License</span>
-              <span className="text-xs sm:text-sm font-medium">{vehicle.licensePlate}</span>
-            </div>
+          
+          {vehicle.type !== 'walking' && (
+            <>
+              <div className="flex justify-between">
+                <span className="text-xs sm:text-sm text-gray-500">Model</span>
+                <span className="text-xs sm:text-sm font-medium">
+                  {vehicle.type === 'bicycle' ? 'Eco-friendly Bike' : vehicle.model}
+                </span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-xs sm:text-sm text-gray-500">Year</span>
+                <span className="text-xs sm:text-sm font-medium">{vehicle.year}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-xs sm:text-sm text-gray-500">Color</span>
+                <span className="text-xs sm:text-sm font-medium">{vehicle.color}</span>
+              </div>
+              {vehicle.licensePlate !== 'N/A' && vehicle.type !== 'bicycle' && (
+                <div className="flex justify-between">
+                  <span className="text-xs sm:text-sm text-gray-500">License</span>
+                  <span className="text-xs sm:text-sm font-medium">{vehicle.licensePlate}</span>
+                </div>
+              )}
+            </>
           )}
+          
           <div className="flex justify-between">
             <span className="text-xs sm:text-sm text-gray-500">Status</span>
-            <Badge className="bg-green-500 text-xs">Approved</Badge>
+            <Badge className="bg-yellow-500 text-xs">Pending Verification</Badge>
           </div>
         </div>
         

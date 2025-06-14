@@ -12,6 +12,7 @@ interface AchievementsTabProps {
 }
 
 const AchievementsTab = ({ profile, achievements }: AchievementsTabProps) => {
+  // Show empty state for achievements
   return (
     <>
       <Card>
@@ -20,63 +21,13 @@ const AchievementsTab = ({ profile, achievements }: AchievementsTabProps) => {
             <Award className="h-5 w-5 mr-2 text-amber-500" />
             Rider Achievements
           </CardTitle>
-          <CardDescription>Milestones and recognitions you've earned</CardDescription>
+          <CardDescription>Milestones and recognitions you'll earn as you complete deliveries</CardDescription>
         </CardHeader>
         <CardContent className="p-6 pt-0">
-          <div className="space-y-6">
-            {achievements.map(achievement => {
-              const AchievementIcon = achievement.icon;
-              const isCompleted = achievement.progress === 100;
-              
-              return (
-                <div 
-                  key={achievement.id} 
-                  className={`p-4 border rounded-lg flex items-start ${
-                    isCompleted ? 'bg-primary-light border-primary' : ''
-                  }`}
-                >
-                  <div className={`p-3 rounded-full mr-4 ${
-                    isCompleted ? 'bg-primary text-white' : 'bg-gray-100'
-                  }`}>
-                    <AchievementIcon className="h-6 w-6" />
-                  </div>
-                  
-                  <div className="flex-1">
-                    <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center">
-                      <h3 className="font-medium">{achievement.title}</h3>
-                      {isCompleted ? (
-                        <Badge className="mt-1 sm:mt-0 w-fit bg-green-500">Earned {achievement.earnedDate}</Badge>
-                      ) : (
-                        <Badge className="mt-1 sm:mt-0 w-fit" variant="outline">{achievement.progress}% Complete</Badge>
-                      )}
-                    </div>
-                    
-                    <p className="text-sm text-gray-600 mt-1">{achievement.description}</p>
-                    
-                    {!isCompleted && (
-                      <div className="mt-2">
-                        <Progress value={achievement.progress} className="h-2" />
-                      </div>
-                    )}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-          
-          <div className="mt-6 p-4 bg-primary-light rounded-lg">
-            <div className="flex flex-col sm:flex-row items-center justify-between">
-              <div className="flex items-center mb-3 sm:mb-0">
-                <Star className="h-6 w-6 text-primary mr-2" />
-                <div>
-                  <p className="font-medium">Sustainability Champion</p>
-                  <p className="text-sm">3 more eco-friendly deliveries to reach next level</p>
-                </div>
-              </div>
-              <Button className="bg-primary hover:bg-primary-hover text-black">
-                View All Badges
-              </Button>
-            </div>
+          <div className="text-center py-12">
+            <Award className="h-12 w-12 text-gray-300 mx-auto mb-4" />
+            <h3 className="text-lg font-medium text-gray-900 mb-2">No achievements yet</h3>
+            <p className="text-gray-500">Complete your first delivery to start earning achievements!</p>
           </div>
         </CardContent>
       </Card>
@@ -93,15 +44,15 @@ const AchievementsTab = ({ profile, achievements }: AchievementsTabProps) => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
             <div className="p-3 border rounded-lg text-center">
               <p className="text-sm text-gray-500">CO₂ Emissions Saved</p>
-              <p className="font-bold text-2xl text-green-600">{profile.stats.carbonSaved} kg</p>
+              <p className="font-bold text-2xl text-green-600">0 kg</p>
             </div>
             <div className="p-3 border rounded-lg text-center">
               <p className="text-sm text-gray-500">Trees Equivalent</p>
-              <p className="font-bold text-2xl text-green-600">{Math.round(profile.stats.carbonSaved / 25)}</p>
+              <p className="font-bold text-2xl text-green-600">0</p>
             </div>
             <div className="p-3 border rounded-lg text-center">
               <p className="text-sm text-gray-500">Eco Score Ranking</p>
-              <p className="font-bold text-2xl text-green-600">Top 5%</p>
+              <p className="font-bold text-2xl text-green-600">-</p>
             </div>
           </div>
           
@@ -111,9 +62,9 @@ const AchievementsTab = ({ profile, achievements }: AchievementsTabProps) => {
             <div className="flex justify-between items-center">
               <div className="flex items-center">
                 <Bike className="h-5 w-5 text-green-600 mr-2" />
-                <span>Bicycle/E-bike Deliveries</span>
+                <span>Walking/Bicycle Deliveries</span>
               </div>
-              <span className="font-medium">78%</span>
+              <span className="font-medium">0%</span>
             </div>
             
             <div className="flex justify-between items-center">
@@ -121,7 +72,7 @@ const AchievementsTab = ({ profile, achievements }: AchievementsTabProps) => {
                 <Car className="h-5 w-5 text-amber-600 mr-2" />
                 <span>Electric Vehicle Deliveries</span>
               </div>
-              <span className="font-medium">15%</span>
+              <span className="font-medium">0%</span>
             </div>
             
             <div className="flex justify-between items-center">
@@ -129,13 +80,13 @@ const AchievementsTab = ({ profile, achievements }: AchievementsTabProps) => {
                 <AlertCircle className="h-5 w-5 text-red-600 mr-2" />
                 <span>Conventional Vehicle Deliveries</span>
               </div>
-              <span className="font-medium">7%</span>
+              <span className="font-medium">0%</span>
             </div>
           </div>
           
-          <Button className="w-full mt-6 bg-green-600 hover:bg-green-700">
-            View Complete Sustainability Report
-          </Button>
+          <div className="text-center py-8">
+            <p className="text-gray-500">Start completing deliveries to see your sustainability impact!</p>
+          </div>
         </CardContent>
       </Card>
     </>

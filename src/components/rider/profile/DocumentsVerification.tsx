@@ -3,7 +3,7 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { FileText, Shield, Car, Check } from 'lucide-react';
+import { FileText, Shield, Car, AlertCircle } from 'lucide-react';
 
 interface DocumentsVerificationProps {
   documents: any;
@@ -55,9 +55,9 @@ const DocumentsVerification = ({ documents, onUpdateDocuments }: DocumentsVerifi
                     <p className="text-xs text-gray-500">Exp: {doc.expiry}</p>
                   </div>
                 </div>
-                <Badge className={`${doc.verified ? 'bg-green-500' : 'bg-yellow-500'} flex items-center gap-1 text-xs`}>
-                  {doc.verified && <Check className="h-3 w-3" />}
-                  {doc.verified ? 'Verified' : 'Pending'}
+                <Badge className="bg-red-500 flex items-center gap-1 text-xs">
+                  <AlertCircle className="h-3 w-3" />
+                  Not Verified
                 </Badge>
               </div>
             );
@@ -69,7 +69,7 @@ const DocumentsVerification = ({ documents, onUpdateDocuments }: DocumentsVerifi
           className="w-full mt-3 sm:mt-4 text-xs sm:text-sm h-8 sm:h-9"
           onClick={onUpdateDocuments}
         >
-          Update Documents
+          Upload Documents
         </Button>
       </CardContent>
     </Card>
