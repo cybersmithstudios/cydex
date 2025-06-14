@@ -34,7 +34,7 @@ export const OrderCard: React.FC<OrderCardProps> = ({
                 {order.vendor_name}
               </h3>
               {hasEcoBonus && (
-                <Leaf className="h-4 w-4 text-green-500" title="Eco-friendly delivery" />
+                <Leaf className="h-4 w-4 text-green-500" />
               )}
             </div>
             <p className="text-sm text-gray-600 truncate">

@@ -109,7 +109,7 @@ export const OrdersTable: React.FC<OrdersTableProps> = ({
                           {order.vendor_name}
                         </p>
                         {Number(order.eco_bonus) > 0 && (
-                          <Leaf className="h-4 w-4 text-green-500" title="Eco-friendly order" />
+                          <Leaf className="h-4 w-4 text-green-500" />
                         )}
                       </div>
                       <p className="text-sm text-gray-500 truncate">

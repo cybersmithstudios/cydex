@@ -6,18 +6,25 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { TrendingUp, Navigation, Phone, Leaf, RefreshCw, AlertCircle } from 'lucide-react';
 import { useRiderData } from '@/hooks/useRiderData';
+import { useRiderDeliveries } from '@/hooks/rider/useRiderDeliveries';
 import { OrderFilters } from '@/components/rider/orders/OrderFilters';
 import { OrderCard } from '@/components/rider/orders/OrderCard';
 import { OrdersTable } from '@/components/rider/orders/OrdersTable';
 
 const AvailableOrdersPage = () => {
   const { 
-    availableDeliveries, 
-    loading, 
-    error,
-    acceptDelivery,
-    refetch 
+    availableDeliveries: riderDataDeliveries, 
+    loading: riderDataLoading,
+    refetch: riderDataRefetch 
   } = useRiderData();
+  
+  const {
+    availableDeliveries,
+    loading: deliveriesLoading,
+    error: deliveriesError,
+    acceptDelivery,
+    fetchAvailableDeliveries
+  } = useRiderDeliveries();
   
   const [searchQuery, setSearchQuery] = useState('');
   const [filterEco, setFilterEco] = useState(false);
@@ -25,21 +32,27 @@ const AvailableOrdersPage = () => {
   const [filteredOrders, setFilteredOrders] = useState(availableDeliveries);
   const [acceptingOrder, setAcceptingOrder] = useState<string | null>(null);
 
+  // Use deliveries from the specific hook, fallback to rider data
+  const ordersToUse = availableDeliveries.length > 0 ? availableDeliveries : riderDataDeliveries;
+  const loading = deliveriesLoading || riderDataLoading;
+  const error = deliveriesError;
+
   // Real-time updates setup
   useEffect(() => {
     console.log('[AvailableOrders] Setting up auto-refresh');
     const interval = setInterval(() => {
       if (!loading) {
-        refetch.availableDeliveries();
+        fetchAvailableDeliveries();
+        riderDataRefetch.availableDeliveries();
       }
     }, 30000); // Refresh every 30 seconds
 
     return () => clearInterval(interval);
-  }, [loading, refetch.availableDeliveries]);
+  }, [loading, fetchAvailableDeliveries, riderDataRefetch.availableDeliveries]);
 
   // Filter and sort logic
   useEffect(() => {
-    let filtered = [...availableDeliveries];
+    let filtered = [...ordersToUse];
 
     // Search filter
     if (searchQuery.trim()) {
@@ -78,7 +91,7 @@ const AvailableOrdersPage = () => {
     }
 
     setFilteredOrders(filtered);
-  }, [availableDeliveries, searchQuery, filterEco, sortBy]);
+  }, [ordersToUse, searchQuery, filterEco, sortBy]);
 
   const handleAcceptOrder = async (orderId: string) => {
     if (acceptingOrder) return; // Prevent multiple simultaneous accepts
@@ -96,7 +109,8 @@ const AvailableOrdersPage = () => {
 
   const handleRefresh = () => {
     console.log('[AvailableOrders] Manual refresh triggered');
-    refetch.availableDeliveries();
+    fetchAvailableDeliveries();
+    riderDataRefetch.availableDeliveries();
   };
 
   return (
@@ -123,7 +137,7 @@ const AvailableOrdersPage = () => {
             </Button>
             <Badge className="text-xs sm:text-sm bg-green-500">
               <TrendingUp className="mr-1 h-3 w-3 sm:h-4 sm:w-4" />
-              {availableDeliveries.length} Available
+              {ordersToUse.length} Available
             </Badge>
           </div>
         </div>

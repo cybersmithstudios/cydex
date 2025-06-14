@@ -178,35 +178,27 @@ export const useRiderDeliveries = () => {
       console.log('[RiderDeliveries] Accepting delivery:', deliveryId);
       
       const operation = async () => {
-        // Use a transaction to ensure data consistency
-        const { error } = await supabase.rpc('accept_delivery_transaction', {
-          p_delivery_id: deliveryId,
-          p_rider_id: user.id
-        });
+        // Direct update approach since RPC function doesn't exist
+        const { error: updateError } = await supabase
+          .from('deliveries')
+          .update({
+            rider_id: user.id,
+            status: 'accepted',
+            accepted_at: new Date().toISOString()
+          })
+          .eq('id', deliveryId)
+          .eq('status', 'available')
+          .is('rider_id', null);
 
-        if (error) {
-          // Fallback to manual update if RPC doesn't exist
-          const { error: updateError } = await supabase
-            .from('deliveries')
-            .update({
-              rider_id: user.id,
-              status: 'accepted',
-              accepted_at: new Date().toISOString()
-            })
-            .eq('id', deliveryId)
-            .eq('status', 'available')
-            .is('rider_id', null);
+        if (updateError) throw updateError;
 
-          if (updateError) throw updateError;
+        // Update the order
+        const { error: orderError } = await supabase
+          .from('orders')
+          .update({ rider_id: user.id })
+          .eq('id', deliveryId);
 
-          // Update the order
-          const { error: orderError } = await supabase
-            .from('orders')
-            .update({ rider_id: user.id })
-            .eq('id', deliveryId);
-
-          if (orderError) throw orderError;
-        }
+        if (orderError) throw orderError;
       };
 
       await retryWithBackoff(operation);
