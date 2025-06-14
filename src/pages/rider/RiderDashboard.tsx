@@ -3,7 +3,7 @@ import React from 'react';
 import { useAuth } from '@/contexts/SupabaseAuthContext';
 import DashboardLayout from '@/components/layout/DashboardLayout';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
+import { Switch } from '@/components/ui/switch';
 import { useRiderData } from '@/hooks/useRiderData';
 import { EarningsOverview } from '@/components/rider/dashboard/EarningsOverview';
 import { CurrentDeliveryCard } from '@/components/rider/dashboard/CurrentDeliveryCard';
@@ -42,13 +42,15 @@ const RiderDashboard = () => {
   }
 
   const deliveriesCompleted = todaysEarnings.length;
+  const isOnline = riderProfile?.rider_status === 'available';
 
   const handleAcceptOrder = async (orderId: string) => {
     await acceptDelivery(orderId);
   };
 
-  const handleStatusChange = async (status: any) => {
-    await updateRiderStatus(status);
+  const handleToggleOnlineStatus = async (checked: boolean) => {
+    const newStatus = checked ? 'available' : 'offline';
+    await updateRiderStatus(newStatus);
   };
 
   return (
@@ -61,19 +63,19 @@ const RiderDashboard = () => {
               Manage your deliveries and track your impact
             </p>
           </div>
-          <div className="flex items-center gap-2">
-            <Badge className={`text-xs sm:text-sm ${riderProfile?.rider_status === 'available' ? 'bg-green-500' : 'bg-gray-500'}`}>
-              {riderProfile?.rider_status === 'available' ? 'Available for Deliveries' : 'Offline'}
+          <div className="flex items-center gap-3">
+            <Badge className={`text-xs sm:text-sm ${isOnline ? 'bg-green-500' : 'bg-gray-500'}`}>
+              {isOnline ? 'Available for Deliveries' : 'Offline'}
             </Badge>
-            <Button
-              size="sm"
-              variant={riderProfile?.rider_status === 'available' ? 'destructive' : 'default'}
-              onClick={() => handleStatusChange(
-                riderProfile?.rider_status === 'available' ? 'offline' : 'available'
-              )}
-            >
-              {riderProfile?.rider_status === 'available' ? 'Go Offline' : 'Go Online'}
-            </Button>
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-gray-600">Offline</span>
+              <Switch
+                checked={isOnline}
+                onCheckedChange={handleToggleOnlineStatus}
+                className="data-[state=checked]:bg-green-500"
+              />
+              <span className="text-sm text-gray-600">Online</span>
+            </div>
           </div>
         </div>
 
