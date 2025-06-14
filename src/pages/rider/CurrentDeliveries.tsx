@@ -1,52 +1,107 @@
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import DashboardLayout from '@/components/layout/DashboardLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { MapPin, Clock, Leaf, Phone, Navigation } from 'lucide-react';
+import { MapPin, Clock, Leaf, Phone, Navigation, RefreshCw, AlertCircle } from 'lucide-react';
 import { useRiderData } from '@/hooks/useRiderData';
 import { useAuth } from '@/contexts/SupabaseAuthContext';
+import { toast } from 'sonner';
 
 const CurrentDeliveriesPage = () => {
   const { user } = useAuth();
-  const { loading: riderDataLoading, currentDeliveries, updateDeliveryStatus } = useRiderData();
+  const { 
+    loading: riderDataLoading, 
+    currentDeliveries, 
+    updateDeliveryStatus,
+    refetch
+  } = useRiderData();
+  
+  const [loadingStates, setLoadingStates] = useState<Record<string, boolean>>({});
+  const [refreshing, setRefreshing] = useState(false);
 
-  const getStatusBadge = (status: string) => {
-    switch (status) {
-      case 'accepted':
-        return <Badge className="bg-blue-500 text-xs">Accepted</Badge>;
-      case 'picking_up':
-        return <Badge className="bg-yellow-500 text-xs">Picking Up</Badge>;
-      case 'picked_up':
-        return <Badge className="bg-amber-500 text-xs">Picked Up</Badge>;
-      case 'delivering':
-        return <Badge className="bg-orange-500 text-xs">Delivering</Badge>;
-      case 'delivered':
-        return <Badge className="bg-green-500 text-xs">Delivered</Badge>;
-      default:
-        return <Badge className="text-xs">Unknown</Badge>;
+  // Auto-refresh every 30 seconds for real-time updates
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (currentDeliveries.length > 0) {
+        refetch.currentDeliveries();
+      }
+    }, 30000);
+
+    return () => clearInterval(interval);
+  }, [currentDeliveries.length, refetch.currentDeliveries]);
+
+  const handleRefresh = async () => {
+    setRefreshing(true);
+    try {
+      await refetch.currentDeliveries();
+      toast.success('Deliveries refreshed');
+    } catch (error) {
+      toast.error('Failed to refresh deliveries');
+    } finally {
+      setRefreshing(false);
     }
   };
 
+  const getStatusBadge = (status: string) => {
+    const statusConfig = {
+      accepted: { label: 'Accepted', className: 'bg-blue-500' },
+      picking_up: { label: 'Picking Up', className: 'bg-yellow-500' },
+      picked_up: { label: 'Picked Up', className: 'bg-amber-500' },
+      delivering: { label: 'Delivering', className: 'bg-orange-500' },
+      delivered: { label: 'Delivered', className: 'bg-green-500' },
+    };
+    
+    const config = statusConfig[status as keyof typeof statusConfig] || 
+                  { label: 'Unknown', className: 'bg-gray-500' };
+    
+    return <Badge className={`${config.className} text-white text-xs`}>{config.label}</Badge>;
+  };
+
   const getNextAction = (status: string) => {
-    switch (status) {
-      case 'accepted':
-        return { label: 'Start Pickup', nextStatus: 'picking_up' };
-      case 'picking_up':
-        return { label: 'Mark Picked Up', nextStatus: 'picked_up' };
-      case 'picked_up':
-        return { label: 'Start Delivery', nextStatus: 'delivering' };
-      case 'delivering':
-        return { label: 'Mark Delivered', nextStatus: 'delivered' };
-      default:
-        return { label: 'Complete', nextStatus: 'delivered' };
-    }
+    const actions = {
+      accepted: { label: 'Start Pickup', nextStatus: 'picking_up' },
+      picking_up: { label: 'Mark Picked Up', nextStatus: 'picked_up' },
+      picked_up: { label: 'Start Delivery', nextStatus: 'delivering' },
+      delivering: { label: 'Mark Delivered', nextStatus: 'delivered' },
+    };
+    
+    return actions[status as keyof typeof actions] || 
+           { label: 'Complete', nextStatus: 'delivered' };
   };
 
   const handleStatusUpdate = async (deliveryId: string, currentStatus: string) => {
     const nextAction = getNextAction(currentStatus);
-    await updateDeliveryStatus(deliveryId, nextAction.nextStatus as any);
+    
+    setLoadingStates(prev => ({ ...prev, [deliveryId]: true }));
+    
+    try {
+      const success = await updateDeliveryStatus(deliveryId, nextAction.nextStatus as any);
+      if (success) {
+        toast.success(`Status updated to ${nextAction.nextStatus.replace('_', ' ')}`);
+      }
+    } catch (error) {
+      console.error('Error updating delivery status:', error);
+      toast.error('Failed to update delivery status');
+    } finally {
+      setLoadingStates(prev => ({ ...prev, [deliveryId]: false }));
+    }
+  };
+
+  const handleContactCustomer = (delivery: any) => {
+    // This would integrate with a real communication system
+    toast.info('Contact feature would integrate with communication system');
+  };
+
+  const handleGetDirections = (delivery: any) => {
+    // This would integrate with maps/navigation
+    if (delivery.delivery_location?.address) {
+      const address = encodeURIComponent(delivery.delivery_location.address);
+      window.open(`https://www.google.com/maps/search/?api=1&query=${address}`, '_blank');
+    } else {
+      toast.error('Delivery address not available');
+    }
   };
 
   if (riderDataLoading) {
@@ -76,9 +131,21 @@ const CurrentDeliveriesPage = () => {
               Manage your active deliveries and track progress
             </p>
           </div>
-          <Badge className="text-xs sm:text-sm bg-blue-500">
-            {currentDeliveries.length} Active
-          </Badge>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleRefresh}
+              disabled={refreshing}
+              className="flex items-center gap-2"
+            >
+              <RefreshCw className={`h-4 w-4 ${refreshing ? 'animate-spin' : ''}`} />
+              Refresh
+            </Button>
+            <Badge className="text-xs sm:text-sm bg-blue-500 text-white">
+              {currentDeliveries.length} Active
+            </Badge>
+          </div>
         </div>
 
         {currentDeliveries.length === 0 ? (
@@ -89,7 +156,7 @@ const CurrentDeliveriesPage = () => {
               <p className="text-gray-500 mb-4">You don't have any deliveries in progress right now.</p>
               <Button 
                 onClick={() => window.location.href = '/rider/available'}
-                className="bg-primary hover:bg-primary-hover text-black"
+                className="bg-primary hover:bg-primary/90 text-black"
               >
                 Browse Available Orders
               </Button>
@@ -99,13 +166,14 @@ const CurrentDeliveriesPage = () => {
           <div className="space-y-4">
             {currentDeliveries.map((delivery) => {
               const nextAction = getNextAction(delivery.status);
+              const isLoading = loadingStates[delivery.id];
               
               return (
                 <Card key={delivery.id} className="border-2 border-primary">
                   <CardHeader className="pb-3">
                     <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
-                      <div>
-                        <CardTitle className="text-base sm:text-lg">
+                      <div className="min-w-0 flex-1">
+                        <CardTitle className="text-base sm:text-lg truncate">
                           {delivery.vendor_name} → {delivery.customer_name}
                         </CardTitle>
                         <CardDescription className="text-sm">
@@ -120,15 +188,25 @@ const CurrentDeliveriesPage = () => {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                       <div className="space-y-2">
                         <div className="flex items-center text-sm text-gray-600">
-                          <Clock className="h-4 w-4 mr-2" />
-                          <span>Pickup: {new Date(delivery.estimated_pickup_time).toLocaleTimeString()}</span>
+                          <Clock className="h-4 w-4 mr-2 flex-shrink-0" />
+                          <span className="truncate">
+                            Pickup: {new Date(delivery.estimated_pickup_time).toLocaleTimeString([], {
+                              hour: '2-digit',
+                              minute: '2-digit'
+                            })}
+                          </span>
                         </div>
                         <div className="flex items-center text-sm text-gray-600">
-                          <Clock className="h-4 w-4 mr-2" />
-                          <span>Delivery: {new Date(delivery.estimated_delivery_time).toLocaleTimeString()}</span>
+                          <Clock className="h-4 w-4 mr-2 flex-shrink-0" />
+                          <span className="truncate">
+                            Delivery: {new Date(delivery.estimated_delivery_time).toLocaleTimeString([], {
+                              hour: '2-digit',
+                              minute: '2-digit'
+                            })}
+                          </span>
                         </div>
                         <div className="flex items-center text-sm text-gray-600">
-                          <MapPin className="h-4 w-4 mr-2" />
+                          <MapPin className="h-4 w-4 mr-2 flex-shrink-0" />
                           <span>Distance: {Number(delivery.actual_distance || 0).toFixed(1)} km</span>
                         </div>
                       </div>
@@ -142,8 +220,16 @@ const CurrentDeliveriesPage = () => {
                           <span className="font-medium">Fee: </span>
                           <span>₦{Number(delivery.delivery_fee || 0).toLocaleString()}</span>
                         </div>
+                        {Number(delivery.eco_bonus || 0) > 0 && (
+                          <div className="text-sm">
+                            <span className="font-medium">Eco Bonus: </span>
+                            <span className="text-green-600">
+                              +₦{Number(delivery.eco_bonus).toLocaleString()}
+                            </span>
+                          </div>
+                        )}
                         <div className="flex items-center text-sm bg-green-50 text-green-700 px-2 py-1 rounded w-fit">
-                          <Leaf className="h-4 w-4 mr-1" />
+                          <Leaf className="h-4 w-4 mr-1 flex-shrink-0" />
                           <span>{Number(delivery.carbon_saved || 0).toFixed(1)} kg CO₂ saved</span>
                         </div>
                       </div>
@@ -151,8 +237,13 @@ const CurrentDeliveriesPage = () => {
 
                     {delivery.special_instructions && (
                       <div className="mb-4 p-3 bg-blue-50 rounded-lg">
-                        <h4 className="font-medium text-sm text-blue-900 mb-1">Special Instructions:</h4>
-                        <p className="text-sm text-blue-800">{delivery.special_instructions}</p>
+                        <div className="flex items-start gap-2">
+                          <AlertCircle className="h-4 w-4 text-blue-600 mt-0.5 flex-shrink-0" />
+                          <div>
+                            <h4 className="font-medium text-sm text-blue-900 mb-1">Special Instructions:</h4>
+                            <p className="text-sm text-blue-800">{delivery.special_instructions}</p>
+                          </div>
+                        </div>
                       </div>
                     )}
 
@@ -161,25 +252,28 @@ const CurrentDeliveriesPage = () => {
                         variant="outline"
                         size="sm"
                         className="flex items-center gap-2"
+                        onClick={() => handleContactCustomer(delivery)}
                       >
                         <Phone className="h-4 w-4" />
-                        Contact Customer
+                        Contact
                       </Button>
                       
                       <Button
                         variant="outline"
                         size="sm"
                         className="flex items-center gap-2"
+                        onClick={() => handleGetDirections(delivery)}
                       >
                         <Navigation className="h-4 w-4" />
-                        Get Directions
+                        Directions
                       </Button>
                       
                       <Button
                         onClick={() => handleStatusUpdate(delivery.id, delivery.status)}
-                        className="bg-primary hover:bg-primary-hover text-black flex-1 sm:flex-none"
+                        disabled={isLoading}
+                        className="bg-primary hover:bg-primary/90 text-black flex-1 sm:flex-none"
                       >
-                        {nextAction.label}
+                        {isLoading ? 'Updating...' : nextAction.label}
                       </Button>
                     </div>
                   </CardContent>
@@ -189,41 +283,28 @@ const CurrentDeliveriesPage = () => {
           </div>
         )}
 
+        {/* Delivery Tips - Compact version for mobile */}
         <Card>
-          <CardHeader>
-            <CardTitle className="text-lg">Delivery Tips</CardTitle>
-            <CardDescription>Best practices for successful deliveries</CardDescription>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-base sm:text-lg">Delivery Tips</CardTitle>
+            <CardDescription className="text-sm">Best practices for successful deliveries</CardDescription>
           </CardHeader>
-          <CardContent className="space-y-3">
-            <div className="flex items-start space-x-3">
-              <div className="w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0 mt-0.5">
-                <span className="text-xs font-medium text-blue-600">1</span>
+          <CardContent className="space-y-2 sm:space-y-3">
+            {[
+              { num: '1', title: 'Verify pickup details', desc: 'Always confirm order details with the vendor before pickup.' },
+              { num: '2', title: 'Handle with care', desc: 'Keep items secure and follow any special handling instructions.' },
+              { num: '3', title: 'Communicate proactively', desc: 'Keep customers informed about any delays or issues.' }
+            ].map((tip) => (
+              <div key={tip.num} className="flex items-start space-x-3">
+                <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <span className="text-xs font-medium text-blue-600">{tip.num}</span>
+                </div>
+                <div className="min-w-0">
+                  <h4 className="font-medium text-sm">{tip.title}</h4>
+                  <p className="text-xs text-gray-500 mt-0.5">{tip.desc}</p>
+                </div>
               </div>
-              <div>
-                <h4 className="font-medium text-sm">Verify pickup details</h4>
-                <p className="text-xs text-gray-500">Always confirm order details with the vendor before pickup.</p>
-              </div>
-            </div>
-            
-            <div className="flex items-start space-x-3">
-              <div className="w-6 h-6 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0 mt-0.5">
-                <span className="text-xs font-medium text-green-600">2</span>
-              </div>
-              <div>
-                <h4 className="font-medium text-sm">Handle with care</h4>
-                <p className="text-xs text-gray-500">Keep items secure and follow any special handling instructions.</p>
-              </div>
-            </div>
-            
-            <div className="flex items-start space-x-3">
-              <div className="w-6 h-6 rounded-full bg-purple-100 flex items-center justify-center flex-shrink-0 mt-0.5">
-                <span className="text-xs font-medium text-purple-600">3</span>
-              </div>
-              <div>
-                <h4 className="font-medium text-sm">Communicate proactively</h4>
-                <p className="text-xs text-gray-500">Keep customers informed about any delays or issues.</p>
-              </div>
-            </div>
+            ))}
           </CardContent>
         </Card>
       </div>
