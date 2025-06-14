@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { useAuth } from '@/contexts/SupabaseAuthContext';
 import DashboardLayout from '@/components/layout/DashboardLayout';
 import { Card, CardContent } from '@/components/ui/card';
-import { LoadingDisplay } from '@/components/ui/LoadingDisplay';
+import LoadingDisplay from '@/components/ui/LoadingDisplay';
 import RiderProfileHeader from '@/components/rider/profile/RiderProfileHeader';
 import ProfileHeader from '@/components/rider/profile/ProfileHeader';
 import VehicleInfo from '@/components/rider/profile/VehicleInfo';
