@@ -5,12 +5,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { MapPin, Clock, Leaf, Phone, Navigation } from 'lucide-react';
-import { useRiderDeliveries } from '@/hooks/rider/useRiderDeliveries';
+import { useRiderData } from '@/hooks/useRiderData';
 import { useAuth } from '@/contexts/SupabaseAuthContext';
 
 const CurrentDeliveriesPage = () => {
   const { user } = useAuth();
-  const { currentDeliveries, updateDeliveryStatus, loading } = useRiderDeliveries();
+  const { loading, currentDeliveries, updateDeliveryStatus } = useRiderData();
 
   const getStatusBadge = (status: string) => {
     switch (status) {
