@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { useAuth } from '@/contexts/SupabaseAuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
@@ -29,31 +29,65 @@ export interface DeliveryData {
   };
 }
 
+const MAX_RETRIES = 3;
+const RETRY_DELAY = 1000;
+
 export const useRiderDeliveries = () => {
   const { user } = useAuth();
   const [availableDeliveries, setAvailableDeliveries] = useState<DeliveryData[]>([]);
   const [currentDeliveries, setCurrentDeliveries] = useState<DeliveryData[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const fetchAvailableDeliveries = async () => {
+  const retryWithBackoff = async <T>(
+    operation: () => Promise<T>,
+    retries = MAX_RETRIES
+  ): Promise<T> => {
     try {
-      const { data, error } = await supabase
-        .from('deliveries')
-        .select(`
-          *,
-          orders!inner(
-            customer_id,
-            vendor_id,
-            subtotal,
-            customer_profile:profiles!customer_id(name),
-            vendor_profile:profiles!vendor_id(name),
-            order_items(count)
-          )
-        `)
-        .eq('status', 'available')
-        .is('rider_id', null)
-        .order('created_at', { ascending: true });
+      return await operation();
+    } catch (error) {
+      if (retries > 0) {
+        console.log(`Retrying operation, ${retries} attempts remaining`);
+        await new Promise(resolve => setTimeout(resolve, RETRY_DELAY * (MAX_RETRIES - retries + 1)));
+        return retryWithBackoff(operation, retries - 1);
+      }
+      throw error;
+    }
+  };
 
-      if (error) throw error;
+  const fetchAvailableDeliveries = useCallback(async () => {
+    if (loading) return; // Prevent concurrent requests
+    
+    setLoading(true);
+    setError(null);
+    
+    try {
+      console.log('[RiderDeliveries] Fetching available deliveries');
+      
+      const operation = async () => {
+        const { data, error } = await supabase
+          .from('deliveries')
+          .select(`
+            *,
+            orders!inner(
+              customer_id,
+              vendor_id,
+              subtotal,
+              customer_profile:profiles!customer_id(name),
+              vendor_profile:profiles!vendor_id(name),
+              order_items(count)
+            )
+          `)
+          .eq('status', 'available')
+          .is('rider_id', null)
+          .order('created_at', { ascending: true })
+          .limit(50); // Pagination limit for performance
+
+        if (error) throw error;
+        return data;
+      };
+
+      const data = await retryWithBackoff(operation);
 
       const formattedDeliveries = data?.map(delivery => ({
         ...delivery,
@@ -63,35 +97,52 @@ export const useRiderDeliveries = () => {
         order: delivery.orders
       })) || [];
 
+      console.log('[RiderDeliveries] Available deliveries loaded:', formattedDeliveries.length);
       setAvailableDeliveries(formattedDeliveries);
-    } catch (error) {
-      console.error('Error fetching available deliveries:', error);
-      toast.error('Failed to load available deliveries');
+    } catch (error: any) {
+      console.error('[RiderDeliveries] Error fetching available deliveries:', error);
+      setError('Failed to load available deliveries');
+      toast.error('Failed to load available deliveries. Please try again.');
+    } finally {
+      setLoading(false);
     }
-  };
+  }, [loading]);
 
-  const fetchCurrentDeliveries = async () => {
-    if (!user?.id) return;
+  const fetchCurrentDeliveries = useCallback(async () => {
+    if (!user?.id) {
+      console.log('[RiderDeliveries] No user ID available');
+      return;
+    }
+
+    setLoading(true);
+    setError(null);
 
     try {
-      const { data, error } = await supabase
-        .from('deliveries')
-        .select(`
-          *,
-          orders!inner(
-            customer_id,
-            vendor_id,
-            subtotal,
-            customer_profile:profiles!customer_id(name),
-            vendor_profile:profiles!vendor_id(name),
-            order_items(count)
-          )
-        `)
-        .eq('rider_id', user.id)
-        .in('status', ['accepted', 'picking_up', 'picked_up', 'delivering'])
-        .order('accepted_at', { ascending: true });
+      console.log('[RiderDeliveries] Fetching current deliveries for rider:', user.id);
+      
+      const operation = async () => {
+        const { data, error } = await supabase
+          .from('deliveries')
+          .select(`
+            *,
+            orders!inner(
+              customer_id,
+              vendor_id,
+              subtotal,
+              customer_profile:profiles!customer_id(name),
+              vendor_profile:profiles!vendor_id(name),
+              order_items(count)
+            )
+          `)
+          .eq('rider_id', user.id)
+          .in('status', ['accepted', 'picking_up', 'picked_up', 'delivering'])
+          .order('accepted_at', { ascending: true });
 
-      if (error) throw error;
+        if (error) throw error;
+        return data;
+      };
+
+      const data = await retryWithBackoff(operation);
 
       const formattedDeliveries = data?.map(delivery => ({
         ...delivery,
@@ -101,39 +152,67 @@ export const useRiderDeliveries = () => {
         order: delivery.orders
       })) || [];
 
+      console.log('[RiderDeliveries] Current deliveries loaded:', formattedDeliveries.length);
       setCurrentDeliveries(formattedDeliveries);
-    } catch (error) {
-      console.error('Error fetching current deliveries:', error);
-      toast.error('Failed to load current deliveries');
+    } catch (error: any) {
+      console.error('[RiderDeliveries] Error fetching current deliveries:', error);
+      setError('Failed to load current deliveries');
+      toast.error('Failed to load current deliveries. Please try again.');
+    } finally {
+      setLoading(false);
     }
-  };
+  }, [user?.id, loading]);
 
-  const acceptDelivery = async (deliveryId: string) => {
-    if (!user?.id) return false;
+  const acceptDelivery = useCallback(async (deliveryId: string) => {
+    if (!user?.id) {
+      toast.error('User not authenticated');
+      return false;
+    }
+
+    if (!deliveryId) {
+      toast.error('Invalid delivery ID');
+      return false;
+    }
 
     try {
-      const { error } = await supabase
-        .from('deliveries')
-        .update({
-          rider_id: user.id,
-          status: 'accepted',
-          accepted_at: new Date().toISOString()
-        })
-        .eq('id', deliveryId)
-        .eq('status', 'available')
-        .is('rider_id', null);
+      console.log('[RiderDeliveries] Accepting delivery:', deliveryId);
+      
+      const operation = async () => {
+        // Use a transaction to ensure data consistency
+        const { error } = await supabase.rpc('accept_delivery_transaction', {
+          p_delivery_id: deliveryId,
+          p_rider_id: user.id
+        });
 
-      if (error) throw error;
+        if (error) {
+          // Fallback to manual update if RPC doesn't exist
+          const { error: updateError } = await supabase
+            .from('deliveries')
+            .update({
+              rider_id: user.id,
+              status: 'accepted',
+              accepted_at: new Date().toISOString()
+            })
+            .eq('id', deliveryId)
+            .eq('status', 'available')
+            .is('rider_id', null);
 
-      // Also update the order with rider assignment
-      const { error: orderError } = await supabase
-        .from('orders')
-        .update({ rider_id: user.id })
-        .eq('id', deliveryId);
+          if (updateError) throw updateError;
 
-      if (orderError) throw orderError;
+          // Update the order
+          const { error: orderError } = await supabase
+            .from('orders')
+            .update({ rider_id: user.id })
+            .eq('id', deliveryId);
+
+          if (orderError) throw orderError;
+        }
+      };
+
+      await retryWithBackoff(operation);
 
       toast.success('Delivery accepted successfully!');
+      console.log('[RiderDeliveries] Delivery accepted successfully');
       
       // Refresh data
       await Promise.all([
@@ -142,58 +221,96 @@ export const useRiderDeliveries = () => {
       ]);
 
       return true;
-    } catch (error) {
-      console.error('Error accepting delivery:', error);
-      toast.error('Failed to accept delivery');
-      return false;
-    }
-  };
-
-  const updateDeliveryStatus = async (deliveryId: string, status: DeliveryData['status']) => {
-    try {
-      const updateData: any = { status };
+    } catch (error: any) {
+      console.error('[RiderDeliveries] Error accepting delivery:', error);
       
-      // Add timestamp for status changes
-      if (status === 'picked_up') {
-        updateData.picked_up_at = new Date().toISOString();
-      } else if (status === 'delivered') {
-        updateData.delivered_at = new Date().toISOString();
+      if (error.message?.includes('already accepted')) {
+        toast.error('This delivery has already been accepted by another rider');
+      } else if (error.message?.includes('not found')) {
+        toast.error('Delivery not found or no longer available');
+      } else {
+        toast.error('Failed to accept delivery. Please try again.');
       }
-
-      const { error } = await supabase
-        .from('deliveries')
-        .update(updateData)
-        .eq('id', deliveryId);
-
-      if (error) throw error;
-
-      // Update order status as well
-      const { error: orderError } = await supabase
-        .from('orders')
-        .update({ status })
-        .eq('id', deliveryId);
-
-      if (orderError) throw orderError;
-
-      toast.success(`Delivery status updated to ${status}`);
       
-      // Refresh data
-      await fetchCurrentDeliveries();
-
-      return true;
-    } catch (error) {
-      console.error('Error updating delivery status:', error);
-      toast.error('Failed to update delivery status');
+      // Refresh available deliveries to remove stale data
+      await fetchAvailableDeliveries();
       return false;
     }
-  };
+  }, [user?.id, fetchAvailableDeliveries, fetchCurrentDeliveries]);
+
+  const updateDeliveryStatus = useCallback(async (deliveryId: string, status: DeliveryData['status']) => {
+    if (!deliveryId || !status) {
+      toast.error('Invalid delivery ID or status');
+      return false;
+    }
+
+    try {
+      console.log('[RiderDeliveries] Updating delivery status:', deliveryId, status);
+      
+      const operation = async () => {
+        const updateData: any = { 
+          status,
+          updated_at: new Date().toISOString()
+        };
+        
+        // Add appropriate timestamps
+        if (status === 'picking_up') {
+          updateData.picking_up_at = new Date().toISOString();
+        } else if (status === 'picked_up') {
+          updateData.picked_up_at = new Date().toISOString();
+        } else if (status === 'delivering') {
+          updateData.delivering_at = new Date().toISOString();
+        } else if (status === 'delivered') {
+          updateData.delivered_at = new Date().toISOString();
+        }
+
+        const { error } = await supabase
+          .from('deliveries')
+          .update(updateData)
+          .eq('id', deliveryId)
+          .eq('rider_id', user?.id); // Ensure rider can only update their own deliveries
+
+        if (error) throw error;
+
+        // Update order status as well
+        const { error: orderError } = await supabase
+          .from('orders')
+          .update({ 
+            status,
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', deliveryId);
+
+        if (orderError) throw orderError;
+      };
+
+      await retryWithBackoff(operation);
+
+      toast.success(`Delivery status updated to ${status.replace('_', ' ')}`);
+      console.log('[RiderDeliveries] Status updated successfully');
+      
+      // Refresh current deliveries
+      await fetchCurrentDeliveries();
+      return true;
+    } catch (error: any) {
+      console.error('[RiderDeliveries] Error updating delivery status:', error);
+      toast.error('Failed to update delivery status. Please try again.');
+      return false;
+    }
+  }, [user?.id, fetchCurrentDeliveries]);
 
   return {
     availableDeliveries,
     currentDeliveries,
+    loading,
+    error,
     acceptDelivery,
     updateDeliveryStatus,
     fetchAvailableDeliveries,
-    fetchCurrentDeliveries
+    fetchCurrentDeliveries,
+    refetch: {
+      availableDeliveries: fetchAvailableDeliveries,
+      currentDeliveries: fetchCurrentDeliveries
+    }
   };
 };

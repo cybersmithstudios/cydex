@@ -3,72 +3,106 @@ import React, { useState, useEffect } from 'react';
 import DashboardLayout from '@/components/layout/DashboardLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { TrendingUp, Navigation, Phone, Leaf } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { TrendingUp, Navigation, Phone, Leaf, RefreshCw, AlertCircle } from 'lucide-react';
 import { useRiderData } from '@/hooks/useRiderData';
 import { OrderFilters } from '@/components/rider/orders/OrderFilters';
 import { OrderCard } from '@/components/rider/orders/OrderCard';
 import { OrdersTable } from '@/components/rider/orders/OrdersTable';
 
 const AvailableOrdersPage = () => {
-  const { availableDeliveries, loading, acceptDelivery } = useRiderData();
+  const { 
+    availableDeliveries, 
+    loading, 
+    error,
+    acceptDelivery,
+    refetch 
+  } = useRiderData();
+  
   const [searchQuery, setSearchQuery] = useState('');
   const [filterEco, setFilterEco] = useState(false);
   const [sortBy, setSortBy] = useState('distance');
   const [filteredOrders, setFilteredOrders] = useState(availableDeliveries);
+  const [acceptingOrder, setAcceptingOrder] = useState<string | null>(null);
 
+  // Real-time updates setup
   useEffect(() => {
-    let filtered = availableDeliveries;
+    console.log('[AvailableOrders] Setting up auto-refresh');
+    const interval = setInterval(() => {
+      if (!loading) {
+        refetch.availableDeliveries();
+      }
+    }, 30000); // Refresh every 30 seconds
 
-    if (searchQuery) {
+    return () => clearInterval(interval);
+  }, [loading, refetch.availableDeliveries]);
+
+  // Filter and sort logic
+  useEffect(() => {
+    let filtered = [...availableDeliveries];
+
+    // Search filter
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase();
       filtered = filtered.filter(
         (order) =>
-          order.vendor_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          order.customer_name?.toLowerCase().includes(searchQuery.toLowerCase())
+          order.vendor_name?.toLowerCase().includes(query) ||
+          order.customer_name?.toLowerCase().includes(query) ||
+          order.order_id?.toLowerCase().includes(query)
       );
     }
 
+    // Eco filter
     if (filterEco) {
       filtered = filtered.filter((order) => Number(order.eco_bonus) > 0);
     }
 
-    if (sortBy === 'distance') {
-      filtered.sort((a, b) => Number(a.actual_distance || 0) - Number(b.actual_distance || 0));
-    } else if (sortBy === 'fee') {
-      filtered.sort((a, b) => Number(a.delivery_fee) - Number(b.delivery_fee));
-    } else if (sortBy === 'eco_bonus') {
-      filtered.sort((a, b) => Number(b.eco_bonus) - Number(a.eco_bonus));
-    } else if (sortBy === 'time') {
-      filtered.sort((a, b) => new Date(a.estimated_delivery_time).getTime() - new Date(b.estimated_delivery_time).getTime());
+    // Sort logic
+    switch (sortBy) {
+      case 'distance':
+        filtered.sort((a, b) => Number(a.actual_distance || 0) - Number(b.actual_distance || 0));
+        break;
+      case 'fee':
+        filtered.sort((a, b) => Number(b.delivery_fee) - Number(a.delivery_fee));
+        break;
+      case 'eco_bonus':
+        filtered.sort((a, b) => Number(b.eco_bonus) - Number(a.eco_bonus));
+        break;
+      case 'time':
+        filtered.sort((a, b) => 
+          new Date(a.estimated_pickup_time).getTime() - new Date(b.estimated_pickup_time).getTime()
+        );
+        break;
+      default:
+        break;
     }
 
-    setFilteredOrders([...filtered]);
+    setFilteredOrders(filtered);
   }, [availableDeliveries, searchQuery, filterEco, sortBy]);
 
   const handleAcceptOrder = async (orderId: string) => {
-    await acceptDelivery(orderId);
+    if (acceptingOrder) return; // Prevent multiple simultaneous accepts
+    
+    setAcceptingOrder(orderId);
+    try {
+      console.log('[AvailableOrders] Accepting order:', orderId);
+      await acceptDelivery(orderId);
+    } catch (error) {
+      console.error('[AvailableOrders] Error accepting order:', error);
+    } finally {
+      setAcceptingOrder(null);
+    }
   };
 
-  if (loading) {
-    return (
-      <DashboardLayout userRole="RIDER">
-        <div className="p-2 sm:p-4 md:p-6 max-w-7xl mx-auto">
-          <div className="animate-pulse space-y-4">
-            <div className="h-8 bg-gray-200 rounded w-1/4"></div>
-            <div className="h-32 bg-gray-200 rounded"></div>
-            <div className="space-y-3">
-              {[1, 2, 3].map((i) => (
-                <div key={i} className="h-24 bg-gray-200 rounded"></div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </DashboardLayout>
-    );
-  }
+  const handleRefresh = () => {
+    console.log('[AvailableOrders] Manual refresh triggered');
+    refetch.availableDeliveries();
+  };
 
   return (
     <DashboardLayout userRole="RIDER">
       <div className="p-2 sm:p-4 md:p-6 max-w-7xl mx-auto space-y-3 sm:space-y-4 md:space-y-6">
+        {/* Header */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4">
           <div>
             <h1 className="text-lg sm:text-xl md:text-2xl font-bold">Available Orders</h1>
@@ -76,12 +110,48 @@ const AvailableOrdersPage = () => {
               Accept eco-friendly deliveries and earn bonuses
             </p>
           </div>
-          <Badge className="text-xs sm:text-sm bg-green-500">
-            <TrendingUp className="mr-1 h-3 w-3 sm:h-4 sm:w-4" />
-            {availableDeliveries.length} Available
-          </Badge>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleRefresh}
+              disabled={loading}
+              className="flex items-center gap-2"
+            >
+              <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
+              Refresh
+            </Button>
+            <Badge className="text-xs sm:text-sm bg-green-500">
+              <TrendingUp className="mr-1 h-3 w-3 sm:h-4 sm:w-4" />
+              {availableDeliveries.length} Available
+            </Badge>
+          </div>
         </div>
 
+        {/* Error Display */}
+        {error && (
+          <Card className="border-red-200 bg-red-50">
+            <CardContent className="p-4">
+              <div className="flex items-center space-x-2">
+                <AlertCircle className="h-5 w-5 text-red-500" />
+                <div>
+                  <h3 className="font-medium text-red-900">Error Loading Orders</h3>
+                  <p className="text-sm text-red-700">{error}</p>
+                </div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleRefresh}
+                  className="ml-auto"
+                >
+                  Try Again
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Filters */}
         <OrderFilters
           searchQuery={searchQuery}
           onSearchChange={setSearchQuery}
@@ -91,68 +161,91 @@ const AvailableOrdersPage = () => {
           onSortChange={setSortBy}
         />
 
-        {filteredOrders.length === 0 ? (
-          <Card>
-            <CardContent className="text-center py-8">
-              <p className="text-gray-500">No available orders found matching your filters.</p>
-            </CardContent>
-          </Card>
-        ) : (
+        {/* Orders Display */}
+        {!error && (
           <>
             {/* Mobile Card View */}
             <div className="md:hidden space-y-3">
-              {filteredOrders.map((order) => (
-                <OrderCard
-                  key={order.id}
-                  order={order}
-                  onAcceptOrder={handleAcceptOrder}
-                />
-              ))}
+              {loading && filteredOrders.length === 0 ? (
+                <div className="space-y-3">
+                  {[1, 2, 3].map((i) => (
+                    <div key={i} className="animate-pulse">
+                      <div className="h-32 bg-gray-200 rounded-lg"></div>
+                    </div>
+                  ))}
+                </div>
+              ) : filteredOrders.length === 0 ? (
+                <Card>
+                  <CardContent className="text-center py-8">
+                    <p className="text-gray-500">No available orders found matching your filters.</p>
+                  </CardContent>
+                </Card>
+              ) : (
+                filteredOrders.map((order) => (
+                  <OrderCard
+                    key={order.id}
+                    order={order}
+                    onAcceptOrder={handleAcceptOrder}
+                    loading={acceptingOrder === order.id}
+                  />
+                ))
+              )}
             </div>
 
             {/* Desktop Table View */}
-            <div className="hidden md:block overflow-x-auto">
+            <div className="hidden md:block">
               <OrdersTable
                 orders={filteredOrders}
                 onAcceptOrder={handleAcceptOrder}
+                loading={loading && filteredOrders.length === 0}
+                error={error}
               />
             </div>
           </>
         )}
 
+        {/* Tips Card */}
         <Card>
           <CardHeader className="pb-3 sm:pb-4">
-            <CardTitle className="text-base sm:text-lg">Delivery Tips</CardTitle>
+            <CardTitle className="text-base sm:text-lg">Delivery Excellence Tips</CardTitle>
             <CardDescription className="text-sm">
               Maximize your earnings and sustainability impact
             </CardDescription>
           </CardHeader>
           <CardContent className="pt-0">
-            <div className="space-y-2 sm:space-y-3">
-              <div className="flex items-center space-x-3">
-                <Navigation className="h-4 w-4 sm:h-5 sm:w-5 text-blue-500 flex-shrink-0" />
+            <div className="space-y-3">
+              <div className="flex items-start space-x-3">
+                <div className="flex-shrink-0 p-2 bg-blue-50 rounded-full">
+                  <Navigation className="h-4 w-4 text-blue-600" />
+                </div>
                 <div className="min-w-0">
-                  <h3 className="text-xs sm:text-sm font-medium">Plan Your Route</h3>
-                  <p className="text-xs text-gray-500">
-                    Optimize your route to save time and reduce emissions.
+                  <h3 className="text-sm font-medium text-gray-900">Optimize Your Route</h3>
+                  <p className="text-xs text-gray-500 mt-1">
+                    Plan efficient routes to save time, fuel, and reduce emissions while maximizing deliveries.
                   </p>
                 </div>
               </div>
-              <div className="flex items-center space-x-3">
-                <Phone className="h-4 w-4 sm:h-5 sm:w-5 text-green-500 flex-shrink-0" />
+              
+              <div className="flex items-start space-x-3">
+                <div className="flex-shrink-0 p-2 bg-green-50 rounded-full">
+                  <Phone className="h-4 w-4 text-green-600" />
+                </div>
                 <div className="min-w-0">
-                  <h3 className="text-xs sm:text-sm font-medium">Communicate with Customers</h3>
-                  <p className="text-xs text-gray-500">
-                    Keep customers informed about their delivery status.
+                  <h3 className="text-sm font-medium text-gray-900">Proactive Communication</h3>
+                  <p className="text-xs text-gray-500 mt-1">
+                    Keep customers informed about delivery status and any potential delays.
                   </p>
                 </div>
               </div>
-              <div className="flex items-center space-x-3">
-                <Leaf className="h-4 w-4 sm:h-5 sm:w-5 text-amber-500 flex-shrink-0" />
+              
+              <div className="flex items-start space-x-3">
+                <div className="flex-shrink-0 p-2 bg-amber-50 rounded-full">
+                  <Leaf className="h-4 w-4 text-amber-600" />
+                </div>
                 <div className="min-w-0">
-                  <h3 className="text-xs sm:text-sm font-medium">Choose Eco-Friendly Options</h3>
-                  <p className="text-xs text-gray-500">
-                    Prioritize deliveries with eco-friendly vendors for extra bonuses.
+                  <h3 className="text-sm font-medium text-gray-900">Prioritize Eco-Friendly Orders</h3>
+                  <p className="text-xs text-gray-500 mt-1">
+                    Choose deliveries with eco bonuses to increase earnings and environmental impact.
                   </p>
                 </div>
               </div>
