@@ -10,7 +10,7 @@ import { useAuth } from '@/contexts/SupabaseAuthContext';
 
 const CurrentDeliveriesPage = () => {
   const { user } = useAuth();
-  const { loading, currentDeliveries, updateDeliveryStatus } = useRiderData();
+  const { loading: riderDataLoading, currentDeliveries, updateDeliveryStatus } = useRiderData();
 
   const getStatusBadge = (status: string) => {
     switch (status) {
@@ -49,7 +49,7 @@ const CurrentDeliveriesPage = () => {
     await updateDeliveryStatus(deliveryId, nextAction.nextStatus as any);
   };
 
-  if (loading) {
+  if (riderDataLoading) {
     return (
       <DashboardLayout userRole="RIDER">
         <div className="p-2 sm:p-4 md:p-6 max-w-7xl mx-auto">
