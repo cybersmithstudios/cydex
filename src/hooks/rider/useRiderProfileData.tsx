@@ -1,5 +1,6 @@
 
 import { useState } from 'react';
+import { Leaf, Zap, Star, Map, Bike } from 'lucide-react';
 
 export const useRiderProfileData = () => {
   // Mock profile data - in a real app, this would come from an API
@@ -100,7 +101,7 @@ export const useRiderProfileData = () => {
       id: 1,
       title: "Eco Warrior",
       description: "Saved over 1,000kg of carbon emissions",
-      icon: () => <div>🌱</div>,
+      icon: Leaf,
       earnedDate: "Mar 2025",
       progress: 100
     },
@@ -108,7 +109,7 @@ export const useRiderProfileData = () => {
       id: 2,
       title: "Speed Demon",
       description: "Completed 50 deliveries with early arrival",
-      icon: () => <div>⚡</div>,
+      icon: Zap,
       earnedDate: "Feb 2025",
       progress: 100
     },
@@ -116,7 +117,7 @@ export const useRiderProfileData = () => {
       id: 3,
       title: "5-Star Rider",
       description: "Maintained 5-star rating for 3 consecutive months",
-      icon: () => <div>⭐</div>,
+      icon: Star,
       earnedDate: "Jan 2025",
       progress: 100
     },
@@ -124,14 +125,14 @@ export const useRiderProfileData = () => {
       id: 4,
       title: "Urban Explorer",
       description: "Completed deliveries in all city zones",
-      icon: () => <div>🗺️</div>,
+      icon: Map,
       progress: 80
     },
     {
       id: 5,
       title: "Marathon Rider",
       description: "Traveled over 5,000km making deliveries",
-      icon: () => <div>🚴</div>,
+      icon: Bike,
       progress: 65
     }
   ];
