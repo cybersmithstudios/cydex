@@ -31,6 +31,37 @@ export interface DocumentInfo {
   };
 }
 
+export interface BankDetail {
+  id: string;
+  bank_name: string;
+  account_number: string;
+  account_name: string;
+  bvn?: string;
+  is_verified: boolean;
+  is_default: boolean;
+}
+
+export interface ReviewData {
+  id: string;
+  customer_name: string;
+  rating: number;
+  comment: string;
+  delivery_rating: number;
+  communication_rating: number;
+  created_at: string;
+}
+
+export interface AchievementData {
+  id: string;
+  title: string;
+  description: string;
+  achievement_type: string;
+  progress: number;
+  target: number;
+  earned_date?: string;
+  icon: string;
+}
+
 export interface RiderProfileData {
   id: string;
   name: string;
@@ -39,14 +70,12 @@ export interface RiderProfileData {
   address: string;
   avatar?: string;
   joinDate: string;
+  isOnline: boolean;
+  isVerified: boolean;
+  verificationStatus: string;
   vehicle: VehicleInfo;
   documents: DocumentInfo;
-  bankDetails: {
-    bank: string;
-    accountNumber: string;
-    accountName: string;
-    bvn: string;
-  };
+  bankDetails: BankDetail[];
   preferences: {
     deliveryPreferences: {
       maxDistance: number;
@@ -68,23 +97,6 @@ export interface RiderProfileData {
     carbonSaved: number;
     sustainabilityScore: number;
   };
-}
-
-export interface ReviewData {
-  id: string;
-  customer: string;
-  date: string;
-  rating: number;
-  comment: string;
-}
-
-export interface AchievementData {
-  id: string;
-  title: string;
-  description: string;
-  progress: number;
-  earnedDate?: string;
-  icon: string;
 }
 
 const MAX_RETRIES = 3;
@@ -162,16 +174,33 @@ export const useRiderProfileData = () => {
         return deliveries || [];
       };
 
-      const [profileData, riderData, deliveriesData] = await Promise.all([
+      // Fetch bank details
+      const bankOperation = async () => {
+        const { data: bankDetails, error: bankError } = await supabase
+          .from('rider_bank_details')
+          .select('*')
+          .eq('rider_id', user.id)
+          .order('created_at', { ascending: false });
+
+        if (bankError) throw bankError;
+        return bankDetails || [];
+      };
+
+      const [profileData, riderData, deliveriesData, bankDetailsData] = await Promise.all([
         retryWithBackoff(profileOperation),
         retryWithBackoff(riderOperation),
-        retryWithBackoff(statsOperation)
+        retryWithBackoff(statsOperation),
+        retryWithBackoff(bankOperation)
       ]);
 
       // Calculate stats from real data
       const totalDeliveries = deliveriesData.length;
       const totalDistance = deliveriesData.reduce((sum, d) => sum + (Number(d.actual_distance) || 0), 0);
       const carbonSaved = deliveriesData.reduce((sum, d) => sum + (Number(d.carbon_saved) || 0), 0);
+
+      // Parse preferences safely
+      const deliveryPrefs = riderData?.delivery_preferences || {};
+      const notificationPrefs = riderData?.notification_preferences || {};
 
       const transformedProfile: RiderProfileData = {
         id: profileData.id,
@@ -181,11 +210,14 @@ export const useRiderProfileData = () => {
         address: String(profileData.address || ''),
         avatar: profileData.avatar ? String(profileData.avatar) : undefined,
         joinDate: new Date(profileData.created_at).toLocaleDateString(),
+        isOnline: riderData?.rider_status === 'online',
+        isVerified: riderData?.verification_status === 'verified',
+        verificationStatus: String(riderData?.verification_status || 'pending'),
         vehicle: {
           type: String(riderData?.vehicle_type || 'walking'),
-          model: 'Eco-friendly Transport',
-          year: '2023',
-          color: 'Green',
+          model: riderData?.vehicle_type === 'walking' ? 'On Foot' : 'Eco-friendly Transport',
+          year: riderData?.vehicle_type === 'walking' ? 'N/A' : '2023',
+          color: riderData?.vehicle_type === 'walking' ? 'N/A' : 'Green',
           licensePlate: String(riderData?.license_number || 'N/A'),
           registration: String(riderData?.vehicle_registration || 'N/A')
         },
@@ -203,32 +235,35 @@ export const useRiderProfileData = () => {
             expiryDate: '2025-12-31'
           }
         },
-        bankDetails: {
-          bank: '',
-          accountNumber: '',
-          accountName: '',
-          bvn: ''
-        },
+        bankDetails: bankDetailsData.map(bank => ({
+          id: bank.id,
+          bank_name: bank.bank_name,
+          account_number: bank.account_number,
+          account_name: bank.account_name,
+          bvn: bank.bvn,
+          is_verified: bank.is_verified,
+          is_default: bank.is_default
+        })),
         preferences: {
           deliveryPreferences: {
-            maxDistance: 15,
-            preferredZones: [],
-            availableDays: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
+            maxDistance: Number(deliveryPrefs.max_distance || 15),
+            preferredZones: Array.isArray(deliveryPrefs.preferred_zones) ? deliveryPrefs.preferred_zones : [],
+            availableDays: Array.isArray(deliveryPrefs.available_days) ? deliveryPrefs.available_days : ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
           },
           notifications: {
-            app: true,
-            email: true,
-            sms: false,
-            marketing: false
+            app: Boolean(notificationPrefs.app !== false),
+            email: Boolean(notificationPrefs.email !== false),
+            sms: Boolean(notificationPrefs.sms === true),
+            marketing: Boolean(notificationPrefs.marketing === true)
           }
         },
         stats: {
-          rating: 0,
-          reviews: 0,
+          rating: Number(riderData?.rating) || 0,
+          reviews: 0, // Will be calculated from reviews
           completedDeliveries: totalDeliveries,
           totalDistance: Math.round(totalDistance),
           carbonSaved: Math.round(carbonSaved),
-          sustainabilityScore: 0
+          sustainabilityScore: Math.min(100, Math.round(carbonSaved / 10))
         }
       };
 
@@ -248,19 +283,66 @@ export const useRiderProfileData = () => {
     if (!user?.id) return;
 
     try {
-      // Empty reviews for new riders
-      setRecentReviews([]);
+      const { data: reviewsData, error } = await supabase
+        .from('rider_reviews')
+        .select(`
+          *,
+          customer:profiles!customer_id(name)
+        `)
+        .eq('rider_id', user.id)
+        .order('created_at', { ascending: false })
+        .limit(10);
+
+      if (error) throw error;
+
+      const formattedReviews: ReviewData[] = (reviewsData || []).map(review => ({
+        id: review.id,
+        customer_name: review.customer?.name || 'Anonymous',
+        rating: review.rating,
+        comment: review.comment || '',
+        delivery_rating: review.delivery_rating || review.rating,
+        communication_rating: review.communication_rating || review.rating,
+        created_at: new Date(review.created_at).toLocaleDateString()
+      }));
+
+      setRecentReviews(formattedReviews);
+
+      // Update review count in profile
+      if (riderProfile) {
+        setRiderProfile(prev => prev ? {
+          ...prev,
+          stats: { ...prev.stats, reviews: formattedReviews.length }
+        } : null);
+      }
     } catch (error) {
       console.error('[RiderProfile] Error fetching reviews:', error);
     }
-  }, [user?.id]);
+  }, [user?.id, riderProfile]);
 
   const fetchAchievements = useCallback(async () => {
     if (!user?.id) return;
 
     try {
-      // Empty achievements for new riders
-      setAchievements([]);
+      const { data: achievementsData, error } = await supabase
+        .from('rider_achievements')
+        .select('*')
+        .eq('rider_id', user.id)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+
+      const formattedAchievements: AchievementData[] = (achievementsData || []).map(achievement => ({
+        id: achievement.id,
+        title: achievement.title,
+        description: achievement.description || '',
+        achievement_type: achievement.achievement_type,
+        progress: achievement.progress,
+        target: achievement.target,
+        earned_date: achievement.earned_date ? new Date(achievement.earned_date).toLocaleDateString() : undefined,
+        icon: achievement.icon
+      }));
+
+      setAchievements(formattedAchievements);
     } catch (error) {
       console.error('[RiderProfile] Error fetching achievements:', error);
     }
@@ -286,15 +368,29 @@ export const useRiderProfileData = () => {
       if (profileError) throw profileError;
 
       // Update rider_profiles table if needed
-      if (updates.vehicle) {
+      if (updates.vehicle || updates.preferences) {
+        const updateData: any = {
+          updated_at: new Date().toISOString()
+        };
+
+        if (updates.vehicle) {
+          updateData.vehicle_type = updates.vehicle.type;
+          updateData.license_number = updates.vehicle.licensePlate;
+          updateData.vehicle_registration = updates.vehicle.registration;
+        }
+
+        if (updates.preferences) {
+          if (updates.preferences.deliveryPreferences) {
+            updateData.delivery_preferences = updates.preferences.deliveryPreferences;
+          }
+          if (updates.preferences.notifications) {
+            updateData.notification_preferences = updates.preferences.notifications;
+          }
+        }
+
         const { error: riderError } = await supabase
           .from('rider_profiles')
-          .update({
-            vehicle_type: updates.vehicle.type,
-            license_number: updates.vehicle.licensePlate,
-            vehicle_registration: updates.vehicle.registration,
-            updated_at: new Date().toISOString()
-          })
+          .update(updateData)
           .eq('id', user.id);
 
         if (riderError) throw riderError;
@@ -312,13 +408,68 @@ export const useRiderProfileData = () => {
     }
   };
 
+  const updateRiderStatus = async (isOnline: boolean) => {
+    if (!user?.id) return false;
+
+    try {
+      const { error } = await supabase
+        .from('rider_profiles')
+        .update({
+          rider_status: isOnline ? 'online' : 'offline',
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', user.id);
+
+      if (error) throw error;
+
+      // Update local state
+      setRiderProfile(prev => prev ? { ...prev, isOnline } : null);
+      toast.success(`Status updated to ${isOnline ? 'online' : 'offline'}`);
+      return true;
+    } catch (error: any) {
+      console.error('[RiderProfile] Error updating status:', error);
+      toast.error('Failed to update status');
+      return false;
+    }
+  };
+
+  const addBankDetails = async (bankDetails: Omit<BankDetail, 'id' | 'is_verified' | 'is_default'>) => {
+    if (!user?.id) return false;
+
+    try {
+      const { error } = await supabase
+        .from('rider_bank_details')
+        .insert({
+          rider_id: user.id,
+          ...bankDetails,
+          is_verified: false,
+          is_default: false
+        });
+
+      if (error) throw error;
+
+      toast.success('Bank details added successfully');
+      await fetchRiderProfile();
+      return true;
+    } catch (error: any) {
+      console.error('[RiderProfile] Error adding bank details:', error);
+      toast.error('Failed to add bank details');
+      return false;
+    }
+  };
+
   useEffect(() => {
     if (user?.id && user?.role === 'RIDER') {
       fetchRiderProfile();
+    }
+  }, [user?.id, user?.role, fetchRiderProfile]);
+
+  useEffect(() => {
+    if (riderProfile) {
       fetchRecentReviews();
       fetchAchievements();
     }
-  }, [user?.id, user?.role, fetchRiderProfile, fetchRecentReviews, fetchAchievements]);
+  }, [riderProfile?.id, fetchRecentReviews, fetchAchievements]);
 
   return {
     riderProfile,
@@ -327,6 +478,8 @@ export const useRiderProfileData = () => {
     loading,
     error,
     updateProfile,
+    updateRiderStatus,
+    addBankDetails,
     refetchProfile: fetchRiderProfile
   };
 };

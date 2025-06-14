@@ -3,7 +3,7 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Car, Bike } from 'lucide-react';
+import { Car, Bike, User } from 'lucide-react';
 
 interface VehicleInfoProps {
   vehicle: any;
@@ -14,10 +14,14 @@ const VehicleInfo = ({ vehicle, onUpdateVehicle }: VehicleInfoProps) => {
   if (!vehicle) return null;
 
   const getVehicleIcon = () => {
-    if (vehicle.type === 'walking' || vehicle.type === 'bicycle') {
-      return <Bike className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />;
+    switch (vehicle.type) {
+      case 'walking':
+        return <User className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />;
+      case 'bicycle':
+        return <Bike className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />;
+      default:
+        return <Car className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />;
     }
-    return <Car className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />;
   };
 
   const getVehicleDisplayName = () => {
@@ -30,6 +34,8 @@ const VehicleInfo = ({ vehicle, onUpdateVehicle }: VehicleInfoProps) => {
         return 'Motorcycle';
       case 'car':
         return 'Car';
+      case 'van':
+        return 'Van';
       default:
         return vehicle.type;
     }
@@ -54,9 +60,7 @@ const VehicleInfo = ({ vehicle, onUpdateVehicle }: VehicleInfoProps) => {
             <>
               <div className="flex justify-between">
                 <span className="text-xs sm:text-sm text-gray-500">Model</span>
-                <span className="text-xs sm:text-sm font-medium">
-                  {vehicle.type === 'bicycle' ? 'Eco-friendly Bike' : vehicle.model}
-                </span>
+                <span className="text-xs sm:text-sm font-medium">{vehicle.model}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-xs sm:text-sm text-gray-500">Year</span>

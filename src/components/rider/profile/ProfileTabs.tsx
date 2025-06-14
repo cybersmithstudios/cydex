@@ -11,9 +11,10 @@ interface ProfileTabsProps {
   profile: any;
   recentReviews: any[];
   achievements: any[];
+  onAddBankDetails?: (bankDetails: any) => Promise<boolean>;
 }
 
-const ProfileTabs = ({ editing, profile, recentReviews, achievements }: ProfileTabsProps) => {
+const ProfileTabs = ({ editing, profile, recentReviews, achievements, onAddBankDetails }: ProfileTabsProps) => {
   return (
     <Tabs defaultValue="personal" className="w-full">
       <TabsList className="grid grid-cols-2 md:grid-cols-4 mb-3 sm:mb-4 md:mb-6 w-full">
@@ -28,7 +29,7 @@ const ProfileTabs = ({ editing, profile, recentReviews, achievements }: ProfileT
       </TabsContent>
       
       <TabsContent value="bank" className="mt-0">
-        <BankingTab editing={editing} profile={profile} />
+        <BankingTab editing={editing} profile={profile} onAddBankDetails={onAddBankDetails} />
       </TabsContent>
       
       <TabsContent value="reviews" className="mt-0">

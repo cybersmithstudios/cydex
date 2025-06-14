@@ -1,12 +1,12 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
 import { Separator } from '@/components/ui/separator';
-import { Smartphone, Mail, MessageSquare, Bell } from 'lucide-react';
+import { Slider } from '@/components/ui/slider';
+import { User, Bell, MapPin, Settings } from 'lucide-react';
 
 interface PersonalInfoTabProps {
   editing: boolean;
@@ -14,173 +14,206 @@ interface PersonalInfoTabProps {
 }
 
 const PersonalInfoTab = ({ editing, profile }: PersonalInfoTabProps) => {
+  const [preferences, setPreferences] = useState(profile?.preferences || {
+    deliveryPreferences: {
+      maxDistance: 15,
+      preferredZones: [],
+      availableDays: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
+    },
+    notifications: {
+      app: true,
+      email: true,
+      sms: false,
+      marketing: false
+    }
+  });
+
+  const availableDays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+
   return (
     <>
       <Card>
         <CardHeader>
-          <CardTitle className="text-lg">Personal Information</CardTitle>
-          <CardDescription>Your basic profile details and contact information</CardDescription>
+          <CardTitle className="text-lg flex items-center">
+            <User className="h-5 w-5 mr-2" />
+            Personal Information
+          </CardTitle>
+          <CardDescription>Update your basic profile information</CardDescription>
         </CardHeader>
         <CardContent className="p-6 pt-0">
-          <div className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="fullName">Full Name</Label>
-                <Input 
-                  id="fullName" 
-                  value={profile.name} 
-                  readOnly={!editing} 
-                  className={editing ? "" : "bg-gray-50"}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
-                <Input 
-                  id="email" 
-                  value={profile.email} 
-                  readOnly={!editing} 
-                  className={editing ? "" : "bg-gray-50"}
-                />
-              </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="name">Full Name</Label>
+              <Input 
+                id="name" 
+                defaultValue={profile?.name}
+                disabled={!editing}
+                className={!editing ? "bg-gray-50" : ""} 
+              />
             </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="phone">Phone Number</Label>
-                <Input 
-                  id="phone" 
-                  value={profile.phone || ''} 
-                  readOnly={!editing} 
-                  className={editing ? "" : "bg-gray-50"}
-                  placeholder="Add your phone number"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="alternatePhone">Alternate Phone (Optional)</Label>
-                <Input 
-                  id="alternatePhone" 
-                  placeholder="Add alternate number" 
-                  readOnly={!editing} 
-                  className={editing ? "" : "bg-gray-50"}
-                />
-              </div>
+            <div className="space-y-2">
+              <Label htmlFor="email">Email</Label>
+              <Input 
+                id="email" 
+                type="email" 
+                defaultValue={profile?.email}
+                disabled={!editing}
+                className={!editing ? "bg-gray-50" : ""} 
+              />
             </div>
-            
+            <div className="space-y-2">
+              <Label htmlFor="phone">Phone Number</Label>
+              <Input 
+                id="phone" 
+                defaultValue={profile?.phone}
+                disabled={!editing}
+                className={!editing ? "bg-gray-50" : ""} 
+              />
+            </div>
             <div className="space-y-2">
               <Label htmlFor="address">Address</Label>
               <Input 
                 id="address" 
-                value={profile.address || ''} 
-                readOnly={!editing} 
-                className={editing ? "" : "bg-gray-50"}
-                placeholder="Add your address"
+                defaultValue={profile?.address}
+                disabled={!editing}
+                className={!editing ? "bg-gray-50" : ""} 
               />
-            </div>
-            
-            <Separator className="my-4" />
-            
-            <div className="space-y-4">
-              <h3 className="font-medium">Delivery Preferences</h3>
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="maxDistance">Maximum Delivery Distance</Label>
-                  <div className="flex items-center">
-                    <Input 
-                      id="maxDistance" 
-                      type="number"
-                      value={profile.preferences.deliveryPreferences.maxDistance} 
-                      readOnly={!editing} 
-                      className={`w-20 ${editing ? "" : "bg-gray-50"}`}
-                    />
-                    <span className="ml-2">km</span>
-                  </div>
-                </div>
-                
-                <div className="space-y-2">
-                  <Label>Preferred Delivery Zones</Label>
-                  <div className="p-3 border rounded-lg bg-gray-50">
-                    <p className="text-sm text-gray-500">No preferred zones set. All zones available.</p>
-                  </div>
-                </div>
-                
-                <div className="space-y-2">
-                  <Label>Available Days (Read-only)</Label>
-                  <div className="flex flex-wrap gap-2">
-                    {["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"].map((day) => (
-                      <Badge 
-                        key={day} 
-                        variant={profile.preferences.deliveryPreferences.availableDays.includes(day) ? "default" : "outline"}
-                        className={!profile.preferences.deliveryPreferences.availableDays.includes(day) ? "text-gray-400" : ""}
-                      >
-                        {day}
-                      </Badge>
-                    ))}
-                  </div>
-                  <p className="text-xs text-gray-500">Contact support to modify your availability</p>
-                </div>
-              </div>
             </div>
           </div>
         </CardContent>
       </Card>
-      
+
+      <Card className="mt-6">
+        <CardHeader>
+          <CardTitle className="text-lg flex items-center">
+            <MapPin className="h-5 w-5 mr-2" />
+            Delivery Preferences
+          </CardTitle>
+          <CardDescription>Configure your delivery operation settings</CardDescription>
+        </CardHeader>
+        <CardContent className="p-6 pt-0">
+          <div className="space-y-6">
+            <div className="space-y-3">
+              <Label>Maximum Delivery Distance: {preferences.deliveryPreferences.maxDistance} km</Label>
+              <Slider
+                value={[preferences.deliveryPreferences.maxDistance]}
+                onValueChange={(value) => setPreferences({
+                  ...preferences,
+                  deliveryPreferences: { ...preferences.deliveryPreferences, maxDistance: value[0] }
+                })}
+                max={50}
+                min={5}
+                step={5}
+                className="w-full"
+                disabled={!editing}
+              />
+            </div>
+
+            <div className="space-y-3">
+              <Label>Preferred Delivery Zones</Label>
+              <Input 
+                placeholder="No preferred zones set"
+                disabled
+                className="bg-gray-50"
+                value=""
+              />
+              <p className="text-xs text-gray-500">Preferred zones will be configured by administrators based on demand</p>
+            </div>
+
+            <div className="space-y-3">
+              <Label>Available Days</Label>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                {availableDays.map((day) => (
+                  <div key={day} className="flex items-center space-x-2">
+                    <input
+                      type="checkbox"
+                      id={day}
+                      checked={preferences.deliveryPreferences.availableDays.includes(day)}
+                      disabled={true}
+                      className="rounded border-gray-300"
+                    />
+                    <Label htmlFor={day} className="text-sm">{day.slice(0, 3)}</Label>
+                  </div>
+                ))}
+              </div>
+              <p className="text-xs text-gray-500">Available days are currently fixed. Contact support to modify.</p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
       <Card className="mt-6">
         <CardHeader>
           <CardTitle className="text-lg flex items-center">
             <Bell className="h-5 w-5 mr-2" />
             Notification Preferences
           </CardTitle>
-          <CardDescription>Control how and when you receive notifications</CardDescription>
+          <CardDescription>Choose how you want to receive notifications</CardDescription>
         </CardHeader>
         <CardContent className="p-6 pt-0">
           <div className="space-y-4">
             <div className="flex items-center justify-between">
-              <Label htmlFor="app-notifications" className="flex items-center">
-                <Smartphone className="h-5 w-5 mr-2 text-gray-500" />
-                App Notifications
-              </Label>
+              <div>
+                <p className="font-medium">App Notifications</p>
+                <p className="text-sm text-gray-500">Receive push notifications in the app</p>
+              </div>
               <Switch 
-                id="app-notifications" 
-                checked={profile.preferences.notifications.app} 
+                checked={preferences.notifications.app}
+                onCheckedChange={(checked) => setPreferences({
+                  ...preferences,
+                  notifications: { ...preferences.notifications, app: checked }
+                })}
                 disabled={!editing}
               />
             </div>
             
-            <div className="flex items-center justify-between">
-              <Label htmlFor="email-notifications" className="flex items-center">
-                <Mail className="h-5 w-5 mr-2 text-gray-500" />
-                Email Notifications
-              </Label>
-              <Switch 
-                id="email-notifications" 
-                checked={profile.preferences.notifications.email} 
-                disabled={!editing}
-              />
-            </div>
-            
-            <div className="flex items-center justify-between">
-              <Label htmlFor="sms-notifications" className="flex items-center">
-                <MessageSquare className="h-5 w-5 mr-2 text-gray-500" />
-                SMS Notifications
-              </Label>
-              <Switch 
-                id="sms-notifications" 
-                checked={profile.preferences.notifications.sms} 
-                disabled={!editing}
-              />
-            </div>
+            <Separator />
             
             <div className="flex items-center justify-between">
               <div>
-                <Label htmlFor="marketing-notifications" className="flex items-center">
-                  <Bell className="h-5 w-5 mr-2 text-gray-500" />
-                  Marketing & Promotions
-                </Label>
-                <p className="text-xs text-gray-500 ml-7">Receive updates about promotions and special offers</p>
+                <p className="font-medium">Email Notifications</p>
+                <p className="text-sm text-gray-500">Receive important updates via email</p>
               </div>
               <Switch 
-                id="marketing-notifications" 
-                checked={profile.preferences.notifications.marketing} 
+                checked={preferences.notifications.email}
+                onCheckedChange={(checked) => setPreferences({
+                  ...preferences,
+                  notifications: { ...preferences.notifications, email: checked }
+                })}
+                disabled={!editing}
+              />
+            </div>
+            
+            <Separator />
+            
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="font-medium">SMS Notifications</p>
+                <p className="text-sm text-gray-500">Receive SMS for urgent delivery updates</p>
+              </div>
+              <Switch 
+                checked={preferences.notifications.sms}
+                onCheckedChange={(checked) => setPreferences({
+                  ...preferences,
+                  notifications: { ...preferences.notifications, sms: checked }
+                })}
+                disabled={!editing}
+              />
+            </div>
+            
+            <Separator />
+            
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="font-medium">Marketing Communications</p>
+                <p className="text-sm text-gray-500">Receive promotional offers and news</p>
+              </div>
+              <Switch 
+                checked={preferences.notifications.marketing}
+                onCheckedChange={(checked) => setPreferences({
+                  ...preferences,
+                  notifications: { ...preferences.notifications, marketing: checked }
+                })}
                 disabled={!editing}
               />
             </div>

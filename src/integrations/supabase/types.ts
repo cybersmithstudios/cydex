@@ -532,6 +532,100 @@ export type Database = {
         }
         Relationships: []
       }
+      rider_achievements: {
+        Row: {
+          achievement_type: string
+          created_at: string | null
+          description: string | null
+          earned_date: string | null
+          icon: string | null
+          id: string
+          progress: number | null
+          rider_id: string | null
+          target: number | null
+          title: string
+        }
+        Insert: {
+          achievement_type: string
+          created_at?: string | null
+          description?: string | null
+          earned_date?: string | null
+          icon?: string | null
+          id?: string
+          progress?: number | null
+          rider_id?: string | null
+          target?: number | null
+          title: string
+        }
+        Update: {
+          achievement_type?: string
+          created_at?: string | null
+          description?: string | null
+          earned_date?: string | null
+          icon?: string | null
+          id?: string
+          progress?: number | null
+          rider_id?: string | null
+          target?: number | null
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rider_achievements_rider_id_fkey"
+            columns: ["rider_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      rider_bank_details: {
+        Row: {
+          account_name: string
+          account_number: string
+          bank_name: string
+          bvn: string | null
+          created_at: string | null
+          id: string
+          is_default: boolean | null
+          is_verified: boolean | null
+          rider_id: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          account_name: string
+          account_number: string
+          bank_name: string
+          bvn?: string | null
+          created_at?: string | null
+          id?: string
+          is_default?: boolean | null
+          is_verified?: boolean | null
+          rider_id?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          account_name?: string
+          account_number?: string
+          bank_name?: string
+          bvn?: string | null
+          created_at?: string | null
+          id?: string
+          is_default?: boolean | null
+          is_verified?: boolean | null
+          rider_id?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rider_bank_details_rider_id_fkey"
+            columns: ["rider_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       rider_earnings: {
         Row: {
           carbon_credits_earned: number | null
@@ -588,49 +682,125 @@ export type Database = {
       }
       rider_profiles: {
         Row: {
+          bank_details: Json | null
           created_at: string | null
           current_location: Json | null
+          delivery_preferences: Json | null
           id: string
           is_verified: boolean | null
           license_number: string | null
+          notification_preferences: Json | null
           rating: number | null
           rider_status: Database["public"]["Enums"]["rider_status"] | null
           total_deliveries: number | null
           updated_at: string | null
           vehicle_registration: string | null
           vehicle_type: string | null
+          verification_documents: Json | null
+          verification_status: string | null
         }
         Insert: {
+          bank_details?: Json | null
           created_at?: string | null
           current_location?: Json | null
+          delivery_preferences?: Json | null
           id: string
           is_verified?: boolean | null
           license_number?: string | null
+          notification_preferences?: Json | null
           rating?: number | null
           rider_status?: Database["public"]["Enums"]["rider_status"] | null
           total_deliveries?: number | null
           updated_at?: string | null
           vehicle_registration?: string | null
           vehicle_type?: string | null
+          verification_documents?: Json | null
+          verification_status?: string | null
         }
         Update: {
+          bank_details?: Json | null
           created_at?: string | null
           current_location?: Json | null
+          delivery_preferences?: Json | null
           id?: string
           is_verified?: boolean | null
           license_number?: string | null
+          notification_preferences?: Json | null
           rating?: number | null
           rider_status?: Database["public"]["Enums"]["rider_status"] | null
           total_deliveries?: number | null
           updated_at?: string | null
           vehicle_registration?: string | null
           vehicle_type?: string | null
+          verification_documents?: Json | null
+          verification_status?: string | null
         }
         Relationships: [
           {
             foreignKeyName: "rider_profiles_id_fkey"
             columns: ["id"]
             isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      rider_reviews: {
+        Row: {
+          comment: string | null
+          communication_rating: number | null
+          created_at: string | null
+          customer_id: string | null
+          delivery_rating: number | null
+          id: string
+          order_id: string | null
+          rating: number
+          rider_id: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          comment?: string | null
+          communication_rating?: number | null
+          created_at?: string | null
+          customer_id?: string | null
+          delivery_rating?: number | null
+          id?: string
+          order_id?: string | null
+          rating: number
+          rider_id?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          comment?: string | null
+          communication_rating?: number | null
+          created_at?: string | null
+          customer_id?: string | null
+          delivery_rating?: number | null
+          id?: string
+          order_id?: string | null
+          rating?: number
+          rider_id?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rider_reviews_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rider_reviews_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rider_reviews_rider_id_fkey"
+            columns: ["rider_id"]
+            isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
@@ -790,6 +960,13 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      calculate_rider_rating: {
+        Args: { rider_uuid: string }
+        Returns: {
+          average_rating: number
+          total_reviews: number
+        }[]
+      }
       generate_order_number: {
         Args: Record<PropertyKey, never>
         Returns: string
@@ -818,6 +995,7 @@ export type Database = {
         | "delivered"
         | "cancelled"
       rider_status: "offline" | "available" | "busy" | "break"
+      vehicle_type_enum: "walking" | "bicycle" | "motorcycle" | "car" | "van"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -943,6 +1121,7 @@ export const Constants = {
         "cancelled",
       ],
       rider_status: ["offline", "available", "busy", "break"],
+      vehicle_type_enum: ["walking", "bicycle", "motorcycle", "car", "van"],
     },
   },
 } as const

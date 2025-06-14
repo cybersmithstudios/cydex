@@ -4,15 +4,23 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Button } from '@/components/ui/button';
+import { Switch } from '@/components/ui/switch';
 import { Upload, Star, Calendar, MapPin } from 'lucide-react';
 
 interface ProfileHeaderProps {
   profile: any;
   editing: boolean;
+  onStatusToggle?: (isOnline: boolean) => void;
 }
 
-const ProfileHeader = ({ profile, editing }: ProfileHeaderProps) => {
+const ProfileHeader = ({ profile, editing, onStatusToggle }: ProfileHeaderProps) => {
   if (!profile) return null;
+
+  const handleStatusChange = (checked: boolean) => {
+    if (onStatusToggle) {
+      onStatusToggle(checked);
+    }
+  };
 
   return (
     <div className="flex flex-col items-center space-y-3 sm:space-y-4">
@@ -39,8 +47,24 @@ const ProfileHeader = ({ profile, editing }: ProfileHeaderProps) => {
       </div>
       
       <div className="flex items-center gap-2">
-        <Badge className="bg-green-500 text-xs">Active</Badge>
-        <Badge variant="outline" className="text-xs">Verified</Badge>
+        <div className="flex items-center gap-2">
+          <span className="text-xs sm:text-sm">Offline</span>
+          <Switch 
+            checked={profile.isOnline} 
+            onCheckedChange={handleStatusChange}
+            className="data-[state=checked]:bg-green-500"
+          />
+          <span className="text-xs sm:text-sm">Online</span>
+        </div>
+      </div>
+
+      <div className="flex items-center gap-2">
+        <Badge className={profile.isOnline ? "bg-green-500" : "bg-gray-500"} variant="default">
+          {profile.isOnline ? 'Online' : 'Offline'}
+        </Badge>
+        <Badge variant="outline" className={`text-xs ${profile.isVerified ? 'border-green-500 text-green-600' : 'border-red-500 text-red-600'}`}>
+          {profile.isVerified ? 'Verified' : 'Not Verified'}
+        </Badge>
       </div>
       
       <div className="w-full">

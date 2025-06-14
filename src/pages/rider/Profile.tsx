@@ -26,7 +26,9 @@ const RiderProfilePage = () => {
     achievements, 
     loading, 
     error, 
-    updateProfile 
+    updateProfile,
+    updateRiderStatus,
+    addBankDetails
   } = useRiderProfileData();
 
   const handleSaveProfile = async () => {
@@ -35,18 +37,30 @@ const RiderProfilePage = () => {
     const success = await updateProfile(riderProfile);
     if (success) {
       setEditing(false);
-      toast.success('Profile updated successfully');
     }
   };
 
-  const handleUpdateVehicle = () => {
-    setShowVehicleDialog(false);
-    toast.success('Vehicle information updated');
+  const handleUpdateVehicle = async (vehicleData: any) => {
+    if (!riderProfile) return;
+    
+    const success = await updateProfile({
+      ...riderProfile,
+      vehicle: vehicleData
+    });
+    
+    if (success) {
+      setShowVehicleDialog(false);
+      toast.success('Vehicle information updated');
+    }
   };
 
   const handleUploadId = () => {
     setShowIdVerificationDialog(false);
     toast.success('Document uploaded successfully');
+  };
+
+  const handleStatusToggle = async (isOnline: boolean) => {
+    await updateRiderStatus(isOnline);
   };
 
   if (loading) {
@@ -92,7 +106,11 @@ const RiderProfilePage = () => {
           <div className="lg:col-span-1 space-y-3 sm:space-y-4 md:space-y-6">
             <Card>
               <CardContent className="p-3 sm:p-4 md:p-6">
-                <ProfileHeader profile={riderProfile} editing={editing} />
+                <ProfileHeader 
+                  profile={riderProfile} 
+                  editing={editing}
+                  onStatusToggle={handleStatusToggle}
+                />
               </CardContent>
             </Card>
 
@@ -113,7 +131,8 @@ const RiderProfilePage = () => {
               editing={editing} 
               profile={riderProfile} 
               recentReviews={recentReviews} 
-              achievements={achievements} 
+              achievements={achievements}
+              onAddBankDetails={addBankDetails}
             />
           </div>
         </div>
