@@ -175,38 +175,38 @@ export const useRiderProfileData = () => {
 
       const transformedProfile: RiderProfileData = {
         id: profileData.id,
-        name: profileData.name || 'Rider',
-        email: profileData.email || '',
-        phone: profileData.phone || '',
-        address: profileData.address || 'Not provided',
-        avatar: profileData.avatar,
+        name: String(profileData.name || 'Rider'),
+        email: String(profileData.email || ''),
+        phone: String(profileData.phone || ''),
+        address: String(profileData.address || 'Not provided'),
+        avatar: profileData.avatar ? String(profileData.avatar) : undefined,
         joinDate: new Date(profileData.created_at).toLocaleDateString(),
         vehicle: {
-          type: riderData?.vehicle_type || 'bicycle',
+          type: String(riderData?.vehicle_type || 'bicycle'),
           model: 'Trek FX 3',
           year: '2023',
           color: 'Black',
-          licensePlate: riderData?.license_number || 'N/A',
-          registration: riderData?.vehicle_registration || 'Pending'
+          licensePlate: String(riderData?.license_number || 'N/A'),
+          registration: String(riderData?.vehicle_registration || 'Pending')
         },
         documents: {
           idCard: {
-            verified: riderData?.is_verified || false,
+            verified: Boolean(riderData?.is_verified || false),
             expiryDate: '2025-12-31'
           },
           driverLicense: {
-            verified: riderData?.is_verified || false,
+            verified: Boolean(riderData?.is_verified || false),
             expiryDate: '2025-12-31'
           },
           insurance: {
-            verified: riderData?.is_verified || false,
+            verified: Boolean(riderData?.is_verified || false),
             expiryDate: '2025-12-31'
           }
         },
         bankDetails: {
           bank: 'First Bank',
           accountNumber: '*****1234',
-          accountName: profileData.name || 'Rider',
+          accountName: String(profileData.name || 'Rider'),
           bvn: '*****5678'
         },
         preferences: {
