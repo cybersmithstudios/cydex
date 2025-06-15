@@ -1,20 +1,30 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Separator } from '@/components/ui/separator';
 import { Slider } from '@/components/ui/slider';
-import { User, Bell, MapPin, Settings } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { User, Bell, MapPin, Save } from 'lucide-react';
+import { toast } from 'sonner';
 
 interface PersonalInfoTabProps {
   editing: boolean;
   profile: any;
+  onSaveProfile?: (updatedData?: any) => Promise<void>;
 }
 
-const PersonalInfoTab = ({ editing, profile }: PersonalInfoTabProps) => {
-  const [preferences, setPreferences] = useState(profile?.preferences || {
+const PersonalInfoTab = ({ editing, profile, onSaveProfile }: PersonalInfoTabProps) => {
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    address: '',
+  });
+
+  const [preferences, setPreferences] = useState({
     deliveryPreferences: {
       maxDistance: 15,
       preferredZones: [],
@@ -27,6 +37,46 @@ const PersonalInfoTab = ({ editing, profile }: PersonalInfoTabProps) => {
       marketing: false
     }
   });
+
+  // Initialize form data when profile changes
+  useEffect(() => {
+    if (profile) {
+      setFormData({
+        name: profile.name || '',
+        email: profile.email || '',
+        phone: profile.phone || '',
+        address: profile.address || '',
+      });
+      
+      setPreferences(profile.preferences || preferences);
+    }
+  }, [profile]);
+
+  const handleInputChange = (field: string, value: string) => {
+    setFormData(prev => ({
+      ...prev,
+      [field]: value
+    }));
+  };
+
+  const handleSave = async () => {
+    if (!onSaveProfile) {
+      toast.error('Save function not available');
+      return;
+    }
+
+    console.log('[PersonalInfoTab] Saving profile data:', { formData, preferences });
+    
+    try {
+      await onSaveProfile({
+        ...formData,
+        preferences
+      });
+    } catch (error) {
+      console.error('[PersonalInfoTab] Save error:', error);
+      toast.error('Failed to save profile');
+    }
+  };
 
   const availableDays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
@@ -46,7 +96,8 @@ const PersonalInfoTab = ({ editing, profile }: PersonalInfoTabProps) => {
               <Label htmlFor="name">Full Name</Label>
               <Input 
                 id="name" 
-                defaultValue={profile?.name}
+                value={formData.name}
+                onChange={(e) => handleInputChange('name', e.target.value)}
                 disabled={!editing}
                 className={!editing ? "bg-gray-50" : ""} 
               />
@@ -56,7 +107,8 @@ const PersonalInfoTab = ({ editing, profile }: PersonalInfoTabProps) => {
               <Input 
                 id="email" 
                 type="email" 
-                defaultValue={profile?.email}
+                value={formData.email}
+                onChange={(e) => handleInputChange('email', e.target.value)}
                 disabled={!editing}
                 className={!editing ? "bg-gray-50" : ""} 
               />
@@ -65,7 +117,8 @@ const PersonalInfoTab = ({ editing, profile }: PersonalInfoTabProps) => {
               <Label htmlFor="phone">Phone Number</Label>
               <Input 
                 id="phone" 
-                defaultValue={profile?.phone}
+                value={formData.phone}
+                onChange={(e) => handleInputChange('phone', e.target.value)}
                 disabled={!editing}
                 className={!editing ? "bg-gray-50" : ""} 
               />
@@ -74,12 +127,22 @@ const PersonalInfoTab = ({ editing, profile }: PersonalInfoTabProps) => {
               <Label htmlFor="address">Address</Label>
               <Input 
                 id="address" 
-                defaultValue={profile?.address}
+                value={formData.address}
+                onChange={(e) => handleInputChange('address', e.target.value)}
                 disabled={!editing}
                 className={!editing ? "bg-gray-50" : ""} 
               />
             </div>
           </div>
+          
+          {editing && (
+            <div className="mt-6 flex justify-end">
+              <Button onClick={handleSave} className="bg-primary hover:bg-primary-hover text-black">
+                <Save className="h-4 w-4 mr-2" />
+                Save Personal Info
+              </Button>
+            </div>
+          )}
         </CardContent>
       </Card>
 

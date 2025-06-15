@@ -7,16 +7,28 @@ export const transformProfileData = (
   deliveriesData: any[],
   bankDetailsData: any[]
 ): RiderProfileData => {
+  console.log('[ProfileTransformer] Transforming profile data:', { profileData, riderData });
+  
   // Calculate stats from real data
   const totalDeliveries = deliveriesData.length;
   const totalDistance = deliveriesData.reduce((sum, d) => sum + (Number(d.actual_distance) || 0), 0);
   const carbonSaved = deliveriesData.reduce((sum, d) => sum + (Number(d.carbon_saved) || 0), 0);
 
-  // Parse preferences safely with type assertions
-  const deliveryPrefs = riderData?.delivery_preferences as any || {};
-  const notificationPrefs = riderData?.notification_preferences as any || {};
+  // Parse preferences safely with proper type checking
+  const deliveryPrefs = riderData?.delivery_preferences;
+  const notificationPrefs = riderData?.notification_preferences;
+  
+  // Ensure delivery_preferences is an object
+  const safeDeliveryPrefs = (deliveryPrefs && typeof deliveryPrefs === 'object' && !Array.isArray(deliveryPrefs)) 
+    ? deliveryPrefs as Record<string, any>
+    : {};
+    
+  // Ensure notification_preferences is an object  
+  const safeNotificationPrefs = (notificationPrefs && typeof notificationPrefs === 'object' && !Array.isArray(notificationPrefs))
+    ? notificationPrefs as Record<string, any>
+    : {};
 
-  return {
+  const transformedData: RiderProfileData = {
     id: profileData.id,
     name: String(profileData.name || 'Rider'),
     email: String(profileData.email || ''),
@@ -60,15 +72,15 @@ export const transformProfileData = (
     })),
     preferences: {
       deliveryPreferences: {
-        maxDistance: Number((deliveryPrefs as any)?.max_distance || 15),
-        preferredZones: Array.isArray((deliveryPrefs as any)?.preferred_zones) ? (deliveryPrefs as any).preferred_zones : [],
-        availableDays: Array.isArray((deliveryPrefs as any)?.available_days) ? (deliveryPrefs as any).available_days : ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
+        maxDistance: Number(safeDeliveryPrefs.max_distance || 15),
+        preferredZones: Array.isArray(safeDeliveryPrefs.preferred_zones) ? safeDeliveryPrefs.preferred_zones : [],
+        availableDays: Array.isArray(safeDeliveryPrefs.available_days) ? safeDeliveryPrefs.available_days : ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
       },
       notifications: {
-        app: Boolean((notificationPrefs as any)?.app !== false),
-        email: Boolean((notificationPrefs as any)?.email !== false),
-        sms: Boolean((notificationPrefs as any)?.sms === true),
-        marketing: Boolean((notificationPrefs as any)?.marketing === true)
+        app: Boolean(safeNotificationPrefs.app !== false),
+        email: Boolean(safeNotificationPrefs.email !== false),
+        sms: Boolean(safeNotificationPrefs.sms === true),
+        marketing: Boolean(safeNotificationPrefs.marketing === true)
       }
     },
     stats: {
@@ -80,4 +92,7 @@ export const transformProfileData = (
       sustainabilityScore: Math.min(100, Math.round(carbonSaved / 10))
     }
   };
+
+  console.log('[ProfileTransformer] Transformed data:', transformedData);
+  return transformedData;
 };

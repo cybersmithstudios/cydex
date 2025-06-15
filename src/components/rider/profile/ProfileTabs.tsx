@@ -12,9 +12,17 @@ interface ProfileTabsProps {
   recentReviews: any[];
   achievements: any[];
   onAddBankDetails?: (bankDetails: any) => Promise<boolean>;
+  onSaveProfile?: (updatedData?: any) => Promise<void>;
 }
 
-const ProfileTabs = ({ editing, profile, recentReviews, achievements, onAddBankDetails }: ProfileTabsProps) => {
+const ProfileTabs = ({ 
+  editing, 
+  profile, 
+  recentReviews, 
+  achievements, 
+  onAddBankDetails,
+  onSaveProfile 
+}: ProfileTabsProps) => {
   return (
     <Tabs defaultValue="personal" className="w-full">
       <TabsList className="grid grid-cols-2 md:grid-cols-4 mb-3 sm:mb-4 md:mb-6 w-full">
@@ -25,7 +33,11 @@ const ProfileTabs = ({ editing, profile, recentReviews, achievements, onAddBankD
       </TabsList>
       
       <TabsContent value="personal" className="mt-0">
-        <PersonalInfoTab editing={editing} profile={profile} />
+        <PersonalInfoTab 
+          editing={editing} 
+          profile={profile} 
+          onSaveProfile={onSaveProfile}
+        />
       </TabsContent>
       
       <TabsContent value="bank" className="mt-0">

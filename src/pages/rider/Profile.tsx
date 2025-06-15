@@ -31,20 +31,31 @@ const RiderProfilePage = () => {
     addBankDetails
   } = useRiderProfileData();
 
-  const handleSaveProfile = async () => {
-    if (!riderProfile) return;
+  const handleSaveProfile = async (updatedData?: any) => {
+    console.log('[Profile] Saving profile with data:', updatedData || riderProfile);
     
-    const success = await updateProfile(riderProfile);
+    if (!riderProfile) {
+      toast.error('No profile data to save');
+      return;
+    }
+    
+    const dataToSave = updatedData || riderProfile;
+    const success = await updateProfile(dataToSave);
     if (success) {
       setEditing(false);
+      toast.success('Profile saved successfully');
     }
   };
 
   const handleUpdateVehicle = async (vehicleData: any) => {
-    if (!riderProfile) return;
+    console.log('[Profile] Updating vehicle with data:', vehicleData);
+    
+    if (!riderProfile) {
+      toast.error('No profile data available');
+      return;
+    }
     
     const success = await updateProfile({
-      ...riderProfile,
       vehicle: vehicleData
     });
     
@@ -60,7 +71,11 @@ const RiderProfilePage = () => {
   };
 
   const handleStatusToggle = async (isOnline: boolean) => {
-    await updateRiderStatus(isOnline);
+    console.log('[Profile] Toggling status to:', isOnline);
+    const success = await updateRiderStatus(isOnline);
+    if (success) {
+      toast.success(`Status updated to ${isOnline ? 'online' : 'offline'}`);
+    }
   };
 
   if (loading) {
@@ -98,7 +113,7 @@ const RiderProfilePage = () => {
         <RiderProfileHeader 
           editing={editing}
           onEditToggle={() => setEditing(!editing)}
-          onSave={handleSaveProfile}
+          onSave={() => handleSaveProfile()}
         />
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 sm:gap-4 md:gap-6">
@@ -133,6 +148,7 @@ const RiderProfilePage = () => {
               recentReviews={recentReviews} 
               achievements={achievements}
               onAddBankDetails={addBankDetails}
+              onSaveProfile={handleSaveProfile}
             />
           </div>
         </div>
