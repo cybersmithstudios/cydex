@@ -1,4 +1,3 @@
-
 import { supabase } from '@/integrations/supabase/client';
 import { RiderProfileData, BankDetail } from '../types';
 
@@ -12,7 +11,7 @@ export const updateProfile = async (userId: string, updates: Partial<RiderProfil
       .from('rider_profiles')
       .select('id')
       .eq('id', userId)
-      .single();
+      .maybeSingle();
 
     if (!existingRiderProfile) {
       console.log('[ProfileMutations] Creating new rider profile');
@@ -39,10 +38,10 @@ export const updateProfile = async (userId: string, updates: Partial<RiderProfil
     if (updates.name !== undefined) profileUpdate.name = updates.name;
     if (updates.phone !== undefined) profileUpdate.phone = updates.phone;
     if (updates.address !== undefined) {
-      // Ensure address is stored as a string in the database
+      // Store address as a simple string in the address field
       profileUpdate.address = typeof updates.address === 'string' 
         ? { full_address: updates.address }
-        : updates.address;
+        : { full_address: updates.address || '' };
     }
     
     if (Object.keys(profileUpdate).length > 0) {
@@ -58,7 +57,7 @@ export const updateProfile = async (userId: string, updates: Partial<RiderProfil
       }
     }
 
-    // Update rider_profiles table if needed
+    // Update rider_profiles table for preferences and other rider-specific data
     const riderUpdate: any = {};
     
     if (updates.vehicle) {

@@ -40,12 +40,23 @@ const PersonalInfoTab = ({ editing, profile, onSaveProfile }: PersonalInfoTabPro
     if (profile?.id && !initializedRef.current) {
       console.log('[PersonalInfoTab] Initializing form with profile:', profile);
       
+      // Handle address properly - extract string from object or use as-is
+      let addressValue = '';
+      if (typeof profile.address === 'string') {
+        addressValue = profile.address;
+      } else if (profile.address?.full_address) {
+        addressValue = profile.address.full_address;
+      } else if (profile.address) {
+        // If it's an object but not the expected format, stringify it as fallback
+        console.warn('[PersonalInfoTab] Unexpected address format:', profile.address);
+        addressValue = JSON.stringify(profile.address);
+      }
+      
       setFormData({
         name: profile.name || '',
         email: profile.email || '',
         phone: profile.phone || '',
-        address: typeof profile.address === 'string' ? profile.address : 
-                profile.address?.full_address || '',
+        address: addressValue,
       });
       
       if (profile.preferences) {
@@ -83,7 +94,7 @@ const PersonalInfoTab = ({ editing, profile, onSaveProfile }: PersonalInfoTabPro
       const updateData = {
         name: formData.name,
         phone: formData.phone,
-        address: formData.address,
+        address: formData.address, // Send as string
         preferences
       };
       
