@@ -3,7 +3,7 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { FileText, Shield, Car, AlertCircle } from 'lucide-react';
+import { FileText, Shield, AlertCircle } from 'lucide-react';
 
 interface DocumentsVerificationProps {
   documents: any;
@@ -19,18 +19,6 @@ const DocumentsVerification = ({ documents, onUpdateDocuments }: DocumentsVerifi
       name: 'National ID',
       expiry: documents.idCard.expiryDate,
       verified: documents.idCard.verified
-    },
-    {
-      icon: Car,
-      name: 'Driver\'s License',
-      expiry: documents.driverLicense.expiryDate,
-      verified: documents.driverLicense.verified
-    },
-    {
-      icon: FileText,
-      name: 'Insurance',
-      expiry: documents.insurance.expiryDate,
-      verified: documents.insurance.verified
     }
   ];
 
@@ -69,7 +57,7 @@ const DocumentsVerification = ({ documents, onUpdateDocuments }: DocumentsVerifi
           className="w-full mt-3 sm:mt-4 text-xs sm:text-sm h-8 sm:h-9"
           onClick={onUpdateDocuments}
         >
-          Upload Documents
+          Upload National ID
         </Button>
       </CardContent>
     </Card>

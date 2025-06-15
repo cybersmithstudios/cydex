@@ -17,28 +17,14 @@ const DocumentDialog = ({ open, onOpenChange, onUpload }: DocumentDialogProps) =
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="text-base sm:text-lg">Document Verification</DialogTitle>
+          <DialogTitle className="text-base sm:text-lg">National ID Verification</DialogTitle>
           <DialogDescription className="text-sm">
-            Update your identification documents for verification
+            Upload your National ID for verification
           </DialogDescription>
         </DialogHeader>
         <div className="space-y-3 sm:space-y-4 py-2">
           <div className="space-y-2">
-            <Label htmlFor="id-type" className="text-sm">ID Type</Label>
-            <select 
-              id="id-type" 
-              defaultValue="national"
-              className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary text-sm h-8 sm:h-9"
-            >
-              <option value="national">National ID Card</option>
-              <option value="passport">International Passport</option>
-              <option value="drivers">Driver's License</option>
-              <option value="voters">Voter's Card</option>
-            </select>
-          </div>
-          
-          <div className="space-y-2">
-            <Label htmlFor="id-number" className="text-sm">ID Number</Label>
+            <Label htmlFor="id-number" className="text-sm">National ID Number</Label>
             <Input id="id-number" className="text-sm h-8 sm:h-9" />
           </div>
           
@@ -48,12 +34,12 @@ const DocumentDialog = ({ open, onOpenChange, onUpload }: DocumentDialogProps) =
           </div>
           
           <div className="space-y-2">
-            <Label className="text-sm">Upload ID Document (Front)</Label>
+            <Label className="text-sm">Upload National ID (Front)</Label>
             <Input type="file" accept="image/*" className="text-sm h-8 sm:h-9" />
           </div>
           
           <div className="space-y-2">
-            <Label className="text-sm">Upload ID Document (Back)</Label>
+            <Label className="text-sm">Upload National ID (Back)</Label>
             <Input type="file" accept="image/*" className="text-sm h-8 sm:h-9" />
           </div>
           

@@ -3,7 +3,7 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Car, Bike, User } from 'lucide-react';
+import { Car, Bike, User, Zap } from 'lucide-react';
 
 interface VehicleInfoProps {
   vehicle: any;
@@ -19,8 +19,10 @@ const VehicleInfo = ({ vehicle, onUpdateVehicle }: VehicleInfoProps) => {
         return <User className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />;
       case 'bicycle':
         return <Bike className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />;
+      case 'electric_bike':
+        return <Zap className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />;
       default:
-        return <Car className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />;
+        return <User className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />;
     }
   };
 
@@ -30,12 +32,8 @@ const VehicleInfo = ({ vehicle, onUpdateVehicle }: VehicleInfoProps) => {
         return 'Walking';
       case 'bicycle':
         return 'Bicycle';
-      case 'motorcycle':
-        return 'Motorcycle';
-      case 'car':
-        return 'Car';
-      case 'van':
-        return 'Van';
+      case 'electric_bike':
+        return 'Electric Bike';
       default:
         return vehicle.type;
     }
@@ -70,12 +68,6 @@ const VehicleInfo = ({ vehicle, onUpdateVehicle }: VehicleInfoProps) => {
                 <span className="text-xs sm:text-sm text-gray-500">Color</span>
                 <span className="text-xs sm:text-sm font-medium">{vehicle.color}</span>
               </div>
-              {vehicle.licensePlate !== 'N/A' && vehicle.type !== 'bicycle' && (
-                <div className="flex justify-between">
-                  <span className="text-xs sm:text-sm text-gray-500">License</span>
-                  <span className="text-xs sm:text-sm font-medium">{vehicle.licensePlate}</span>
-                </div>
-              )}
             </>
           )}
           

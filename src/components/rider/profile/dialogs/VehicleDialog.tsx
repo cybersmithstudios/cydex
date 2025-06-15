@@ -49,9 +49,9 @@ const VehicleDialog = ({ open, onOpenChange, vehicle, onUpdate }: VehicleDialogP
             >
               <option value="walking">Walking</option>
               <option value="bicycle">Bicycle</option>
-              <option value="motorcycle">Motorcycle</option>
-              <option value="car">Car</option>
-              <option value="van">Van</option>
+              <option value="electric_bike" disabled className="text-gray-400">
+                Electric Bike (Coming Soon)
+              </option>
             </select>
           </div>
 
@@ -78,33 +78,20 @@ const VehicleDialog = ({ open, onOpenChange, vehicle, onUpdate }: VehicleDialogP
                 </div>
               </div>
               
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="vehicle-color" className="text-sm">Color</Label>
-                  <Input 
-                    id="vehicle-color" 
-                    value={formData.color}
-                    onChange={(e) => setFormData({ ...formData, color: e.target.value })}
-                    className="text-sm h-8 sm:h-9" 
-                  />
-                </div>
-                {formData.type !== 'bicycle' && (
-                  <div className="space-y-2">
-                    <Label htmlFor="license-plate" className="text-sm">License Plate</Label>
-                    <Input 
-                      id="license-plate" 
-                      value={formData.licensePlate}
-                      onChange={(e) => setFormData({ ...formData, licensePlate: e.target.value })}
-                      className="text-sm h-8 sm:h-9" 
-                    />
-                  </div>
-                )}
+              <div className="space-y-2">
+                <Label htmlFor="vehicle-color" className="text-sm">Color</Label>
+                <Input 
+                  id="vehicle-color" 
+                  value={formData.color}
+                  onChange={(e) => setFormData({ ...formData, color: e.target.value })}
+                  className="text-sm h-8 sm:h-9" 
+                />
               </div>
               
               <div className="space-y-2">
                 <Label htmlFor="vehicle-docs" className="text-sm">Upload Vehicle Documentation</Label>
                 <Input id="vehicle-docs" type="file" className="text-sm h-8 sm:h-9" />
-                <p className="text-xs text-gray-500">Upload registration documents or vehicle insurance</p>
+                <p className="text-xs text-gray-500">Upload registration documents if applicable</p>
               </div>
             </>
           )}
