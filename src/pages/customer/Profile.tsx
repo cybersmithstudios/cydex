@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+
+import React, { useState, useEffect } from 'react';
 import DashboardLayout from '@/components/layout/DashboardLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -11,31 +12,109 @@ import SecuritySettings from '@/components/customer/profile/SecuritySettings';
 import PreferencesSettings from '@/components/customer/profile/PreferencesSettings';
 import AccountSummary from '@/components/customer/profile/AccountSummary';
 import RecentActivity from '@/components/customer/profile/RecentActivity';
+import { useAuth } from '@/contexts/SupabaseAuthContext';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from '@/hooks/use-toast';
 
 const ProfilePage = () => {
-  const [isEditing, setIsEditing] = useState(false);
-  const [profileData, setProfileData] = useState({
-    name: 'Sarah Johnson',
-    email: 'sarah.johnson@example.com',
-    phone: '+234 803 123 4567',
-    address: '15 Green Avenue, Victoria Island, Lagos',
-    dateJoined: 'March 2023',
-    carbonCredits: 450,
-    ordersCompleted: 127,
-    sustainabilityScore: 8.7
-  });
+  const { user } = useAuth();
 
-  const handleSave = () => {
+  const [isEditing, setIsEditing] = useState(false);
+  const [profileData, setProfileData] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+
+  // Fetch user's profile
+  useEffect(() => {
+    const fetchProfile = async () => {
+      if (!user?.id) return;
+      setLoading(true);
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', user.id)
+        .single();
+      if (error) {
+        toast({
+          variant: "destructive",
+          title: "Error loading profile",
+          description: error.message
+        });
+        setLoading(false);
+        return;
+      }
+      setProfileData({
+        name: data.name || "",
+        email: data.email || "",
+        phone: data.phone || "",
+        address:
+          (data.address && typeof data.address === "object"
+            ? (data.address.street || "") +
+              (data.address.city ? ", " + data.address.city : "") +
+              (data.address.state ? ", " + data.address.state : "") +
+              (data.address.country ? ", " + data.address.country : "")
+            : ""),
+        dateJoined: data.created_at
+          ? new Date(data.created_at).toLocaleString("en-NG", {
+              year: "numeric",
+              month: "long"
+            })
+          : "",
+        carbonCredits: data.carbon_credits ?? 0,
+        ordersCompleted: 0, // If available in another table, fetch and populate
+        sustainabilityScore: 8.7 // Placeholder, if you have a sourced metric, replace
+      });
+      setLoading(false);
+    };
+
+    fetchProfile();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.id]);
+
+  const handleSave = async () => {
+    if (!user?.id) return;
     setIsEditing(false);
-    // In a real app, this would save to backend
+    const updates: any = {
+      name: profileData.name,
+      phone: profileData.phone,
+      address: profileData.address
+        ? { street: profileData.address }
+        : null
+    };
+    const { error } = await supabase
+      .from('profiles')
+      .update(updates)
+      .eq('id', user.id);
+    if (error) {
+      toast({
+        variant: "destructive",
+        title: "Profile update failed",
+        description: error.message,
+      });
+    } else {
+      toast({
+        variant: "success",
+        title: "Profile updated successfully!"
+      });
+    }
   };
 
   const handleInputChange = (field: string, value: string) => {
-    setProfileData(prev => ({
+    setProfileData((prev: any) => ({
       ...prev,
       [field]: value
     }));
   };
+
+  if (loading || !profileData) {
+    return (
+      <DashboardLayout userRole="CUSTOMER">
+        <div className="p-2 sm:p-4 md:p-6 max-w-full mx-auto space-y-3 sm:space-y-4 md:space-y-6">
+          <div className="animate-pulse h-44 rounded bg-gray-100 mb-4"></div>
+          <div className="animate-pulse h-96 rounded bg-gray-100"></div>
+        </div>
+      </DashboardLayout>
+    );
+  }
 
   return (
     <DashboardLayout userRole="CUSTOMER">
