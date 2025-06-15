@@ -24,6 +24,7 @@ export const useRiderProfileData = () => {
   // Memoize the user ID to prevent unnecessary re-renders
   const userId = useMemo(() => user?.id, [user?.id]);
 
+  // All useCallback hooks must be called unconditionally
   const fetchCompleteProfile = useCallback(async () => {
     if (!userId) {
       console.log('[RiderProfile] No user ID available');
@@ -131,7 +132,7 @@ export const useRiderProfileData = () => {
   }, [riderProfile?.id, loadRecentReviews, loadAchievements]);
 
   // Memoize the return object to prevent unnecessary re-renders
-  return useMemo(() => ({
+  const returnValue = useMemo(() => ({
     riderProfile,
     recentReviews,
     achievements,
@@ -152,4 +153,6 @@ export const useRiderProfileData = () => {
     handleAddBankDetails,
     fetchCompleteProfile
   ]);
+
+  return returnValue;
 };
