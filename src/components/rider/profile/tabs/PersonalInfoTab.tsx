@@ -1,5 +1,4 @@
-
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -38,9 +37,11 @@ const PersonalInfoTab = ({ editing, profile, onSaveProfile }: PersonalInfoTabPro
     }
   });
 
-  // Initialize form data only when profile.id changes (not on every profile change)
+  const initializedRef = useRef(false);
+
+  // Initialize form data only once when profile.id is available
   useEffect(() => {
-    if (profile?.id) {
+    if (profile?.id && !initializedRef.current) {
       console.log('[PersonalInfoTab] Initializing form with profile:', profile.id);
       setFormData({
         name: profile.name || '',
@@ -52,8 +53,16 @@ const PersonalInfoTab = ({ editing, profile, onSaveProfile }: PersonalInfoTabPro
       if (profile.preferences) {
         setPreferences(profile.preferences);
       }
+      initializedRef.current = true;
     }
-  }, [profile?.id]); // Only depend on profile.id to avoid constant resets
+  }, [profile?.id]);
+
+  // Reset initialization flag when profile ID changes
+  useEffect(() => {
+    if (profile?.id) {
+      initializedRef.current = false;
+    }
+  }, [profile?.id]);
 
   const handleInputChange = (field: string, value: string) => {
     console.log('[PersonalInfoTab] Input change:', field, value);

@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/SupabaseAuthContext';
 import { cn } from '@/lib/utils';
@@ -20,21 +20,23 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, userRole })
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-  console.log('DashboardLayout render:', {
-    userRole,
-    user,
-    loading,
-    isAuthenticated,
-    children: !!children
-  });
-
-  const navLinks = getNavLinks(userRole);
-  const userRoleTitle = getRoleTitle(userRole);
+  // Memoize navigation links to prevent recreation on every render
+  const navLinks = useMemo(() => getNavLinks(userRole), [userRole]);
+  const userRoleTitle = useMemo(() => getRoleTitle(userRole), [userRole]);
   
-  const handleLogout = () => {
+  // Memoize handlers to prevent recreation on every render
+  const handleLogout = useMemo(() => () => {
     logout();
     navigate('/auth');
-  };
+  }, [logout, navigate]);
+
+  const handleMenuToggle = useMemo(() => () => {
+    setIsMobileMenuOpen(!isMobileMenuOpen);
+  }, [isMobileMenuOpen]);
+
+  const handleMobileMenuClose = useMemo(() => () => {
+    setIsMobileMenuOpen(false);
+  }, []);
 
   // Show loading state while auth is being determined
   if (loading) {
@@ -56,8 +58,6 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, userRole })
     return null;
   }
 
-  console.log('DashboardLayout: Rendering dashboard content');
-
   return (
     <div className="min-h-screen bg-gray-50 flex">
       {/* Sidebar for larger screens */}
@@ -72,7 +72,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, userRole })
 
       {/* Mobile Header */}
       <MobileHeader 
-        onMenuToggle={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+        onMenuToggle={handleMenuToggle}
         user={user}
         userRole={userRole}
         handleLogout={handleLogout}
@@ -81,7 +81,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, userRole })
       {/* Mobile Menu */}
       <MobileMenu 
         isOpen={isMobileMenuOpen}
-        onClose={() => setIsMobileMenuOpen(false)}
+        onClose={handleMobileMenuClose}
         navLinks={navLinks}
         user={user}
         handleLogout={handleLogout}

@@ -1,5 +1,5 @@
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useAuth } from '@/contexts/SupabaseAuthContext';
 import { toast } from 'sonner';
 import { useRiderProfileQueries } from './useRiderProfileQueries';
@@ -21,8 +21,11 @@ export const useRiderProfileData = () => {
   const { fetchRecentReviews } = useRiderReviews();
   const { fetchAchievements } = useRiderAchievements();
 
+  // Memoize the user ID to prevent unnecessary re-renders
+  const userId = useMemo(() => user?.id, [user?.id]);
+
   const fetchCompleteProfile = useCallback(async () => {
-    if (!user?.id) {
+    if (!userId) {
       console.log('[RiderProfile] No user ID available');
       return;
     }
@@ -31,7 +34,7 @@ export const useRiderProfileData = () => {
     setError(null);
 
     try {
-      const profile = await fetchRiderProfile(user.id);
+      const profile = await fetchRiderProfile(userId);
       setRiderProfile(profile);
       console.log('[RiderProfile] Profile loaded successfully');
     } catch (error: any) {
@@ -41,44 +44,36 @@ export const useRiderProfileData = () => {
     } finally {
       setLoading(false);
     }
-  }, [user?.id, fetchRiderProfile]);
+  }, [userId, fetchRiderProfile]);
 
   const loadRecentReviews = useCallback(async () => {
-    if (!user?.id) return;
+    if (!userId) return;
 
     try {
-      const reviews = await fetchRecentReviews(user.id);
+      const reviews = await fetchRecentReviews(userId);
       setRecentReviews(reviews);
-
-      // Update review count in profile
-      if (riderProfile) {
-        setRiderProfile(prev => prev ? {
-          ...prev,
-          stats: { ...prev.stats, reviews: reviews.length }
-        } : null);
-      }
     } catch (error) {
       console.error('[RiderProfile] Error loading reviews:', error);
     }
-  }, [user?.id, riderProfile, fetchRecentReviews]);
+  }, [userId, fetchRecentReviews]);
 
   const loadAchievements = useCallback(async () => {
-    if (!user?.id) return;
+    if (!userId) return;
 
     try {
-      const achievementsData = await fetchAchievements(user.id);
+      const achievementsData = await fetchAchievements(userId);
       setAchievements(achievementsData);
     } catch (error) {
       console.error('[RiderProfile] Error loading achievements:', error);
     }
-  }, [user?.id, fetchAchievements]);
+  }, [userId, fetchAchievements]);
 
-  const handleUpdateProfile = async (updates: Partial<RiderProfileData>) => {
-    if (!user?.id) return false;
+  const handleUpdateProfile = useCallback(async (updates: Partial<RiderProfileData>) => {
+    if (!userId) return false;
 
     try {
       setLoading(true);
-      await updateProfile(user.id, updates);
+      await updateProfile(userId, updates);
       toast.success('Profile updated successfully');
       await fetchCompleteProfile();
       return true;
@@ -89,13 +84,13 @@ export const useRiderProfileData = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [userId, updateProfile, fetchCompleteProfile]);
 
-  const handleUpdateRiderStatus = async (isOnline: boolean) => {
-    if (!user?.id) return false;
+  const handleUpdateRiderStatus = useCallback(async (isOnline: boolean) => {
+    if (!userId) return false;
 
     try {
-      await updateRiderStatus(user.id, isOnline);
+      await updateRiderStatus(userId, isOnline);
       // Update local state
       setRiderProfile(prev => prev ? { ...prev, isOnline } : null);
       toast.success(`Status updated to ${isOnline ? 'online' : 'offline'}`);
@@ -105,13 +100,13 @@ export const useRiderProfileData = () => {
       toast.error('Failed to update status');
       return false;
     }
-  };
+  }, [userId, updateRiderStatus]);
 
-  const handleAddBankDetails = async (bankDetails: Omit<BankDetail, 'id' | 'is_verified' | 'is_default'>) => {
-    if (!user?.id) return false;
+  const handleAddBankDetails = useCallback(async (bankDetails: Omit<BankDetail, 'id' | 'is_verified' | 'is_default'>) => {
+    if (!userId) return false;
 
     try {
-      await addBankDetails(user.id, bankDetails);
+      await addBankDetails(userId, bankDetails);
       toast.success('Bank details added successfully');
       await fetchCompleteProfile();
       return true;
@@ -120,22 +115,23 @@ export const useRiderProfileData = () => {
       toast.error('Failed to add bank details');
       return false;
     }
-  };
+  }, [userId, addBankDetails, fetchCompleteProfile]);
 
   useEffect(() => {
-    if (user?.id && user?.role === 'RIDER') {
+    if (userId && user?.role === 'RIDER') {
       fetchCompleteProfile();
     }
-  }, [user?.id, user?.role, fetchCompleteProfile]);
+  }, [userId, user?.role, fetchCompleteProfile]);
 
   useEffect(() => {
-    if (riderProfile) {
+    if (riderProfile?.id) {
       loadRecentReviews();
       loadAchievements();
     }
   }, [riderProfile?.id, loadRecentReviews, loadAchievements]);
 
-  return {
+  // Memoize the return object to prevent unnecessary re-renders
+  return useMemo(() => ({
     riderProfile,
     recentReviews,
     achievements,
@@ -145,5 +141,15 @@ export const useRiderProfileData = () => {
     updateRiderStatus: handleUpdateRiderStatus,
     addBankDetails: handleAddBankDetails,
     refetchProfile: fetchCompleteProfile
-  };
+  }), [
+    riderProfile,
+    recentReviews,
+    achievements,
+    loading,
+    error,
+    handleUpdateProfile,
+    handleUpdateRiderStatus,
+    handleAddBankDetails,
+    fetchCompleteProfile
+  ]);
 };
