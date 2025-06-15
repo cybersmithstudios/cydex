@@ -38,9 +38,10 @@ const PersonalInfoTab = ({ editing, profile, onSaveProfile }: PersonalInfoTabPro
     }
   });
 
-  // Initialize form data when profile changes
+  // Initialize form data only when profile.id changes (not on every profile change)
   useEffect(() => {
-    if (profile) {
+    if (profile?.id) {
+      console.log('[PersonalInfoTab] Initializing form with profile:', profile.id);
       setFormData({
         name: profile.name || '',
         email: profile.email || '',
@@ -48,11 +49,14 @@ const PersonalInfoTab = ({ editing, profile, onSaveProfile }: PersonalInfoTabPro
         address: profile.address || '',
       });
       
-      setPreferences(profile.preferences || preferences);
+      if (profile.preferences) {
+        setPreferences(profile.preferences);
+      }
     }
-  }, [profile]);
+  }, [profile?.id]); // Only depend on profile.id to avoid constant resets
 
   const handleInputChange = (field: string, value: string) => {
+    console.log('[PersonalInfoTab] Input change:', field, value);
     setFormData(prev => ({
       ...prev,
       [field]: value
@@ -160,10 +164,13 @@ const PersonalInfoTab = ({ editing, profile, onSaveProfile }: PersonalInfoTabPro
               <Label>Maximum Delivery Distance: {preferences.deliveryPreferences.maxDistance} km</Label>
               <Slider
                 value={[preferences.deliveryPreferences.maxDistance]}
-                onValueChange={(value) => setPreferences({
-                  ...preferences,
-                  deliveryPreferences: { ...preferences.deliveryPreferences, maxDistance: value[0] }
-                })}
+                onValueChange={(value) => {
+                  console.log('[PersonalInfoTab] Distance change:', value[0]);
+                  setPreferences({
+                    ...preferences,
+                    deliveryPreferences: { ...preferences.deliveryPreferences, maxDistance: value[0] }
+                  });
+                }}
                 max={50}
                 min={5}
                 step={5}
@@ -222,10 +229,13 @@ const PersonalInfoTab = ({ editing, profile, onSaveProfile }: PersonalInfoTabPro
               </div>
               <Switch 
                 checked={preferences.notifications.app}
-                onCheckedChange={(checked) => setPreferences({
-                  ...preferences,
-                  notifications: { ...preferences.notifications, app: checked }
-                })}
+                onCheckedChange={(checked) => {
+                  console.log('[PersonalInfoTab] App notification change:', checked);
+                  setPreferences({
+                    ...preferences,
+                    notifications: { ...preferences.notifications, app: checked }
+                  });
+                }}
                 disabled={!editing}
               />
             </div>
@@ -239,10 +249,13 @@ const PersonalInfoTab = ({ editing, profile, onSaveProfile }: PersonalInfoTabPro
               </div>
               <Switch 
                 checked={preferences.notifications.email}
-                onCheckedChange={(checked) => setPreferences({
-                  ...preferences,
-                  notifications: { ...preferences.notifications, email: checked }
-                })}
+                onCheckedChange={(checked) => {
+                  console.log('[PersonalInfoTab] Email notification change:', checked);
+                  setPreferences({
+                    ...preferences,
+                    notifications: { ...preferences.notifications, email: checked }
+                  });
+                }}
                 disabled={!editing}
               />
             </div>
@@ -256,10 +269,13 @@ const PersonalInfoTab = ({ editing, profile, onSaveProfile }: PersonalInfoTabPro
               </div>
               <Switch 
                 checked={preferences.notifications.sms}
-                onCheckedChange={(checked) => setPreferences({
-                  ...preferences,
-                  notifications: { ...preferences.notifications, sms: checked }
-                })}
+                onCheckedChange={(checked) => {
+                  console.log('[PersonalInfoTab] SMS notification change:', checked);
+                  setPreferences({
+                    ...preferences,
+                    notifications: { ...preferences.notifications, sms: checked }
+                  });
+                }}
                 disabled={!editing}
               />
             </div>
@@ -273,10 +289,13 @@ const PersonalInfoTab = ({ editing, profile, onSaveProfile }: PersonalInfoTabPro
               </div>
               <Switch 
                 checked={preferences.notifications.marketing}
-                onCheckedChange={(checked) => setPreferences({
-                  ...preferences,
-                  notifications: { ...preferences.notifications, marketing: checked }
-                })}
+                onCheckedChange={(checked) => {
+                  console.log('[PersonalInfoTab] Marketing notification change:', checked);
+                  setPreferences({
+                    ...preferences,
+                    notifications: { ...preferences.notifications, marketing: checked }
+                  });
+                }}
                 disabled={!editing}
               />
             </div>
