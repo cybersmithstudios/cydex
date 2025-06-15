@@ -21,7 +21,7 @@ import { ProductCard } from '@/components/customer/ProductCard';
 import { ShoppingCartSidebar } from '@/components/customer/ShoppingCartSidebar';
 import { DeliveryScheduler } from '@/components/customer/DeliveryScheduler';
 import { useProducts, Product } from '@/hooks/useProducts';
-import { useSupabase } from '@/contexts/SupabaseContext';
+import { supabase } from '@/lib/supabase';
 import { PaymentModal } from '@/components/customer/PaymentModal';
 import { useCartContext } from '@/contexts/CartContext';
 import { VendorRatingModal } from '@/components/customer/VendorRatingModal';
@@ -29,7 +29,6 @@ import { VendorRatingModal } from '@/components/customer/VendorRatingModal';
 const NewOrder = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
-  const { supabase } = useSupabase();
   const { products, loading } = useProducts();
   const { 
     cartItems, 
