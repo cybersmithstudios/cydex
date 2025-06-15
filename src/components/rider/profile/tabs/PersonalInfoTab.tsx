@@ -35,20 +35,23 @@ const PersonalInfoTab = ({ editing, profile, onSaveProfile }: PersonalInfoTabPro
 
   const initializedRef = useRef(false);
 
-  // Initialize form data only once when profile.id is available
+  // Initialize form data when profile is available
   useEffect(() => {
     if (profile?.id && !initializedRef.current) {
-      console.log('[PersonalInfoTab] Initializing form with profile:', profile.id);
+      console.log('[PersonalInfoTab] Initializing form with profile:', profile);
+      
       setFormData({
         name: profile.name || '',
         email: profile.email || '',
         phone: profile.phone || '',
-        address: profile.address || '',
+        address: typeof profile.address === 'string' ? profile.address : 
+                profile.address?.full_address || '',
       });
       
       if (profile.preferences) {
         setPreferences(profile.preferences);
       }
+      
       initializedRef.current = true;
     }
   }, [profile?.id]);
@@ -77,10 +80,14 @@ const PersonalInfoTab = ({ editing, profile, onSaveProfile }: PersonalInfoTabPro
     console.log('[PersonalInfoTab] Saving profile data:', { formData, preferences });
     
     try {
-      await onSaveProfile({
-        ...formData,
+      const updateData = {
+        name: formData.name,
+        phone: formData.phone,
+        address: formData.address,
         preferences
-      });
+      };
+      
+      await onSaveProfile(updateData);
       toast.success('Profile updated successfully');
     } catch (error) {
       console.error('[PersonalInfoTab] Save error:', error);
