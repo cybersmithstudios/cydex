@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from 'react';
-import { useSupabase } from '@/contexts/SupabaseContext';
+import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/SupabaseAuthContext';
 import { toast } from 'sonner';
 
@@ -53,7 +53,6 @@ export interface Order {
 }
 
 export const useCustomerOrders = () => {
-  const { supabase } = useSupabase();
   const { user } = useAuth();
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
