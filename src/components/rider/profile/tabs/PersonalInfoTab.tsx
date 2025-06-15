@@ -76,10 +76,34 @@ const PersonalInfoTab = ({ editing, profile, onSaveProfile }: PersonalInfoTabPro
         ...formData,
         preferences
       });
+      toast.success('Profile updated successfully');
     } catch (error) {
       console.error('[PersonalInfoTab] Save error:', error);
       toast.error('Failed to save profile');
     }
+  };
+
+  const handleDistanceChange = (value: number[]) => {
+    const newDistance = value[0];
+    console.log('[PersonalInfoTab] Distance change:', newDistance);
+    setPreferences(prev => ({
+      ...prev,
+      deliveryPreferences: { 
+        ...prev.deliveryPreferences, 
+        maxDistance: newDistance 
+      }
+    }));
+  };
+
+  const handleNotificationChange = (field: string, checked: boolean) => {
+    console.log('[PersonalInfoTab] Notification change:', field, checked);
+    setPreferences(prev => ({
+      ...prev,
+      notifications: { 
+        ...prev.notifications, 
+        [field]: checked 
+      }
+    }));
   };
 
   const availableDays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
@@ -164,13 +188,7 @@ const PersonalInfoTab = ({ editing, profile, onSaveProfile }: PersonalInfoTabPro
               <Label>Maximum Delivery Distance: {preferences.deliveryPreferences.maxDistance} km</Label>
               <Slider
                 value={[preferences.deliveryPreferences.maxDistance]}
-                onValueChange={(value) => {
-                  console.log('[PersonalInfoTab] Distance change:', value[0]);
-                  setPreferences({
-                    ...preferences,
-                    deliveryPreferences: { ...preferences.deliveryPreferences, maxDistance: value[0] }
-                  });
-                }}
+                onValueChange={handleDistanceChange}
                 max={50}
                 min={5}
                 step={5}
@@ -209,6 +227,15 @@ const PersonalInfoTab = ({ editing, profile, onSaveProfile }: PersonalInfoTabPro
               <p className="text-xs text-gray-500">Available days are currently fixed. Contact support to modify.</p>
             </div>
           </div>
+
+          {editing && (
+            <div className="mt-6 flex justify-end">
+              <Button onClick={handleSave} className="bg-primary hover:bg-primary-hover text-black">
+                <Save className="h-4 w-4 mr-2" />
+                Save Delivery Preferences
+              </Button>
+            </div>
+          )}
         </CardContent>
       </Card>
 
@@ -229,13 +256,7 @@ const PersonalInfoTab = ({ editing, profile, onSaveProfile }: PersonalInfoTabPro
               </div>
               <Switch 
                 checked={preferences.notifications.app}
-                onCheckedChange={(checked) => {
-                  console.log('[PersonalInfoTab] App notification change:', checked);
-                  setPreferences({
-                    ...preferences,
-                    notifications: { ...preferences.notifications, app: checked }
-                  });
-                }}
+                onCheckedChange={(checked) => handleNotificationChange('app', checked)}
                 disabled={!editing}
               />
             </div>
@@ -249,13 +270,7 @@ const PersonalInfoTab = ({ editing, profile, onSaveProfile }: PersonalInfoTabPro
               </div>
               <Switch 
                 checked={preferences.notifications.email}
-                onCheckedChange={(checked) => {
-                  console.log('[PersonalInfoTab] Email notification change:', checked);
-                  setPreferences({
-                    ...preferences,
-                    notifications: { ...preferences.notifications, email: checked }
-                  });
-                }}
+                onCheckedChange={(checked) => handleNotificationChange('email', checked)}
                 disabled={!editing}
               />
             </div>
@@ -269,13 +284,7 @@ const PersonalInfoTab = ({ editing, profile, onSaveProfile }: PersonalInfoTabPro
               </div>
               <Switch 
                 checked={preferences.notifications.sms}
-                onCheckedChange={(checked) => {
-                  console.log('[PersonalInfoTab] SMS notification change:', checked);
-                  setPreferences({
-                    ...preferences,
-                    notifications: { ...preferences.notifications, sms: checked }
-                  });
-                }}
+                onCheckedChange={(checked) => handleNotificationChange('sms', checked)}
                 disabled={!editing}
               />
             </div>
@@ -289,17 +298,20 @@ const PersonalInfoTab = ({ editing, profile, onSaveProfile }: PersonalInfoTabPro
               </div>
               <Switch 
                 checked={preferences.notifications.marketing}
-                onCheckedChange={(checked) => {
-                  console.log('[PersonalInfoTab] Marketing notification change:', checked);
-                  setPreferences({
-                    ...preferences,
-                    notifications: { ...preferences.notifications, marketing: checked }
-                  });
-                }}
+                onCheckedChange={(checked) => handleNotificationChange('marketing', checked)}
                 disabled={!editing}
               />
             </div>
           </div>
+
+          {editing && (
+            <div className="mt-6 flex justify-end">
+              <Button onClick={handleSave} className="bg-primary hover:bg-primary-hover text-black">
+                <Save className="h-4 w-4 mr-2" />
+                Save Notification Preferences
+              </Button>
+            </div>
+          )}
         </CardContent>
       </Card>
     </>

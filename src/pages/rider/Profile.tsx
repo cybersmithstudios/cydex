@@ -28,7 +28,8 @@ const RiderProfilePage = () => {
     error, 
     updateProfile,
     updateRiderStatus,
-    addBankDetails
+    addBankDetails,
+    refetchProfile
   } = useRiderProfileData();
 
   const handleSaveProfile = async (updatedData?: any) => {
@@ -78,6 +79,12 @@ const RiderProfilePage = () => {
     }
   };
 
+  const handleAvatarUpdate = async (avatarUrl: string) => {
+    console.log('[Profile] Avatar updated:', avatarUrl);
+    // Refetch profile to get updated avatar
+    await refetchProfile();
+  };
+
   if (loading) {
     return (
       <DashboardLayout userRole="RIDER">
@@ -125,6 +132,7 @@ const RiderProfilePage = () => {
                   profile={riderProfile} 
                   editing={editing}
                   onStatusToggle={handleStatusToggle}
+                  onAvatarUpdate={handleAvatarUpdate}
                 />
               </CardContent>
             </Card>
