@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import DashboardLayout from '@/components/layout/DashboardLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -23,6 +22,24 @@ const ProfilePage = () => {
   const [profileData, setProfileData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
+  // Helper for parsing address
+  const formatAddress = (address: any) => {
+    // Address should be an object, not an array, and contain street/city/state/country
+    if (address && typeof address === "object" && !Array.isArray(address)) {
+      // Use optional chaining and fallback to empty string
+      const street = address?.street ?? "";
+      const city = address?.city ?? "";
+      const state = address?.state ?? "";
+      const country = address?.country ?? "";
+
+      // Build address string, skipping empty parts
+      return [street, city, state, country].filter(Boolean).join(", ");
+    }
+    // If it's a string (legacy), just return it
+    if (typeof address === "string") return address;
+    return "";
+  };
+
   // Fetch user's profile
   useEffect(() => {
     const fetchProfile = async () => {
@@ -46,13 +63,7 @@ const ProfilePage = () => {
         name: data.name || "",
         email: data.email || "",
         phone: data.phone || "",
-        address:
-          (data.address && typeof data.address === "object"
-            ? (data.address.street || "") +
-              (data.address.city ? ", " + data.address.city : "") +
-              (data.address.state ? ", " + data.address.state : "") +
-              (data.address.country ? ", " + data.address.country : "")
-            : ""),
+        address: formatAddress(data.address),
         dateJoined: data.created_at
           ? new Date(data.created_at).toLocaleString("en-NG", {
               year: "numeric",
@@ -73,12 +84,18 @@ const ProfilePage = () => {
   const handleSave = async () => {
     if (!user?.id) return;
     setIsEditing(false);
+    // Save a minimal address object as required - split on commas
+    let addressToSave = null;
+    if (profileData.address) {
+      // Try to parse input from the form to populate street (very basic)
+      const [street = "", city = "", state = "", country = ""] = profileData.address.split(",").map(str => str.trim());
+      addressToSave = { street, city, state, country };
+    }
+
     const updates: any = {
       name: profileData.name,
       phone: profileData.phone,
-      address: profileData.address
-        ? { street: profileData.address }
-        : null
+      address: addressToSave,
     };
     const { error } = await supabase
       .from('profiles')
@@ -92,7 +109,7 @@ const ProfilePage = () => {
       });
     } else {
       toast({
-        variant: "success",
+        variant: "default",   // Fixed: "success" not allowed, use "default"
         title: "Profile updated successfully!"
       });
     }
