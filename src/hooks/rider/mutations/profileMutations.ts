@@ -1,4 +1,3 @@
-
 import { supabase } from '@/integrations/supabase/client';
 import { RiderProfileData, BankDetail } from '../types';
 
@@ -7,15 +6,13 @@ export const updateProfile = async (userId: string, updates: Partial<RiderProfil
   console.log('[ProfileMutations] Update data:', updates);
 
   try {
-    // Update profiles table
+    // Update profiles table (without updated_at since it doesn't exist in this table)
     const profileUpdate: any = {};
     if (updates.name !== undefined) profileUpdate.name = updates.name;
     if (updates.phone !== undefined) profileUpdate.phone = updates.phone;
     if (updates.address !== undefined) profileUpdate.address = updates.address;
     
     if (Object.keys(profileUpdate).length > 0) {
-      profileUpdate.updated_at = new Date().toISOString();
-      
       console.log('[ProfileMutations] Updating profiles table:', profileUpdate);
       const { error: profileError } = await supabase
         .from('profiles')
