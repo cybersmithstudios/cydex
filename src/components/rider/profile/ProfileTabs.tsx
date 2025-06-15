@@ -26,12 +26,12 @@ const ProfileTabs = ({
 }: ProfileTabsProps) => {
   return (
     <Tabs defaultValue="personal" className="w-full">
-      <TabsList className="grid grid-cols-3 md:grid-cols-5 mb-3 sm:mb-4 md:mb-6 w-full">
-        <TabsTrigger value="personal" className="text-xs sm:text-sm">Personal</TabsTrigger>
-        <TabsTrigger value="bank" className="text-xs sm:text-sm">Banking</TabsTrigger>
-        <TabsTrigger value="security" className="text-xs sm:text-sm">Security</TabsTrigger>
-        <TabsTrigger value="reviews" className="text-xs sm:text-sm">Reviews</TabsTrigger>
-        <TabsTrigger value="achievements" className="text-xs sm:text-sm">Achievements</TabsTrigger>
+      <TabsList className="flex w-full mb-3 sm:mb-4 md:mb-6 overflow-x-auto scrollbar-none">
+        <TabsTrigger value="personal" className="text-xs sm:text-sm whitespace-nowrap flex-shrink-0 px-2 sm:px-3">Personal</TabsTrigger>
+        <TabsTrigger value="bank" className="text-xs sm:text-sm whitespace-nowrap flex-shrink-0 px-2 sm:px-3">Banking</TabsTrigger>
+        <TabsTrigger value="security" className="text-xs sm:text-sm whitespace-nowrap flex-shrink-0 px-2 sm:px-3">Security</TabsTrigger>
+        <TabsTrigger value="reviews" className="text-xs sm:text-sm whitespace-nowrap flex-shrink-0 px-2 sm:px-3">Reviews</TabsTrigger>
+        <TabsTrigger value="achievements" className="text-xs sm:text-sm whitespace-nowrap flex-shrink-0 px-2 sm:px-3">Achievements</TabsTrigger>
       </TabsList>
       
       <TabsContent value="personal" className="mt-0">
