@@ -1,6 +1,6 @@
-
 import React from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import PersonalInfoTab from './tabs/PersonalInfoTab';
 import BankingTab from './tabs/BankingTab';
 import ReviewsTab from './tabs/ReviewsTab';
@@ -26,13 +26,17 @@ const ProfileTabs = ({
 }: ProfileTabsProps) => {
   return (
     <Tabs defaultValue="personal" className="w-full">
-      <TabsList className="flex w-full mb-3 sm:mb-4 md:mb-6 overflow-x-auto scrollbar-none">
-        <TabsTrigger value="personal" className="text-xs sm:text-sm whitespace-nowrap flex-shrink-0 px-2 sm:px-3">Personal</TabsTrigger>
-        <TabsTrigger value="bank" className="text-xs sm:text-sm whitespace-nowrap flex-shrink-0 px-2 sm:px-3">Banking</TabsTrigger>
-        <TabsTrigger value="security" className="text-xs sm:text-sm whitespace-nowrap flex-shrink-0 px-2 sm:px-3">Security</TabsTrigger>
-        <TabsTrigger value="reviews" className="text-xs sm:text-sm whitespace-nowrap flex-shrink-0 px-2 sm:px-3">Reviews</TabsTrigger>
-        <TabsTrigger value="achievements" className="text-xs sm:text-sm whitespace-nowrap flex-shrink-0 px-2 sm:px-3">Achievements</TabsTrigger>
-      </TabsList>
+      <div className="mb-3 sm:mb-4 md:mb-6">
+        <ScrollArea className="w-full">
+          <TabsList className="flex w-max min-w-full h-10">
+            <TabsTrigger value="personal" className="text-xs sm:text-sm whitespace-nowrap flex-shrink-0 px-2 sm:px-3">Personal</TabsTrigger>
+            <TabsTrigger value="bank" className="text-xs sm:text-sm whitespace-nowrap flex-shrink-0 px-2 sm:px-3">Banking</TabsTrigger>
+            <TabsTrigger value="security" className="text-xs sm:text-sm whitespace-nowrap flex-shrink-0 px-2 sm:px-3">Security</TabsTrigger>
+            <TabsTrigger value="reviews" className="text-xs sm:text-sm whitespace-nowrap flex-shrink-0 px-2 sm:px-3">Reviews</TabsTrigger>
+            <TabsTrigger value="achievements" className="text-xs sm:text-sm whitespace-nowrap flex-shrink-0 px-2 sm:px-3">Achievements</TabsTrigger>
+          </TabsList>
+        </ScrollArea>
+      </div>
       
       <TabsContent value="personal" className="mt-0">
         <PersonalInfoTab 
