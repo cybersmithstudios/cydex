@@ -1,0 +1,280 @@
+import { useState, useEffect } from 'react';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/contexts/SupabaseAuthContext';
+import { toast } from '@/hooks/use-toast';
+
+export interface VendorTransaction {
+  id: string;
+  transaction_id: string;
+  type: 'sale' | 'payout' | 'refund' | 'adjustment';
+  amount: number;
+  fee: number;
+  net_amount: number;
+  status: 'pending' | 'completed' | 'failed' | 'cancelled';
+  description: string;
+  reference_id?: string;
+  reference_type?: string;
+  bank_account_id?: string;
+  metadata: Record<string, any>;
+  processed_at?: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface VendorBankAccount {
+  id: string;
+  vendor_id: string;
+  account_name: string;
+  bank_name: string;
+  account_number: string;
+  is_default: boolean;
+  is_verified: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface PayoutRequest {
+  id: string;
+  vendor_id: string;
+  bank_account_id: string;
+  amount: number;
+  fee: number;
+  net_amount: number;
+  status: 'pending' | 'processing' | 'completed' | 'failed' | 'cancelled';
+  failure_reason?: string;
+  requested_at: string;
+  processed_at?: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export const useVendorFinancials = () => {
+  const { user } = useAuth();
+  const [transactions, setTransactions] = useState<VendorTransaction[]>([]);
+  const [bankAccounts, setBankAccounts] = useState<VendorBankAccount[]>([]);
+  const [payoutRequests, setPayoutRequests] = useState<PayoutRequest[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+
+  // Fetch transactions
+  const fetchTransactions = async () => {
+    if (!user?.id) return;
+    
+    try {
+      const { data, error } = await supabase
+        .from('vendor_transactions')
+        .select('*')
+        .eq('vendor_id', user.id)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      setTransactions((data || []) as VendorTransaction[]);
+    } catch (error) {
+      console.error('Error fetching transactions:', error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to load transactions"
+      });
+    }
+  };
+
+  // Fetch bank accounts
+  const fetchBankAccounts = async () => {
+    if (!user?.id) return;
+    
+    try {
+      const { data, error } = await supabase
+        .from('vendor_bank_accounts')
+        .select('*')
+        .eq('vendor_id', user.id)
+        .order('is_default', { ascending: false });
+
+      if (error) throw error;
+      setBankAccounts(data || []);
+    } catch (error) {
+      console.error('Error fetching bank accounts:', error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to load bank accounts"
+      });
+    }
+  };
+
+  // Fetch payout requests
+  const fetchPayoutRequests = async () => {
+    if (!user?.id) return;
+    
+    try {
+      const { data, error } = await supabase
+        .from('vendor_payout_requests')
+        .select('*')
+        .eq('vendor_id', user.id)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      setPayoutRequests((data || []) as PayoutRequest[]);
+    } catch (error) {
+      console.error('Error fetching payout requests:', error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to load payout requests"
+      });
+    }
+  };
+
+  // Add bank account
+  const addBankAccount = async (accountData: Omit<VendorBankAccount, 'id' | 'vendor_id' | 'created_at' | 'updated_at'>) => {
+    if (!user?.id) return;
+
+    try {
+      const { data, error } = await supabase
+        .from('vendor_bank_accounts')
+        .insert({
+          vendor_id: user.id,
+          ...accountData
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+      
+      setBankAccounts(prev => [...prev, data]);
+      toast({
+        title: "Bank account added",
+        description: "Your bank account has been added successfully"
+      });
+      
+      return data;
+    } catch (error) {
+      console.error('Error adding bank account:', error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to add bank account"
+      });
+      throw error;
+    }
+  };
+
+  // Request payout
+  const requestPayout = async (amount: number, bankAccountId: string) => {
+    if (!user?.id) return;
+
+    try {
+      const fee = amount * 0.015; // 1.5% fee
+      const netAmount = amount - fee;
+
+      const { data, error } = await supabase
+        .from('vendor_payout_requests')
+        .insert({
+          vendor_id: user.id,
+          bank_account_id: bankAccountId,
+          amount,
+          fee,
+          net_amount: netAmount
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+      
+      setPayoutRequests(prev => [data as PayoutRequest, ...prev]);
+      toast({
+        title: "Payout requested",
+        description: `Payout of ₦${amount.toLocaleString()} has been requested`
+      });
+      
+      return data;
+    } catch (error) {
+      console.error('Error requesting payout:', error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to request payout"
+      });
+      throw error;
+    }
+  };
+
+  // Calculate balances
+  const calculateBalance = () => {
+    const completedTransactions = transactions.filter(t => t.status === 'completed');
+    
+    const totalBalance = completedTransactions.reduce((acc, t) => {
+      if (t.type === 'sale') {
+        return acc + t.net_amount;
+      } else if (t.type === 'payout') {
+        return acc - t.amount;
+      } else if (t.type === 'refund') {
+        return acc - t.amount;
+      }
+      return acc;
+    }, 0);
+
+    const salesThisMonth = completedTransactions
+      .filter(t => {
+        const transactionDate = new Date(t.created_at);
+        const now = new Date();
+        return t.type === 'sale' && 
+               transactionDate.getMonth() === now.getMonth() && 
+               transactionDate.getFullYear() === now.getFullYear();
+      })
+      .reduce((acc, t) => acc + t.net_amount, 0);
+
+    const availableForPayout = completedTransactions
+      .filter(t => t.type === 'sale')
+      .reduce((acc, t) => acc + t.net_amount, 0) - 
+      completedTransactions
+      .filter(t => t.type === 'payout')
+      .reduce((acc, t) => acc + t.amount, 0);
+
+    return {
+      totalBalance,
+      salesThisMonth,
+      availableForPayout: Math.max(0, availableForPayout)
+    };
+  };
+
+  // Refresh all data
+  const refreshData = async () => {
+    setRefreshing(true);
+    await Promise.all([
+      fetchTransactions(),
+      fetchBankAccounts(),
+      fetchPayoutRequests()
+    ]);
+    setRefreshing(false);
+  };
+
+  // Initial load
+  useEffect(() => {
+    const loadData = async () => {
+      setLoading(true);
+      await Promise.all([
+        fetchTransactions(),
+        fetchBankAccounts(),
+        fetchPayoutRequests()
+      ]);
+      setLoading(false);
+    };
+
+    if (user?.id) {
+      loadData();
+    }
+  }, [user?.id]);
+
+  return {
+    transactions,
+    bankAccounts,
+    payoutRequests,
+    loading,
+    refreshing,
+    addBankAccount,
+    requestPayout,
+    refreshData,
+    balances: calculateBalance()
+  };
+};

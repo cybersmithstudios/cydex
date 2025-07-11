@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import DashboardLayout from '@/components/layout/DashboardLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -24,24 +24,101 @@ import {
   Settings as SettingsIcon,
   Camera,
   FileText,
-  HelpCircle
+  HelpCircle,
+  Loader2,
+  RefreshCw
 } from 'lucide-react';
+import { useVendorSettings } from '@/hooks/useVendorSettings';
 
 const VendorSettingsPage = () => {
+  const { 
+    settings, 
+    profile, 
+    loading, 
+    saving,
+    updateSettings,
+    updateProfile,
+    fetchVendorStats,
+    fetchRecentActivity,
+    formatAddress 
+  } = useVendorSettings();
+
   const [isEditing, setIsEditing] = useState(false);
   const [profileData, setProfileData] = useState({
-    name: 'Green Foods Market',
-    email: 'vendor@greenfoods.com',
-    phone: '+234 803 123 4567',
-    address: '123 Eco Street, Victoria Island, Lagos',
-    description: 'Your one-stop shop for organic and sustainable products. We are committed to providing high-quality eco-friendly items that help protect our environment.',
-    businessLicense: 'BL-2023-12345',
-    category: 'Grocery & Organic Foods'
+    name: '',
+    email: '',
+    phone: '',
+    address: '',
+    description: '',
+    business_license: '',
+    category: ''
   });
+  const [vendorStats, setVendorStats] = useState<any>(null);
+  const [recentActivity, setRecentActivity] = useState<any[]>([]);
+  const [localSettings, setLocalSettings] = useState<any>(null);
 
-  const handleSave = () => {
-    setIsEditing(false);
-    // In a real app, this would save to backend
+  // Initialize data when profile/settings load
+  useEffect(() => {
+    if (profile && settings) {
+      setProfileData({
+        name: profile.name || '',
+        email: profile.email || '',
+        phone: profile.phone || '',
+        address: formatAddress(profile.address) || '',
+        description: settings.description || '',
+        business_license: settings.business_license || '',
+        category: settings.category || ''
+      });
+      setLocalSettings(settings);
+    }
+  }, [profile, settings, formatAddress]);
+
+  // Load additional data
+  useEffect(() => {
+    const loadAdditionalData = async () => {
+      const [stats, activity] = await Promise.all([
+        fetchVendorStats(),
+        fetchRecentActivity()
+      ]);
+      setVendorStats(stats);
+      setRecentActivity(activity);
+    };
+
+    if (profile?.id) {
+      loadAdditionalData();
+    }
+  }, [profile?.id, fetchVendorStats, fetchRecentActivity]);
+
+  const handleSave = async () => {
+    if (!profile || !settings) return;
+    
+    try {
+      // Update profile data
+      const addressParts = profileData.address.split(',').map(s => s.trim());
+      const addressObj = {
+        street: addressParts[0] || '',
+        city: addressParts[1] || '',
+        state: addressParts[2] || '',
+        country: addressParts[3] || ''
+      };
+
+      await updateProfile({
+        name: profileData.name,
+        phone: profileData.phone,
+        address: addressObj
+      });
+
+      // Update settings data
+      await updateSettings({
+        description: profileData.description,
+        business_license: profileData.business_license,
+        category: profileData.category
+      });
+
+      setIsEditing(false);
+    } catch (error) {
+      // Error handled in hooks
+    }
   };
 
   const handleInputChange = (field: string, value: string) => {
@@ -50,6 +127,65 @@ const VendorSettingsPage = () => {
       [field]: value
     }));
   };
+
+  const handleNotificationChange = async (key: string, value: boolean) => {
+    if (!localSettings) return;
+    
+    const updatedPreferences = {
+      ...localSettings.notification_preferences,
+      [key]: value
+    };
+    
+    try {
+      await updateSettings({
+        notification_preferences: updatedPreferences
+      });
+      setLocalSettings(prev => ({
+        ...prev,
+        notification_preferences: updatedPreferences
+      }));
+    } catch (error) {
+      // Error handled in hook
+    }
+  };
+
+  const handleSecurityChange = async (key: string, value: boolean | number) => {
+    if (!localSettings) return;
+    
+    const updatedSettings = {
+      ...localSettings.security_settings,
+      [key]: value
+    };
+    
+    try {
+      await updateSettings({
+        security_settings: updatedSettings
+      });
+      setLocalSettings(prev => ({
+        ...prev,
+        security_settings: updatedSettings
+      }));
+    } catch (error) {
+      // Error handled in hook
+    }
+  };
+
+  if (loading || !profile || !settings) {
+    return (
+      <DashboardLayout userRole="VENDOR">
+        <div className="p-3 sm:p-4 md:p-6 max-w-full mx-auto space-y-4 sm:space-y-6">
+          <div className="animate-pulse space-y-4">
+            <div className="h-8 bg-gray-200 rounded"></div>
+            <div className="h-96 bg-gray-200 rounded"></div>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+              <div className="h-64 bg-gray-200 rounded"></div>
+              <div className="h-64 bg-gray-200 rounded"></div>
+            </div>
+          </div>
+        </div>
+      </DashboardLayout>
+    );
+  }
 
   return (
     <DashboardLayout userRole="VENDOR">
@@ -63,10 +199,14 @@ const VendorSettingsPage = () => {
           </div>
           <Button 
             onClick={() => setIsEditing(true)} 
-            disabled={isEditing}
+            disabled={isEditing || saving}
             className="w-full sm:w-auto text-xs sm:text-sm"
           >
-            <SettingsIcon className="mr-2 h-3 w-3 sm:h-4 sm:w-4" />
+            {saving ? (
+              <Loader2 className="mr-2 h-3 w-3 sm:h-4 sm:w-4 animate-spin" />
+            ) : (
+              <SettingsIcon className="mr-2 h-3 w-3 sm:h-4 sm:w-4" />
+            )}
             Edit Profile
           </Button>
         </div>
@@ -88,79 +228,84 @@ const VendorSettingsPage = () => {
                 <div className="flex flex-col lg:flex-row gap-4 sm:gap-6">
                   <div className="lg:w-1/3 flex flex-col items-center">
                     <Avatar className="h-24 w-24 sm:h-32 sm:w-32">
-                      <AvatarImage src="https://api.dicebear.com/7.x/pixel-art/svg?seed=GreenFoods" />
-                      <AvatarFallback className="text-lg sm:text-xl">GF</AvatarFallback>
+                      <AvatarImage src={profile.avatar || `https://api.dicebear.com/7.x/pixel-art/svg?seed=${profile.name}`} />
+                      <AvatarFallback className="text-lg sm:text-xl">
+                        {profile.name.substring(0, 2).toUpperCase()}
+                      </AvatarFallback>
                     </Avatar>
-                    <Button variant="ghost" size="sm" className="mt-2 text-xs sm:text-sm">
+                    <Button variant="ghost" size="sm" className="mt-2 text-xs sm:text-sm" disabled>
                       <Camera className="mr-2 h-3 w-3 sm:h-4 sm:w-4" />
                       Change Logo
                     </Button>
+                    {profile.verified && (
+                      <Badge className="mt-2 bg-green-100 text-green-800">Verified</Badge>
+                    )}
                   </div>
 
                   <div className="lg:w-2/3 space-y-3 sm:space-y-4">
                     <FormField
-                        id="name"
+                      id="name"
                       label="Store Name"
-                        placeholder="Your Store Name"
-                        value={profileData.name}
+                      placeholder="Your Store Name"
+                      value={profileData.name}
                       onChange={(value) => handleInputChange('name', value)}
-                        disabled={!isEditing}
-                      />
+                      disabled={!isEditing}
+                    />
                     
                     <FormField
-                        id="email"
+                      id="email"
                       label="Email Address"
-                        placeholder="Your Email"
-                        value={profileData.email}
+                      placeholder="Your Email"
+                      value={profileData.email}
                       onChange={(value) => handleInputChange('email', value)}
-                        disabled={!isEditing}
-                      />
+                      disabled={true} // Email should not be editable
+                    />
                     
                     <FormField
-                        id="phone"
+                      id="phone"
                       label="Phone Number"
-                        placeholder="Your Phone"
-                        value={profileData.phone}
+                      placeholder="Your Phone"
+                      value={profileData.phone}
                       onChange={(value) => handleInputChange('phone', value)}
-                        disabled={!isEditing}
-                      />
+                      disabled={!isEditing}
+                    />
                     
                     <FormField
-                        id="address"
+                      id="address"
                       label="Address"
-                        placeholder="Your Address"
-                        value={profileData.address}
+                      placeholder="Street, City, State, Country"
+                      value={profileData.address}
                       onChange={(value) => handleInputChange('address', value)}
-                        disabled={!isEditing}
-                      />
+                      disabled={!isEditing}
+                    />
                     
                     <FormField
-                        id="description"
+                      id="description"
                       label="Description"
-                        placeholder="Your Store Description"
-                        value={profileData.description}
+                      placeholder="Your Store Description"
+                      value={profileData.description}
                       onChange={(value) => handleInputChange('description', value)}
-                        disabled={!isEditing}
+                      disabled={!isEditing}
                       isTextarea
                     />
                     
                     <FormField
-                        id="businessLicense"
+                      id="businessLicense"
                       label="Business License"
-                        placeholder="Your Business License"
-                        value={profileData.businessLicense}
-                      onChange={(value) => handleInputChange('businessLicense', value)}
-                        disabled={!isEditing}
-                      />
+                      placeholder="Your Business License"
+                      value={profileData.business_license}
+                      onChange={(value) => handleInputChange('business_license', value)}
+                      disabled={!isEditing}
+                    />
                     
                     <FormField
-                        id="category"
+                      id="category"
                       label="Category"
-                        placeholder="Your Category"
-                        value={profileData.category}
+                      placeholder="Your Business Category"
+                      value={profileData.category}
                       onChange={(value) => handleInputChange('category', value)}
-                        disabled={!isEditing}
-                      />
+                      disabled={!isEditing}
+                    />
                   </div>
                 </div>
 
@@ -170,14 +315,23 @@ const VendorSettingsPage = () => {
                       variant="secondary" 
                       onClick={() => setIsEditing(false)} 
                       className="w-full sm:w-auto sm:mr-2 text-xs sm:text-sm"
+                      disabled={saving}
                     >
                       Cancel
                     </Button>
                     <Button 
                       onClick={handleSave}
                       className="w-full sm:w-auto text-xs sm:text-sm"
+                      disabled={saving}
                     >
-                      Save Changes
+                      {saving ? (
+                        <>
+                          <Loader2 className="mr-2 h-3 w-3 animate-spin" />
+                          Saving...
+                        </>
+                      ) : (
+                        'Save Changes'
+                      )}
                     </Button>
                   </div>
                 )}
@@ -188,7 +342,7 @@ const VendorSettingsPage = () => {
                   <SecurityCard
                     title="Password"
                     description="Change your password to keep your account secure."
-                    action={<Button className="text-xs sm:text-sm">Change Password</Button>}
+                    action={<Button className="text-xs sm:text-sm" disabled>Change Password</Button>}
                   />
 
                   <SecurityCard
@@ -197,7 +351,29 @@ const VendorSettingsPage = () => {
                     action={
                       <div className="flex items-center justify-between w-full">
                         <span className="text-sm sm:text-base">Enable Two-Factor Authentication</span>
-                        <Switch id="2fa" />
+                        <Switch 
+                          id="2fa" 
+                          checked={localSettings?.security_settings?.two_factor_enabled || false}
+                          onCheckedChange={(checked) => handleSecurityChange('two_factor_enabled', checked)}
+                        />
+                      </div>
+                    }
+                  />
+
+                  <SecurityCard
+                    title="Session Timeout"
+                    description="Automatically log out after period of inactivity."
+                    action={
+                      <div className="flex items-center gap-2">
+                        <Input
+                          type="number"
+                          value={localSettings?.security_settings?.session_timeout / 60 || 60}
+                          onChange={(e) => handleSecurityChange('session_timeout', parseInt(e.target.value) * 60)}
+                          className="w-20"
+                          min="5"
+                          max="480"
+                        />
+                        <span className="text-sm">minutes</span>
                       </div>
                     }
                   />
@@ -213,11 +389,35 @@ const VendorSettingsPage = () => {
                     <div className="space-y-3">
                       <div className="flex items-center justify-between">
                         <span className="text-sm sm:text-base">Email Notifications</span>
-                        <Switch id="email-notifications" />
+                        <Switch 
+                          id="email-notifications"
+                          checked={localSettings?.notification_preferences?.email || false}
+                          onCheckedChange={(checked) => handleNotificationChange('email', checked)}
+                        />
                       </div>
                       <div className="flex items-center justify-between">
                         <span className="text-sm sm:text-base">Push Notifications</span>
-                        <Switch id="push-notifications" />
+                        <Switch 
+                          id="push-notifications"
+                          checked={localSettings?.notification_preferences?.push || false}
+                          onCheckedChange={(checked) => handleNotificationChange('push', checked)}
+                        />
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm sm:text-base">SMS Notifications</span>
+                        <Switch 
+                          id="sms-notifications"
+                          checked={localSettings?.notification_preferences?.sms || false}
+                          onCheckedChange={(checked) => handleNotificationChange('sms', checked)}
+                        />
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm sm:text-base">Marketing Emails</span>
+                        <Switch 
+                          id="marketing-notifications"
+                          checked={localSettings?.notification_preferences?.marketing || false}
+                          onCheckedChange={(checked) => handleNotificationChange('marketing', checked)}
+                        />
                       </div>
                     </div>
                   </PreferenceCard>
@@ -226,7 +426,7 @@ const VendorSettingsPage = () => {
                     title="Appearance"
                     description="Customize the look and feel of your account."
                   >
-                    <Button className="text-xs sm:text-sm">Change Theme</Button>
+                    <Button className="text-xs sm:text-sm" disabled>Change Theme</Button>
                   </PreferenceCard>
                 </div>
               </TabsContent>
@@ -241,21 +441,37 @@ const VendorSettingsPage = () => {
               <CardDescription className="text-sm">Your store activity at a glance</CardDescription>
             </CardHeader>
             <CardContent className="space-y-3 sm:space-y-4">
-              <SummaryItem
-                icon={<Store className="h-5 w-5 sm:h-6 sm:w-6 text-green-500" />}
-                title="125 Products"
-                description="Total products in your store"
-              />
-              <SummaryItem
-                icon={<Package className="h-5 w-5 sm:h-6 sm:w-6 text-blue-500" />}
-                title="450 Orders"
-                description="Orders completed this month"
-              />
-              <SummaryItem
-                icon={<CreditCard className="h-5 w-5 sm:h-6 sm:w-6 text-amber-500" />}
-                title="₦1,500,000 Revenue"
-                description="Total revenue this month"
-              />
+              {vendorStats ? (
+                <>
+                  <SummaryItem
+                    icon={<Store className="h-5 w-5 sm:h-6 sm:w-6 text-green-500" />}
+                    title={`${vendorStats.productCount} Products`}
+                    description="Total active products in your store"
+                  />
+                  <SummaryItem
+                    icon={<Package className="h-5 w-5 sm:h-6 sm:w-6 text-blue-500" />}
+                    title={`${vendorStats.orderCount} Orders`}
+                    description="Orders completed this month"
+                  />
+                  <SummaryItem
+                    icon={<CreditCard className="h-5 w-5 sm:h-6 sm:w-6 text-amber-500" />}
+                    title={`₦${vendorStats.totalRevenue.toLocaleString()} Revenue`}
+                    description="Total revenue this month"
+                  />
+                </>
+              ) : (
+                <div className="animate-pulse space-y-4">
+                  {[...Array(3)].map((_, i) => (
+                    <div key={i} className="flex items-center space-x-4">
+                      <div className="h-6 w-6 bg-gray-200 rounded"></div>
+                      <div className="space-y-2 flex-1">
+                        <div className="h-4 bg-gray-200 rounded w-24"></div>
+                        <div className="h-3 bg-gray-200 rounded w-32"></div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </CardContent>
           </Card>
 
@@ -265,21 +481,28 @@ const VendorSettingsPage = () => {
               <CardDescription className="text-sm">Your latest actions and updates</CardDescription>
             </CardHeader>
             <CardContent className="space-y-3 sm:space-y-4">
-              <ActivityItem
-                icon={<Bell className="h-5 w-5 sm:h-6 sm:w-6 text-gray-500" />}
-                title="New order received!"
-                description="Order #12345 placed by John Doe"
-              />
-              <ActivityItem
-                icon={<FileText className="h-5 w-5 sm:h-6 sm:w-6 text-gray-500" />}
-                title="Product updated"
-                description="Eco-friendly water bottle updated"
-              />
-              <ActivityItem
-                icon={<HelpCircle className="h-5 w-5 sm:h-6 sm:w-6 text-gray-500" />}
-                title="Support request"
-                description="New support request from Jane Smith"
-              />
+              {recentActivity.length > 0 ? (
+                recentActivity.map((activity, index) => (
+                  <ActivityItem
+                    key={index}
+                    icon={
+                      activity.type === 'order' ? (
+                        <Bell className="h-5 w-5 sm:h-6 sm:w-6 text-gray-500" />
+                      ) : (
+                        <FileText className="h-5 w-5 sm:h-6 sm:w-6 text-gray-500" />
+                      )
+                    }
+                    title={activity.title}
+                    description={activity.description}
+                    timestamp={activity.timestamp}
+                  />
+                ))
+              ) : (
+                <div className="text-center py-4">
+                  <HelpCircle className="h-8 w-8 text-gray-400 mx-auto mb-2" />
+                  <p className="text-sm text-gray-500">No recent activity</p>
+                </div>
+              )}
             </CardContent>
           </Card>
         </div>
@@ -296,6 +519,14 @@ const FormField = ({
   onChange, 
   disabled, 
   isTextarea = false 
+}: {
+  id: string;
+  label: string;
+  placeholder: string;
+  value: string;
+  onChange: (value: string) => void;
+  disabled: boolean;
+  isTextarea?: boolean;
 }) => (
   <div className="space-y-1 sm:space-y-2">
     <Label htmlFor={id} className="text-sm sm:text-base">{label}</Label>
@@ -321,7 +552,7 @@ const FormField = ({
   </div>
 );
 
-const SecurityCard = ({ title, description, action }) => (
+const SecurityCard = ({ title, description, action }: { title: string; description: string; action: React.ReactNode }) => (
   <Card className="shadow-none">
     <CardHeader className="pb-2 sm:pb-4">
       <CardTitle className="text-sm sm:text-base">{title}</CardTitle>
@@ -333,7 +564,7 @@ const SecurityCard = ({ title, description, action }) => (
   </Card>
 );
 
-const PreferenceCard = ({ title, description, children }) => (
+const PreferenceCard = ({ title, description, children }: { title: string; description: string; children: React.ReactNode }) => (
   <Card className="shadow-none">
     <CardHeader className="pb-2 sm:pb-4">
       <CardTitle className="text-sm sm:text-base">{title}</CardTitle>
@@ -345,7 +576,7 @@ const PreferenceCard = ({ title, description, children }) => (
   </Card>
 );
 
-const SummaryItem = ({ icon, title, description }) => (
+const SummaryItem = ({ icon, title, description }: { icon: React.ReactNode; title: string; description: string }) => (
   <div className="flex items-center space-x-3 sm:space-x-4">
     {icon}
     <div>
@@ -355,7 +586,7 @@ const SummaryItem = ({ icon, title, description }) => (
   </div>
 );
 
-const ActivityItem = ({ icon, title, description }) => (
+const ActivityItem = ({ icon, title, description, timestamp }: { icon: React.ReactNode; title: string; description: string; timestamp: string }) => (
   <div className="flex items-start space-x-3 sm:space-x-4">
     <div className="flex-shrink-0 mt-0.5">
       {icon}
@@ -363,6 +594,9 @@ const ActivityItem = ({ icon, title, description }) => (
     <div className="min-w-0 flex-1">
       <h3 className="text-sm sm:text-base font-medium">{title}</h3>
       <p className="text-xs sm:text-sm text-gray-500 truncate">{description}</p>
+      <p className="text-xs text-gray-400 mt-1">
+        {new Date(timestamp).toLocaleString()}
+      </p>
     </div>
   </div>
 );

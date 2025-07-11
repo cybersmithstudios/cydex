@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import DashboardLayout from '@/components/layout/DashboardLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -6,36 +6,89 @@ import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Progress } from '@/components/ui/progress';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import {
   Recycle, Leaf, Package, BarChart4, Calendar, MapPin, ArrowUpRight,
-  TrendingUp, Users, Truck, Award, DollarSign
+  TrendingUp, Users, Truck, Award, DollarSign, Plus, Loader2, RefreshCw
 } from 'lucide-react';
-
-// Mock data
-const recyclingStats = {
-  totalRecycled: 1250,
-  carbonSaved: 480.5,
-  customerParticipation: 78,
-  vendorRecyclingRate: 92
-};
-
-const recentRecycling = [
-  { id: 1, date: '2023-07-15', type: 'Cardboard', weight: 150, points: 30, partner: 'EcoPack Solutions' },
-  { id: 2, date: '2023-07-10', type: 'Plastic', weight: 220, points: 45, partner: 'GreenCycle Ltd' },
-  { id: 3, date: '2023-07-05', type: 'Glass', weight: 180, points: 35, partner: 'EnviroGlass Inc' }
-];
-
-const packagingPartners = [
-  { id: 1, name: 'EcoPack Solutions', logo: 'https://example.com/ecopack-logo.png', rating: 4.5, materials: 'Cardboard, Paper' },
-  { id: 2, name: 'GreenCycle Ltd', logo: 'https://example.com/greencycle-logo.png', rating: 4.2, materials: 'Plastic, Aluminum' },
-  { id: 3, name: 'EnviroGlass Inc', logo: 'https://example.com/enviroglass-logo.png', rating: 4.8, materials: 'Glass' }
-];
+import { useVendorRecycling } from '@/hooks/useVendorRecycling';
 
 const VendorRecyclingPage = () => {
+  const { 
+    stats, 
+    activities, 
+    partners, 
+    loading, 
+    refreshing,
+    addRecyclingActivity,
+    getImpactMetrics,
+    refreshData 
+  } = useVendorRecycling();
+
+  const [showAddActivityDialog, setShowAddActivityDialog] = useState(false);
+  const [newActivity, setNewActivity] = useState({
+    material_type: '',
+    weight_kg: '',
+    partner_name: '',
+    activity_date: new Date().toISOString().split('T')[0]
+  });
+
+  const handleAddActivity = async () => {
+    if (!newActivity.material_type || !newActivity.weight_kg || !newActivity.partner_name) return;
+
+    try {
+      const pointsEarned = Math.floor(parseFloat(newActivity.weight_kg) * 2); // 2 points per kg
+      
+      await addRecyclingActivity({
+        material_type: newActivity.material_type,
+        weight_kg: parseFloat(newActivity.weight_kg),
+        points_earned: pointsEarned,
+        partner_name: newActivity.partner_name,
+        activity_date: newActivity.activity_date
+      });
+      
+      setNewActivity({
+        material_type: '',
+        weight_kg: '',
+        partner_name: '',
+        activity_date: new Date().toISOString().split('T')[0]
+      });
+      setShowAddActivityDialog(false);
+    } catch (error) {
+      // Error handled in hook
+    }
+  };
+
+  const impactMetrics = getImpactMetrics();
+
+  if (loading) {
+    return (
+      <DashboardLayout userRole="VENDOR">
+        <div className="p-3 sm:p-4 md:p-6 max-w-full mx-auto space-y-4 sm:space-y-6">
+          <div className="animate-pulse space-y-4">
+            <div className="h-8 bg-gray-200 rounded"></div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+              {[...Array(4)].map((_, i) => (
+                <div key={i} className="h-24 bg-gray-200 rounded"></div>
+              ))}
+            </div>
+            <div className="grid grid-cols-1 xl:grid-cols-3 gap-4">
+              <div className="xl:col-span-2 h-96 bg-gray-200 rounded"></div>
+              <div className="h-96 bg-gray-200 rounded"></div>
+            </div>
+          </div>
+        </div>
+      </DashboardLayout>
+    );
+  }
+
   return (
     <DashboardLayout userRole="VENDOR">
       <div className="p-3 sm:p-4 md:p-6 max-w-full mx-auto space-y-4 sm:space-y-6">
-        {/* Header Section - Mobile Optimized */}
+        {/* Header Section */}
         <div className="flex flex-col sm:flex-row justify-between items-start gap-3 sm:gap-4">
           <div>
             <h1 className="text-xl sm:text-2xl font-bold">Recycling Program</h1>
@@ -43,12 +96,98 @@ const VendorRecyclingPage = () => {
               Manage your recycling efforts and track your impact
             </p>
           </div>
-          <Button className="bg-primary hover:bg-primary-hover text-black w-full sm:w-auto text-xs sm:text-sm">
-            Manage Partners
-          </Button>
+          <div className="flex gap-2">
+            <Button 
+              variant="outline" 
+              onClick={refreshData}
+              disabled={refreshing}
+              className="text-xs sm:text-sm"
+            >
+              {refreshing ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <RefreshCw className="h-4 w-4 mr-2" />}
+              Refresh
+            </Button>
+            
+            <Dialog open={showAddActivityDialog} onOpenChange={setShowAddActivityDialog}>
+              <DialogTrigger asChild>
+                <Button className="bg-primary hover:bg-primary-hover text-black text-xs sm:text-sm">
+                  <Plus className="mr-2 h-4 w-4" />
+                  Add Activity
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Add Recycling Activity</DialogTitle>
+                  <DialogDescription>
+                    Record a new recycling activity to track your environmental impact
+                  </DialogDescription>
+                </DialogHeader>
+                <div className="space-y-4">
+                  <div>
+                    <Label htmlFor="material-type">Material Type</Label>
+                    <Select value={newActivity.material_type} onValueChange={(value) => setNewActivity(prev => ({ ...prev, material_type: value }))}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select material type" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="cardboard">Cardboard</SelectItem>
+                        <SelectItem value="plastic">Plastic</SelectItem>
+                        <SelectItem value="glass">Glass</SelectItem>
+                        <SelectItem value="paper">Paper</SelectItem>
+                        <SelectItem value="aluminum">Aluminum</SelectItem>
+                        <SelectItem value="metal">Metal</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    <Label htmlFor="weight">Weight (kg)</Label>
+                    <Input
+                      id="weight"
+                      type="number"
+                      step="0.1"
+                      placeholder="Enter weight in kg"
+                      value={newActivity.weight_kg}
+                      onChange={(e) => setNewActivity(prev => ({ ...prev, weight_kg: e.target.value }))}
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="partner">Recycling Partner</Label>
+                    <Select value={newActivity.partner_name} onValueChange={(value) => setNewActivity(prev => ({ ...prev, partner_name: value }))}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select partner" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {partners.map((partner) => (
+                          <SelectItem key={partner.id} value={partner.name}>
+                            {partner.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    <Label htmlFor="date">Activity Date</Label>
+                    <Input
+                      id="date"
+                      type="date"
+                      value={newActivity.activity_date}
+                      onChange={(e) => setNewActivity(prev => ({ ...prev, activity_date: e.target.value }))}
+                    />
+                  </div>
+                </div>
+                <DialogFooter>
+                  <Button variant="outline" onClick={() => setShowAddActivityDialog(false)}>
+                    Cancel
+                  </Button>
+                  <Button onClick={handleAddActivity}>
+                    Add Activity
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
+          </div>
         </div>
 
-        {/* Stats Cards - Mobile Optimized */}
+        {/* Stats Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
           <Card>
             <CardHeader className="pb-2 sm:pb-3">
@@ -57,7 +196,7 @@ const VendorRecyclingPage = () => {
             <CardContent>
               <div className="flex items-center gap-2">
                 <Package className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
-                <span className="text-2xl sm:text-3xl font-bold">{recyclingStats.totalRecycled} kg</span>
+                <span className="text-2xl sm:text-3xl font-bold">{stats?.total_recycled_kg.toFixed(1) || '0'} kg</span>
               </div>
               <p className="text-xs sm:text-sm text-gray-500">Materials this year</p>
             </CardContent>
@@ -70,7 +209,7 @@ const VendorRecyclingPage = () => {
             <CardContent>
               <div className="flex items-center gap-2">
                 <Leaf className="h-4 w-4 sm:h-5 sm:w-5 text-green-600" />
-                <span className="text-2xl sm:text-3xl font-bold">{recyclingStats.carbonSaved} kg</span>
+                <span className="text-2xl sm:text-3xl font-bold">{stats?.carbon_saved_kg.toFixed(1) || '0'} kg</span>
               </div>
               <p className="text-xs sm:text-sm text-gray-500">CO₂ emissions reduced</p>
             </CardContent>
@@ -82,9 +221,9 @@ const VendorRecyclingPage = () => {
             </CardHeader>
             <CardContent>
               <div className="mb-2">
-                <span className="text-2xl sm:text-3xl font-bold">{recyclingStats.customerParticipation}%</span>
+                <span className="text-2xl sm:text-3xl font-bold">{stats?.customer_participation_rate.toFixed(0) || '0'}%</span>
               </div>
-              <Progress value={recyclingStats.customerParticipation} className="h-2 bg-gray-100" />
+              <Progress value={stats?.customer_participation_rate || 0} className="h-2 bg-gray-100" />
               <p className="text-xs sm:text-sm text-gray-500 mt-2">Customers actively recycling</p>
             </CardContent>
           </Card>
@@ -96,14 +235,14 @@ const VendorRecyclingPage = () => {
             <CardContent>
               <div className="flex items-center gap-2">
                 <TrendingUp className="h-4 w-4 sm:h-5 sm:w-5 text-blue-500" />
-                <span className="text-2xl sm:text-3xl font-bold">{recyclingStats.vendorRecyclingRate}%</span>
+                <span className="text-2xl sm:text-3xl font-bold">{stats?.vendor_recycling_rate.toFixed(0) || '0'}%</span>
               </div>
               <p className="text-xs sm:text-sm text-gray-500">Materials recycled by vendor</p>
             </CardContent>
           </Card>
         </div>
 
-        {/* Main Content - Mobile Optimized */}
+        {/* Main Content */}
         <div className="grid grid-cols-1 xl:grid-cols-3 gap-4 sm:gap-6">
           <div className="col-span-1 xl:col-span-2">
             <Card>
@@ -121,37 +260,45 @@ const VendorRecyclingPage = () => {
                   
                   <TabsContent value="history" className="mt-3 sm:mt-4">
                     <div className="space-y-3 sm:space-y-4">
-                      {recentRecycling.map((item) => (
-                        <RecyclingHistoryCard key={item.id} item={item} />
-                      ))}
+                      {activities.length > 0 ? (
+                        activities.map((item) => (
+                          <RecyclingHistoryCard key={item.id} item={item} />
+                        ))
+                      ) : (
+                        <div className="text-center py-8">
+                          <Recycle className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                          <h3 className="font-medium text-lg mb-2">No Activities Yet</h3>
+                          <p className="text-gray-500 mb-4">Start recording your recycling activities to track your impact</p>
+                          <Dialog open={showAddActivityDialog} onOpenChange={setShowAddActivityDialog}>
+                            <DialogTrigger asChild>
+                              <Button>
+                                <Plus className="mr-2 h-4 w-4" />
+                                Add First Activity
+                              </Button>
+                            </DialogTrigger>
+                          </Dialog>
+                        </div>
+                      )}
                     </div>
-                    
-                    <Button variant="outline" className="w-full mt-3 sm:mt-4 text-xs sm:text-sm">
-                      View All Activity
-                    </Button>
                   </TabsContent>
                   
                   <TabsContent value="partners" className="mt-3 sm:mt-4">
                     <div className="space-y-3 sm:space-y-4">
-                      {packagingPartners.map((partner) => (
+                      {partners.map((partner) => (
                         <PartnerCard key={partner.id} partner={partner} />
                       ))}
                     </div>
-                    
-                    <Button variant="outline" className="w-full mt-3 sm:mt-4 text-xs sm:text-sm">
-                      View All Partners
-                    </Button>
                   </TabsContent>
                   
                   <TabsContent value="impact" className="mt-3 sm:mt-4">
-                    <ImpactContent />
+                    {impactMetrics && <ImpactContent metrics={impactMetrics} />}
                   </TabsContent>
                 </Tabs>
               </CardContent>
             </Card>
           </div>
           
-          {/* Sidebar - Mobile Optimized */}
+          {/* Sidebar */}
           <div className="col-span-1">
             <Card>
               <CardHeader className="pb-3 sm:pb-6">
@@ -189,25 +336,22 @@ const VendorRecyclingPage = () => {
             
             <Card className="mt-3 sm:mt-4">
               <CardHeader className="pb-3 sm:pb-6">
-                <CardTitle className="text-base sm:text-lg">Upcoming Events</CardTitle>
-                <CardDescription className="text-sm">Local recycling events</CardDescription>
+                <CardTitle className="text-base sm:text-lg">Quick Stats</CardTitle>
+                <CardDescription className="text-sm">Your recycling summary</CardDescription>
               </CardHeader>
               <CardContent className="space-y-3">
-                <EventCard 
-                  title="Community Clean-Up"
-                  date="July 22, 2023"
-                  status="Register now"
-                  statusColor="green"
-                />
-                
-                <EventCard 
-                  title="Recycling Workshop"
-                  date="August 5, 2023"
-                  status="Learn more"
-                  statusColor="blue"
-                />
-                
-                <Button className="w-full text-xs sm:text-sm">View All Events</Button>
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-gray-600">Total Activities</span>
+                  <span className="font-bold">{activities.length}</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-gray-600">Points Earned</span>
+                  <span className="font-bold">{activities.reduce((sum, a) => sum + a.points_earned, 0)}</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-gray-600">Partners Used</span>
+                  <span className="font-bold">{new Set(activities.map(a => a.partner_name)).size}</span>
+                </div>
               </CardContent>
             </Card>
           </div>
@@ -217,8 +361,8 @@ const VendorRecyclingPage = () => {
   );
 };
 
-// Mobile-Optimized Recycling History Card Component
-const RecyclingHistoryCard = ({ item }) => (
+// Recycling History Card Component
+const RecyclingHistoryCard = ({ item }: { item: any }) => (
   <div className="bg-white border rounded-lg p-3 sm:p-4 hover:shadow-md transition-shadow">
     <div className="flex flex-col gap-3">
       <div className="flex items-start gap-3">
@@ -227,13 +371,13 @@ const RecyclingHistoryCard = ({ item }) => (
         </div>
         <div className="flex-1 min-w-0">
           <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
-            <h3 className="font-medium text-sm sm:text-base">{item.type} Recycling</h3>
-            <Badge variant="outline" className="text-xs w-fit">{item.weight} kg</Badge>
+            <h3 className="font-medium text-sm sm:text-base capitalize">{item.material_type} Recycling</h3>
+            <Badge variant="outline" className="text-xs w-fit">{item.weight_kg} kg</Badge>
           </div>
-          <div className="mt-1 text-xs sm:text-sm text-gray-600">{item.date}</div>
+          <div className="mt-1 text-xs sm:text-sm text-gray-600">{new Date(item.activity_date).toLocaleDateString()}</div>
           <div className="mt-2 flex items-center text-xs sm:text-sm text-gray-600">
             <Truck className="h-3 w-3 sm:h-4 sm:w-4 mr-1 flex-shrink-0" />
-            <span className="truncate">Partner: {item.partner}</span>
+            <span className="truncate">Partner: {item.partner_name}</span>
           </div>
         </div>
       </div>
@@ -241,26 +385,26 @@ const RecyclingHistoryCard = ({ item }) => (
       <div className="flex justify-end">
         <div className="flex items-center bg-green-50 text-green-700 px-2 py-1 rounded text-xs sm:text-sm">
           <Leaf className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
-          <span>+{item.points} points</span>
+          <span>+{item.points_earned} points</span>
         </div>
       </div>
     </div>
   </div>
 );
 
-// Mobile-Optimized Partner Card Component
-const PartnerCard = ({ partner }) => (
+// Partner Card Component
+const PartnerCard = ({ partner }: { partner: any }) => (
   <div className="bg-white border rounded-lg p-3 sm:p-4 hover:shadow-md transition-shadow">
     <div className="flex flex-col sm:flex-row justify-between gap-3">
       <div className="flex items-start gap-3">
         <Avatar className="h-8 w-8 sm:h-10 sm:w-10 flex-shrink-0">
-          <AvatarImage src={partner.logo} alt={partner.name} />
+          <AvatarImage src={partner.logo_url} alt={partner.name} />
           <AvatarFallback className="text-xs sm:text-sm">{partner.name.substring(0, 2)}</AvatarFallback>
         </Avatar>
         <div className="flex-1 min-w-0">
           <h3 className="font-medium text-sm sm:text-base">{partner.name}</h3>
           <div className="mt-1 text-xs sm:text-sm text-gray-600">
-            Materials: {partner.materials}
+            Materials: {partner.materials.join(', ')}
           </div>
           <div className="mt-2 flex items-center text-xs sm:text-sm text-gray-600">
             <Users className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
@@ -270,22 +414,21 @@ const PartnerCard = ({ partner }) => (
       </div>
       
       <div className="flex sm:items-center">
-        <Button variant="outline" className="w-full sm:w-auto text-xs sm:text-sm">Manage</Button>
+        <Button variant="outline" className="w-full sm:w-auto text-xs sm:text-sm">Contact</Button>
       </div>
     </div>
   </div>
 );
 
-// Mobile-Optimized Impact Content Component
-const ImpactContent = () => (
+// Impact Content Component
+const ImpactContent = ({ metrics }: { metrics: any[] }) => (
   <div className="space-y-3 sm:space-y-4">
     <div className="bg-white border rounded-lg p-3 sm:p-4">
       <h3 className="font-medium mb-3 sm:mb-4 text-sm sm:text-base">Environmental Impact</h3>
       <div className="space-y-3 sm:space-y-4">
-        <ImpactMetric label="CO₂ Saved" value="480.5 kg" progress={60} />
-        <ImpactMetric label="Energy Saved" value="1240 kWh" progress={45} />
-        <ImpactMetric label="Water Conserved" value="8600 liters" progress={70} />
-        <ImpactMetric label="Landfill Space Saved" value="24 m³" progress={40} />
+        {metrics.map((metric, index) => (
+          <ImpactMetric key={index} {...metric} />
+        ))}
       </div>
       
       <Button className="w-full mt-4 sm:mt-6 bg-primary hover:bg-primary-hover text-black text-xs sm:text-sm">
@@ -295,34 +438,14 @@ const ImpactContent = () => (
   </div>
 );
 
-// Mobile-Optimized Impact Metric Component
-const ImpactMetric = ({ label, value, progress }) => (
+// Impact Metric Component
+const ImpactMetric = ({ label, value, progress }: { label: string; value: string; progress: number }) => (
   <div>
     <div className="flex justify-between text-xs sm:text-sm mb-1">
       <span>{label}</span>
       <span>{value}</span>
     </div>
     <Progress value={progress} className="h-2" />
-  </div>
-);
-
-// Mobile-Optimized Event Card Component
-const EventCard = ({ title, date, status, statusColor }) => (
-  <div className="p-3 border rounded-lg">
-    <h4 className="font-medium text-sm sm:text-base">{title}</h4>
-    <p className="text-xs sm:text-sm text-gray-600 mt-1">{date}</p>
-    <div className="flex justify-between items-center mt-2">
-      <span className={`text-xs px-2 py-1 rounded ${
-        statusColor === 'green' 
-          ? 'bg-green-50 text-green-700' 
-          : 'bg-blue-50 text-blue-700'
-      }`}>
-        {status}
-      </span>
-      <Button variant="ghost" size="sm" className="h-auto p-1">
-        <Calendar className="h-3 w-3 sm:h-4 sm:w-4" />
-      </Button>
-    </div>
   </div>
 );
 
