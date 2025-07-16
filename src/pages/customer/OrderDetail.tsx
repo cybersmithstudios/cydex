@@ -15,40 +15,83 @@ import OrderNotFound from '@/components/customer/OrderNotFound';
 import OrderDetailLoading from '@/components/customer/OrderDetailLoading';
 
 // Helper function to generate tracking steps based on order status
-const generateTrackingSteps = (status: string, createdAt: string, updatedAt: string) => {
+const generateTrackingSteps = (order: any) => {
   const steps = [
     { 
       id: 1, 
       title: 'Order Placed', 
       completed: true, 
-      time: new Date(createdAt).toLocaleTimeString('en-US', { 
+      time: new Date(order.created_at).toLocaleTimeString('en-US', { 
         hour: '2-digit', 
         minute: '2-digit' 
-      })
+      }),
+      description: 'Your order has been placed successfully'
     },
     { 
       id: 2, 
-      title: 'Processing', 
-      completed: ['processing', 'confirmed', 'preparing', 'ready', 'out_for_delivery', 'delivered'].includes(status), 
-      time: ['processing', 'confirmed', 'preparing', 'ready', 'out_for_delivery', 'delivered'].includes(status) 
-        ? new Date(updatedAt).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }) 
-        : null
+      title: 'Payment Confirmed', 
+      completed: order.payment_status === 'paid', 
+      time: order.payment_status === 'paid' 
+        ? new Date(order.updated_at).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }) 
+        : null,
+      description: order.payment_status === 'paid' 
+        ? 'Payment has been confirmed. Waiting for vendor approval.' 
+        : 'Waiting for payment confirmation'
     },
     { 
       id: 3, 
-      title: 'Out for Delivery', 
-      completed: ['out_for_delivery', 'delivered'].includes(status), 
-      time: ['out_for_delivery', 'delivered'].includes(status) 
-        ? new Date(updatedAt).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }) 
-        : null
+      title: 'Vendor Accepted', 
+      completed: ['processing', 'ready', 'out_for_delivery', 'delivered'].includes(order.status), 
+      time: order.vendor_accepted_at 
+        ? new Date(order.vendor_accepted_at).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }) 
+        : null,
+      description: ['processing', 'ready', 'out_for_delivery', 'delivered'].includes(order.status)
+        ? 'Vendor has accepted your order. Looking for a rider...'
+        : 'Waiting for vendor to accept the order'
     },
     { 
       id: 4, 
+      title: 'Rider Assigned', 
+      completed: order.rider_id !== null, 
+      time: order.rider_assigned_at 
+        ? new Date(order.rider_assigned_at).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }) 
+        : null,
+      description: order.rider_id 
+        ? 'A rider has been assigned to your order'
+        : 'Searching for an available rider'
+    },
+    { 
+      id: 5, 
+      title: 'Ready for Pickup', 
+      completed: ['ready', 'out_for_delivery', 'delivered'].includes(order.status), 
+      time: order.ready_for_pickup_at 
+        ? new Date(order.ready_for_pickup_at).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }) 
+        : null,
+      description: ['ready', 'out_for_delivery', 'delivered'].includes(order.status)
+        ? 'Order is ready and will be picked up by rider'
+        : 'Order is being prepared'
+    },
+    { 
+      id: 6, 
+      title: 'Out for Delivery', 
+      completed: ['out_for_delivery', 'delivered'].includes(order.status), 
+      time: order.picked_up_at 
+        ? new Date(order.picked_up_at).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }) 
+        : null,
+      description: ['out_for_delivery', 'delivered'].includes(order.status)
+        ? 'Your order is on the way to you'
+        : 'Waiting for rider to pick up the order'
+    },
+    { 
+      id: 7, 
       title: 'Delivered', 
-      completed: status === 'delivered', 
-      time: status === 'delivered' 
-        ? new Date(updatedAt).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }) 
-        : null
+      completed: order.status === 'delivered', 
+      time: order.delivered_at 
+        ? new Date(order.delivered_at).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }) 
+        : null,
+      description: order.status === 'delivered'
+        ? 'Your order has been delivered successfully!'
+        : 'Order will be delivered to your address'
     }
   ];
 
@@ -200,7 +243,7 @@ const OrderDetailPage = () => {
     status: order.status,
     paymentStatus: order.payment_status,
     carbonSaved: order.carbon_credits_earned,
-    trackingSteps: generateTrackingSteps(order.status, order.created_at, order.updated_at),
+    trackingSteps: generateTrackingSteps(order),
     eta: calculateETA(order.status, order.delivery_type),
     deliveryAddress: `${order.delivery_address.street}, ${order.delivery_address.city}, ${order.delivery_address.state}`,
     orderDate: new Date(order.created_at).toLocaleDateString(),
@@ -223,7 +266,9 @@ const OrderDetailPage = () => {
     totalAmount: formatCurrency(order.total_amount),
     deliveryFee: formatCurrency(order.delivery_fee),
     discount: formatCurrency(0), // We don't have discount tracking yet
-    paymentMethod: order.payment_method || 'Unknown'
+    paymentMethod: order.payment_method || 'Unknown',
+    verificationCode: order.verification_code,
+    orderNumber: order.order_number
   };
 
   return (

@@ -321,6 +321,50 @@ export type Database = {
           },
         ]
       }
+      order_notifications: {
+        Row: {
+          created_at: string
+          id: string
+          message: string
+          notification_type: string
+          order_id: string
+          read_at: string | null
+          recipient_id: string
+          recipient_type: string
+          title: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          message: string
+          notification_type: string
+          order_id: string
+          read_at?: string | null
+          recipient_id: string
+          recipient_type: string
+          title: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          message?: string
+          notification_type?: string
+          order_id?: string
+          read_at?: string | null
+          recipient_id?: string
+          recipient_type?: string
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "order_notifications_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       orders: {
         Row: {
           cancel_reason: string | null
@@ -337,6 +381,9 @@ export type Database = {
           order_number: string
           payment_method: string | null
           payment_status: string
+          picked_up_at: string | null
+          ready_for_pickup_at: string | null
+          rider_assigned_at: string | null
           rider_id: string | null
           special_instructions: string | null
           status: string
@@ -344,7 +391,9 @@ export type Database = {
           time_slot: string | null
           total_amount: number
           updated_at: string
+          vendor_accepted_at: string | null
           vendor_id: string | null
+          verification_code: string | null
         }
         Insert: {
           cancel_reason?: string | null
@@ -361,6 +410,9 @@ export type Database = {
           order_number: string
           payment_method?: string | null
           payment_status?: string
+          picked_up_at?: string | null
+          ready_for_pickup_at?: string | null
+          rider_assigned_at?: string | null
           rider_id?: string | null
           special_instructions?: string | null
           status?: string
@@ -368,7 +420,9 @@ export type Database = {
           time_slot?: string | null
           total_amount: number
           updated_at?: string
+          vendor_accepted_at?: string | null
           vendor_id?: string | null
+          verification_code?: string | null
         }
         Update: {
           cancel_reason?: string | null
@@ -385,6 +439,9 @@ export type Database = {
           order_number?: string
           payment_method?: string | null
           payment_status?: string
+          picked_up_at?: string | null
+          ready_for_pickup_at?: string | null
+          rider_assigned_at?: string | null
           rider_id?: string | null
           special_instructions?: string | null
           status?: string
@@ -392,7 +449,9 @@ export type Database = {
           time_slot?: string | null
           total_amount?: number
           updated_at?: string
+          vendor_accepted_at?: string | null
           vendor_id?: string | null
+          verification_code?: string | null
         }
         Relationships: [
           {
@@ -1310,7 +1369,22 @@ export type Database = {
           total_reviews: number
         }[]
       }
+      create_order_notification: {
+        Args: {
+          p_order_id: string
+          p_recipient_id: string
+          p_recipient_type: string
+          p_notification_type: string
+          p_title: string
+          p_message: string
+        }
+        Returns: string
+      }
       generate_order_number: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
+      generate_verification_code: {
         Args: Record<PropertyKey, never>
         Returns: string
       }
