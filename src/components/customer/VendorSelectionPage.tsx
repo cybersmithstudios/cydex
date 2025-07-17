@@ -37,34 +37,32 @@ export const VendorSelectionPage: React.FC<VendorSelectionPageProps> = ({
     try {
       setLoading(true);
       
-      // Fetch vendors who have active products
+      // First, get vendors with active products using a more reliable approach
       const { data: vendorData, error } = await supabase
         .from('profiles')
-        .select(`
-          id,
-          name,
-          email,
-          avatar,
-          products:products(
-            id,
-            name,
-            category,
-            status,
-            stock_quantity
-          )
-        `)
+        .select('id, name, email, avatar')
         .eq('role', 'vendor')
         .eq('status', 'active');
 
       if (error) throw error;
 
-      // Process vendor data to include product counts and categories
-      const processedVendors = vendorData
-        .map(vendor => {
-          const activeProducts = vendor.products?.filter(
-            p => p.status === 'active' && p.stock_quantity > 0
-          ) || [];
-          
+      if (!vendorData || vendorData.length === 0) {
+        console.log('No active vendors found');
+        setVendors([]);
+        return;
+      }
+
+      // Then fetch products for each vendor
+      const vendorsWithProducts = await Promise.all(
+        vendorData.map(async (vendor) => {
+          const { data: products } = await supabase
+            .from('products')
+            .select('id, name, category, status, stock_quantity')
+            .eq('vendor_id', vendor.id)
+            .eq('status', 'active')
+            .gt('stock_quantity', 0);
+
+          const activeProducts = products || [];
           const categories = Array.from(
             new Set(activeProducts.map(p => p.category).filter(Boolean))
           );
@@ -78,8 +76,12 @@ export const VendorSelectionPage: React.FC<VendorSelectionPageProps> = ({
             categories: categories as string[]
           };
         })
-        .filter(vendor => vendor.productCount > 0); // Only vendors with active products
+      );
 
+      // Filter to only include vendors with products
+      const processedVendors = vendorsWithProducts.filter(vendor => vendor.productCount > 0);
+      
+      console.log('Processed vendors:', processedVendors);
       setVendors(processedVendors);
       
       // Extract all unique categories
