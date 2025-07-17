@@ -1,17 +1,19 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ChevronLeft, Package, Clock, CheckCircle, AlertCircle, User, MapPin, Phone, Mail } from 'lucide-react';
 import { useVendorOrders } from '@/hooks/useVendorOrders';
+import { VendorOrderAcceptance } from './VendorOrderAcceptance';
 import { toast } from 'sonner';
 
 const OrderDetailReal = () => {
   const { orderId } = useParams();
   const navigate = useNavigate();
   const { orders, loading, updateOrderStatus } = useVendorOrders();
+  const [actionLoading, setActionLoading] = useState(false);
   
   const order = orders.find(o => o.id === orderId);
 
@@ -55,10 +57,24 @@ const OrderDetailReal = () => {
   const handleStatusUpdate = async (newStatus: string) => {
     if (!order) return;
     
+    setActionLoading(true);
     const success = await updateOrderStatus(order.id, newStatus);
     if (success) {
       toast.success(`Order status updated to ${newStatus}`);
     }
+    setActionLoading(false);
+  };
+
+  const handleAcceptOrder = async (orderId: string) => {
+    await handleStatusUpdate('processing');
+  };
+
+  const handleRejectOrder = async (orderId: string, reason: string) => {
+    await handleStatusUpdate('cancelled');
+  };
+
+  const handleMarkReady = async () => {
+    await handleStatusUpdate('ready');
   };
 
   if (loading) {
@@ -117,6 +133,18 @@ const OrderDetailReal = () => {
         Back to Orders
       </Button>
 
+      {/* Show acceptance interface for pending orders */}
+      {order.status === 'pending' && (
+        <div className="mb-6">
+          <VendorOrderAcceptance
+            order={order}
+            onAccept={handleAcceptOrder}
+            onReject={handleRejectOrder}
+            loading={actionLoading}
+          />
+        </div>
+      )}
+
       <div className="flex justify-between items-start mb-6">
         <div>
           <h1 className="text-2xl font-bold">Order #{order.order_number}</h1>
@@ -125,15 +153,15 @@ const OrderDetailReal = () => {
         <div className="text-right">
           {getStatusBadge(order.status)}
           <div className="mt-2">
-            {order.status === 'pending' && (
-              <Button onClick={() => handleStatusUpdate('processing')}>
-                Accept Order
+            {order.status === 'processing' && order.rider_id && (
+              <Button onClick={handleMarkReady} disabled={actionLoading}>
+                Mark Ready for Pickup
               </Button>
             )}
-            {order.status === 'processing' && (
-              <Button onClick={() => handleStatusUpdate('delivered')}>
-                Mark as Delivered
-              </Button>
+            {order.status === 'processing' && !order.rider_id && (
+              <Badge variant="outline" className="bg-blue-50 text-blue-700">
+                Searching for Rider...
+              </Badge>
             )}
           </div>
         </div>
@@ -275,12 +303,42 @@ const OrderDetailReal = () => {
                   </div>
                 </div>
                 
-                {order.status !== 'pending' && (
+                {order.vendor_accepted_at && (
                   <div className="flex items-center gap-3">
                     <div className="w-2 h-2 bg-green-500 rounded-full"></div>
                     <div>
-                      <p className="font-medium">Processing</p>
-                      <p className="text-sm text-gray-600">{formatDate(order.updated_at)}</p>
+                      <p className="font-medium">Accepted by Vendor</p>
+                      <p className="text-sm text-gray-600">{formatDate(order.vendor_accepted_at)}</p>
+                    </div>
+                  </div>
+                )}
+                
+                {order.rider_assigned_at && (
+                  <div className="flex items-center gap-3">
+                    <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                    <div>
+                      <p className="font-medium">Rider Assigned</p>
+                      <p className="text-sm text-gray-600">{formatDate(order.rider_assigned_at)}</p>
+                    </div>
+                  </div>
+                )}
+
+                {order.ready_for_pickup_at && (
+                  <div className="flex items-center gap-3">
+                    <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                    <div>
+                      <p className="font-medium">Ready for Pickup</p>
+                      <p className="text-sm text-gray-600">{formatDate(order.ready_for_pickup_at)}</p>
+                    </div>
+                  </div>
+                )}
+
+                {order.picked_up_at && (
+                  <div className="flex items-center gap-3">
+                    <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                    <div>
+                      <p className="font-medium">Picked Up</p>
+                      <p className="text-sm text-gray-600">{formatDate(order.picked_up_at)}</p>
                     </div>
                   </div>
                 )}

@@ -192,11 +192,20 @@ export const useRiderDeliveries = () => {
 
         if (updateError) throw updateError;
 
+        // Find the order associated with this delivery
+        const { data: deliveryData, error: deliveryFetchError } = await supabase
+          .from('deliveries')
+          .select('order_id')
+          .eq('id', deliveryId)
+          .single();
+
+        if (deliveryFetchError) throw deliveryFetchError;
+
         // Update the order
         const { error: orderError } = await supabase
           .from('orders')
           .update({ rider_id: user.id })
-          .eq('id', deliveryId);
+          .eq('id', deliveryData.order_id);
 
         if (orderError) throw orderError;
       };

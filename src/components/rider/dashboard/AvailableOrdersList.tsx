@@ -29,7 +29,7 @@ export const AvailableOrdersList: React.FC<AvailableOrdersListProps> = ({
               <p>No available orders at the moment</p>
             </div>
           ) : (
-            availableDeliveries.slice(0, 3).map((order) => (
+            availableDeliveries.slice(0, 5).map((order) => (
               <div key={order.id} className="bg-white border rounded-lg p-3 sm:p-4 hover:shadow-md transition-shadow">
                 <div className="flex flex-col sm:flex-row justify-between">
                   <div className="flex items-start space-x-3 sm:space-x-4">
@@ -39,14 +39,14 @@ export const AvailableOrdersList: React.FC<AvailableOrdersListProps> = ({
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center flex-wrap gap-1 sm:gap-0">
                         <h3 className="font-medium text-sm sm:text-base truncate">
-                          {order.vendor_name} → {order.customer_name}
+                          Order from {order.vendor_name}
                         </h3>
                         <span className="mx-2 text-gray-300 hidden sm:inline">•</span>
-                        <span className="text-xs sm:text-sm text-gray-500">{order.order_id}</span>
+                        <span className="text-xs sm:text-sm text-gray-500">Deliver to {order.customer_name}</span>
                       </div>
                       <div className="flex items-center mt-1 flex-wrap gap-2">
                         <Badge className="bg-blue-100 text-blue-800 hover:bg-blue-200 text-xs">
-                          {Number(order.actual_distance || 1.5).toFixed(1)} miles
+                          {Number(order.actual_distance || 2.5).toFixed(1)} km
                         </Badge>
                         <div className="flex items-center text-xs sm:text-sm text-gray-600">
                           <Clock className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />

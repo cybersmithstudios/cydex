@@ -8,6 +8,8 @@ export interface VendorOrder {
   id: string;
   order_number: string;
   customer_id: string;
+  vendor_id: string;
+  rider_id?: string;
   status: string;
   payment_status: string;
   delivery_type: string;
@@ -19,6 +21,11 @@ export interface VendorOrder {
   delivered_at?: string;
   cancelled_at?: string;
   cancel_reason?: string;
+  verification_code?: string;
+  vendor_accepted_at?: string;
+  rider_assigned_at?: string;
+  picked_up_at?: string;
+  ready_for_pickup_at?: string;
   delivery_address: any;
   time_slot?: string;
   special_instructions?: string;
@@ -40,6 +47,8 @@ export interface VendorOrder {
     total_price: number;
     product_description?: string;
     product_category?: string;
+    is_eco_friendly: boolean;
+    carbon_impact: number;
   }>;
 }
 
@@ -88,7 +97,11 @@ export const useVendorOrders = () => {
           email: order.rider.email || 'unknown@email.com',
           phone: order.rider.phone || undefined,
         } : undefined,
-        order_items: order.order_items || [],
+        order_items: (order.order_items || []).map((item: any) => ({
+          ...item,
+          is_eco_friendly: item.is_eco_friendly ?? true,
+          carbon_impact: item.carbon_impact ?? 0
+        })),
       }));
 
       setOrders(transformedOrders);
