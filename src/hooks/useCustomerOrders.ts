@@ -25,6 +25,11 @@ export interface Order {
   cancelled_at?: string;
   cancel_reason?: string;
   special_instructions?: string;
+  verification_code?: string;
+  vendor_accepted_at?: string;
+  rider_assigned_at?: string;
+  picked_up_at?: string;
+  ready_for_pickup_at?: string;
   created_at: string;
   updated_at: string;
   vendor?: {
