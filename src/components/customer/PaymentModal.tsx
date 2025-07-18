@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { usePaystackPayment } from 'react-paystack';
 import {
   Dialog,
@@ -11,14 +11,19 @@ import {
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/SupabaseAuthContext';
 import { toast } from 'sonner';
+import { paymentService } from '@/services/paymentService';
+import { Loader2 } from 'lucide-react';
 
 interface PaymentModalProps {
   isOpen: boolean;
   onClose: () => void;
   amount: number;
-  onSuccess: () => void;
-  onError: () => void;
+  onSuccess: (reference: string) => void;
+  onError: (error: Error) => void;
   orderNumber: string;
+  customerEmail: string;
+  customerId?: string;
+  metadata?: Record<string, any>;
 }
 
 export const PaymentModal: React.FC<PaymentModalProps> = ({
@@ -28,50 +33,112 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({
   onSuccess,
   onError,
   orderNumber,
-}) => {
+  customerEmail,
+  customerId,
+  metadata = {},
+}): JSX.Element | null => {
+  const [isLoading, setIsLoading] = useState(false);
+  const [paymentConfig, setPaymentConfig] = useState<any>(null);
   const { user } = useAuth();
 
-  const config = {
-    reference: `${orderNumber}-${Date.now()}`,
-    email: user?.email || '',
-    amount: amount * 100, // Convert to kobo
-    publicKey: 'pk_test_b11301f99f310c1a5002e66379e5eaa5906b7e63',
-    currency: 'NGN',
-    metadata: {
-      custom_fields: [
+  // Initialize payment config when modal opens
+  useEffect(() => {
+    if (!isOpen) return;
+
+    try {
+      const config = paymentService.createPaymentConfig(
+        amount,
+        customerEmail,
+        orderNumber,
+        customerId || user?.id,
         {
-          display_name: 'Order Number',
-          variable_name: 'order_number',
-          value: orderNumber,
-        },
-        {
-          display_name: 'Customer ID',
-          variable_name: 'customer_id',
-          value: user?.id || '',
-        },
-        {
-          display_name: 'Platform',
-          variable_name: 'platform',
-          value: 'Cydex',
-        },
-      ],
-    },
+          ...metadata,
+          source: 'web_checkout',
+          ui_version: '1.0.0',
+        }
+      );
+      
+      setPaymentConfig(config);
+    } catch (error) {
+      console.error('Error initializing payment:', error);
+      toast.error('Failed to initialize payment. Please try again.');
+      onError(error instanceof Error ? error : new Error('Payment initialization failed'));
+      onClose();
+    }
+  }, [isOpen, amount, customerEmail, orderNumber, customerId, user?.id, metadata, onError, onClose]);
+
+  // Define the payment config type that matches react-paystack's expected props
+  const getPaymentConfig = () => {
+    if (!paymentConfig) {
+      return {
+        email: customerEmail,
+        amount: 0,
+        publicKey: paymentService.getPublicKey(),
+        text: 'Pay Now',
+        onSuccess: () => {},
+        onClose: () => {},
+      };
+    }
+    return {
+      ...paymentConfig,
+      text: 'Pay Now',
+      onSuccess: () => {},
+      onClose: () => {},
+    };
   };
 
-  const initializePayment = usePaystackPayment(config);
+  const initializePayment = usePaystackPayment(getPaymentConfig());
 
-  const handlePayment = () => {
-    // Initialize payment with correct object format for react-paystack v6.0.0
-    initializePayment({
-      onSuccess: () => {
-        toast.success('Payment successful');
-        onSuccess();
-        onClose();
-      },
-      onClose: () => {
-        onClose();
-      },
-    });
+  const handlePayment = async () => {
+    if (!paymentConfig) {
+      toast.error('Payment configuration not ready. Please try again.');
+      return;
+    }
+
+    setIsLoading(true);
+
+    try {
+      // Initialize payment with success and error callbacks
+      await new Promise<void>((resolve, reject) => {
+        initializePayment({
+          onSuccess: async (response) => {
+            try {
+              // Verify the payment with our backend
+              const verification = await paymentService.verifyPayment(response.reference);
+              
+              if (verification.success) {
+                toast.success('Payment successful!');
+                onSuccess(response.reference);
+                resolve();
+              } else {
+                const error = new Error(verification.error || 'Payment verification failed');
+                onError(error);
+                reject(error);
+              }
+            } catch (error) {
+              console.error('Payment verification error:', error);
+              const errorObj = error instanceof Error ? error : new Error('Payment verification failed');
+              onError(errorObj);
+              toast.error('Payment verification failed. Please contact support.');
+              reject(errorObj);
+            } finally {
+              setIsLoading(false);
+            }
+          },
+          onClose: () => {
+            setIsLoading(false);
+            onClose();
+            reject(new Error('Payment was closed by user'));
+          },
+        });
+      });
+    } catch (error) {
+      // Error is already handled in the promise callbacks
+      console.error('Payment initialization error:', error);
+      if (error instanceof Error) {
+        onError(error);
+      }
+    }
   };
 
   return (
@@ -97,21 +164,27 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({
             <span className="font-bold text-lg">₦{amount.toLocaleString()}</span>
           </div>
           
-          <div className="bg-green-50 p-3 rounded-lg">
-            <div className="flex items-center">
-              <div className="flex-shrink-0">
-                <svg className="h-5 w-5 text-green-400" viewBox="0 0 20 20" fill="currentColor">
+          <div className="bg-blue-50 p-3 rounded-lg border border-blue-100">
+            <div className="flex items-start">
+              <div className="flex-shrink-0 mt-0.5">
+                <svg className="h-5 w-5 text-blue-400" viewBox="0 0 20 20" fill="currentColor">
                   <path 
                     fillRule="evenodd" 
-                    d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" 
+                    d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h.01a1 1 0 100-2H10V9a1 1 0 00-1-1z" 
                     clipRule="evenodd" 
                   />
                 </svg>
               </div>
               <div className="ml-3">
-                <p className="text-sm text-green-800">
-                  <strong>Test Mode:</strong> This is a test transaction. No real money will be charged.
-                </p>
+                <h3 className="text-sm font-medium text-blue-800">
+                  Test Mode
+                </h3>
+                <div className="mt-1 text-sm text-blue-700">
+                  <p>This is a test transaction. No real money will be charged.</p>
+                  <p className="mt-1 font-mono text-xs bg-blue-100 p-1 rounded">
+                    Use card: 4084 0840 8408 4081 (any future date, any 3-digit CVV)
+                  </p>
+                </div>
               </div>
             </div>
           </div>
@@ -119,8 +192,16 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({
           <Button 
             className="w-full bg-primary hover:bg-primary/80 text-black font-semibold py-3"
             onClick={handlePayment}
+            disabled={isLoading || !paymentConfig}
           >
-            Pay ₦{amount.toLocaleString()} Now
+            {isLoading ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Processing...
+              </>
+            ) : (
+              `Pay ₦${amount.toLocaleString()} Now`
+            )}
           </Button>
           
           <div className="text-center">

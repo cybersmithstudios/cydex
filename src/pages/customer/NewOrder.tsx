@@ -44,7 +44,12 @@ const NewOrder = () => {
   const [sortBy, setSortBy] = useState('recommended');
   const [currentPage, setCurrentPage] = useState(1);
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
-  const [currentOrder, setCurrentOrder] = useState<{ id: string; order_number: string; total_amount: number } | null>(null);
+  const [currentOrder, setCurrentOrder] = useState<{ 
+    id: string; 
+    order_number: string; 
+    total_amount: number;
+    payment_reference?: string;
+  } | null>(null);
   const [isRatingModalOpen, setIsRatingModalOpen] = useState(false);
   const [ratingOrderData, setRatingOrderData] = useState<{
     orderId: string;
@@ -191,13 +196,19 @@ const NewOrder = () => {
     }
   };
 
-  const handlePaymentSuccess = async () => {
+  const handlePaymentSuccess = async (reference: string) => {
     if (!currentOrder) return;
 
     try {
+      // Update order with payment reference and status
       const { error } = await supabase
         .from('orders')
-        .update({ payment_status: 'paid', status: 'processing' })
+        .update({ 
+          payment_status: 'paid', 
+          status: 'processing',
+          payment_reference: reference,
+          updated_at: new Date().toISOString()
+        })
         .eq('id', currentOrder.id);
 
       if (error) throw error;
@@ -212,13 +223,17 @@ const NewOrder = () => {
           vendorName: vendorItem.vendor_name
         });
         setIsRatingModalOpen(true);
+      } else {
+        // If no vendor item found, just show success and close
+        toast.success('Order placed successfully!');
+        clearCart();
+        setIsPaymentModalOpen(false);
+        navigate('/customer/orders');
       }
-
-      clearCart();
-      setIsPaymentModalOpen(false);
     } catch (error) {
       console.error('Error updating order status:', error);
-      toast.error('Failed to update order status');
+      toast.error('Payment successful but failed to update order status. Please contact support.');
+      setIsPaymentModalOpen(false);
     }
   };
 
@@ -357,13 +372,31 @@ const NewOrder = () => {
       
       {/* Payment Modal */}
       {currentOrder && (
-        <PaymentModal 
+        <PaymentModal
           isOpen={isPaymentModalOpen}
-          onClose={() => setIsPaymentModalOpen(false)}
-          amount={currentOrder.total_amount}
+          onClose={() => {
+            setIsPaymentModalOpen(false);
+            // Only clear cart if payment was not successful
+            if (!currentOrder?.payment_reference) {
+              clearCart();
+            }
+          }}
+          amount={currentOrder?.total_amount || 0}
           onSuccess={handlePaymentSuccess}
           onError={handlePaymentError}
-          orderNumber={currentOrder.order_number}
+          orderNumber={currentOrder?.order_number || ''}
+          customerEmail={user?.email || ''}
+          customerId={user?.id}
+          metadata={{
+            order_id: currentOrder?.id,
+            user_id: user?.id,
+            items: cartItems.map(item => ({
+              id: item.id,
+              name: item.name,
+              quantity: item.quantity,
+              price: item.price
+            }))
+          }}
         />
       )}
       
