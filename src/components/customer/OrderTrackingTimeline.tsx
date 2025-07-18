@@ -68,15 +68,24 @@ const OrderTrackingTimeline = ({
         )}
       </div>
 
-      {/* Show verification code when rider is assigned */}
-      {verificationCode && orderNumber && ['ready', 'out_for_delivery'].includes(status) && (
-        <VerificationCodeDisplay 
-          code={verificationCode}
-          orderNumber={orderNumber}
-          riderName={riderName}
-          status={status}
-        />
-      )}
+       {/* Rider Assignment Notification */}
+       {riderName && status !== 'delivered' && (
+         <div className="mt-4 p-3 bg-green-50 rounded-lg">
+           <p className="text-sm font-medium text-green-900">Rider Assigned</p>
+           <p className="text-lg font-semibold text-green-700">{riderName}</p>
+           <p className="text-sm text-green-600">Your delivery rider has been assigned</p>
+         </div>
+       )}
+
+       {/* Show verification code when rider is assigned */}
+       {verificationCode && orderNumber && ['ready', 'out_for_delivery'].includes(status) && (
+         <VerificationCodeDisplay 
+           code={verificationCode}
+           orderNumber={orderNumber}
+           riderName={riderName}
+           status={status}
+         />
+       )}
     </div>
   );
 };

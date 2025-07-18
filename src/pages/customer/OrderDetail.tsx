@@ -255,6 +255,7 @@ const OrderDetailPage = () => {
       rating: 4.8, // Default rating as we don't have rider ratings in the schema yet
       photo: null
     } : undefined,
+    riderName: order.rider?.name,
     products: order.order_items?.map(item => ({
       id: item.id,
       name: item.product_name,
@@ -285,12 +286,12 @@ const OrderDetailPage = () => {
             />
           </CardHeader>
           
-          <OrderDetailsContent 
-            order={transformedOrder}
-            onCancelOrder={handleCancelOrder}
-            onDownloadReceipt={handleDownloadReceipt}
-            onReorder={handleReorder}
-          />
+           <OrderDetailsContent 
+             order={transformedOrder}
+             onCancelOrder={handleCancelOrder}
+             onDownloadReceipt={handleDownloadReceipt}
+             onReorder={handleReorder}
+           />
         </Card>
       </div>
     </DashboardLayout>

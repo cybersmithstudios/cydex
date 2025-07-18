@@ -45,6 +45,9 @@ interface OrderDetailsContentProps {
     deliveryFee: string;
     discount: string;
     paymentMethod?: string;
+    riderName?: string;
+    verificationCode?: string;
+    orderNumber?: string;
   };
   onCancelOrder: () => void;
   onDownloadReceipt: () => void;
@@ -64,6 +67,9 @@ const OrderDetailsContent = ({
         steps={order.trackingSteps} 
         eta={order.eta} 
         status={order.status}
+        verificationCode={order.verificationCode}
+        orderNumber={order.orderNumber}
+        riderName={order.riderName}
       />
 
       {/* Order Info */}

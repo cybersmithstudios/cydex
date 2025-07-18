@@ -289,6 +289,45 @@ const OrderDetailReal = () => {
             </CardContent>
           </Card>
 
+          {/* Rider Information */}
+          {order.rider && (
+            <Card>
+              <CardContent className="pt-6">
+                <h3 className="text-lg font-semibold mb-4">Assigned Rider</h3>
+                
+                <div className="space-y-3">
+                  <div className="flex items-center gap-3">
+                    <User className="h-5 w-5 text-gray-400" />
+                    <div>
+                      <p className="font-medium">{order.rider.name}</p>
+                      <p className="text-sm text-gray-600">Delivery Rider</p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center gap-3">
+                    <Mail className="h-5 w-5 text-gray-400" />
+                    <p className="text-sm">{order.rider.email}</p>
+                  </div>
+                  
+                  {order.rider.phone && (
+                    <div className="flex items-center gap-3">
+                      <Phone className="h-5 w-5 text-gray-400" />
+                      <p className="text-sm">{order.rider.phone}</p>
+                    </div>
+                  )}
+
+                  {order.verification_code && (
+                    <div className="mt-4 p-3 bg-green-50 rounded-lg">
+                      <p className="font-medium text-green-900">Verification Code</p>
+                      <p className="text-lg font-mono text-green-700">{order.verification_code}</p>
+                      <p className="text-sm text-green-600">Share this code with the rider for order pickup</p>
+                    </div>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
           {/* Order Timeline */}
           <Card>
             <CardContent className="pt-6">
