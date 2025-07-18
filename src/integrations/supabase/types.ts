@@ -380,6 +380,7 @@ export type Database = {
           id: string
           order_number: string
           payment_method: string | null
+          payment_reference: string | null
           payment_status: string
           picked_up_at: string | null
           ready_for_pickup_at: string | null
@@ -409,6 +410,7 @@ export type Database = {
           id?: string
           order_number: string
           payment_method?: string | null
+          payment_reference?: string | null
           payment_status?: string
           picked_up_at?: string | null
           ready_for_pickup_at?: string | null
@@ -438,6 +440,7 @@ export type Database = {
           id?: string
           order_number?: string
           payment_method?: string | null
+          payment_reference?: string | null
           payment_status?: string
           picked_up_at?: string | null
           ready_for_pickup_at?: string | null
