@@ -44,20 +44,11 @@ const NewOrder = () => {
   const [sortBy, setSortBy] = useState('recommended');
   const [currentPage, setCurrentPage] = useState(1);
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
-  const [orderStatus, setOrderStatus] = useState<'pending' | 'paid' | 'processing' | 'completed' | 'cancelled'>('pending');
   const [currentOrder, setCurrentOrder] = useState<{ 
     id: string; 
     order_number: string; 
     total_amount: number;
     payment_reference?: string;
-    status: string;
-    created_at: string;
-    items?: Array<{
-      id: string;
-      name: string;
-      quantity: number;
-      price: number;
-    }>;
   } | null>(null);
   const [isRatingModalOpen, setIsRatingModalOpen] = useState(false);
   const [ratingOrderData, setRatingOrderData] = useState<{
@@ -210,7 +201,7 @@ const NewOrder = () => {
 
     try {
       // Update order with payment reference and status
-      const { data: updatedOrder, error } = await supabase
+      const { error } = await supabase
         .from('orders')
         .update({ 
           payment_status: 'paid', 
@@ -218,34 +209,30 @@ const NewOrder = () => {
           payment_reference: reference,
           updated_at: new Date().toISOString()
         })
-        .eq('id', currentOrder.id)
-        .select('*')
-        .single();
+        .eq('id', currentOrder.id);
 
       if (error) throw error;
 
-      // Update local state with the updated order
-      setCurrentOrder({
-        ...currentOrder,
-        ...updatedOrder,
-        items: cartItems.map(item => ({
-          id: item.id,
-          name: item.name,
-          quantity: item.quantity,
-          price: item.price
-        }))
-      });
-      
-      setOrderStatus('paid');
-      clearCart();
-      setIsPaymentModalOpen(false);
-      
-      // Show success message
-      toast.success('Payment successful! Your order is being processed.');
-      
+      // Get vendor info for rating modal
+      const vendorItem = cartItems.find(item => item.vendor_id);
+      if (vendorItem) {
+        setRatingOrderData({
+          orderId: currentOrder.id,
+          orderNumber: currentOrder.order_number,
+          vendorId: vendorItem.vendor_id,
+          vendorName: vendorItem.vendor_name
+        });
+        setIsRatingModalOpen(true);
+      } else {
+        // If no vendor item found, just show success and close
+        toast.success('Order placed successfully!');
+        clearCart();
+        setIsPaymentModalOpen(false);
+        navigate('/customer/orders');
+      }
     } catch (error) {
       console.error('Error updating order status:', error);
-      toast.error('Payment successful but there was an issue updating your order. Please contact support.');
+      toast.error('Payment successful but failed to update order status. Please contact support.');
       setIsPaymentModalOpen(false);
     }
   };
@@ -271,143 +258,6 @@ const NewOrder = () => {
               {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
                 <div key={i} className="h-40 sm:h-48 bg-gray-200 rounded"></div>
               ))}
-            </div>
-          </div>
-        </div>
-      </DashboardLayout>
-    );
-  }
-
-  // Show order success view if order is paid
-  if (orderStatus === 'paid' && currentOrder) {
-    return (
-      <DashboardLayout userRole="CUSTOMER">
-        <div className="max-w-4xl mx-auto p-4 sm:p-6">
-          <div className="bg-white rounded-lg shadow-sm p-6">
-            {/* Success Header */}
-            <div className="text-center mb-8">
-              <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-green-100">
-                <svg className="h-10 w-10 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                </svg>
-              </div>
-              <h2 className="mt-4 text-2xl font-bold text-gray-900">Order Confirmed!</h2>
-              <p className="mt-2 text-gray-600">Thank you for your order #{currentOrder.order_number}</p>
-              <p className="text-gray-500 text-sm">A confirmation has been sent to your email</p>
-            </div>
-
-            {/* Order Summary */}
-            <div className="border-t border-b border-gray-200 py-6">
-              <h3 className="text-lg font-medium text-gray-900 mb-4">Order Summary</h3>
-              
-              <div className="space-y-4">
-                {currentOrder.items?.map((item) => (
-                  <div key={item.id} className="flex justify-between">
-                    <div className="flex">
-                      <span className="text-gray-600">{item.quantity} × {item.name}</span>
-                    </div>
-                    <span className="text-gray-900">₦{(item.price * item.quantity).toLocaleString()}</span>
-                  </div>
-                ))}
-                
-                <div className="border-t border-gray-200 pt-4 mt-4">
-                  <div className="flex justify-between text-base font-medium text-gray-900">
-                    <p>Total</p>
-                    <p>₦{currentOrder.total_amount?.toLocaleString()}</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Order Timeline */}
-            <div className="mt-8">
-              <h3 className="text-lg font-medium text-gray-900 mb-4">Order Status</h3>
-              <div className="flow-root">
-                <ul className="-mb-8">
-                  <li>
-                    <div className="relative pb-8">
-                      <span className="absolute top-4 left-4 -ml-px h-full w-0.5 bg-gray-200" aria-hidden="true"></span>
-                      <div className="relative flex space-x-3">
-                        <div>
-                          <span className="h-8 w-8 rounded-full bg-green-500 flex items-center justify-center ring-8 ring-white">
-                            <svg className="h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                              <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                            </svg>
-                          </span>
-                        </div>
-                        <div className="min-w-0 flex-1 pt-1.5 flex justify-between space-x-4">
-                          <div>
-                            <p className="text-sm text-gray-500">Order confirmed</p>
-                          </div>
-                          <div className="text-right text-sm whitespace-nowrap text-gray-500">
-                            Just now
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </li>
-                  <li>
-                    <div className="relative pb-8">
-                      <span className="absolute top-4 left-4 -ml-px h-full w-0.5 bg-gray-200" aria-hidden="true"></span>
-                      <div className="relative flex space-x-3">
-                        <div>
-                          <span className="h-8 w-8 rounded-full bg-blue-500 flex items-center justify-center ring-8 ring-white">
-                            <svg className="h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                            </svg>
-                          </span>
-                        </div>
-                        <div className="min-w-0 flex-1 pt-1.5 flex justify-between space-x-4">
-                          <div>
-                            <p className="text-sm text-gray-500">Processing your order</p>
-                            <p className="text-sm text-gray-400">We're preparing your items</p>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </li>
-                  <li>
-                    <div className="relative pb-8">
-                      <div className="relative flex space-x-3">
-                        <div>
-                          <span className="h-8 w-8 rounded-full bg-gray-200 flex items-center justify-center ring-8 ring-white">
-                            <svg className="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                              <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z" />
-                              <path fillRule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z" clipRule="evenodd" />
-                            </svg>
-                          </span>
-                        </div>
-                        <div className="min-w-0 flex-1 pt-1.5 flex justify-between space-x-4">
-                          <div>
-                            <p className="text-sm text-gray-500">Order completed</p>
-                            <p className="text-sm text-gray-400">We'll notify you when it's ready</p>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </li>
-                </ul>
-              </div>
-            </div>
-
-            {/* Next Steps */}
-            <div className="mt-10 flex flex-col sm:flex-row justify-center gap-3">
-              <button
-                onClick={() => navigate('/customer/orders')}
-                className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
-              >
-                View all orders
-              </button>
-              <button
-                onClick={() => {
-                  setCurrentOrder(null);
-                  setOrderStatus('pending');
-                  navigate('/customer/new-order');
-                }}
-                className="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
-              >
-                Place another order
-              </button>
             </div>
           </div>
         </div>
