@@ -1,5 +1,6 @@
 import React, { createContext, useContext } from 'react';
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
+import { supabase as defaultSupabase } from '@/integrations/supabase/client';
 
 interface SupabaseContextType {
   supabase: SupabaseClient;
@@ -31,8 +32,7 @@ export const SupabaseProvider: React.FC<SupabaseProviderProps> = ({
     supabase = createClient(supabaseUrl, supabaseKey);
   } else {
     // Fallback to the pre-configured client used across the codebase
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    supabase = require('@/integrations/supabase/client').supabase;
+    supabase = defaultSupabase;
   }
 
   return (
