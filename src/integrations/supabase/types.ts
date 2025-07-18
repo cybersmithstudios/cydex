@@ -7,6 +7,11 @@ export type Json =
   | Json[]
 
 export type Database = {
+  // Allows to automatically instanciate createClient with right options
+  // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
+  __InternalSupabase: {
+    PostgrestVersion: "12.2.3 (519615d)"
+  }
   public: {
     Tables: {
       audit_logs: {
@@ -316,6 +321,50 @@ export type Database = {
           },
         ]
       }
+      order_notifications: {
+        Row: {
+          created_at: string
+          id: string
+          message: string
+          notification_type: string
+          order_id: string
+          read_at: string | null
+          recipient_id: string
+          recipient_type: string
+          title: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          message: string
+          notification_type: string
+          order_id: string
+          read_at?: string | null
+          recipient_id: string
+          recipient_type: string
+          title: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          message?: string
+          notification_type?: string
+          order_id?: string
+          read_at?: string | null
+          recipient_id?: string
+          recipient_type?: string
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "order_notifications_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       orders: {
         Row: {
           cancel_reason: string | null
@@ -332,6 +381,9 @@ export type Database = {
           order_number: string
           payment_method: string | null
           payment_status: string
+          picked_up_at: string | null
+          ready_for_pickup_at: string | null
+          rider_assigned_at: string | null
           rider_id: string | null
           special_instructions: string | null
           status: string
@@ -339,7 +391,9 @@ export type Database = {
           time_slot: string | null
           total_amount: number
           updated_at: string
+          vendor_accepted_at: string | null
           vendor_id: string | null
+          verification_code: string | null
         }
         Insert: {
           cancel_reason?: string | null
@@ -356,6 +410,9 @@ export type Database = {
           order_number: string
           payment_method?: string | null
           payment_status?: string
+          picked_up_at?: string | null
+          ready_for_pickup_at?: string | null
+          rider_assigned_at?: string | null
           rider_id?: string | null
           special_instructions?: string | null
           status?: string
@@ -363,7 +420,9 @@ export type Database = {
           time_slot?: string | null
           total_amount: number
           updated_at?: string
+          vendor_accepted_at?: string | null
           vendor_id?: string | null
+          verification_code?: string | null
         }
         Update: {
           cancel_reason?: string | null
@@ -380,6 +439,9 @@ export type Database = {
           order_number?: string
           payment_method?: string | null
           payment_status?: string
+          picked_up_at?: string | null
+          ready_for_pickup_at?: string | null
+          rider_assigned_at?: string | null
           rider_id?: string | null
           special_instructions?: string | null
           status?: string
@@ -387,7 +449,9 @@ export type Database = {
           time_slot?: string | null
           total_amount?: number
           updated_at?: string
+          vendor_accepted_at?: string | null
           vendor_id?: string | null
+          verification_code?: string | null
         }
         Relationships: [
           {
@@ -532,6 +596,136 @@ export type Database = {
         }
         Relationships: []
       }
+      recycling_partners: {
+        Row: {
+          contact_info: Json | null
+          created_at: string | null
+          id: string
+          is_active: boolean | null
+          logo_url: string | null
+          materials: string[]
+          name: string
+          rating: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          contact_info?: Json | null
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          logo_url?: string | null
+          materials: string[]
+          name: string
+          rating?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          contact_info?: Json | null
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          logo_url?: string | null
+          materials?: string[]
+          name?: string
+          rating?: number | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      rider_achievements: {
+        Row: {
+          achievement_type: string
+          created_at: string | null
+          description: string | null
+          earned_date: string | null
+          icon: string | null
+          id: string
+          progress: number | null
+          rider_id: string | null
+          target: number | null
+          title: string
+        }
+        Insert: {
+          achievement_type: string
+          created_at?: string | null
+          description?: string | null
+          earned_date?: string | null
+          icon?: string | null
+          id?: string
+          progress?: number | null
+          rider_id?: string | null
+          target?: number | null
+          title: string
+        }
+        Update: {
+          achievement_type?: string
+          created_at?: string | null
+          description?: string | null
+          earned_date?: string | null
+          icon?: string | null
+          id?: string
+          progress?: number | null
+          rider_id?: string | null
+          target?: number | null
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rider_achievements_rider_id_fkey"
+            columns: ["rider_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      rider_bank_details: {
+        Row: {
+          account_name: string
+          account_number: string
+          bank_name: string
+          bvn: string | null
+          created_at: string | null
+          id: string
+          is_default: boolean | null
+          is_verified: boolean | null
+          rider_id: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          account_name: string
+          account_number: string
+          bank_name: string
+          bvn?: string | null
+          created_at?: string | null
+          id?: string
+          is_default?: boolean | null
+          is_verified?: boolean | null
+          rider_id?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          account_name?: string
+          account_number?: string
+          bank_name?: string
+          bvn?: string | null
+          created_at?: string | null
+          id?: string
+          is_default?: boolean | null
+          is_verified?: boolean | null
+          rider_id?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rider_bank_details_rider_id_fkey"
+            columns: ["rider_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       rider_earnings: {
         Row: {
           carbon_credits_earned: number | null
@@ -588,49 +782,125 @@ export type Database = {
       }
       rider_profiles: {
         Row: {
+          bank_details: Json | null
           created_at: string | null
           current_location: Json | null
+          delivery_preferences: Json | null
           id: string
           is_verified: boolean | null
           license_number: string | null
+          notification_preferences: Json | null
           rating: number | null
           rider_status: Database["public"]["Enums"]["rider_status"] | null
           total_deliveries: number | null
           updated_at: string | null
           vehicle_registration: string | null
           vehicle_type: string | null
+          verification_documents: Json | null
+          verification_status: string | null
         }
         Insert: {
+          bank_details?: Json | null
           created_at?: string | null
           current_location?: Json | null
+          delivery_preferences?: Json | null
           id: string
           is_verified?: boolean | null
           license_number?: string | null
+          notification_preferences?: Json | null
           rating?: number | null
           rider_status?: Database["public"]["Enums"]["rider_status"] | null
           total_deliveries?: number | null
           updated_at?: string | null
           vehicle_registration?: string | null
           vehicle_type?: string | null
+          verification_documents?: Json | null
+          verification_status?: string | null
         }
         Update: {
+          bank_details?: Json | null
           created_at?: string | null
           current_location?: Json | null
+          delivery_preferences?: Json | null
           id?: string
           is_verified?: boolean | null
           license_number?: string | null
+          notification_preferences?: Json | null
           rating?: number | null
           rider_status?: Database["public"]["Enums"]["rider_status"] | null
           total_deliveries?: number | null
           updated_at?: string | null
           vehicle_registration?: string | null
           vehicle_type?: string | null
+          verification_documents?: Json | null
+          verification_status?: string | null
         }
         Relationships: [
           {
             foreignKeyName: "rider_profiles_id_fkey"
             columns: ["id"]
             isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      rider_reviews: {
+        Row: {
+          comment: string | null
+          communication_rating: number | null
+          created_at: string | null
+          customer_id: string | null
+          delivery_rating: number | null
+          id: string
+          order_id: string | null
+          rating: number
+          rider_id: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          comment?: string | null
+          communication_rating?: number | null
+          created_at?: string | null
+          customer_id?: string | null
+          delivery_rating?: number | null
+          id?: string
+          order_id?: string | null
+          rating: number
+          rider_id?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          comment?: string | null
+          communication_rating?: number | null
+          created_at?: string | null
+          customer_id?: string | null
+          delivery_rating?: number | null
+          id?: string
+          order_id?: string | null
+          rating?: number
+          rider_id?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rider_reviews_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rider_reviews_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rider_reviews_rider_id_fkey"
+            columns: ["rider_id"]
+            isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
@@ -677,6 +947,110 @@ export type Database = {
           {
             foreignKeyName: "rider_schedules_rider_id_fkey"
             columns: ["rider_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      vendor_bank_accounts: {
+        Row: {
+          account_name: string
+          account_number: string
+          bank_name: string
+          created_at: string | null
+          id: string
+          is_default: boolean | null
+          is_verified: boolean | null
+          updated_at: string | null
+          vendor_id: string
+        }
+        Insert: {
+          account_name: string
+          account_number: string
+          bank_name: string
+          created_at?: string | null
+          id?: string
+          is_default?: boolean | null
+          is_verified?: boolean | null
+          updated_at?: string | null
+          vendor_id: string
+        }
+        Update: {
+          account_name?: string
+          account_number?: string
+          bank_name?: string
+          created_at?: string | null
+          id?: string
+          is_default?: boolean | null
+          is_verified?: boolean | null
+          updated_at?: string | null
+          vendor_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vendor_bank_accounts_vendor_id_fkey"
+            columns: ["vendor_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      vendor_payout_requests: {
+        Row: {
+          amount: number
+          bank_account_id: string
+          created_at: string | null
+          failure_reason: string | null
+          fee: number | null
+          id: string
+          net_amount: number
+          processed_at: string | null
+          requested_at: string | null
+          status: string
+          updated_at: string | null
+          vendor_id: string
+        }
+        Insert: {
+          amount: number
+          bank_account_id: string
+          created_at?: string | null
+          failure_reason?: string | null
+          fee?: number | null
+          id?: string
+          net_amount: number
+          processed_at?: string | null
+          requested_at?: string | null
+          status?: string
+          updated_at?: string | null
+          vendor_id: string
+        }
+        Update: {
+          amount?: number
+          bank_account_id?: string
+          created_at?: string | null
+          failure_reason?: string | null
+          fee?: number | null
+          id?: string
+          net_amount?: number
+          processed_at?: string | null
+          requested_at?: string | null
+          status?: string
+          updated_at?: string | null
+          vendor_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vendor_payout_requests_bank_account_id_fkey"
+            columns: ["bank_account_id"]
+            isOneToOne: false
+            referencedRelation: "vendor_bank_accounts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vendor_payout_requests_vendor_id_fkey"
+            columns: ["vendor_id"]
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
@@ -744,6 +1118,132 @@ export type Database = {
           },
         ]
       }
+      vendor_recycling_activities: {
+        Row: {
+          activity_date: string
+          created_at: string | null
+          id: string
+          material_type: string
+          partner_name: string
+          points_earned: number | null
+          vendor_id: string
+          weight_kg: number
+        }
+        Insert: {
+          activity_date: string
+          created_at?: string | null
+          id?: string
+          material_type: string
+          partner_name: string
+          points_earned?: number | null
+          vendor_id: string
+          weight_kg: number
+        }
+        Update: {
+          activity_date?: string
+          created_at?: string | null
+          id?: string
+          material_type?: string
+          partner_name?: string
+          points_earned?: number | null
+          vendor_id?: string
+          weight_kg?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vendor_recycling_activities_vendor_id_fkey"
+            columns: ["vendor_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      vendor_recycling_stats: {
+        Row: {
+          carbon_saved_kg: number | null
+          customer_participation_rate: number | null
+          id: string
+          total_recycled_kg: number | null
+          updated_at: string | null
+          vendor_id: string
+          vendor_recycling_rate: number | null
+        }
+        Insert: {
+          carbon_saved_kg?: number | null
+          customer_participation_rate?: number | null
+          id?: string
+          total_recycled_kg?: number | null
+          updated_at?: string | null
+          vendor_id: string
+          vendor_recycling_rate?: number | null
+        }
+        Update: {
+          carbon_saved_kg?: number | null
+          customer_participation_rate?: number | null
+          id?: string
+          total_recycled_kg?: number | null
+          updated_at?: string | null
+          vendor_id?: string
+          vendor_recycling_rate?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vendor_recycling_stats_vendor_id_fkey"
+            columns: ["vendor_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      vendor_settings: {
+        Row: {
+          business_license: string | null
+          category: string | null
+          created_at: string | null
+          description: string | null
+          id: string
+          logo_url: string | null
+          notification_preferences: Json | null
+          security_settings: Json | null
+          updated_at: string | null
+          vendor_id: string
+        }
+        Insert: {
+          business_license?: string | null
+          category?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          logo_url?: string | null
+          notification_preferences?: Json | null
+          security_settings?: Json | null
+          updated_at?: string | null
+          vendor_id: string
+        }
+        Update: {
+          business_license?: string | null
+          category?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          logo_url?: string | null
+          notification_preferences?: Json | null
+          security_settings?: Json | null
+          updated_at?: string | null
+          vendor_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vendor_settings_vendor_id_fkey"
+            columns: ["vendor_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       vendor_stats: {
         Row: {
           id: string
@@ -785,12 +1285,106 @@ export type Database = {
           },
         ]
       }
+      vendor_transactions: {
+        Row: {
+          amount: number
+          bank_account_id: string | null
+          created_at: string | null
+          description: string | null
+          fee: number | null
+          id: string
+          metadata: Json | null
+          net_amount: number
+          processed_at: string | null
+          reference_id: string | null
+          reference_type: string | null
+          status: string
+          transaction_id: string
+          type: string
+          updated_at: string | null
+          vendor_id: string
+        }
+        Insert: {
+          amount: number
+          bank_account_id?: string | null
+          created_at?: string | null
+          description?: string | null
+          fee?: number | null
+          id?: string
+          metadata?: Json | null
+          net_amount: number
+          processed_at?: string | null
+          reference_id?: string | null
+          reference_type?: string | null
+          status?: string
+          transaction_id: string
+          type: string
+          updated_at?: string | null
+          vendor_id: string
+        }
+        Update: {
+          amount?: number
+          bank_account_id?: string | null
+          created_at?: string | null
+          description?: string | null
+          fee?: number | null
+          id?: string
+          metadata?: Json | null
+          net_amount?: number
+          processed_at?: string | null
+          reference_id?: string | null
+          reference_type?: string | null
+          status?: string
+          transaction_id?: string
+          type?: string
+          updated_at?: string | null
+          vendor_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vendor_transactions_bank_account_id_fkey"
+            columns: ["bank_account_id"]
+            isOneToOne: false
+            referencedRelation: "vendor_bank_accounts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vendor_transactions_vendor_id_fkey"
+            columns: ["vendor_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
+      calculate_rider_rating: {
+        Args: { rider_uuid: string }
+        Returns: {
+          average_rating: number
+          total_reviews: number
+        }[]
+      }
+      create_order_notification: {
+        Args: {
+          p_order_id: string
+          p_recipient_id: string
+          p_recipient_type: string
+          p_notification_type: string
+          p_title: string
+          p_message: string
+        }
+        Returns: string
+      }
       generate_order_number: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
+      generate_verification_code: {
         Args: Record<PropertyKey, never>
         Returns: string
       }
@@ -818,6 +1412,7 @@ export type Database = {
         | "delivered"
         | "cancelled"
       rider_status: "offline" | "available" | "busy" | "break"
+      vehicle_type_enum: "walking" | "bicycle" | "motorcycle" | "car" | "van"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -825,21 +1420,25 @@ export type Database = {
   }
 }
 
-type DefaultSchema = Database[Extract<keyof Database, "public">]
+type DatabaseWithoutInternals = Omit<Database, "__InternalSupabase">
+
+type DefaultSchema = DatabaseWithoutInternals[Extract<keyof Database, "public">]
 
 export type Tables<
   DefaultSchemaTableNameOrOptions extends
     | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
-    | { schema: keyof Database },
+    | { schema: keyof DatabaseWithoutInternals },
   TableName extends DefaultSchemaTableNameOrOptions extends {
-    schema: keyof Database
+    schema: keyof DatabaseWithoutInternals
   }
-    ? keyof (Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
-        Database[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
+    ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+        DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
     : never = never,
-> = DefaultSchemaTableNameOrOptions extends { schema: keyof Database }
-  ? (Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
-      Database[DefaultSchemaTableNameOrOptions["schema"]]["Views"])[TableName] extends {
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+      DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])[TableName] extends {
       Row: infer R
     }
     ? R
@@ -857,14 +1456,16 @@ export type Tables<
 export type TablesInsert<
   DefaultSchemaTableNameOrOptions extends
     | keyof DefaultSchema["Tables"]
-    | { schema: keyof Database },
+    | { schema: keyof DatabaseWithoutInternals },
   TableName extends DefaultSchemaTableNameOrOptions extends {
-    schema: keyof Database
+    schema: keyof DatabaseWithoutInternals
   }
-    ? keyof Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
     : never = never,
-> = DefaultSchemaTableNameOrOptions extends { schema: keyof Database }
-  ? Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
       Insert: infer I
     }
     ? I
@@ -880,14 +1481,16 @@ export type TablesInsert<
 export type TablesUpdate<
   DefaultSchemaTableNameOrOptions extends
     | keyof DefaultSchema["Tables"]
-    | { schema: keyof Database },
+    | { schema: keyof DatabaseWithoutInternals },
   TableName extends DefaultSchemaTableNameOrOptions extends {
-    schema: keyof Database
+    schema: keyof DatabaseWithoutInternals
   }
-    ? keyof Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
     : never = never,
-> = DefaultSchemaTableNameOrOptions extends { schema: keyof Database }
-  ? Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
       Update: infer U
     }
     ? U
@@ -903,14 +1506,16 @@ export type TablesUpdate<
 export type Enums<
   DefaultSchemaEnumNameOrOptions extends
     | keyof DefaultSchema["Enums"]
-    | { schema: keyof Database },
+    | { schema: keyof DatabaseWithoutInternals },
   EnumName extends DefaultSchemaEnumNameOrOptions extends {
-    schema: keyof Database
+    schema: keyof DatabaseWithoutInternals
   }
-    ? keyof Database[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
+    ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
     : never = never,
-> = DefaultSchemaEnumNameOrOptions extends { schema: keyof Database }
-  ? Database[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"][EnumName]
+> = DefaultSchemaEnumNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"][EnumName]
   : DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema["Enums"]
     ? DefaultSchema["Enums"][DefaultSchemaEnumNameOrOptions]
     : never
@@ -918,14 +1523,16 @@ export type Enums<
 export type CompositeTypes<
   PublicCompositeTypeNameOrOptions extends
     | keyof DefaultSchema["CompositeTypes"]
-    | { schema: keyof Database },
+    | { schema: keyof DatabaseWithoutInternals },
   CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
-    schema: keyof Database
+    schema: keyof DatabaseWithoutInternals
   }
-    ? keyof Database[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
+    ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
     : never = never,
-> = PublicCompositeTypeNameOrOptions extends { schema: keyof Database }
-  ? Database[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
+> = PublicCompositeTypeNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
   : PublicCompositeTypeNameOrOptions extends keyof DefaultSchema["CompositeTypes"]
     ? DefaultSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
     : never
@@ -943,6 +1550,7 @@ export const Constants = {
         "cancelled",
       ],
       rider_status: ["offline", "available", "busy", "break"],
+      vehicle_type_enum: ["walking", "bicycle", "motorcycle", "car", "van"],
     },
   },
 } as const

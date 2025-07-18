@@ -51,7 +51,6 @@ export const useOrderDetails = (orderId: string) => {
           )
         `)
         .eq('id', orderId)
-        .eq('customer_id', user.id)
         .single();
 
       if (orderError) throw orderError;

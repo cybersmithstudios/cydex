@@ -3,7 +3,7 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Car } from 'lucide-react';
+import { Car, Bike, User, Zap } from 'lucide-react';
 
 interface VehicleInfoProps {
   vehicle: any;
@@ -11,48 +11,78 @@ interface VehicleInfoProps {
 }
 
 const VehicleInfo = ({ vehicle, onUpdateVehicle }: VehicleInfoProps) => {
+  if (!vehicle) return null;
+
+  const getVehicleIcon = () => {
+    switch (vehicle.type) {
+      case 'walking':
+        return <User className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />;
+      case 'bicycle':
+        return <Bike className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />;
+      case 'electric_bike':
+        return <Zap className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />;
+      default:
+        return <User className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />;
+    }
+  };
+
+  const getVehicleDisplayName = () => {
+    switch (vehicle.type) {
+      case 'walking':
+        return 'Walking';
+      case 'bicycle':
+        return 'Bicycle';
+      case 'electric_bike':
+        return 'Electric Bike';
+      default:
+        return vehicle.type;
+    }
+  };
+
   return (
     <Card>
-      <CardHeader>
-        <CardTitle className="text-lg flex items-center">
-          <Car className="h-5 w-5 mr-2" />
-          Vehicle Information
+      <CardHeader className="pb-3">
+        <CardTitle className="text-base sm:text-lg flex items-center">
+          {getVehicleIcon()}
+          Vehicle Info
         </CardTitle>
       </CardHeader>
-      <CardContent className="p-6 pt-0">
-        <div className="space-y-3">
+      <CardContent className="p-3 sm:p-6 pt-0">
+        <div className="space-y-2 sm:space-y-3">
           <div className="flex justify-between">
-            <span className="text-sm text-gray-500">Type</span>
-            <span className="text-sm font-medium">{vehicle.type}</span>
+            <span className="text-xs sm:text-sm text-gray-500">Type</span>
+            <span className="text-xs sm:text-sm font-medium capitalize">{getVehicleDisplayName()}</span>
           </div>
+          
+          {vehicle.type !== 'walking' && (
+            <>
+              <div className="flex justify-between">
+                <span className="text-xs sm:text-sm text-gray-500">Model</span>
+                <span className="text-xs sm:text-sm font-medium">{vehicle.model}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-xs sm:text-sm text-gray-500">Year</span>
+                <span className="text-xs sm:text-sm font-medium">{vehicle.year}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-xs sm:text-sm text-gray-500">Color</span>
+                <span className="text-xs sm:text-sm font-medium">{vehicle.color}</span>
+              </div>
+            </>
+          )}
+          
           <div className="flex justify-between">
-            <span className="text-sm text-gray-500">Model</span>
-            <span className="text-sm font-medium">{vehicle.model}</span>
-          </div>
-          <div className="flex justify-between">
-            <span className="text-sm text-gray-500">Year</span>
-            <span className="text-sm font-medium">{vehicle.year}</span>
-          </div>
-          <div className="flex justify-between">
-            <span className="text-sm text-gray-500">Color</span>
-            <span className="text-sm font-medium">{vehicle.color}</span>
-          </div>
-          <div className="flex justify-between">
-            <span className="text-sm text-gray-500">License Plate</span>
-            <span className="text-sm font-medium">{vehicle.licensePlate}</span>
-          </div>
-          <div className="flex justify-between">
-            <span className="text-sm text-gray-500">Registration Status</span>
-            <Badge className="bg-green-500">Approved</Badge>
+            <span className="text-xs sm:text-sm text-gray-500">Status</span>
+            <Badge className="bg-yellow-500 text-xs">Pending Verification</Badge>
           </div>
         </div>
         
         <Button 
           variant="outline" 
-          className="w-full mt-4"
+          className="w-full mt-3 sm:mt-4 text-xs sm:text-sm h-8 sm:h-9"
           onClick={onUpdateVehicle}
         >
-          Update Vehicle Details
+          Update Vehicle
         </Button>
       </CardContent>
     </Card>

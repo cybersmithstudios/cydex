@@ -1,5 +1,6 @@
+
 import { useState, useEffect } from 'react';
-import { useSupabase } from '@/contexts/SupabaseContext';
+import { supabase } from '@/integrations/supabase/client';
 
 export interface VendorRating {
   average_rating: number;
@@ -9,7 +10,6 @@ export interface VendorRating {
 }
 
 export const useVendorRatings = (vendorId: string | null = null) => {
-  const { supabase } = useSupabase();
   const [ratings, setRatings] = useState<Record<string, VendorRating>>({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -120,4 +120,4 @@ export const useVendorRatings = (vendorId: string | null = null) => {
     getRatingForVendor,
     refreshRatings
   };
-}; 
+};

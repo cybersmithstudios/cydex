@@ -1,9 +1,8 @@
 
 import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Progress } from '@/components/ui/progress';
-import { Star, Copy as Clipboard } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { Star, MessageSquare, User } from 'lucide-react';
 
 interface ReviewsTabProps {
   profile: any;
@@ -11,143 +10,138 @@ interface ReviewsTabProps {
 }
 
 const ReviewsTab = ({ profile, recentReviews }: ReviewsTabProps) => {
+  const hasReviews = recentReviews && recentReviews.length > 0;
+  
+  // Calculate rating breakdown from reviews
+  const ratingBreakdown = hasReviews ? [5, 4, 3, 2, 1].map(rating => {
+    const count = recentReviews.filter(review => review.rating === rating).length;
+    const percentage = recentReviews.length > 0 ? (count / recentReviews.length) * 100 : 0;
+    return { rating, count, percentage };
+  }) : [];
+
   return (
     <>
       <Card>
-        <CardHeader className="flex flex-col sm:flex-row justify-between items-start sm:items-center">
-          <div>
-            <CardTitle className="text-lg flex items-center">
-              <Star className="h-5 w-5 mr-2 text-amber-500" />
-              Customer Reviews
-            </CardTitle>
-            <CardDescription>What customers are saying about you</CardDescription>
-          </div>
-          <div className="mt-2 sm:mt-0 flex items-center">
-            <div className="flex items-center mr-3">
-              {[...Array(5)].map((_, i) => (
-                <Star 
-                  key={i} 
-                  className={`h-5 w-5 ${i < Math.floor(profile.stats.rating) ? 'text-amber-500 fill-amber-500' : 'text-gray-300'}`} 
-                />
-              ))}
-            </div>
-            <div>
-              <p className="font-bold">{profile.stats.rating}/5.0</p>
-              <p className="text-xs text-gray-500">{profile.stats.reviews} reviews</p>
-            </div>
-          </div>
+        <CardHeader>
+          <CardTitle className="text-lg flex items-center">
+            <Star className="h-5 w-5 mr-2 text-amber-500" />
+            Customer Reviews
+          </CardTitle>
+          <CardDescription>
+            {hasReviews ? `${recentReviews.length} customer reviews` : 'What customers will say about your delivery service'}
+          </CardDescription>
         </CardHeader>
         <CardContent className="p-6 pt-0">
-          <div className="space-y-4">
-            {recentReviews.map(review => (
-              <div key={review.id} className="p-4 border rounded-lg">
-                <div className="flex justify-between mb-2">
-                  <p className="font-medium">{review.customer}</p>
-                  <p className="text-sm text-gray-500">{review.date}</p>
+          {!hasReviews ? (
+            <div className="text-center py-12">
+              <MessageSquare className="h-12 w-12 text-gray-300 mx-auto mb-4" />
+              <h3 className="text-lg font-medium text-gray-900 mb-2">No reviews yet</h3>
+              <p className="text-gray-500">Complete deliveries to start receiving customer reviews!</p>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {recentReviews.map((review) => (
+                <div key={review.id} className="border rounded-lg p-4">
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center">
+                      <User className="h-8 w-8 text-gray-400 bg-gray-100 rounded-full p-1" />
+                      <div className="ml-3">
+                        <p className="font-medium text-sm">{review.customer_name}</p>
+                        <p className="text-xs text-gray-500">{review.created_at}</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center">
+                      {[...Array(5)].map((_, i) => (
+                        <Star 
+                          key={i} 
+                          className={`h-4 w-4 ${i < review.rating ? 'text-amber-500 fill-amber-500' : 'text-gray-300'}`} 
+                        />
+                      ))}
+                      <span className="ml-2 text-sm font-medium">{review.rating}.0</span>
+                    </div>
+                  </div>
+                  
+                  {review.comment && (
+                    <p className="text-sm text-gray-700 mb-3">{review.comment}</p>
+                  )}
+                  
+                  <div className="flex gap-4 text-xs">
+                    <div className="flex items-center">
+                      <span className="text-gray-500">Delivery:</span>
+                      <div className="flex ml-1">
+                        {[...Array(5)].map((_, i) => (
+                          <Star 
+                            key={i} 
+                            className={`h-3 w-3 ${i < review.delivery_rating ? 'text-amber-500 fill-amber-500' : 'text-gray-300'}`} 
+                          />
+                        ))}
+                      </div>
+                    </div>
+                    <div className="flex items-center">
+                      <span className="text-gray-500">Communication:</span>
+                      <div className="flex ml-1">
+                        {[...Array(5)].map((_, i) => (
+                          <Star 
+                            key={i} 
+                            className={`h-3 w-3 ${i < review.communication_rating ? 'text-amber-500 fill-amber-500' : 'text-gray-300'}`} 
+                          />
+                        ))}
+                      </div>
+                    </div>
+                  </div>
                 </div>
-                <div className="flex items-center mb-2">
-                  {[...Array(5)].map((_, i) => (
-                    <Star 
-                      key={i} 
-                      className={`h-4 w-4 ${i < review.rating ? 'text-amber-500 fill-amber-500' : 'text-gray-300'}`} 
-                    />
-                  ))}
-                </div>
-                <p className="text-sm text-gray-700">{review.comment}</p>
-              </div>
-            ))}
-          </div>
-          
-          <Button variant="outline" className="w-full mt-4">
-            View All Reviews
-          </Button>
+              ))}
+            </div>
+          )}
         </CardContent>
       </Card>
       
       <Card className="mt-6">
         <CardHeader>
-          <CardTitle className="text-lg flex items-center">
-            <Clipboard className="h-5 w-5 mr-2" />
-            Rating Breakdown
-          </CardTitle>
-          <CardDescription>Detailed analysis of your customer ratings</CardDescription>
+          <CardTitle className="text-lg">Rating Overview</CardTitle>
+          <CardDescription>
+            {hasReviews ? 'Your rating breakdown from customer reviews' : 'Your rating breakdown will appear here once you receive reviews'}
+          </CardDescription>
         </CardHeader>
         <CardContent className="p-6 pt-0">
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <div className="flex justify-between items-center">
-                <div className="flex items-center">
-                  <span className="font-medium mr-2">5</span>
-                  <Star className="h-4 w-4 text-amber-500 fill-amber-500" />
-                </div>
-                <span className="text-sm">180 reviews</span>
+          {!hasReviews ? (
+            <div className="text-center py-8">
+              <div className="flex items-center justify-center mb-4">
+                {[...Array(5)].map((_, i) => (
+                  <Star key={i} className="h-8 w-8 text-gray-300" />
+                ))}
               </div>
-              <Progress value={76} className="h-2" />
+              <p className="text-2xl font-bold text-gray-400">0.0/5.0</p>
+              <p className="text-gray-500 mt-2">No ratings yet</p>
             </div>
-            
-            <div className="space-y-2">
-              <div className="flex justify-between items-center">
-                <div className="flex items-center">
-                  <span className="font-medium mr-2">4</span>
-                  <Star className="h-4 w-4 text-amber-500 fill-amber-500" />
+          ) : (
+            <div className="space-y-4">
+              <div className="text-center mb-6">
+                <div className="flex items-center justify-center mb-2">
+                  {[...Array(5)].map((_, i) => (
+                    <Star key={i} className={`h-8 w-8 ${i < Math.floor(profile.stats.rating) ? 'text-amber-500 fill-amber-500' : 'text-gray-300'}`} />
+                  ))}
                 </div>
-                <span className="text-sm">42 reviews</span>
+                <p className="text-3xl font-bold">{profile.stats.rating.toFixed(1)}/5.0</p>
+                <p className="text-gray-500">Based on {recentReviews.length} reviews</p>
               </div>
-              <Progress value={18} className="h-2" />
-            </div>
-            
-            <div className="space-y-2">
-              <div className="flex justify-between items-center">
-                <div className="flex items-center">
-                  <span className="font-medium mr-2">3</span>
-                  <Star className="h-4 w-4 text-amber-500 fill-amber-500" />
-                </div>
-                <span className="text-sm">11 reviews</span>
+              
+              <div className="space-y-2">
+                {ratingBreakdown.map(({ rating, count, percentage }) => (
+                  <div key={rating} className="flex items-center gap-3">
+                    <span className="text-sm w-8">{rating} ★</span>
+                    <div className="flex-1 bg-gray-200 rounded-full h-2">
+                      <div 
+                        className="bg-amber-500 h-2 rounded-full" 
+                        style={{ width: `${percentage}%` }}
+                      />
+                    </div>
+                    <span className="text-sm text-gray-500 w-8">{count}</span>
+                  </div>
+                ))}
               </div>
-              <Progress value={4} className="h-2" />
             </div>
-            
-            <div className="space-y-2">
-              <div className="flex justify-between items-center">
-                <div className="flex items-center">
-                  <span className="font-medium mr-2">2</span>
-                  <Star className="h-4 w-4 text-amber-500 fill-amber-500" />
-                </div>
-                <span className="text-sm">3 reviews</span>
-              </div>
-              <Progress value={1} className="h-2" />
-            </div>
-            
-            <div className="space-y-2">
-              <div className="flex justify-between items-center">
-                <div className="flex items-center">
-                  <span className="font-medium mr-2">1</span>
-                  <Star className="h-4 w-4 text-amber-500 fill-amber-500" />
-                </div>
-                <span className="text-sm">1 review</span>
-              </div>
-              <Progress value={0.4} className="h-2" />
-            </div>
-          </div>
-          
-          <div className="mt-6 grid grid-cols-2 gap-4">
-            <div className="p-3 border rounded-lg text-center">
-              <p className="text-sm text-gray-500">On-time Delivery</p>
-              <p className="font-bold text-lg">98%</p>
-            </div>
-            <div className="p-3 border rounded-lg text-center">
-              <p className="text-sm text-gray-500">Order Accuracy</p>
-              <p className="font-bold text-lg">99%</p>
-            </div>
-            <div className="p-3 border rounded-lg text-center">
-              <p className="text-sm text-gray-500">Customer Service</p>
-              <p className="font-bold text-lg">4.8/5</p>
-            </div>
-            <div className="p-3 border rounded-lg text-center">
-              <p className="text-sm text-gray-500">Handling Quality</p>
-              <p className="font-bold text-lg">4.9/5</p>
-            </div>
-          </div>
+          )}
         </CardContent>
       </Card>
     </>

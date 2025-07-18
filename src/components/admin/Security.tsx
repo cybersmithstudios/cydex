@@ -1,7 +1,7 @@
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Shield, Lock, Eye, AlertTriangle, UserX, Key, Activity } from 'lucide-react';
+import { Shield, Lock, Eye, AlertTriangle, UserX, Activity } from 'lucide-react';
 
 export function Security() {
   // Mock security events
@@ -51,12 +51,12 @@ export function Security() {
         
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">2FA Enabled</CardTitle>
-            <Key className="h-4 w-4 text-muted-foreground" />
+            <CardTitle className="text-sm font-medium">Password Security</CardTitle>
+            <Lock className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">87%</div>
-            <p className="text-xs text-muted-foreground">Of admin users</p>
+            <div className="text-2xl font-bold">Strong</div>
+            <p className="text-xs text-muted-foreground">Policy enforced</p>
           </CardContent>
         </Card>
       </div>
@@ -75,16 +75,8 @@ export function Security() {
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="font-medium">Two-Factor Authentication</p>
-                    <p className="text-sm text-muted-foreground">Require 2FA for all admin users</p>
-                  </div>
-                  <div className="bg-green-100 text-green-800 px-2 py-1 rounded text-xs font-medium">Enabled</div>
-                </div>
-                
-                <div className="flex items-center justify-between">
-                  <div>
                     <p className="font-medium">Password Policy</p>
-                    <p className="text-sm text-muted-foreground">Minimum 10 characters with complexity</p>
+                    <p className="text-sm text-muted-foreground">Minimum 8 characters with complexity</p>
                   </div>
                   <div className="bg-green-100 text-green-800 px-2 py-1 rounded text-xs font-medium">Enabled</div>
                 </div>
@@ -93,6 +85,14 @@ export function Security() {
                   <div>
                     <p className="font-medium">Session Timeout</p>
                     <p className="text-sm text-muted-foreground">Automatically log out after 30 minutes</p>
+                  </div>
+                  <div className="bg-green-100 text-green-800 px-2 py-1 rounded text-xs font-medium">Enabled</div>
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="font-medium">Account Lockout</p>
+                    <p className="text-sm text-muted-foreground">Lock account after 5 failed attempts</p>
                   </div>
                   <div className="bg-green-100 text-green-800 px-2 py-1 rounded text-xs font-medium">Enabled</div>
                 </div>

@@ -11,7 +11,6 @@ import {
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/SupabaseAuthContext';
 import { toast } from 'sonner';
-import { paymentService } from '@/services/paymentService';
 
 interface PaymentModalProps {
   isOpen: boolean;
@@ -62,17 +61,17 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({
   const initializePayment = usePaystackPayment(config);
 
   const handlePayment = () => {
-    // Initialize payment with only success callback as per react-paystack v6.0.0
+    // Initialize payment with correct object format for react-paystack v6.0.0
     initializePayment({
       onSuccess: () => {
-      toast.success('Payment successful');
-      onSuccess();
-      onClose();
-    },
-    onClose: () => {
-      onClose();
-    },
-  });
+        toast.success('Payment successful');
+        onSuccess();
+        onClose();
+      },
+      onClose: () => {
+        onClose();
+      },
+    });
   };
 
   return (

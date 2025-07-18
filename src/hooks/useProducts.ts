@@ -1,6 +1,6 @@
 
 import { useEffect, useState } from 'react';
-import { useSupabase } from '@/contexts/SupabaseContext';
+import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
 export interface Product {
@@ -24,7 +24,6 @@ export interface Product {
 }
 
 export const useProducts = () => {
-  const { supabase } = useSupabase();
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);

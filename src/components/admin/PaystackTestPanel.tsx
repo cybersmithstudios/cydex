@@ -1,14 +1,13 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { usePaystackPayment } from 'react-paystack';
 import { toast } from 'sonner';
-import { CheckCircle, XCircle, CreditCard, TestTube, Info } from 'lucide-react';
+import { TestTube, Info } from 'lucide-react';
+import { TestConfiguration } from './paystack/TestConfiguration';
+import { TestResults } from './paystack/TestResults';
+import { IntegrationStatus } from './paystack/IntegrationStatus';
 
 export const PaystackTestPanel = () => {
   const [testAmount, setTestAmount] = useState(1000);
@@ -52,8 +51,8 @@ export const PaystackTestPanel = () => {
       return;
     }
 
-    initializePayment(
-      (response: any) => {
+    initializePayment({
+      onSuccess: (response: any) => {
         const result = {
           id: Date.now().toString(),
           amount: testAmount,
@@ -67,7 +66,7 @@ export const PaystackTestPanel = () => {
         
         console.log('Test payment successful:', response);
       },
-      () => {
+      onClose: () => {
         const result = {
           id: Date.now().toString(),
           amount: testAmount,
@@ -81,23 +80,11 @@ export const PaystackTestPanel = () => {
         
         console.log('Test payment failed');
       }
-    );
+    });
   };
 
   const clearTestResults = () => {
     setTestResults([]);
-  };
-
-  const getStatusIcon = (status: 'success' | 'failed') => {
-    return status === 'success' 
-      ? <CheckCircle className="h-4 w-4 text-green-500" />
-      : <XCircle className="h-4 w-4 text-red-500" />;
-  };
-
-  const getStatusBadge = (status: 'success' | 'failed') => {
-    return status === 'success'
-      ? <Badge className="bg-green-100 text-green-800">Success</Badge>
-      : <Badge className="bg-red-100 text-red-800">Failed</Badge>;
   };
 
   return (
@@ -123,46 +110,15 @@ export const PaystackTestPanel = () => {
             </AlertDescription>
           </Alert>
 
-          {/* Test Configuration */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="test-email">Test Email</Label>
-              <Input
-                id="test-email"
-                type="email"
-                value={testEmail}
-                onChange={(e) => setTestEmail(e.target.value)}
-                placeholder="test@example.com"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="test-amount">Test Amount (₦)</Label>
-              <Input
-                id="test-amount"
-                type="number"
-                value={testAmount}
-                onChange={(e) => setTestAmount(Number(e.target.value))}
-                min="1"
-                max="100000"
-              />
-            </div>
-          </div>
-
-          {/* Test Actions */}
-          <div className="flex gap-3">
-            <Button 
-              onClick={handleTestPayment}
-              className="bg-primary hover:bg-primary/80 text-black"
-            >
-              <CreditCard className="mr-2 h-4 w-4" />
-              Test Payment (₦{testAmount.toLocaleString()})
-            </Button>
-            {testResults.length > 0 && (
-              <Button variant="outline" onClick={clearTestResults}>
-                Clear Results
-              </Button>
-            )}
-          </div>
+          <TestConfiguration
+            testEmail={testEmail}
+            onEmailChange={setTestEmail}
+            testAmount={testAmount}
+            onAmountChange={setTestAmount}
+            onTestPayment={handleTestPayment}
+            hasResults={testResults.length > 0}
+            onClearResults={clearTestResults}
+          />
 
           {/* Test Cards Info */}
           <div className="bg-blue-50 p-4 rounded-lg">
@@ -175,66 +131,8 @@ export const PaystackTestPanel = () => {
         </CardContent>
       </Card>
 
-      {/* Test Results */}
-      {testResults.length > 0 && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Test Results</CardTitle>
-            <CardDescription>
-              Payment test history for this session
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              {testResults.map((result) => (
-                <div key={result.id} className="flex items-center justify-between p-3 border rounded-lg">
-                  <div className="flex items-center gap-3">
-                    {getStatusIcon(result.status)}
-                    <div>
-                      <p className="font-medium">₦{result.amount.toLocaleString()}</p>
-                      <p className="text-sm text-gray-500">{result.reference}</p>
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    {getStatusBadge(result.status)}
-                    <p className="text-sm text-gray-500 mt-1">{result.timestamp}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Integration Status */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Integration Status</CardTitle>
-          <CardDescription>
-            Current Paystack configuration status
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label>Environment</Label>
-              <Badge className="bg-orange-100 text-orange-800">Test Mode</Badge>
-            </div>
-            <div className="space-y-2">
-              <Label>Public Key</Label>
-              <p className="text-sm font-mono">pk_test_b11...6e63</p>
-            </div>
-            <div className="space-y-2">
-              <Label>Currency</Label>
-              <p className="text-sm">Nigerian Naira (NGN)</p>
-            </div>
-            <div className="space-y-2">
-              <Label>Payment Channels</Label>
-              <p className="text-sm">Card, Bank Transfer, USSD</p>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+      <TestResults results={testResults} />
+      <IntegrationStatus />
     </div>
   );
-}; 
+};
