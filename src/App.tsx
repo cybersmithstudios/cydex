@@ -3,6 +3,7 @@ import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter } from "react-router-dom";
+import { SupabaseProvider } from '@/contexts/SupabaseContext';
 import { AuthProvider } from "@/contexts/SupabaseAuthContext";
 import { CartProvider } from "@/contexts/CartContext";
 import AppRoutes from "@/routes/AppRoutes";
@@ -12,9 +13,12 @@ import { Toaster as ShadcnToaster } from "@/components/ui/toaster";
 const queryClient = new QueryClient();
 
 function App() {
+  const supabaseUrl = import.meta.env.VITE_SUPABASE_URL as string;
+  const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY as string;
   return (
     <ErrorBoundary>
       <QueryClientProvider client={queryClient}>
+        <SupabaseProvider supabaseUrl={supabaseUrl} supabaseKey={supabaseAnonKey}>
         <AuthProvider>
           <CartProvider>
             <TooltipProvider>
@@ -28,6 +32,7 @@ function App() {
             </TooltipProvider>
           </CartProvider>
         </AuthProvider>
+              </SupabaseProvider>
       </QueryClientProvider>
     </ErrorBoundary>
   );

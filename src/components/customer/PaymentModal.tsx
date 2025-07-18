@@ -13,6 +13,7 @@ import { useAuth } from '@/contexts/SupabaseAuthContext';
 import { toast } from 'sonner';
 import { paymentService } from '@/services/paymentService';
 import { Loader2 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 interface PaymentModalProps {
   isOpen: boolean;
@@ -37,6 +38,7 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({
   customerId,
   metadata = {},
 }): JSX.Element | null => {
+  const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const [paymentConfig, setPaymentConfig] = useState<any>(null);
   const { user } = useAuth();
@@ -109,6 +111,13 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({
               if (verification.success) {
                 toast.success('Payment successful!');
                 onSuccess(response.reference);
+                // Navigate to confirmation page
+                navigate('/customer/order-confirmation', {
+                  state: {
+                    orderNumber,
+                    amount,
+                  },
+                });
                 resolve();
               } else {
                 const error = new Error(verification.error || 'Payment verification failed');

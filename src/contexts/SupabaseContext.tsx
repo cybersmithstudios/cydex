@@ -26,7 +26,14 @@ export const SupabaseProvider: React.FC<SupabaseProviderProps> = ({
   supabaseUrl,
   supabaseKey
 }) => {
-  const supabase = createClient(supabaseUrl, supabaseKey);
+  let supabase: SupabaseClient;
+  if (supabaseUrl && supabaseKey) {
+    supabase = createClient(supabaseUrl, supabaseKey);
+  } else {
+    // Fallback to the pre-configured client used across the codebase
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    supabase = require('@/integrations/supabase/client').supabase;
+  }
 
   return (
     <SupabaseContext.Provider value={{ supabase }}>

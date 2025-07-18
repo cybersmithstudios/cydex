@@ -7,6 +7,7 @@ import OrderDetail from '../pages/customer/OrderDetail';
 import Wallet from '../pages/customer/Wallet';
 import Recycling from '../pages/customer/Recycling';
 import Profile from '../pages/customer/Profile';
+import OrderConfirmation from '../pages/customer/OrderConfirmation';
 import ProductDetails from '../pages/customer/ProductDetails';
 
 const CustomerRoutes = () => {
@@ -80,6 +81,15 @@ const CustomerRoutes = () => {
         element={
           <ProtectedRoute allowedRoles={['CUSTOMER']}>
             <Profile />
+          </ProtectedRoute>
+        } 
+      />
+
+      <Route 
+        path="/order-confirmation" 
+        element={
+          <ProtectedRoute allowedRoles={['CUSTOMER']}>
+            <OrderConfirmation />
           </ProtectedRoute>
         } 
       />
