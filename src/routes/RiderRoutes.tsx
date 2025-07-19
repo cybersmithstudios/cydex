@@ -6,6 +6,7 @@ import AvailableOrders from '../pages/rider/AvailableOrders';
 import CurrentDeliveries from '../pages/rider/CurrentDeliveries';
 import RiderEarnings from '../pages/rider/Earnings';
 import RiderProfile from '../pages/rider/Profile';
+import RiderOrderDetail from '../pages/rider/OrderDetail';
 
 const RiderRoutes = () => {
   return (
@@ -51,6 +52,15 @@ const RiderRoutes = () => {
         element={
           <ProtectedRoute allowedRoles={['RIDER']}>
             <RiderProfile />
+          </ProtectedRoute>
+        } 
+      />
+
+      <Route 
+        path="/order/:orderId" 
+        element={
+          <ProtectedRoute allowedRoles={['RIDER']}>
+            <RiderOrderDetail />
           </ProtectedRoute>
         } 
       />

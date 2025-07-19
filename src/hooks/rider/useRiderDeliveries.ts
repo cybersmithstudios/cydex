@@ -166,19 +166,52 @@ export const useRiderDeliveries = () => {
   const acceptDelivery = useCallback(async (deliveryId: string) => {
     if (!user?.id) {
       toast.error('User not authenticated');
-      return false;
+      return { success: false, orderId: null };
     }
 
     if (!deliveryId) {
       toast.error('Invalid delivery ID');
-      return false;
+      return { success: false, orderId: null };
+    }
+
+    // Check if rider already has an active delivery
+    try {
+      const { data: activeDeliveries, error: checkError } = await supabase
+        .from('deliveries')
+        .select('id')
+        .eq('rider_id', user.id)
+        .in('status', ['accepted', 'picking_up', 'picked_up', 'delivering'])
+        .limit(1);
+
+      if (checkError) throw checkError;
+
+      if (activeDeliveries && activeDeliveries.length > 0) {
+        toast.error('You already have an active delivery. Complete it before accepting another.');
+        return { success: false, orderId: null };
+      }
+    } catch (error) {
+      console.error('[RiderDeliveries] Error checking active deliveries:', error);
+      toast.error('Failed to check active deliveries');
+      return { success: false, orderId: null };
     }
 
     try {
       console.log('[RiderDeliveries] Accepting delivery:', deliveryId);
       
+      let orderId: string | null = null;
+
       const operation = async () => {
-        // Direct update approach since RPC function doesn't exist
+        // First get the delivery to find the order ID
+        const { data: deliveryData, error: deliveryFetchError } = await supabase
+          .from('deliveries')
+          .select('order_id')
+          .eq('id', deliveryId)
+          .single();
+
+        if (deliveryFetchError) throw deliveryFetchError;
+        orderId = deliveryData.order_id;
+
+        // Update the delivery
         const { error: updateError } = await supabase
           .from('deliveries')
           .update({
@@ -192,20 +225,14 @@ export const useRiderDeliveries = () => {
 
         if (updateError) throw updateError;
 
-        // Find the order associated with this delivery
-        const { data: deliveryData, error: deliveryFetchError } = await supabase
-          .from('deliveries')
-          .select('order_id')
-          .eq('id', deliveryId)
-          .single();
-
-        if (deliveryFetchError) throw deliveryFetchError;
-
         // Update the order
         const { error: orderError } = await supabase
           .from('orders')
-          .update({ rider_id: user.id })
-          .eq('id', deliveryData.order_id);
+          .update({ 
+            rider_id: user.id,
+            status: 'processing'
+          })
+          .eq('id', orderId);
 
         if (orderError) throw orderError;
       };
@@ -221,7 +248,7 @@ export const useRiderDeliveries = () => {
         fetchCurrentDeliveries()
       ]);
 
-      return true;
+      return { success: true, orderId };
     } catch (error: any) {
       console.error('[RiderDeliveries] Error accepting delivery:', error);
       
@@ -235,20 +262,50 @@ export const useRiderDeliveries = () => {
       
       // Refresh available deliveries to remove stale data
       await fetchAvailableDeliveries();
-      return false;
+      return { success: false, orderId: null };
     }
   }, [user?.id, fetchAvailableDeliveries, fetchCurrentDeliveries]);
 
-  const updateDeliveryStatus = useCallback(async (deliveryId: string, status: DeliveryData['status']) => {
-    if (!deliveryId || !status) {
-      toast.error('Invalid delivery ID or status');
+  const updateDeliveryStatus = useCallback(async (orderId: string, status: DeliveryData['status']) => {
+    if (!orderId || !status) {
+      toast.error('Invalid order ID or status');
       return false;
     }
 
     try {
-      console.log('[RiderDeliveries] Updating delivery status:', deliveryId, status);
+      console.log('[RiderDeliveries] Updating order status:', orderId, status);
       
       const operation = async () => {
+        // Map delivery statuses to order statuses
+        const orderStatusMap: Record<string, string> = {
+          'picked_up': 'ready',
+          'delivering': 'out_for_delivery',
+          'delivered': 'delivered'
+        };
+
+        const orderStatus = orderStatusMap[status] || status;
+        
+        // Update the order first
+        const { error: orderError } = await supabase
+          .from('orders')
+          .update({ 
+            status: orderStatus,
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', orderId);
+
+        if (orderError) throw orderError;
+
+        // Find and update the delivery record
+        const { data: delivery, error: deliveryFetchError } = await supabase
+          .from('deliveries')
+          .select('id')
+          .eq('order_id', orderId)
+          .eq('rider_id', user?.id)
+          .single();
+
+        if (deliveryFetchError) throw deliveryFetchError;
+
         const updateData: any = { 
           status,
           updated_at: new Date().toISOString()
@@ -265,29 +322,18 @@ export const useRiderDeliveries = () => {
           updateData.delivered_at = new Date().toISOString();
         }
 
-        const { error } = await supabase
+        const { error: deliveryError } = await supabase
           .from('deliveries')
           .update(updateData)
-          .eq('id', deliveryId)
-          .eq('rider_id', user?.id); // Ensure rider can only update their own deliveries
+          .eq('id', delivery.id)
+          .eq('rider_id', user?.id);
 
-        if (error) throw error;
-
-        // Update order status as well
-        const { error: orderError } = await supabase
-          .from('orders')
-          .update({ 
-            status,
-            updated_at: new Date().toISOString()
-          })
-          .eq('id', deliveryId);
-
-        if (orderError) throw orderError;
+        if (deliveryError) throw deliveryError;
       };
 
       await retryWithBackoff(operation);
 
-      toast.success(`Delivery status updated to ${status.replace('_', ' ')}`);
+      toast.success(`Order status updated to ${status.replace('_', ' ')}`);
       console.log('[RiderDeliveries] Status updated successfully');
       
       // Refresh current deliveries

@@ -269,6 +269,15 @@ const CurrentDeliveriesPage = () => {
                       </Button>
                       
                       <Button
+                        onClick={() => window.location.href = `/rider/order/${delivery.order_id}`}
+                        variant="outline"
+                        size="sm"
+                        className="flex items-center gap-2"
+                      >
+                        View Details
+                      </Button>
+                      
+                      <Button
                         onClick={() => handleStatusUpdate(delivery.id, delivery.status)}
                         disabled={isLoading}
                         className="bg-primary hover:bg-primary/90 text-black flex-1 sm:flex-none"

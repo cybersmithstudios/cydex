@@ -69,11 +69,20 @@ const OrderTrackingTimeline = ({
       </div>
 
        {/* Rider Assignment Notification */}
-       {riderName && status !== 'delivered' && (
-         <div className="mt-4 p-3 bg-green-50 rounded-lg">
-           <p className="text-sm font-medium text-green-900">Rider Assigned</p>
+       {riderName && !['delivered', 'cancelled'].includes(status) && (
+         <div className="mt-4 p-3 bg-green-50 rounded-lg border border-green-200">
+           <p className="text-sm font-medium text-green-900">✅ Rider Assigned</p>
            <p className="text-lg font-semibold text-green-700">{riderName}</p>
-           <p className="text-sm text-green-600">Your delivery rider has been assigned</p>
+           <p className="text-sm text-green-600">Your delivery rider has been assigned and will handle your order</p>
+           {status === 'processing' && (
+             <p className="text-xs text-green-500 mt-1">Rider is preparing to pick up your order</p>
+           )}
+           {status === 'ready' && (
+             <p className="text-xs text-green-500 mt-1">Rider is on the way to pick up your order</p>
+           )}
+           {status === 'out_for_delivery' && (
+             <p className="text-xs text-green-500 mt-1">Rider is on the way to deliver your order</p>
+           )}
          </div>
        )}
 

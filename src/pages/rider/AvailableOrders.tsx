@@ -99,7 +99,12 @@ const AvailableOrdersPage = () => {
     setAcceptingOrder(orderId);
     try {
       console.log('[AvailableOrders] Accepting order:', orderId);
-      await acceptDelivery(orderId);
+      const result = await acceptDelivery(orderId);
+      
+      if (result.success && result.orderId) {
+        // Redirect to the order detail page
+        window.location.href = `/rider/order/${result.orderId}`;
+      }
     } catch (error) {
       console.error('[AvailableOrders] Error accepting order:', error);
     } finally {
