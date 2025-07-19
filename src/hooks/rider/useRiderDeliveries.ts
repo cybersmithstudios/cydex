@@ -302,9 +302,14 @@ export const useRiderDeliveries = () => {
           .select('id')
           .eq('order_id', orderId)
           .eq('rider_id', user?.id)
-          .single();
+          .maybeSingle();
 
         if (deliveryFetchError) throw deliveryFetchError;
+        
+        if (!delivery) {
+          console.log('[RiderDeliveries] No delivery record found for order:', orderId);
+          return; // Just update the order status, no delivery record to update
+        }
 
         const updateData: any = { 
           status,
