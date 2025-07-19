@@ -261,14 +261,22 @@ const VendorSettingsPage = () => {
                       disabled={true} // Email should not be editable
                     />
                     
-                    <FormField
-                      id="phone"
-                      label="Phone Number"
-                      placeholder="Your Phone"
-                      value={profileData.phone}
-                      onChange={(value) => handleInputChange('phone', value)}
-                      disabled={!isEditing}
-                    />
+                    <div className="space-y-1 sm:space-y-2">
+                      <Label htmlFor="phone" className="text-red-600 font-medium text-sm sm:text-base">Phone Number * (Required)</Label>
+                      <Input
+                        id="phone"
+                        placeholder="Your Phone Number (Required)"
+                        value={profileData.phone}
+                        onChange={(e) => handleInputChange('phone', e.target.value)}
+                        disabled={!isEditing}
+                        className={`text-sm sm:text-base ${!profileData.phone ? 'border-red-500 bg-red-50' : ''}`}
+                      />
+                      {!profileData.phone && (
+                        <p className="text-red-500 text-sm font-medium">
+                          ⚠️ Phone number is required for order communication
+                        </p>
+                      )}
+                    </div>
                     
                     <FormField
                       id="address"

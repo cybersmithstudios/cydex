@@ -49,14 +49,22 @@ const ProfileForm = ({
         />
       </div>
       <div className="space-y-1">
-        <Label htmlFor="phone">Phone Number</Label>
+        <Label htmlFor="phone" className="text-red-600 font-medium">
+          Phone Number * (Required)
+        </Label>
         <Input 
           id="phone" 
-          placeholder="Your Phone" 
+          placeholder="Your Phone Number (Required)"
           value={profileData.phone}
           onChange={(e) => handleInputChange('phone', e.target.value)}
-          disabled={!isEditing} 
+          disabled={!isEditing}
+          className={!profileData.phone ? 'border-red-500 bg-red-50' : ''}
         />
+        {!profileData.phone && (
+          <p className="text-red-500 text-sm font-medium">
+            ⚠️ Phone number is required for order communication
+          </p>
+        )}
       </div>
       <div className="space-y-1">
         <Label htmlFor="address">Address</Label>

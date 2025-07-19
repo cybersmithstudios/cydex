@@ -1,0 +1,173 @@
+import React, { useState } from 'react';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { MapPin } from 'lucide-react';
+
+interface DeliveryAddress {
+  street: string;
+  city: string;
+  state: string;
+  country: string;
+  landmark: string;
+  phone: string;
+  additional_info: string;
+}
+
+interface DeliveryAddressModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onAddressConfirmed: (address: DeliveryAddress) => void;
+  customerPhone?: string;
+}
+
+export const DeliveryAddressModal: React.FC<DeliveryAddressModalProps> = ({
+  isOpen,
+  onClose,
+  onAddressConfirmed,
+  customerPhone = ''
+}) => {
+  const [address, setAddress] = useState<DeliveryAddress>({
+    street: '',
+    city: '',
+    state: '',
+    country: 'Nigeria',
+    landmark: '',
+    phone: customerPhone,
+    additional_info: ''
+  });
+
+  const [errors, setErrors] = useState<Partial<DeliveryAddress>>({});
+
+  const validateForm = () => {
+    const newErrors: Partial<DeliveryAddress> = {};
+
+    if (!address.street.trim()) newErrors.street = 'Street address is required';
+    if (!address.city.trim()) newErrors.city = 'City is required';
+    if (!address.state.trim()) newErrors.state = 'State is required';
+    if (!address.phone.trim()) newErrors.phone = 'Phone number is required';
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleSubmit = () => {
+    if (validateForm()) {
+      onAddressConfirmed(address);
+      onClose();
+    }
+  };
+
+  const handleInputChange = (field: keyof DeliveryAddress, value: string) => {
+    setAddress(prev => ({ ...prev, [field]: value }));
+    if (errors[field]) {
+      setErrors(prev => ({ ...prev, [field]: undefined }));
+    }
+  };
+
+  return (
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="sm:max-w-md max-h-[90vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2">
+            <MapPin className="h-5 w-5" />
+            Delivery Address
+          </DialogTitle>
+          <DialogDescription>
+            Please provide your delivery address details
+          </DialogDescription>
+        </DialogHeader>
+        
+        <div className="space-y-4 py-4">
+          <div className="space-y-2">
+            <Label htmlFor="street">Street Address *</Label>
+            <Input
+              id="street"
+              placeholder="e.g., 123 Main Street, Apartment 4B"
+              value={address.street}
+              onChange={(e) => handleInputChange('street', e.target.value)}
+              className={errors.street ? 'border-red-500' : ''}
+            />
+            {errors.street && <p className="text-red-500 text-sm">{errors.street}</p>}
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="city">City *</Label>
+              <Input
+                id="city"
+                placeholder="e.g., Lagos"
+                value={address.city}
+                onChange={(e) => handleInputChange('city', e.target.value)}
+                className={errors.city ? 'border-red-500' : ''}
+              />
+              {errors.city && <p className="text-red-500 text-sm">{errors.city}</p>}
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="state">State *</Label>
+              <Input
+                id="state"
+                placeholder="e.g., Lagos"
+                value={address.state}
+                onChange={(e) => handleInputChange('state', e.target.value)}
+                className={errors.state ? 'border-red-500' : ''}
+              />
+              {errors.state && <p className="text-red-500 text-sm">{errors.state}</p>}
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="landmark">Nearest Landmark</Label>
+            <Input
+              id="landmark"
+              placeholder="e.g., Near Shoprite Mall"
+              value={address.landmark}
+              onChange={(e) => handleInputChange('landmark', e.target.value)}
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="phone">Contact Phone Number *</Label>
+            <Input
+              id="phone"
+              placeholder="e.g., +234 801 234 5678"
+              value={address.phone}
+              onChange={(e) => handleInputChange('phone', e.target.value)}
+              className={errors.phone ? 'border-red-500' : ''}
+            />
+            {errors.phone && <p className="text-red-500 text-sm">{errors.phone}</p>}
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="additional_info">Additional Instructions</Label>
+            <Textarea
+              id="additional_info"
+              placeholder="e.g., Ring the bell twice, Call when you arrive"
+              value={address.additional_info}
+              onChange={(e) => handleInputChange('additional_info', e.target.value)}
+              className="min-h-[80px]"
+            />
+          </div>
+
+          <div className="flex gap-3 pt-4">
+            <Button variant="outline" onClick={onClose} className="flex-1">
+              Cancel
+            </Button>
+            <Button onClick={handleSubmit} className="flex-1">
+              Confirm Address
+            </Button>
+          </div>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+};

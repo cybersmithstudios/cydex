@@ -52,14 +52,20 @@ const PersonalInfoForm = ({ formData, editing, onInputChange, onSave }: Personal
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="phone">Phone Number</Label>
+            <Label htmlFor="phone" className="text-red-600 font-medium">Phone Number * (Required)</Label>
             <Input 
               id="phone" 
+              placeholder="Your Phone Number (Required)"
               value={formData.phone}
               onChange={(e) => onInputChange('phone', e.target.value)}
               disabled={!editing}
-              className={!editing ? "bg-gray-50" : ""} 
+              className={`${!editing ? "bg-gray-50" : ""} ${!formData.phone ? 'border-red-500 bg-red-50' : ''}`}
             />
+            {!formData.phone && (
+              <p className="text-red-500 text-sm font-medium">
+                ⚠️ Phone number is required for delivery coordination
+              </p>
+            )}
           </div>
           <div className="space-y-2">
             <Label htmlFor="address">Address</Label>

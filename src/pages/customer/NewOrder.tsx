@@ -11,6 +11,7 @@ import { ShoppingCartSidebar } from '@/components/customer/ShoppingCartSidebar';
 import { DeliveryScheduler } from '@/components/customer/DeliveryScheduler';
 import { useProducts } from '@/hooks/useProducts';
 import { supabase } from '@/lib/supabase';
+import { DeliveryAddressModal } from '@/components/customer/DeliveryAddressModal';
 import { PaymentModal } from '@/components/customer/PaymentModal';
 import { useCartContext } from '@/contexts/CartContext';
 import { VendorRatingModal } from '@/components/customer/VendorRatingModal';
@@ -59,6 +60,8 @@ const NewOrder = () => {
   } | null>(null);
   const [isCategoriesExpanded, setIsCategoriesExpanded] = useState(false);
   const [isFiltersExpanded, setIsFiltersExpanded] = useState(false);
+  const [isAddressModalOpen, setIsAddressModalOpen] = useState(false);
+  const [deliveryAddress, setDeliveryAddress] = useState<any>(null);
   const itemsPerPage = 12;
 
   // Filter products to only show those from selected vendor with valid vendor info
@@ -134,6 +137,24 @@ const NewOrder = () => {
         return;
       }
 
+      // Check if user has phone number
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('phone')
+        .eq('id', user.id)
+        .single();
+
+      if (!profile?.phone) {
+        toast.error('Please add your phone number in your profile before placing an order');
+        return;
+      }
+
+      // Show address modal if no delivery address is set
+      if (!deliveryAddress) {
+        setIsAddressModalOpen(true);
+        return;
+      }
+
       // Verify all items are from the same vendor
       const vendorIds = Array.from(new Set(cartItems.map(item => item.vendor_id)));
       if (vendorIds.length > 1) {
@@ -141,6 +162,34 @@ const NewOrder = () => {
         return;
       }
 
+      const subtotal = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+      const delivery_fee = 1000;
+      const total_amount = subtotal + delivery_fee;
+
+      await createOrderWithAddress();
+    } catch (error) {
+      console.error('Error in checkout process:', error);
+      toast.error('Failed to proceed with checkout. Please try again.');
+    }
+  };
+
+  const handleActualCheckout = async () => {
+    try {
+      const subtotal = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+      const delivery_fee = 1000;
+      const total_amount = subtotal + delivery_fee;
+
+      await createOrderWithAddress();
+    } catch (error) {
+      console.error('Error placing order:', error);
+      toast.error('Failed to place order. Please try again.');
+    }
+  };
+
+  const createOrderWithAddress = async () => {
+    if (!user?.id || !selectedVendor || !deliveryAddress) return;
+    
+    try {
       const subtotal = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
       const delivery_fee = 1000;
       const total_amount = subtotal + delivery_fee;
@@ -154,12 +203,7 @@ const NewOrder = () => {
           status: 'pending',
           payment_status: 'pending',
           delivery_type: 'standard',
-          delivery_address: {
-            street: '123 Example Street',
-            city: 'Example City',
-            state: 'Example State',
-            country: 'Nigeria'
-          },
+          delivery_address: deliveryAddress,
           subtotal,
           delivery_fee,
           total_amount,
@@ -191,8 +235,8 @@ const NewOrder = () => {
       setIsPaymentModalOpen(true);
       setIsCartOpen(false);
     } catch (error) {
-      console.error('Error placing order:', error);
-      toast.error('Failed to place order. Please try again.');
+      console.error('Error creating order:', error);
+      toast.error('Failed to create order. Please try again.');
     }
   };
 
@@ -244,6 +288,8 @@ const NewOrder = () => {
   const handleRatingModalClose = () => {
     setIsRatingModalOpen(false);
     setRatingOrderData(null);
+    setDeliveryAddress(null);
+    clearCart();
     navigate('/customer/orders');
   };
 
@@ -411,6 +457,19 @@ const NewOrder = () => {
           orderNumber={ratingOrderData.orderNumber}
         />
       )}
+      
+      {/* Delivery Address Modal */}
+      <DeliveryAddressModal
+        isOpen={isAddressModalOpen}
+        onClose={() => setIsAddressModalOpen(false)}
+        onAddressConfirmed={(address) => {
+          setDeliveryAddress(address);
+          setIsAddressModalOpen(false);
+          // Proceed with checkout after address is confirmed
+          handleActualCheckout();
+        }}
+        customerPhone=""
+      />
       
       {/* Delivery Scheduler Dialog */}
       <DeliveryScheduler 

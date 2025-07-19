@@ -222,11 +222,28 @@ const OrderDetailReal = () => {
                   <MapPin className="h-5 w-5 text-gray-400 mt-0.5" />
                   <div>
                     <p className="font-medium">Delivery Address</p>
-                    <p className="text-sm text-gray-600">
-                      {order.delivery_address?.street}, {order.delivery_address?.city}
-                      {order.delivery_address?.state && `, ${order.delivery_address.state}`}
-                      {order.delivery_address?.postal_code && ` ${order.delivery_address.postal_code}`}
-                    </p>
+                    <div className="text-sm text-gray-600 space-y-1">
+                      {typeof order.delivery_address === 'object' ? (
+                        <>
+                          <p className="font-medium">{order.delivery_address.street}</p>
+                          <p>{order.delivery_address.city}, {order.delivery_address.state}</p>
+                          {order.delivery_address.landmark && (
+                            <p className="text-xs text-gray-500">Landmark: {order.delivery_address.landmark}</p>
+                          )}
+                          {order.delivery_address.phone && (
+                            <div className="flex items-center space-x-2 mt-2">
+                              <Phone className="h-4 w-4 text-gray-400" />
+                              <span className="text-sm font-medium">Contact: {order.delivery_address.phone}</span>
+                            </div>
+                          )}
+                          {order.delivery_address.additional_info && (
+                            <p className="text-xs text-blue-600 italic">Note: {order.delivery_address.additional_info}</p>
+                          )}
+                        </>
+                      ) : (
+                        <p>{order.delivery_address || 'Address not available'}</p>
+                      )}
+                    </div>
                   </div>
                 </div>
                 
