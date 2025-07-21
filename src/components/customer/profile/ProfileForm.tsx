@@ -29,14 +29,22 @@ const ProfileForm = ({
   return (
     <div className="md:w-2/3 space-y-4">
       <div className="space-y-1">
-        <Label htmlFor="name">Full Name</Label>
+        <Label htmlFor="name" className="text-red-600 font-medium">
+          Full Name * (Required)
+        </Label>
         <Input 
           id="name" 
-          placeholder="Your Name" 
+          placeholder="Your Full Name (Required)" 
           value={profileData.name}
           onChange={(e) => handleInputChange('name', e.target.value)}
-          disabled={!isEditing} 
+          disabled={!isEditing}
+          className={!profileData.name ? 'border-red-500 bg-red-50' : ''}
         />
+        {!profileData.name && (
+          <p className="text-red-500 text-sm font-medium">
+            ⚠️ Full name is required for order processing
+          </p>
+        )}
       </div>
       <div className="space-y-1">
         <Label htmlFor="email">Email Address</Label>

@@ -31,14 +31,20 @@ const PersonalInfoForm = ({ formData, editing, onInputChange, onSave }: Personal
       <CardContent className="p-6 pt-0">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-2">
-            <Label htmlFor="name">Full Name</Label>
+            <Label htmlFor="name" className="text-red-600 font-medium">Full Name * (Required)</Label>
             <Input 
               id="name" 
+              placeholder="Your Full Name (Required)"
               value={formData.name}
               onChange={(e) => onInputChange('name', e.target.value)}
               disabled={!editing}
-              className={!editing ? "bg-gray-50" : ""} 
+              className={`${!editing ? "bg-gray-50" : ""} ${!formData.name ? 'border-red-500 bg-red-50' : ''}`}
             />
+            {!formData.name && (
+              <p className="text-red-500 text-sm font-medium">
+                ⚠️ Full name is required for delivery coordination
+              </p>
+            )}
           </div>
           <div className="space-y-2">
             <Label htmlFor="email">Email</Label>

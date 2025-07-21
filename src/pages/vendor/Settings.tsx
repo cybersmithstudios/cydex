@@ -243,14 +243,22 @@ const VendorSettingsPage = () => {
                   </div>
 
                   <div className="lg:w-2/3 space-y-3 sm:space-y-4">
-                    <FormField
-                      id="name"
-                      label="Store Name"
-                      placeholder="Your Store Name"
-                      value={profileData.name}
-                      onChange={(value) => handleInputChange('name', value)}
-                      disabled={!isEditing}
-                    />
+                    <div className="space-y-1 sm:space-y-2">
+                      <Label htmlFor="name" className="text-red-600 font-medium text-sm sm:text-base">Store Name * (Required)</Label>
+                      <Input
+                        id="name"
+                        placeholder="Your Store Name (Required)"
+                        value={profileData.name}
+                        onChange={(e) => handleInputChange('name', e.target.value)}
+                        disabled={!isEditing}
+                        className={`text-sm sm:text-base ${!profileData.name ? 'border-red-500 bg-red-50' : ''}`}
+                      />
+                      {!profileData.name && (
+                        <p className="text-red-500 text-sm font-medium">
+                          ⚠️ Store name is required for order management
+                        </p>
+                      )}
+                    </div>
                     
                     <FormField
                       id="email"
