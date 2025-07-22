@@ -65,7 +65,7 @@ const PersonalInfoTab = ({ editing, profile, onSaveProfile }: PersonalInfoTabPro
       
       initializedRef.current = true;
     }
-  }, [profile?.id]);
+  }, [profile]);
 
   // Reset initialization flag when profile ID changes
   useEffect(() => {

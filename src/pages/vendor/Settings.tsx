@@ -71,7 +71,7 @@ const VendorSettingsPage = () => {
       });
       setLocalSettings(settings);
     }
-  }, [profile, settings, formatAddress]);
+  }, [profile, settings]); // Remove formatAddress dependency
 
   // Load additional data
   useEffect(() => {
