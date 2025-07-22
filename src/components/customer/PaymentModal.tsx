@@ -173,6 +173,23 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({
             <span className="font-bold text-lg">₦{amount.toLocaleString()}</span>
           </div>
           
+          {/* Payment Method Selection */}
+          <div className="space-y-3">
+            <h3 className="text-sm font-medium text-gray-700">Choose Payment Method</h3>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="border border-gray-300 rounded-lg p-3 text-center bg-gray-50">
+                <div className="text-gray-400 mb-1">💰</div>
+                <p className="text-sm font-medium text-gray-500">Wallet</p>
+                <p className="text-xs text-gray-400 mt-1">Coming Soon</p>
+              </div>
+              <div className="border-2 border-primary rounded-lg p-3 text-center bg-primary/5">
+                <div className="text-primary mb-1">💳</div>
+                <p className="text-sm font-medium text-primary">Paystack</p>
+                <p className="text-xs text-gray-600 mt-1">Available</p>
+              </div>
+            </div>
+          </div>
+
           <div className="bg-blue-50 p-3 rounded-lg border border-blue-100">
             <div className="flex items-start">
               <div className="flex-shrink-0 mt-0.5">
@@ -209,7 +226,7 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({
                 Processing...
               </>
             ) : (
-              `Pay ₦${amount.toLocaleString()} Now`
+              `Pay with Paystack - ₦${amount.toLocaleString()}`
             )}
           </Button>
           

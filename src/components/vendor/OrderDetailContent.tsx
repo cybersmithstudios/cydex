@@ -185,8 +185,9 @@ const OrderDetailContent = ({ order, orderId }: OrderDetailContentProps) => {
         
         <div className="space-y-4 sm:space-y-6">
           <CustomerInfoCard 
-            customer={order.customer}
+            customer={order.customer?.name || order.customer}
             paymentMethod={order.paymentMethod}
+            phone={order.customer?.phone}
           />
           
           <OrderTimeline 

@@ -187,6 +187,21 @@ const CustomerDashboard = () => {
                                 <span className="mx-2 text-gray-300">•</span>
                                 <span>Updated {formatDistanceToNow(new Date(order.updated_at))} ago</span>
                               </div>
+                              {/* Order Items Preview */}
+                              {order.order_items && order.order_items.length > 0 && (
+                                <div className="mt-2 flex -space-x-1 overflow-hidden">
+                                  {order.order_items.slice(0, 3).map((item, index) => (
+                                    <div key={index} className="h-6 w-6 sm:h-8 sm:w-8 bg-gray-100 border border-white rounded flex items-center justify-center flex-shrink-0" title={item.product_name || 'Product'}>
+                                      <Box className="h-3 w-3 sm:h-4 sm:w-4 text-gray-400" />
+                                    </div>
+                                  ))}
+                                  {order.order_items.length > 3 && (
+                                    <div className="h-6 w-6 sm:h-8 sm:w-8 bg-gray-200 border border-white rounded flex items-center justify-center text-xs text-gray-600 font-medium">
+                                      +{order.order_items.length - 3}
+                                    </div>
+                                  )}
+                                </div>
+                              )}
                             </div>
                           </div>
                           
@@ -256,6 +271,21 @@ const CustomerDashboard = () => {
                               <span className="mx-2 text-gray-300">•</span>
                               <span>{formatCurrency(order.total_amount)}</span>
                             </div>
+                            {/* Order Items Preview */}
+                            {order.order_items && order.order_items.length > 0 && (
+                              <div className="mt-2 flex -space-x-1 overflow-hidden">
+                                {order.order_items.slice(0, 3).map((item, index) => (
+                                  <div key={index} className="h-6 w-6 sm:h-8 sm:w-8 bg-gray-100 border border-white rounded flex items-center justify-center flex-shrink-0" title={item.product_name || 'Product'}>
+                                    <Box className="h-3 w-3 sm:h-4 sm:w-4 text-gray-400" />
+                                  </div>
+                                ))}
+                                {order.order_items.length > 3 && (
+                                  <div className="h-6 w-6 sm:h-8 sm:w-8 bg-gray-200 border border-white rounded flex items-center justify-center text-xs text-gray-600 font-medium">
+                                    +{order.order_items.length - 3}
+                                  </div>
+                                )}
+                              </div>
+                            )}
                           </div>
                         </div>
                         

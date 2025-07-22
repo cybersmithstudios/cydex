@@ -77,6 +77,7 @@ export const useVendorOrders = () => {
           order_items(*)
         `)
         .eq('vendor_id', user.id)
+        .eq('payment_status', 'paid')
         .order('created_at', { ascending: false });
 
       if (fetchError) {

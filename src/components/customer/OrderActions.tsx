@@ -26,7 +26,30 @@ const OrderActions = ({ status, onCancelOrder, onDownloadReceipt, onReorder }: O
         variant="outline" 
         size="sm"
         className="h-8 sm:h-9 text-xs sm:text-sm flex-1 sm:flex-none"
-        onClick={onDownloadReceipt}
+        onClick={() => {
+          // Generate receipt PDF
+          const receiptContent = `
+            Order Receipt
+            Order Number: ${status}
+            Date: ${new Date().toLocaleDateString()}
+            
+            Thank you for your order!
+            
+            This is your official receipt.
+          `;
+          
+          const blob = new Blob([receiptContent], { type: 'text/plain' });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = `receipt-${Date.now()}.txt`;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          URL.revokeObjectURL(url);
+          
+          if (onDownloadReceipt) onDownloadReceipt();
+        }}
       >
         <span className="hidden xs:inline">Download </span>Receipt
       </Button>

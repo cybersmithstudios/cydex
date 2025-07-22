@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -11,6 +11,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { MapPin } from 'lucide-react';
+import { useAuth } from '@/contexts/SupabaseAuthContext';
+import { useCustomerAddress } from '@/hooks/useCustomerAddress';
 
 interface DeliveryAddress {
   street: string;
@@ -35,17 +37,41 @@ export const DeliveryAddressModal: React.FC<DeliveryAddressModalProps> = ({
   onAddressConfirmed,
   customerPhone = ''
 }) => {
+  const { user } = useAuth();
+  const { savedAddress, saveAddress } = useCustomerAddress();
+  const defaultPhone = customerPhone || '';
+
   const [address, setAddress] = useState<DeliveryAddress>({
     street: '',
     city: '',
     state: '',
     country: 'Nigeria',
     landmark: '',
-    phone: customerPhone,
+    phone: defaultPhone,
     additional_info: ''
   });
 
   const [errors, setErrors] = useState<Partial<DeliveryAddress>>({});
+
+  // Load saved address when modal opens
+  useEffect(() => {
+    if (isOpen && savedAddress) {
+      setAddress({
+        ...savedAddress,
+        phone: savedAddress.phone || defaultPhone, // Use saved phone or current user phone
+      });
+    } else if (isOpen) {
+      setAddress({
+        street: '',
+        city: '',
+        state: '',
+        country: 'Nigeria',
+        landmark: '',
+        phone: defaultPhone,
+        additional_info: ''
+      });
+    }
+  }, [isOpen, savedAddress, defaultPhone]);
 
   const validateForm = () => {
     const newErrors: Partial<DeliveryAddress> = {};
@@ -61,6 +87,8 @@ export const DeliveryAddressModal: React.FC<DeliveryAddressModalProps> = ({
 
   const handleSubmit = () => {
     if (validateForm()) {
+      // Save address for future use
+      saveAddress(address);
       onAddressConfirmed(address);
       onClose();
     }
@@ -82,8 +110,16 @@ export const DeliveryAddressModal: React.FC<DeliveryAddressModalProps> = ({
             Delivery Address
           </DialogTitle>
           <DialogDescription>
-            Please provide your delivery address details
+            {savedAddress 
+              ? "Update your delivery address or use the saved one below"
+              : "Please provide your delivery address details"
+            }
           </DialogDescription>
+          {savedAddress && (
+            <div className="text-sm text-green-600 bg-green-50 p-2 rounded">
+              ✓ Using your saved address. You can modify it below.
+            </div>
+          )}
         </DialogHeader>
         
         <div className="space-y-4 py-4">

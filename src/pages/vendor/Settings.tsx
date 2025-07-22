@@ -305,23 +305,53 @@ const VendorSettingsPage = () => {
                       isTextarea
                     />
                     
-                    <FormField
-                      id="businessLicense"
-                      label="Business License"
-                      placeholder="Your Business License"
-                      value={profileData.business_license}
-                      onChange={(value) => handleInputChange('business_license', value)}
-                      disabled={!isEditing}
-                    />
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium text-gray-700">
+                        Business License
+                      </label>
+                      <div className="relative">
+                        <Input
+                          placeholder="Your Business License"
+                          value=""
+                          disabled
+                          className="bg-gray-50 text-gray-400"
+                        />
+                        <div className="absolute inset-y-0 right-0 flex items-center pr-3">
+                          <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">
+                            Coming Soon...
+                          </span>
+                        </div>
+                      </div>
+                    </div>
                     
-                    <FormField
-                      id="category"
-                      label="Category"
-                      placeholder="Your Business Category"
-                      value={profileData.category}
-                      onChange={(value) => handleInputChange('category', value)}
-                      disabled={!isEditing}
-                    />
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium text-gray-700">
+                        Category <span className="text-red-500">*</span>
+                      </label>
+                      <select
+                        value={profileData.category}
+                        onChange={(e) => handleInputChange('category', e.target.value)}
+                        disabled={!isEditing}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary disabled:bg-gray-50 disabled:text-gray-500"
+                      >
+                        <option value="">Select a category</option>
+                        <option value="restaurant">Restaurant</option>
+                        <option value="grocery">Grocery Store</option>
+                        <option value="pharmacy">Pharmacy</option>
+                        <option value="electronics">Electronics</option>
+                        <option value="clothing">Clothing & Fashion</option>
+                        <option value="books">Books & Stationery</option>
+                        <option value="home-garden">Home & Garden</option>
+                        <option value="health-beauty">Health & Beauty</option>
+                        <option value="sports">Sports & Outdoors</option>
+                        <option value="toys">Toys & Games</option>
+                        <option value="automotive">Automotive</option>
+                        <option value="other">Other</option>
+                      </select>
+                      {!profileData.category && (
+                        <p className="text-sm text-red-500">Please select a category to continue</p>
+                      )}
+                    </div>
                   </div>
                 </div>
 
