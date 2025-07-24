@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Search, ArrowLeft } from 'lucide-react';
 import { useAuth } from '@/contexts/SupabaseAuthContext';
@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import { ShoppingCartSidebar } from '@/components/customer/ShoppingCartSidebar';
 import { DeliveryScheduler } from '@/components/customer/DeliveryScheduler';
+import { useCustomerAddress } from '@/hooks/useCustomerAddress';
 import { useProducts } from '@/hooks/useProducts';
 import { supabase } from '@/lib/supabase';
 import { DeliveryAddressModal } from '@/components/customer/DeliveryAddressModal';
@@ -61,7 +62,15 @@ const NewOrder = () => {
   const [isCategoriesExpanded, setIsCategoriesExpanded] = useState(false);
   const [isFiltersExpanded, setIsFiltersExpanded] = useState(false);
   const [isAddressModalOpen, setIsAddressModalOpen] = useState(false);
+  const { savedAddress } = useCustomerAddress();
   const [deliveryAddress, setDeliveryAddress] = useState<any>(null);
+
+  // Autofill deliveryAddress from savedAddress so modal is skipped next orders
+  useEffect(() => {
+    if (!deliveryAddress && savedAddress) {
+      setDeliveryAddress(savedAddress);
+    }
+  }, [savedAddress]);
   const itemsPerPage = 12;
 
   // Filter products to only show those from selected vendor with valid vendor info

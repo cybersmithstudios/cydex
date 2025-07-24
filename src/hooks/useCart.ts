@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { toast } from 'sonner';
 
 export interface CartItem {
@@ -10,9 +10,30 @@ export interface CartItem {
   vendor_name: string;
 }
 
+// Key used to persist cart in localStorage
+const CART_STORAGE_KEY = 'shopping_cart';
+
 export const useCart = () => {
-  const [cartItems, setCartItems] = useState<CartItem[]>([]);
+  const [cartItems, setCartItems] = useState<CartItem[]>(() => {
+    if (typeof window === 'undefined') return [];
+    try {
+      const stored = localStorage.getItem(CART_STORAGE_KEY);
+      return stored ? (JSON.parse(stored) as CartItem[]) : [];
+    } catch (error) {
+      console.error('Failed to parse stored cart', error);
+      return [];
+    }
+  });
   const [isCartOpen, setIsCartOpen] = useState(false);
+
+  // Persist cart items to localStorage whenever they change
+  useEffect(() => {
+    try {
+      localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cartItems));
+    } catch (error) {
+      console.error('Failed to save cart', error);
+    }
+  }, [cartItems]);
 
   const addToCart = useCallback((item: Omit<CartItem, 'quantity'>, quantity: number = 1) => {
     setCartItems(prev => {
@@ -51,6 +72,11 @@ export const useCart = () => {
 
   const clearCart = useCallback(() => {
     setCartItems([]);
+    try {
+      localStorage.removeItem(CART_STORAGE_KEY);
+    } catch (error) {
+      console.error('Failed to clear cart storage', error);
+    }
   }, []);
 
   return {

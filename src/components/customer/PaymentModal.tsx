@@ -97,6 +97,9 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({
       return;
     }
 
+    // Close our dialog first so Paystack iframe is unobstructed
+    onClose();
+
     setIsLoading(true);
 
     try {
