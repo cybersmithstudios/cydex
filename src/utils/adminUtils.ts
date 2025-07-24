@@ -22,6 +22,7 @@ export const getAllUsers = async () => {
     const { data: profiles, error } = await supabase
       .from('profiles')
       .select('*')
+      .neq('role', null)
       .order('created_at', { ascending: false });
     
     if (error) {

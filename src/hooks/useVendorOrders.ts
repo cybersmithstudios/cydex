@@ -85,27 +85,39 @@ export const useVendorOrders = () => {
         throw fetchError;
       }
 
-      // Transform the data to match our interface
-      const transformedOrders: VendorOrder[] = (data || []).map((order: any) => ({
-        ...order,
-        customer: {
-          name: order.customer?.name || 'Unknown Customer',
-          email: order.customer?.email || 'unknown@email.com',
-          phone: order.customer?.phone || undefined,
-        },
-        rider: order.rider ? {
-          name: order.rider.name || 'Unknown Rider',
-          email: order.rider.email || 'unknown@email.com',
-          phone: order.rider.phone || undefined,
-        } : undefined,
-        order_items: (order.order_items || []).map((item: any) => ({
-          ...item,
-          is_eco_friendly: item.is_eco_friendly ?? true,
-          carbon_impact: item.carbon_impact ?? 0
-        })),
+      // Fetch missing customer info if needed
+      const ordersWithCustomer = await Promise.all((data || []).map(async (order: any) => {
+        let customer = order.customer;
+        if (!customer && order.customer_id) {
+          // Fetch from profiles
+          const { data: profile } = await supabase
+            .from('profiles')
+            .select('name, email, phone')
+            .eq('id', order.customer_id)
+            .single();
+          customer = profile || null;
+        }
+        return {
+          ...order,
+          customer: {
+            name: customer?.name || 'Unknown Customer',
+            email: customer?.email || 'unknown@email.com',
+            phone: customer?.phone || undefined,
+          },
+          rider: order.rider ? {
+            name: order.rider.name || 'Unknown Rider',
+            email: order.rider.email || 'unknown@email.com',
+            phone: order.rider.phone || undefined,
+          } : undefined,
+          order_items: (order.order_items || []).map((item: any) => ({
+            ...item,
+            is_eco_friendly: item.is_eco_friendly ?? true,
+            carbon_impact: item.carbon_impact ?? 0
+          })),
+        };
       }));
 
-      setOrders(transformedOrders);
+      setOrders(ordersWithCustomer);
     } catch (err: any) {
       console.error('Error in fetchOrders:', err);
       setError(err.message || 'Failed to fetch orders');
