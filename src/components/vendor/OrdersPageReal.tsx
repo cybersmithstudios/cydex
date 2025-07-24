@@ -115,22 +115,22 @@ const OrdersPageReal = () => {
               variant="outline"
               onClick={(e) => {
                 e.stopPropagation();
-                updateOrderStatus(order.id, 'processing');
+                updateOrderStatus(order.id, 'accepted');
               }}
             >
               Accept
             </Button>
           )}
-          {order.status === 'processing' && (
+          {order.status === 'accepted' && (
             <Button
               size="sm"
               variant="outline"
               onClick={(e) => {
                 e.stopPropagation();
-                updateOrderStatus(order.id, 'delivered');
+                updateOrderStatus(order.id, 'ready_for_pickup');
               }}
             >
-              Mark Delivered
+              Ready for Pickup
             </Button>
           )}
         </div>

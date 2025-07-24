@@ -66,7 +66,7 @@ const OrderDetailReal = () => {
   };
 
   const handleAcceptOrder = async (orderId: string) => {
-    await handleStatusUpdate('processing');
+    await handleStatusUpdate('accepted');
   };
 
   const handleRejectOrder = async (orderId: string, reason: string) => {
@@ -74,7 +74,7 @@ const OrderDetailReal = () => {
   };
 
   const handleMarkReady = async () => {
-    await handleStatusUpdate('ready');
+    await handleStatusUpdate('ready_for_pickup');
   };
 
   if (loading) {
@@ -153,7 +153,7 @@ const OrderDetailReal = () => {
         <div className="text-right">
           {getStatusBadge(order.status)}
           <div className="mt-2">
-            {order.status === 'processing' && order.rider_id && (
+            {order.status === 'accepted' && (
               <Button onClick={handleMarkReady} disabled={actionLoading}>
                 Mark Ready for Pickup
               </Button>

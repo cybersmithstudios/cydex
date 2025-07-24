@@ -117,30 +117,68 @@ export const useVendorOrders = () => {
 
   const updateOrderStatus = async (orderId: string, newStatus: string) => {
     try {
-      const updateData: any = { 
-        status: newStatus,
-        updated_at: new Date().toISOString()
-      };
-
-      // Add timestamp fields based on status
-      if (newStatus === 'delivered') {
-        updateData.delivered_at = new Date().toISOString();
-      } else if (newStatus === 'cancelled') {
-        updateData.cancelled_at = new Date().toISOString();
+      // Find the order to check current status
+      const order = orders.find(o => o.id === orderId);
+      if (!order) {
+        toast.error('Order not found');
+        return false;
       }
-
-      const { error } = await supabase
-        .from('orders')
-        .update(updateData)
-        .eq('id', orderId)
-        .eq('vendor_id', user?.id);
-
-      if (error) throw error;
-
-      // Refresh orders after update
-      await fetchOrders();
-      toast.success(`Order status updated to ${newStatus}`);
-      return true;
+      // Only allow valid transitions
+      if (order.status === 'pending' && newStatus === 'accepted') {
+        // Accept order
+        const updateData: any = {
+          status: 'accepted',
+          vendor_accepted_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        };
+        const { error } = await supabase
+          .from('orders')
+          .update(updateData)
+          .eq('id', orderId)
+          .eq('vendor_id', user?.id);
+        if (error) throw error;
+        await fetchOrders();
+        toast.success('Order accepted');
+        return true;
+      } else if (order.status === 'accepted' && newStatus === 'ready_for_pickup') {
+        // Mark as ready for pickup
+        const updateData: any = {
+          status: 'ready_for_pickup',
+          ready_for_pickup_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        };
+        const { error } = await supabase
+          .from('orders')
+          .update(updateData)
+          .eq('id', orderId)
+          .eq('vendor_id', user?.id);
+        if (error) throw error;
+        await fetchOrders();
+        toast.success('Order marked as ready for pickup');
+        return true;
+      } else if (newStatus === 'delivered') {
+        toast.error('Vendors cannot mark orders as delivered');
+        return false;
+      } else if (newStatus === 'cancelled' && (order.status === 'pending' || order.status === 'accepted')) {
+        // Allow vendor to cancel only if pending or accepted
+        const updateData: any = {
+          status: 'cancelled',
+          cancelled_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        };
+        const { error } = await supabase
+          .from('orders')
+          .update(updateData)
+          .eq('id', orderId)
+          .eq('vendor_id', user?.id);
+        if (error) throw error;
+        await fetchOrders();
+        toast.success('Order cancelled');
+        return true;
+      } else {
+        toast.error('Invalid status transition');
+        return false;
+      }
     } catch (error: any) {
       console.error('Error updating order status:', error);
       toast.error('Failed to update order status');
