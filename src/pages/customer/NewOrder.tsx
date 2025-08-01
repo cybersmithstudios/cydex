@@ -253,12 +253,12 @@ const NewOrder = () => {
     if (!currentOrder) return;
 
     try {
-      // Update order with payment reference and status
+      // Update order with payment reference and status - keep as pending until vendor accepts
       const { error } = await supabase
         .from('orders')
         .update({ 
           payment_status: 'paid', 
-          status: 'processing',
+          status: 'pending', // Keep as pending until vendor accepts
           payment_reference: reference,
           updated_at: new Date().toISOString()
         })
