@@ -253,7 +253,7 @@ const OrderDetailPage = () => {
       name: order.rider.name,
       phone: order.rider.phone || '',
       rating: 4.8, // Default rating as we don't have rider ratings in the schema yet
-      photo: null
+      photo: order.rider.avatar || null
     } : undefined,
     riderName: order.rider?.name,
     products: order.order_items?.map(item => ({

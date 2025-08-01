@@ -354,8 +354,8 @@ const NewOrder = () => {
             </div>
           </div>
           
-          {/* Cart Button for Desktop */}
-          <div className="hidden lg:block">
+          {/* Cart Button for Desktop and Mobile */}
+          <div className="block">
             <Button
               variant="default"
               onClick={() => setIsCartOpen(true)}
