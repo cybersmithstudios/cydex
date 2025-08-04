@@ -367,6 +367,7 @@ export type Database = {
       }
       orders: {
         Row: {
+          base_rate: number | null
           cancel_reason: string | null
           cancelled_at: string | null
           carbon_credits_earned: number | null
@@ -376,8 +377,15 @@ export type Database = {
           delivery_address: Json
           delivery_fee: number | null
           delivery_type: string
+          distance_fee: number | null
+          distance_km: number | null
           estimated_delivery_time: string | null
+          green_fee: number | null
           id: string
+          is_late_night: boolean | null
+          is_peak_hour: boolean | null
+          is_student_order: boolean | null
+          late_night_fee: number | null
           order_number: string
           payment_method: string | null
           payment_reference: string | null
@@ -388,15 +396,21 @@ export type Database = {
           rider_id: string | null
           special_instructions: string | null
           status: string
+          student_discount: number | null
+          subscription_applied: boolean | null
           subtotal: number
+          surge_fee: number | null
           time_slot: string | null
           total_amount: number
           updated_at: string
           vendor_accepted_at: string | null
           vendor_id: string | null
           verification_code: string | null
+          weight_fee: number | null
+          weight_kg: number | null
         }
         Insert: {
+          base_rate?: number | null
           cancel_reason?: string | null
           cancelled_at?: string | null
           carbon_credits_earned?: number | null
@@ -406,8 +420,15 @@ export type Database = {
           delivery_address: Json
           delivery_fee?: number | null
           delivery_type?: string
+          distance_fee?: number | null
+          distance_km?: number | null
           estimated_delivery_time?: string | null
+          green_fee?: number | null
           id?: string
+          is_late_night?: boolean | null
+          is_peak_hour?: boolean | null
+          is_student_order?: boolean | null
+          late_night_fee?: number | null
           order_number: string
           payment_method?: string | null
           payment_reference?: string | null
@@ -418,15 +439,21 @@ export type Database = {
           rider_id?: string | null
           special_instructions?: string | null
           status?: string
+          student_discount?: number | null
+          subscription_applied?: boolean | null
           subtotal: number
+          surge_fee?: number | null
           time_slot?: string | null
           total_amount: number
           updated_at?: string
           vendor_accepted_at?: string | null
           vendor_id?: string | null
           verification_code?: string | null
+          weight_fee?: number | null
+          weight_kg?: number | null
         }
         Update: {
+          base_rate?: number | null
           cancel_reason?: string | null
           cancelled_at?: string | null
           carbon_credits_earned?: number | null
@@ -436,8 +463,15 @@ export type Database = {
           delivery_address?: Json
           delivery_fee?: number | null
           delivery_type?: string
+          distance_fee?: number | null
+          distance_km?: number | null
           estimated_delivery_time?: string | null
+          green_fee?: number | null
           id?: string
+          is_late_night?: boolean | null
+          is_peak_hour?: boolean | null
+          is_student_order?: boolean | null
+          late_night_fee?: number | null
           order_number?: string
           payment_method?: string | null
           payment_reference?: string | null
@@ -448,13 +482,18 @@ export type Database = {
           rider_id?: string | null
           special_instructions?: string | null
           status?: string
+          student_discount?: number | null
+          subscription_applied?: boolean | null
           subtotal?: number
+          surge_fee?: number | null
           time_slot?: string | null
           total_amount?: number
           updated_at?: string
           vendor_accepted_at?: string | null
           vendor_id?: string | null
           verification_code?: string | null
+          weight_fee?: number | null
+          weight_kg?: number | null
         }
         Relationships: [
           {
@@ -479,6 +518,45 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      pricing_config: {
+        Row: {
+          base_rate: number | null
+          created_at: string | null
+          distance_rate_per_km: number | null
+          green_fee: number | null
+          id: string
+          late_night_fee: number | null
+          student_discount_percent: number | null
+          subscription_monthly_rate: number | null
+          surge_multiplier: number | null
+          weight_rates: Json | null
+        }
+        Insert: {
+          base_rate?: number | null
+          created_at?: string | null
+          distance_rate_per_km?: number | null
+          green_fee?: number | null
+          id?: string
+          late_night_fee?: number | null
+          student_discount_percent?: number | null
+          subscription_monthly_rate?: number | null
+          surge_multiplier?: number | null
+          weight_rates?: Json | null
+        }
+        Update: {
+          base_rate?: number | null
+          created_at?: string | null
+          distance_rate_per_km?: number | null
+          green_fee?: number | null
+          id?: string
+          late_night_fee?: number | null
+          student_discount_percent?: number | null
+          subscription_monthly_rate?: number | null
+          surge_multiplier?: number | null
+          weight_rates?: Json | null
+        }
+        Relationships: []
       }
       products: {
         Row: {
@@ -950,6 +1028,44 @@ export type Database = {
           {
             foreignKeyName: "rider_schedules_rider_id_fkey"
             columns: ["rider_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      student_subscriptions: {
+        Row: {
+          created_at: string | null
+          end_date: string | null
+          id: string
+          payment_reference: string | null
+          start_date: string | null
+          status: string | null
+          student_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          end_date?: string | null
+          id?: string
+          payment_reference?: string | null
+          start_date?: string | null
+          status?: string | null
+          student_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          end_date?: string | null
+          id?: string
+          payment_reference?: string | null
+          start_date?: string | null
+          status?: string | null
+          student_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "student_subscriptions_student_id_fkey"
+            columns: ["student_id"]
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
