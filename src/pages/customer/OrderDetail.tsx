@@ -52,24 +52,24 @@ const generateTrackingSteps = (order: any) => {
     { 
       id: 4, 
       title: 'Rider Assigned', 
-      completed: order.rider_id !== null, 
+      completed: ['rider_assigned', 'ready_for_pickup', 'out_for_delivery', 'delivered'].includes(order.status), 
       time: order.rider_assigned_at 
         ? new Date(order.rider_assigned_at).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }) 
         : null,
-      description: order.rider_id 
+      description: ['rider_assigned', 'ready_for_pickup', 'out_for_delivery', 'delivered'].includes(order.status)
         ? 'A rider has been assigned to your order'
         : 'Searching for an available rider'
     },
     { 
       id: 5, 
-      title: 'Ready for Pickup', 
-      completed: ['ready', 'out_for_delivery', 'delivered'].includes(order.status), 
-      time: order.ready_for_pickup_at 
-        ? new Date(order.ready_for_pickup_at).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }) 
+      title: 'Order Picked Up', 
+      completed: ['out_for_delivery', 'delivered'].includes(order.status), 
+      time: order.picked_up_at 
+        ? new Date(order.picked_up_at).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }) 
         : null,
-      description: ['ready', 'out_for_delivery', 'delivered'].includes(order.status)
-        ? 'Order is ready and will be picked up by rider'
-        : 'Order is being prepared'
+      description: ['out_for_delivery', 'delivered'].includes(order.status)
+        ? 'Order has been picked up by the rider'
+        : 'Order is being prepared for pickup'
     },
     { 
       id: 6, 
@@ -253,7 +253,7 @@ const OrderDetailPage = () => {
       name: order.rider.name,
       phone: order.rider.phone || '',
       rating: 4.8, // Default rating as we don't have rider ratings in the schema yet
-      photo: null
+      photo: order.rider.avatar || null
     } : undefined,
     riderName: order.rider?.name,
     products: order.order_items?.map(item => ({

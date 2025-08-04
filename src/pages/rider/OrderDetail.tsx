@@ -32,10 +32,10 @@ const RiderOrderDetail = () => {
 
   const getNextAction = (): { text: string; action: 'available' | 'accepted' | 'picking_up' | 'picked_up' | 'delivering' | 'delivered' | 'cancelled' } | null => {
     switch (order.status) {
-      case 'processing':
-        return { text: 'Mark as Ready for Pickup', action: 'picked_up' };
-      case 'ready':
-        return { text: 'Picked Up - Start Delivery', action: 'delivering' };
+      case 'rider_assigned':
+        return { text: 'Mark as Picked Up', action: 'picked_up' };
+      case 'ready_for_pickup':
+        return { text: 'Mark as Picked Up', action: 'picked_up' };
       case 'out_for_delivery':
         return { text: 'Mark as Delivered', action: 'delivered' };
       default:

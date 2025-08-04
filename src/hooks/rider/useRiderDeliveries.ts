@@ -73,6 +73,8 @@ export const useRiderDeliveries = () => {
               customer_id,
               vendor_id,
               subtotal,
+              status,
+              payment_status,
               customer_profile:profiles!customer_id(name),
               vendor_profile:profiles!vendor_id(name),
               order_items(count)
@@ -80,6 +82,8 @@ export const useRiderDeliveries = () => {
           `)
           .eq('status', 'available')
           .is('rider_id', null)
+          .eq('orders.payment_status', 'paid')
+          .in('orders.status', ['accepted', 'processing', 'ready_for_pickup'])
           .order('created_at', { ascending: true })
           .limit(50); // Pagination limit for performance
 
@@ -225,12 +229,13 @@ export const useRiderDeliveries = () => {
 
         if (updateError) throw updateError;
 
-        // Update the order
+        // Update the order to assign rider and change status to indicate rider is assigned
         const { error: orderError } = await supabase
           .from('orders')
           .update({ 
             rider_id: user.id,
-            status: 'processing'
+            status: 'rider_assigned',
+            rider_assigned_at: new Date().toISOString()
           })
           .eq('id', orderId);
 
@@ -278,8 +283,8 @@ export const useRiderDeliveries = () => {
       const operation = async () => {
         // Map delivery statuses to order statuses
         const orderStatusMap: Record<string, string> = {
-          'picked_up': 'ready',
-          'delivering': 'out_for_delivery',
+          'picked_up': 'out_for_delivery',
+          'delivering': 'out_for_delivery', 
           'delivered': 'delivered'
         };
 
