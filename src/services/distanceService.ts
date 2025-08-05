@@ -1,90 +1,268 @@
-// Phase 2: Distance Service
-export interface Location {
-  lat: number;
-  lng: number;
-  address: string;
-}
+import { supabase } from '@/lib/supabase';
 
 export interface DistanceResult {
-  distanceKm: number;
-  estimatedDuration: number; // in minutes
-  isLateNight: boolean;
-  isPeakHour: boolean;
+  distance_km: number;
+  duration_minutes: number;
+  origin: string;
+  destination: string;
+  status: 'OK' | 'ZERO_RESULTS' | 'NOT_FOUND' | 'ERROR';
 }
 
-// For now, we'll use a simple distance calculation
-// In production, this would integrate with Google Maps Distance Matrix API
-export const calculateDistance = (from: Location, to: Location): number => {
-  const R = 6371; // Earth's radius in kilometers
-  const dLat = deg2rad(to.lat - from.lat);
-  const dLng = deg2rad(to.lng - from.lng);
-  const a =
-    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-    Math.cos(deg2rad(from.lat)) * Math.cos(deg2rad(to.lat)) *
-    Math.sin(dLng / 2) * Math.sin(dLng / 2);
-  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-  return R * c;
-};
+export class DistanceService {
+  private apiKey: string;
 
-const deg2rad = (deg: number): number => {
-  return deg * (Math.PI / 180);
-};
+  constructor() {
+    this.apiKey = process.env.GOOGLE_MAPS_API_KEY || '';
+  }
 
-export const isLateNightTime = (date: Date = new Date()): boolean => {
-  const hour = date.getHours();
-  return hour >= 20 || hour < 6; // 8 PM to 6 AM
-};
+  /**
+   * Calculate distance between two addresses using Google Maps Distance Matrix API
+   * 
+   * How it works:
+   * 1. Takes pickup and delivery addresses as input
+   * 2. Sends request to Google Maps Distance Matrix API
+   * 3. API returns actual driving distance and time
+   * 4. Returns distance in kilometers for pricing calculation
+   */
+  async calculateDistance(
+    pickupAddress: string,
+    deliveryAddress: string
+  ): Promise<DistanceResult> {
+    try {
+      // Construct the API URL
+      const baseUrl = 'https://maps.googleapis.com/maps/api/distancematrix/json';
+      const params = new URLSearchParams({
+        origins: pickupAddress,
+        destinations: deliveryAddress,
+        key: this.apiKey,
+        units: 'metric', // Returns distance in kilometers
+        mode: 'driving', // Use driving directions (not walking/bicycling)
+        traffic_model: 'best_guess', // Consider traffic
+        departure_time: 'now' // Use current time for traffic
+      });
 
-export const isPeakHourTime = (date: Date = new Date()): boolean => {
-  const hour = date.getHours();
-  return hour >= 12 && hour < 14; // 12 PM to 2 PM
-};
+      const url = `${baseUrl}?${params.toString()}`;
 
-export const estimateDeliveryDuration = (distanceKm: number): number => {
-  // Assume average speed of 30 km/h for delivery
-  const baseDuration = (distanceKm / 30) * 60; // in minutes
-  const processingTime = 15; // 15 minutes for order preparation
-  return Math.round(baseDuration + processingTime);
-};
+      // Make the API request
+      const response = await fetch(url);
+      const data = await response.json();
 
-export const getDistanceAndTimeInfo = async (
-  pickupLocation: Location,
-  deliveryLocation: Location,
-  scheduledTime?: Date
-): Promise<DistanceResult> => {
-  const distanceKm = calculateDistance(pickupLocation, deliveryLocation);
-  const estimatedDuration = estimateDeliveryDuration(distanceKm);
-  const checkTime = scheduledTime || new Date();
-  
-  return {
-    distanceKm: Number(distanceKm.toFixed(2)),
-    estimatedDuration,
-    isLateNight: isLateNightTime(checkTime),
-    isPeakHour: isPeakHourTime(checkTime)
-  };
-};
+      // Handle API response
+      if (data.status === 'OK' && data.rows[0].elements[0].status === 'OK') {
+        const element = data.rows[0].elements[0];
+        
+        return {
+          distance_km: element.distance.value / 1000, // Convert meters to kilometers
+          duration_minutes: Math.ceil(element.duration.value / 60), // Convert seconds to minutes
+          origin: data.origin_addresses[0],
+          destination: data.destination_addresses[0],
+          status: 'OK'
+        };
+      } else {
+        // Handle different error cases
+        const status = data.rows[0].elements[0].status;
+        return {
+          distance_km: 0,
+          duration_minutes: 0,
+          origin: pickupAddress,
+          destination: deliveryAddress,
+          status: status as any
+        };
+      }
+    } catch (error) {
+      console.error('Distance calculation error:', error);
+      return {
+        distance_km: 0,
+        duration_minutes: 0,
+        origin: pickupAddress,
+        destination: deliveryAddress,
+        status: 'ERROR'
+      };
+    }
+  }
 
-// Default UI campus location for testing
-export const UI_CAMPUS_LOCATION: Location = {
-  lat: 7.3775,
-  lng: 3.9470,
-  address: "University of Ibadan, Ibadan, Nigeria"
-};
+  /**
+   * Check if delivery is during late night hours (8 PM - 6 AM)
+   */
+  isLateNight(): boolean {
+    const hour = new Date().getHours();
+    return hour >= 20 || hour < 6;
+  }
 
-// Mock function to geocode address (in production, use Google Maps Geocoding API)
-export const geocodeAddress = async (address: string): Promise<Location | null> => {
-  // For demo purposes, return a mock location near UI campus
-  // In production, integrate with Google Maps Geocoding API
-  const variations = [
-    { lat: 7.3775 + Math.random() * 0.01, lng: 3.9470 + Math.random() * 0.01 },
-    { lat: 7.3865, lng: 3.9036 }, // Bodija area
-    { lat: 7.4165, lng: 3.9093 }, // Ring Road area
-    { lat: 7.3516, lng: 3.9385 }, // Sango area
-  ];
-  
-  const location = variations[Math.floor(Math.random() * variations.length)];
-  return {
-    ...location,
-    address
-  };
-};
+  /**
+   * Check if delivery is during peak hours (12 PM - 2 PM)
+   */
+  isPeakHour(): boolean {
+    const hour = new Date().getHours();
+    return hour >= 12 && hour <= 14;
+  }
+
+  /**
+   * Get estimated delivery time based on distance
+   */
+  getEstimatedDeliveryTime(distanceKm: number): number {
+    // Base delivery time: 30 minutes
+    // Additional time: 5 minutes per km
+    return Math.max(30, 30 + (distanceKm * 5));
+  }
+
+  /**
+   * Validate if addresses are within UI campus area
+   * This helps prevent invalid deliveries
+   */
+  async validateCampusDelivery(
+    pickupAddress: string,
+    deliveryAddress: string
+  ): Promise<{ isValid: boolean; reason?: string }> {
+    try {
+      // UI campus coordinates (approximate center)
+      const uiCampusCenter = { lat: 7.3961, lng: 3.8969 };
+      
+      // Get coordinates for both addresses
+      const pickupCoords = await this.getCoordinates(pickupAddress);
+      const deliveryCoords = await this.getCoordinates(deliveryAddress);
+
+      if (!pickupCoords || !deliveryCoords) {
+        return { isValid: false, reason: 'Could not validate addresses' };
+      }
+
+      // Calculate distance from UI campus center
+      const pickupDistance = this.calculateHaversineDistance(
+        uiCampusCenter.lat, uiCampusCenter.lng,
+        pickupCoords.lat, pickupCoords.lng
+      );
+
+      const deliveryDistance = this.calculateHaversineDistance(
+        uiCampusCenter.lat, uiCampusCenter.lng,
+        deliveryCoords.lat, deliveryCoords.lng
+      );
+
+      // Allow deliveries within 10km of UI campus
+      const maxDistance = 10;
+      
+      if (pickupDistance > maxDistance || deliveryDistance > maxDistance) {
+        return { 
+          isValid: false, 
+          reason: 'Addresses must be within UI campus area (10km radius)' 
+        };
+      }
+
+      return { isValid: true };
+    } catch (error) {
+      console.error('Campus validation error:', error);
+      return { isValid: false, reason: 'Validation failed' };
+    }
+  }
+
+  /**
+   * Get coordinates for an address using Geocoding API
+   */
+  private async getCoordinates(address: string): Promise<{ lat: number; lng: number } | null> {
+    try {
+      const baseUrl = 'https://maps.googleapis.com/maps/api/geocode/json';
+      const params = new URLSearchParams({
+        address: address,
+        key: this.apiKey
+      });
+
+      const url = `${baseUrl}?${params.toString()}`;
+      const response = await fetch(url);
+      const data = await response.json();
+
+      if (data.status === 'OK' && data.results.length > 0) {
+        const location = data.results[0].geometry.location;
+        return {
+          lat: location.lat,
+          lng: location.lng
+        };
+      }
+
+      return null;
+    } catch (error) {
+      console.error('Geocoding error:', error);
+      return null;
+    }
+  }
+
+  /**
+   * Calculate distance between two points using Haversine formula
+   */
+  private calculateHaversineDistance(
+    lat1: number, lng1: number,
+    lat2: number, lng2: number
+  ): number {
+    const R = 6371; // Earth's radius in kilometers
+    const dLat = this.toRadians(lat2 - lat1);
+    const dLng = this.toRadians(lng2 - lng1);
+    
+    const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+              Math.cos(this.toRadians(lat1)) * Math.cos(this.toRadians(lat2)) *
+              Math.sin(dLng / 2) * Math.sin(dLng / 2);
+    
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return R * c;
+  }
+
+  private toRadians(degrees: number): number {
+    return degrees * (Math.PI / 180);
+  }
+
+  /**
+   * Cache distance calculations to reduce API calls
+   */
+  async getCachedDistance(
+    pickupAddress: string,
+    deliveryAddress: string
+  ): Promise<DistanceResult | null> {
+    try {
+      const { data, error } = await supabase
+        .from('distance_cache')
+        .select('*')
+        .eq('pickup_address', pickupAddress)
+        .eq('delivery_address', deliveryAddress)
+        .single();
+
+      if (error || !data) return null;
+
+      // Check if cache is still valid (24 hours)
+      const cacheAge = Date.now() - new Date(data.created_at).getTime();
+      const maxAge = 24 * 60 * 60 * 1000; // 24 hours
+
+      if (cacheAge > maxAge) return null;
+
+      return {
+        distance_km: data.distance_km,
+        duration_minutes: data.duration_minutes,
+        origin: data.origin,
+        destination: data.destination,
+        status: 'OK'
+      };
+    } catch (error) {
+      return null;
+    }
+  }
+
+  /**
+   * Save distance calculation to cache
+   */
+  async cacheDistance(
+    pickupAddress: string,
+    deliveryAddress: string,
+    result: DistanceResult
+  ): Promise<void> {
+    try {
+      await supabase
+        .from('distance_cache')
+        .insert({
+          pickup_address: pickupAddress,
+          delivery_address: deliveryAddress,
+          distance_km: result.distance_km,
+          duration_minutes: result.duration_minutes,
+          origin: result.origin,
+          destination: result.destination
+        });
+    } catch (error) {
+      console.error('Cache save error:', error);
+    }
+  }
+}
