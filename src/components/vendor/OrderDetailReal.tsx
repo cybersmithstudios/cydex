@@ -153,7 +153,7 @@ const OrderDetailReal = () => {
         <div className="text-right">
           {getStatusBadge(order.status)}
           <div className="mt-2">
-            {order.status === 'accepted' && (
+            {(order.status === 'processing' || order.status === 'accepted') && (
               <Button onClick={handleMarkReady} disabled={actionLoading}>
                 Mark Ready for Pickup
               </Button>

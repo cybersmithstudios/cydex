@@ -68,35 +68,52 @@ export const useVendorOrders = () => {
       setLoading(true);
       setError(null);
 
-      const { data, error: fetchError } = await supabase
-        .from('orders')
-        .select(`
-          *,
-          customer:profiles!orders_customer_id_fkey(name, email, phone),
-          rider:profiles!orders_rider_id_fkey(name, email, phone),
-          order_items(*)
-        `)
-        .eq('vendor_id', user.id)
-        .eq('payment_status', 'paid')
-        .order('created_at', { ascending: false });
+        const { data, error: fetchError } = await supabase
+          .from('orders')
+          .select(`
+            *,
+            order_items(*)
+          `)
+          .eq('vendor_id', user.id)
+          .eq('payment_status', 'paid')
+          .order('created_at', { ascending: false });
 
       if (fetchError) {
         console.error('Error fetching vendor orders:', fetchError);
         throw fetchError;
       }
 
-      // Fetch missing customer info if needed
+      // Fetch customer and rider info separately to avoid RLS issues
       const ordersWithCustomer = await Promise.all((data || []).map(async (order: any) => {
-        let customer = order.customer;
-        if (!customer && order.customer_id) {
-          // Fetch from profiles
-          const { data: profile } = await supabase
+        let customer = null;
+        let rider = null;
+
+        // Fetch customer profile
+        if (order.customer_id) {
+          const { data: customerProfile, error: customerError } = await supabase
             .from('profiles')
             .select('name, email, phone')
             .eq('id', order.customer_id)
-            .single();
-          customer = profile || null;
+            .maybeSingle();
+          
+          if (!customerError && customerProfile) {
+            customer = customerProfile;
+          }
         }
+
+        // Fetch rider profile if assigned
+        if (order.rider_id) {
+          const { data: riderProfile, error: riderError } = await supabase
+            .from('profiles')
+            .select('name, email, phone')
+            .eq('id', order.rider_id)
+            .maybeSingle();
+          
+          if (!riderError && riderProfile) {
+            rider = riderProfile;
+          }
+        }
+
         return {
           ...order,
           customer: {
@@ -104,10 +121,10 @@ export const useVendorOrders = () => {
             email: customer?.email || 'unknown@email.com',
             phone: customer?.phone || undefined,
           },
-          rider: order.rider ? {
-            name: order.rider.name || 'Unknown Rider',
-            email: order.rider.email || 'unknown@email.com',
-            phone: order.rider.phone || undefined,
+          rider: rider ? {
+            name: rider.name || 'Unknown Rider',
+            email: rider.email || 'unknown@email.com',
+            phone: rider.phone || undefined,
           } : undefined,
           order_items: (order.order_items || []).map((item: any) => ({
             ...item,
@@ -137,9 +154,9 @@ export const useVendorOrders = () => {
       }
       // Only allow valid transitions
       if (order.status === 'pending' && newStatus === 'accepted') {
-        // Accept order
+        // Accept order - use 'processing' status as per DB constraint
         const updateData: any = {
-          status: 'accepted',
+          status: 'processing',
           vendor_accepted_at: new Date().toISOString(),
           updated_at: new Date().toISOString(),
         };
@@ -152,10 +169,10 @@ export const useVendorOrders = () => {
         await fetchOrders();
         toast.success('Order accepted');
         return true;
-      } else if (order.status === 'accepted' && newStatus === 'ready_for_pickup') {
-        // Mark as ready for pickup
+      } else if ((order.status === 'processing' || order.status === 'accepted') && newStatus === 'ready_for_pickup') {
+        // Mark as ready for pickup - use 'ready' status as per DB constraint
         const updateData: any = {
-          status: 'ready_for_pickup',
+          status: 'ready',
           ready_for_pickup_at: new Date().toISOString(),
           updated_at: new Date().toISOString(),
         };
@@ -171,7 +188,7 @@ export const useVendorOrders = () => {
       } else if (newStatus === 'delivered') {
         toast.error('Vendors cannot mark orders as delivered');
         return false;
-      } else if (newStatus === 'cancelled' && (order.status === 'pending' || order.status === 'accepted')) {
+      } else if (newStatus === 'cancelled' && (order.status === 'pending' || order.status === 'accepted' || order.status === 'processing')) {
         // Allow vendor to cancel only if pending or accepted
         const updateData: any = {
           status: 'cancelled',
