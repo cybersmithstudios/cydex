@@ -1,241 +1,205 @@
-// Phase 3: Student Subscription Management Component
+// Phase 3: Student Subscription Form Component
 import React, { useState, useEffect } from 'react';
-import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { CheckCircle, Users, Zap, Leaf } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Separator } from '@/components/ui/separator';
-import { CheckCircle, Crown, Calendar, CreditCard, AlertCircle } from 'lucide-react';
-import { formatNaira } from '@/services/pricingService';
-import { getStudentEligibility, type StudentSubscription } from '@/services/studentVerificationService';
-import { useAuth } from '@/contexts/AuthContext';
-import { useToast } from '@/hooks/use-toast';
-import { createPaystackPaymentConfig, logPaymentEvent } from '@/utils/paystack';
+import { getStudentEligibility, createStudentSubscription } from '@/services/studentVerificationService';
+import { useAuth } from '@/contexts/SupabaseAuthContext';
 import { usePaystackPayment } from 'react-paystack';
+import { toast } from 'sonner';
 
 export const SubscriptionForm: React.FC = () => {
   const { user } = useAuth();
-  const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   const [studentInfo, setStudentInfo] = useState({
     isEligible: false,
     hasSubscription: false,
-    subscription: null as StudentSubscription | null,
+    subscription: null,
     eligibleForSubscription: false
   });
 
-  const subscriptionPrice = 1000; // ₦1,000 per month
-
   useEffect(() => {
-    if (user?.email) {
-      loadStudentInfo();
-    }
+    const loadStudentInfo = async () => {
+      if (user?.email) {
+        const info = await getStudentEligibility(user.email, user.id);
+        setStudentInfo({
+          isEligible: info.isEligibleForDiscount,
+          hasSubscription: info.hasActiveSubscription,
+          subscription: info.subscription,
+          eligibleForSubscription: info.eligibleForSubscription
+        });
+      }
+    };
+    
+    loadStudentInfo();
   }, [user]);
 
-  const loadStudentInfo = async () => {
-    if (!user?.email) return;
-    
-    setLoading(true);
+  const subscriptionPrice = 100000; // ₦1,000 in kobo
+
+  const createPaystackPaymentConfig = () => ({
+    reference: `sub_${new Date().getTime()}`,
+    email: user?.email || '',
+    amount: subscriptionPrice,
+    publicKey: 'pk_test_your_paystack_public_key', // Replace with actual key
+    text: 'Subscribe Now',
+    onSuccess: (reference: any) => {
+      console.log('Payment successful:', reference);
+      handleSubscriptionSuccess(reference.reference);
+    },
+    onClose: () => {
+      console.log('Payment closed');
+      toast.info('Payment cancelled');
+    },
+  });
+
+  const initializePayment = usePaystackPayment(createPaystackPaymentConfig());
+
+  const handleSubscriptionSuccess = async (paymentReference: string) => {
     try {
-      const info = await getStudentEligibility(user.email, user.id);
-      setStudentInfo({
-        isEligible: info.isEligibleForDiscount,
-        hasSubscription: info.hasActiveSubscription,
-        subscription: info.subscription,
-        eligibleForSubscription: info.eligibleForSubscription
-      });
+      setLoading(true);
+      const subscription = await createStudentSubscription(user!.id, paymentReference);
+      
+      if (subscription) {
+        toast.success('Subscription activated successfully!');
+        // Refresh student info
+        const updatedInfo = await getStudentEligibility(user!.email, user!.id);
+        setStudentInfo({
+          isEligible: updatedInfo.isEligibleForDiscount,
+          hasSubscription: updatedInfo.hasActiveSubscription,
+          subscription: updatedInfo.subscription,
+          eligibleForSubscription: updatedInfo.eligibleForSubscription
+        });
+      } else {
+        toast.error('Failed to activate subscription. Please contact support.');
+      }
     } catch (error) {
-      console.error('Failed to load student info:', error);
+      console.error('Subscription error:', error);
+      toast.error('Failed to activate subscription. Please try again.');
     } finally {
       setLoading(false);
     }
   };
 
-  const paystackConfig = user ? createPaystackPaymentConfig(
-    subscriptionPrice,
-    user.email,
-    `SUB-${Date.now()}`,
-    user.id
-  ) : null;
-
-  const initializePayment = usePaystackPayment(paystackConfig || {
-    publicKey: '',
-    amount: 0,
-    email: ''
-  });
-
   const handleSubscribe = () => {
-    if (!user || !paystackConfig) return;
-
-    logPaymentEvent('initiated', {
-      reference: paystackConfig.reference,
-      amount: subscriptionPrice,
-      email: user.email,
-      orderNumber: paystackConfig.reference
-    });
-
-    initializePayment({
-      onSuccess: (response) => {
-        logPaymentEvent('success', {
-          reference: response.reference,
-          amount: subscriptionPrice,
-          email: user.email,
-          orderNumber: paystackConfig.reference,
-          status: response.status
-        });
-
-        toast({
-          title: "Payment Successful!",
-          description: "Your student subscription has been activated.",
-        });
-
-        // Refresh student info
-        loadStudentInfo();
-      },
-      onClose: () => {
-        toast({
-          title: "Payment Cancelled",
-          description: "You can try again anytime.",
-          variant: "destructive"
-        });
-      },
-    });
+    if (!user) {
+      toast.error('Please log in to subscribe');
+      return;
+    }
+    
+    initializePayment({});
   };
 
   if (!user) {
     return (
-      <Card className="w-full max-w-lg mx-auto">
-        <CardContent className="p-6">
-          <Alert>
-            <AlertCircle className="h-4 w-4" />
-            <AlertDescription>
-              Please log in to access student subscription features.
-            </AlertDescription>
-          </Alert>
-        </CardContent>
-      </Card>
+      <Alert>
+        <AlertDescription>
+          Please log in to view subscription options.
+        </AlertDescription>
+      </Alert>
     );
   }
 
   if (!studentInfo.isEligible) {
     return (
-      <Card className="w-full max-w-lg mx-auto">
-        <CardContent className="p-6">
-          <Alert>
-            <AlertCircle className="h-4 w-4" />
-            <AlertDescription>
-              Student subscriptions are only available for @ui.edu.ng email addresses.
-            </AlertDescription>
-          </Alert>
-        </CardContent>
-      </Card>
+      <Alert>
+        <AlertDescription>
+          Student subscriptions are only available for University of Ibadan students with @ui.edu.ng email addresses.
+        </AlertDescription>
+      </Alert>
     );
   }
 
   return (
-    <Card className="w-full max-w-lg mx-auto">
+    <Card className="w-full max-w-2xl mx-auto">
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          <Crown className="h-5 w-5 text-yellow-500" />
+          <Users className="h-5 w-5" />
           Student Subscription
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-6">
         {/* Current Status */}
-        <div className="text-center space-y-2">
-          {studentInfo.hasSubscription && studentInfo.subscription ? (
-            <div>
-              <Badge variant="secondary" className="bg-green-100 text-green-700 mb-2">
-                <CheckCircle className="h-3 w-3 mr-1" />
-                Active Subscription
-              </Badge>
-              <div className="text-sm text-muted-foreground">
-                <div className="flex items-center justify-center gap-1">
-                  <Calendar className="h-3 w-3" />
-                  Expires: {new Date(studentInfo.subscription.end_date || '').toLocaleDateString()}
-                </div>
-              </div>
-            </div>
-          ) : (
-            <div>
-              <Badge variant="outline" className="border-yellow-500 text-yellow-700 mb-2">
-                No Active Subscription
-              </Badge>
-              <p className="text-sm text-muted-foreground">
-                Subscribe for unlimited deliveries at just {formatNaira(subscriptionPrice)}/month
-              </p>
-            </div>
+        <div className="p-4 rounded-lg border bg-muted/30">
+          <div className="flex items-center justify-between mb-2">
+            <span className="font-medium">Subscription Status</span>
+            <Badge variant={studentInfo.hasSubscription ? 'default' : 'secondary'}>
+              {studentInfo.hasSubscription ? 'Active' : 'Inactive'}
+            </Badge>
+          </div>
+          {studentInfo.hasSubscription && studentInfo.subscription && (
+            <p className="text-sm text-muted-foreground">
+              Valid until: {new Date(studentInfo.subscription.end_date!).toLocaleDateString()}
+            </p>
           )}
         </div>
 
-        <Separator />
-
         {/* Subscription Benefits */}
-        <div className="space-y-3">
-          <h4 className="font-semibold">Subscription Benefits</h4>
-          <ul className="space-y-2 text-sm">
-            <li className="flex items-center gap-2">
-              <CheckCircle className="h-4 w-4 text-green-500" />
-              Unlimited deliveries within UI campus
-            </li>
-            <li className="flex items-center gap-2">
-              <CheckCircle className="h-4 w-4 text-green-500" />
-              No per-delivery charges
-            </li>
-            <li className="flex items-center gap-2">
-              <CheckCircle className="h-4 w-4 text-green-500" />
-              Priority delivery during peak hours
-            </li>
-            <li className="flex items-center gap-2">
-              <CheckCircle className="h-4 w-4 text-green-500" />
-              Exclusive student offers and discounts
-            </li>
-          </ul>
+        <div className="space-y-4">
+          <h3 className="font-semibold text-lg">Subscription Benefits</h3>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="flex items-start gap-3 p-4 rounded-lg border">
+              <Zap className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
+              <div>
+                <h4 className="font-medium">Unlimited Deliveries</h4>
+                <p className="text-sm text-muted-foreground">No per-delivery charges</p>
+              </div>
+            </div>
+            
+            <div className="flex items-start gap-3 p-4 rounded-lg border">
+              <CheckCircle className="h-5 w-5 text-green-600 mt-0.5 flex-shrink-0" />
+              <div>
+                <h4 className="font-medium">Priority Service</h4>
+                <p className="text-sm text-muted-foreground">Faster delivery times</p>
+              </div>
+            </div>
+            
+            <div className="flex items-start gap-3 p-4 rounded-lg border">
+              <Leaf className="h-5 w-5 text-emerald-600 mt-0.5 flex-shrink-0" />
+              <div>
+                <h4 className="font-medium">Eco Impact</h4>
+                <p className="text-sm text-muted-foreground">Support sustainability</p>
+              </div>
+            </div>
+          </div>
         </div>
 
-        <Separator />
-
         {/* Pricing */}
-        <div className="space-y-2">
-          <div className="flex justify-between items-center">
-            <span className="font-medium">Monthly Subscription</span>
-            <span className="text-xl font-bold">{formatNaira(subscriptionPrice)}</span>
+        <div className="p-6 rounded-lg border bg-primary/5">
+          <div className="text-center">
+            <div className="text-3xl font-bold text-primary mb-2">₦1,000</div>
+            <div className="text-muted-foreground mb-4">per month</div>
+            <p className="text-sm text-muted-foreground">
+              Exclusive pricing for UI students. Save money on frequent deliveries!
+            </p>
           </div>
-          <p className="text-xs text-muted-foreground">
-            * Valid only for @ui.edu.ng email addresses
-          </p>
         </div>
 
         {/* Action Button */}
-        {studentInfo.eligibleForSubscription ? (
+        {studentInfo.hasSubscription ? (
+          <Alert className="border-green-200 bg-green-50">
+            <CheckCircle className="h-4 w-4" />
+            <AlertDescription>
+              Your student subscription is active! Enjoy unlimited deliveries.
+            </AlertDescription>
+          </Alert>
+        ) : (
           <Button 
-            onClick={handleSubscribe}
+            onClick={handleSubscribe} 
             disabled={loading}
             className="w-full"
             size="lg"
           >
-            <CreditCard className="h-4 w-4 mr-2" />
-            {loading ? 'Processing...' : `Subscribe for ${formatNaira(subscriptionPrice)}/month`}
+            {loading ? 'Processing...' : 'Subscribe for ₦1,000/month'}
           </Button>
-        ) : studentInfo.hasSubscription ? (
-          <Alert>
-            <CheckCircle className="h-4 w-4" />
-            <AlertDescription>
-              Your subscription is active and will auto-renew monthly.
-            </AlertDescription>
-          </Alert>
-        ) : (
-          <Alert>
-            <AlertCircle className="h-4 w-4" />
-            <AlertDescription>
-              You already have an active subscription or are not eligible.
-            </AlertDescription>
-          </Alert>
         )}
 
-        {/* Note */}
-        <div className="text-xs text-muted-foreground text-center">
-          Subscription will be active immediately after successful payment and will auto-renew monthly.
+        <div className="text-center">
+          <p className="text-xs text-muted-foreground">
+            Available only for University of Ibadan students. 
+            Payment processed securely via Paystack.
+          </p>
         </div>
       </CardContent>
     </Card>

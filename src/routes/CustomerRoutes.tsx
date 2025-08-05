@@ -9,6 +9,7 @@ import Recycling from '../pages/customer/Recycling';
 import Profile from '../pages/customer/Profile';
 import OrderConfirmation from '../pages/customer/OrderConfirmation';
 import ProductDetails from '../pages/customer/ProductDetails';
+import Pricing from '../pages/customer/Pricing';
 
 const CustomerRoutes = () => {
   return (
@@ -81,6 +82,15 @@ const CustomerRoutes = () => {
         element={
           <ProtectedRoute allowedRoles={['CUSTOMER']}>
             <Profile />
+          </ProtectedRoute>
+        } 
+      />
+
+      <Route 
+        path="/pricing" 
+        element={
+          <ProtectedRoute allowedRoles={['CUSTOMER']}>
+            <Pricing />
           </ProtectedRoute>
         } 
       />
