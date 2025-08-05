@@ -23,10 +23,6 @@ import { DesktopCategoriesSidebar } from '@/components/customer/order/DesktopCat
 import { ProductsGrid } from '@/components/customer/order/ProductsGrid';
 import { PaginationSection } from '@/components/customer/order/PaginationSection';
 import { OrderHeader } from '@/components/customer/order/OrderHeader';
-import { PricingCalculator } from '@/components/pricing/PricingCalculator';
-import { calculatePrice, type PricingBreakdown, type PricingParams } from '@/services/pricingService';
-import { getDistanceAndTimeInfo, geocodeAddress, UI_CAMPUS_LOCATION } from '@/services/distanceService';
-import { getStudentEligibility } from '@/services/studentVerificationService';
 
 const NewOrder = () => {
   const { user } = useAuth();
@@ -68,9 +64,6 @@ const NewOrder = () => {
   const [isAddressModalOpen, setIsAddressModalOpen] = useState(false);
   const { savedAddress } = useCustomerAddress();
   const [deliveryAddress, setDeliveryAddress] = useState<any>(null);
-  const [pricingBreakdown, setPricingBreakdown] = useState<PricingBreakdown | null>(null);
-  const [pricingParams, setPricingParams] = useState<PricingParams | null>(null);
-  const [isPricingCalculatorOpen, setIsPricingCalculatorOpen] = useState(false);
 
   // Autofill deliveryAddress from savedAddress so modal is skipped next orders
   useEffect(() => {
@@ -136,69 +129,6 @@ const NewOrder = () => {
     clearCart(); // Clear cart when going back to vendor selection
   };
 
-  const calculateDeliveryPricing = async () => {
-    if (!deliveryAddress || cartItems.length === 0) return null;
-
-    try {
-      // Get pickup location (vendor location) - for now use UI campus
-      const pickupLocation = UI_CAMPUS_LOCATION;
-      const deliveryLocation = await geocodeAddress(deliveryAddress.address) || UI_CAMPUS_LOCATION;
-      
-      // Calculate package weight (estimate based on cart items)
-      const estimatedWeight = cartItems.reduce((total, item) => total + (item.quantity * 0.5), 0); // 0.5kg per item estimate
-      
-      // Get distance and time info
-      const distanceInfo = await getDistanceAndTimeInfo(pickupLocation, deliveryLocation);
-      
-      // Get student eligibility
-      const studentInfo = user?.email ? await getStudentEligibility(user.email, user.id) : {
-        isEligibleForDiscount: false,
-        hasActiveSubscription: false
-      };
-      
-      // Prepare pricing parameters
-      const params: PricingParams = {
-        distanceKm: distanceInfo.distanceKm,
-        weightKg: estimatedWeight,
-        isLateNight: distanceInfo.isLateNight,
-        isPeakHour: distanceInfo.isPeakHour,
-        isStudentOrder: studentInfo.isEligibleForDiscount,
-        hasSubscription: studentInfo.hasActiveSubscription,
-        includeGreenFee: false // User can choose this in checkout
-      };
-      
-      // Calculate pricing breakdown
-      const breakdown = await calculatePrice(params);
-      
-      return { breakdown, params };
-    } catch (error) {
-      console.error('Failed to calculate delivery pricing:', error);
-      // Fallback to default pricing
-      return {
-        breakdown: {
-          baseRate: 200,
-          distanceFee: 0,
-          weightFee: 0,
-          lateNightFee: 0,
-          surgeFee: 0,
-          studentDiscount: 0,
-          greenFee: 0,
-          subtotal: 200,
-          total: 200
-        },
-        params: {
-          distanceKm: 2,
-          weightKg: 1,
-          isLateNight: false,
-          isPeakHour: false,
-          isStudentOrder: false,
-          hasSubscription: false,
-          includeGreenFee: false
-        }
-      };
-    }
-  };
-
   const handleCheckout = async () => {
     try {
       if (!user?.id) {
@@ -241,6 +171,10 @@ const NewOrder = () => {
         return;
       }
 
+      const subtotal = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+      const delivery_fee = 1000;
+      const total_amount = subtotal + delivery_fee;
+
       await createOrderWithAddress();
     } catch (error) {
       console.error('Error in checkout process:', error);
@@ -250,6 +184,10 @@ const NewOrder = () => {
 
   const handleActualCheckout = async () => {
     try {
+      const subtotal = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+      const delivery_fee = 1000;
+      const total_amount = subtotal + delivery_fee;
+
       await createOrderWithAddress();
     } catch (error) {
       console.error('Error placing order:', error);
@@ -262,34 +200,10 @@ const NewOrder = () => {
     
     try {
       const subtotal = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-      
-      // Calculate delivery pricing using the new pricing system
-      const pricingResult = await calculateDeliveryPricing();
-      const deliveryPricing = pricingResult?.breakdown || {
-        baseRate: 200,
-        distanceFee: 0,
-        weightFee: 0,
-        lateNightFee: 0,
-        surgeFee: 0,
-        studentDiscount: 0,
-        greenFee: 0,
-        subtotal: 200,
-        total: 200
-      };
-      const pricingParameters = pricingResult?.params || {
-        distanceKm: 2,
-        weightKg: 1,
-        isLateNight: false,
-        isPeakHour: false,
-        isStudentOrder: false,
-        hasSubscription: false,
-        includeGreenFee: false
-      };
-
-      const delivery_fee = deliveryPricing.total;
+      const delivery_fee = 1000;
       const total_amount = subtotal + delivery_fee;
 
-      // Create the order with detailed pricing breakdown
+      // Create the order
       const { data: order, error: orderError } = await supabase
         .from('orders')
         .insert({
@@ -302,21 +216,7 @@ const NewOrder = () => {
           subtotal,
           delivery_fee,
           total_amount,
-          carbon_credits_earned: cartItems.length,
-          // Add pricing breakdown fields
-          base_rate: deliveryPricing.baseRate,
-          distance_fee: deliveryPricing.distanceFee,
-          weight_fee: deliveryPricing.weightFee,
-          late_night_fee: deliveryPricing.lateNightFee,
-          surge_fee: deliveryPricing.surgeFee,
-          student_discount: deliveryPricing.studentDiscount,
-          green_fee: deliveryPricing.greenFee,
-          distance_km: pricingParameters.distanceKm,
-          weight_kg: pricingParameters.weightKg,
-          is_late_night: pricingParameters.isLateNight,
-          is_peak_hour: pricingParameters.isPeakHour,
-          is_student_order: pricingParameters.isStudentOrder,
-          subscription_applied: pricingParameters.hasSubscription
+          carbon_credits_earned: cartItems.length
         })
         .select()
         .single();
@@ -339,10 +239,6 @@ const NewOrder = () => {
         .insert(orderItems);
 
       if (itemsError) throw itemsError;
-
-      // Store the pricing info for later use
-      setPricingBreakdown(deliveryPricing);
-      setPricingParams(pricingParameters);
 
       setCurrentOrder(order);
       setIsPaymentModalOpen(true);
