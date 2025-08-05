@@ -7,7 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { AlertCircle, Calculator } from 'lucide-react';
 import { calculatePrice, formatNaira, PricingBreakdown, PricingParams } from '@/services/pricingService';
-import { geocodeAddress, getDistanceAndTimeInfo, UI_CAMPUS_LOCATION } from '@/services/distanceService';
+import { DistanceService } from '@/services/distanceService';
 import { getStudentEligibility } from '@/services/studentVerificationService';
 import { useAuth } from '@/contexts/SupabaseAuthContext';
 import { Alert, AlertDescription } from '@/components/ui/alert';
@@ -60,23 +60,22 @@ export const PricingCalculator: React.FC<PricingCalculatorProps> = ({
 
     setIsCalculating(true);
     try {
-      // Geocode addresses
-      const pickupLocation = await geocodeAddress(pickupAddress) || UI_CAMPUS_LOCATION;
-      const deliveryLocation = await geocodeAddress(deliveryAddress);
+      // Use the new DistanceService
+      const distanceService = new DistanceService();
       
-      if (!deliveryLocation) {
-        throw new Error('Could not geocode delivery address');
+      // Calculate distance using Google Maps API
+      const distanceResult = await distanceService.calculateDistance(pickupAddress, deliveryAddress);
+      
+      if (distanceResult.status !== 'OK') {
+        throw new Error('Could not calculate distance');
       }
 
-      // Get distance and time information
-      const distanceInfo = await getDistanceAndTimeInfo(pickupLocation, deliveryLocation);
-      
       // Prepare pricing parameters
       const pricingParams: PricingParams = {
-        distanceKm: distanceInfo.distanceKm,
+        distanceKm: distanceResult.distance_km,
         weightKg: weight,
-        isLateNight: distanceInfo.isLateNight,
-        isPeakHour: distanceInfo.isPeakHour,
+        isLateNight: distanceService.isLateNight(),
+        isPeakHour: distanceService.isPeakHour(),
         isStudentOrder: studentInfo.isEligible,
         hasSubscription: studentInfo.hasSubscription,
         includeGreenFee
@@ -102,65 +101,67 @@ export const PricingCalculator: React.FC<PricingCalculatorProps> = ({
           <Calculator className="h-5 w-5" />
           Delivery Price Calculator
         </CardTitle>
+        <p className="text-sm text-gray-600">
+          Calculate delivery cost based on distance, weight, and time
+        </p>
       </CardHeader>
-      <CardContent className="space-y-6">
-        {/* Student Status Banner */}
-        {studentInfo.isEligible && (
-          <Alert className="border-green-200 bg-green-50">
-            <AlertCircle className="h-4 w-4" />
-            <AlertDescription>
-              {studentInfo.hasSubscription 
-                ? "🎓 You have an active student subscription! Enjoy unlimited deliveries."
-                : "🎓 Student discount available! Get 10% off your delivery or subscribe for unlimited deliveries."
-              }
-            </AlertDescription>
-          </Alert>
-        )}
-
-        {/* Input Fields */}
+      <CardContent className="space-y-4">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="space-y-2">
+          <div>
             <Label htmlFor="pickup">Pickup Address</Label>
             <Input
               id="pickup"
               value={pickupAddress}
               onChange={(e) => setPickupAddress(e.target.value)}
-              placeholder="Enter pickup address"
+              placeholder="e.g., University of Ibadan"
+              className="mt-1"
             />
           </div>
-          
-          <div className="space-y-2">
+          <div>
             <Label htmlFor="delivery">Delivery Address</Label>
             <Input
               id="delivery"
               value={deliveryAddress}
               onChange={(e) => setDeliveryAddress(e.target.value)}
-              placeholder="Enter delivery address"
+              placeholder="e.g., Bodija Market"
+              className="mt-1"
             />
           </div>
         </div>
 
-        <div className="space-y-2">
-          <Label htmlFor="weight">Package Weight (kg)</Label>
-          <Input
-            id="weight"
-            type="number"
-            min="0.1"
-            max="20"
-            step="0.1"
-            value={weight}
-            onChange={(e) => setWeight(parseFloat(e.target.value) || 0)}
-          />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <Label htmlFor="weight">Weight (kg)</Label>
+            <Input
+              id="weight"
+              type="number"
+              min="0.1"
+              max="10"
+              step="0.1"
+              value={weight}
+              onChange={(e) => setWeight(parseFloat(e.target.value) || 0)}
+              className="mt-1"
+            />
+          </div>
+          <div className="flex items-center space-x-2">
+            <Switch
+              id="green-fee"
+              checked={includeGreenFee}
+              onCheckedChange={setIncludeGreenFee}
+            />
+            <Label htmlFor="green-fee">Include Green Fee (₦20)</Label>
+          </div>
         </div>
 
-        <div className="flex items-center justify-between">
-          <Label htmlFor="green-fee">Include Green Fee (₦20)</Label>
-          <Switch
-            id="green-fee"
-            checked={includeGreenFee}
-            onCheckedChange={setIncludeGreenFee}
-          />
-        </div>
+        {studentInfo.isEligible && (
+          <Alert>
+            <AlertCircle className="h-4 w-4" />
+            <AlertDescription>
+              UI Student discount applied (10% off)
+              {studentInfo.hasSubscription && ' + Subscription discount'}
+            </AlertDescription>
+          </Alert>
+        )}
 
         <Button 
           onClick={handleCalculate} 
@@ -170,67 +171,58 @@ export const PricingCalculator: React.FC<PricingCalculatorProps> = ({
           {isCalculating ? 'Calculating...' : 'Calculate Price'}
         </Button>
 
-        {/* Price Breakdown */}
         {priceBreakdown && (
-          <Card className="border-primary/20 bg-primary/5">
-            <CardHeader>
-              <CardTitle className="text-lg">Price Breakdown</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
+          <div className="space-y-3 p-4 bg-green-50 border border-green-200 rounded-md">
+            <div className="flex justify-between items-center">
+              <span className="font-semibold">Total Price:</span>
+              <span className="text-xl font-bold text-green-700">
+                {formatNaira(priceBreakdown.totalPrice)}
+              </span>
+            </div>
+            
+            <div className="text-sm space-y-1">
               <div className="flex justify-between">
-                <span>Base Rate (up to 2km, &lt;0.5kg):</span>
+                <span>Base Rate:</span>
                 <span>{formatNaira(priceBreakdown.baseRate)}</span>
               </div>
-              
               {priceBreakdown.distanceFee > 0 && (
                 <div className="flex justify-between">
                   <span>Distance Fee:</span>
                   <span>{formatNaira(priceBreakdown.distanceFee)}</span>
                 </div>
               )}
-              
               {priceBreakdown.weightFee > 0 && (
                 <div className="flex justify-between">
                   <span>Weight Fee:</span>
                   <span>{formatNaira(priceBreakdown.weightFee)}</span>
                 </div>
               )}
-              
               {priceBreakdown.lateNightFee > 0 && (
-                <div className="flex justify-between text-amber-600">
-                  <span>Late Night Fee (8PM-6AM):</span>
+                <div className="flex justify-between">
+                  <span>Late Night Fee:</span>
                   <span>{formatNaira(priceBreakdown.lateNightFee)}</span>
                 </div>
               )}
-              
               {priceBreakdown.surgeFee > 0 && (
-                <div className="flex justify-between text-orange-600">
-                  <span>Peak Hour Surge (12PM-2PM):</span>
+                <div className="flex justify-between">
+                  <span>Peak Hour Fee:</span>
                   <span>{formatNaira(priceBreakdown.surgeFee)}</span>
                 </div>
               )}
-              
               {priceBreakdown.studentDiscount > 0 && (
                 <div className="flex justify-between text-green-600">
-                  <span>Student Discount (10%):</span>
+                  <span>Student Discount:</span>
                   <span>-{formatNaira(priceBreakdown.studentDiscount)}</span>
                 </div>
               )}
-              
               {priceBreakdown.greenFee > 0 && (
-                <div className="flex justify-between text-emerald-600">
+                <div className="flex justify-between">
                   <span>Green Fee:</span>
                   <span>{formatNaira(priceBreakdown.greenFee)}</span>
                 </div>
               )}
-              
-              <hr className="my-2" />
-              <div className="flex justify-between font-bold text-lg">
-                <span>Total:</span>
-                <span className="text-primary">{formatNaira(priceBreakdown.total)}</span>
-              </div>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         )}
       </CardContent>
     </Card>

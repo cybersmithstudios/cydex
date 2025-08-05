@@ -171,7 +171,7 @@ export class DistanceService {
 
       if (data.status === 'OK' && data.results.length > 0) {
         const location = data.results[0].geometry.location;
-        return {
+  return {
           lat: location.lat,
           lng: location.lng
         };
@@ -230,7 +230,7 @@ export class DistanceService {
 
       if (cacheAge > maxAge) return null;
 
-      return {
+  return {
         distance_km: data.distance_km,
         duration_minutes: data.duration_minutes,
         origin: data.origin,
