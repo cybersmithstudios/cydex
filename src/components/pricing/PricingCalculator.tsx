@@ -176,7 +176,7 @@ export const PricingCalculator: React.FC<PricingCalculatorProps> = ({
             <div className="flex justify-between items-center">
               <span className="font-semibold">Total Price:</span>
               <span className="text-xl font-bold text-green-700">
-                {formatNaira(priceBreakdown.totalPrice)}
+                {formatNaira(priceBreakdown.total)}
               </span>
             </div>
             
