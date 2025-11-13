@@ -24,7 +24,7 @@ export function CarbonCredits() {
   const stats = [
     { title: "Total Carbon Saved", value: "12.6 Tons", change: "+24%", icon: Leaf, color: "text-green-600" },
     { title: "Active Participants", value: "1,845", change: "+12%", icon: Trophy, color: "text-blue-600" },
-    { title: "Recycling Rate", value: "78%", change: "+8%", icon: Recycle, color: "text-purple-600" },
+    // { title: "Recycling Rate", value: "78%", change: "+8%", icon: Recycle, color: "text-purple-600" },
     { title: "Credits Issued", value: "28,456", change: "+18%", icon: TrendingUp, color: "text-orange-600" },
   ];
 
@@ -96,7 +96,7 @@ export function CarbonCredits() {
       userEmail: 'john@example.com',
       totalCredits: 450,
       earnedThisMonth: 75,
-      activities: ['Recycling', 'Eco-friendly purchases', 'Tree planting'],
+      activities: ['Eco-friendly purchases', 'Tree planting'],
       joinDate: '2023-01-15',
       level: 'Gold',
       rank: 15
@@ -107,7 +107,7 @@ export function CarbonCredits() {
       userEmail: 'sarah@example.com',
       totalCredits: 620,
       earnedThisMonth: 95,
-      activities: ['Solar usage', 'Recycling', 'Green transport'],
+      activities: ['Solar usage', 'Green transport'],
       joinDate: '2022-11-20',
       level: 'Platinum',
       rank: 8
@@ -118,7 +118,7 @@ export function CarbonCredits() {
       userEmail: 'michael@example.com',
       totalCredits: 380,
       earnedThisMonth: 60,
-      activities: ['Recycling', 'Energy saving'],
+      activities: ['Energy saving'],
       joinDate: '2023-02-10',
       level: 'Silver',
       rank: 22

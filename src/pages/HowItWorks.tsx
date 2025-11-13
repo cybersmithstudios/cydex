@@ -149,7 +149,7 @@ const HowItWorks = () => {
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
               {/* Vendor Steps */}
               <StepCard number="01" title="List Your Store" description="Create your store profile and start accepting orders through our platform." />
-              <StepCard number="02" title="Recycling Program" description="Partner with our recycling reward program to further enhance your green credentials." />
+              {/* <StepCard number="02" title="Recycling Program" description="Partner with our recycling reward program to further enhance your green credentials." /> */}
               <StepCard number="03" title="Get Incentives" description="Receive business incentives and increased visibility for eco-friendly deliveries." />
             </div>
           </div>

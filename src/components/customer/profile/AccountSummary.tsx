@@ -26,7 +26,7 @@ const AccountSummary = ({ profileData }: AccountSummaryProps) => {
           <Leaf className="h-6 w-6 text-green-500" />
           <div>
             <h3 className="text-lg font-medium">{profileData.carbonCredits} Carbon Credits</h3>
-            <p className="text-sm text-gray-500">Earn more by recycling and making eco-friendly choices</p>
+            <p className="text-sm text-gray-500">Earn more by making eco-friendly choices</p>
           </div>
         </div>
         <div className="flex items-center space-x-4">

@@ -20,7 +20,7 @@ In a world where convenience often comes at an environmental cost, Cydex offers 
 
 - **For Customers**: Order from eco-friendly vendors, choose sustainable delivery methods, track in real-time, and earn carbon credits.
 - **For Riders**: Accept and deliver orders using zero-emission transportation, maximize earnings through carbon credits.
-- **For Vendors**: List your business, join our recycling program, and get incentives for sustainable practices.
+- **For Vendors**: List your business and get incentives for sustainable practices.
 
 ### Target Audience
 
