@@ -539,7 +539,7 @@ export default async function handler(
 }
 ```
 
-### Step 4.3: Create Subscription API
+### Step 4.3: Create Subscription AP
 **File: `src/pages/api/subscribe.ts`**
 
 ```typescript
