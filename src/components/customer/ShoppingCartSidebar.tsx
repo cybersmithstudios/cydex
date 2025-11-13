@@ -110,14 +110,14 @@ export const ShoppingCartSidebar: React.FC<ShoppingCartSidebarProps> = ({
                 </div>
                 <div className="flex justify-between text-sm">
                   <span>Delivery Fee</span>
-                  <span>₦1,000.00</span>
+                  <span>₦500.00</span>
                 </div>
                 
                 <Separator />
                 
                 <div className="flex justify-between font-semibold">
                   <span>Total</span>
-                  <span>₦{(cartTotal + 1000).toLocaleString()}</span>
+                  <span>₦{(cartTotal + 500).toLocaleString()}</span>
                 </div>
               </div>
               

@@ -6,7 +6,7 @@ import VendorOrders from '../pages/vendor/Orders';
 import VendorOrderDetail from '../pages/vendor/OrderDetail';
 import ProcessOrder from '../pages/vendor/ProcessOrder';
 import VendorWallet from '../pages/vendor/Wallet';
-import VendorRecycling from '../pages/vendor/Recycling';
+// import VendorRecycling from '../pages/vendor/Recycling';
 import VendorSettings from '../pages/vendor/Settings';
 import AddProduct from '../pages/vendor/AddProduct';
 
@@ -58,14 +58,14 @@ const VendorRoutes = () => {
         } 
       />
 
-      <Route 
+      {/* <Route 
         path="/recycling" 
         element={
           <ProtectedRoute allowedRoles={['VENDOR']}>
             <VendorRecycling />
           </ProtectedRoute>
         } 
-      />
+      /> */}
 
       <Route 
         path="/settings" 

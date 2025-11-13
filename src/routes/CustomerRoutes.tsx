@@ -5,7 +5,7 @@ import NewOrder from '../pages/customer/NewOrder';
 import Orders from '../pages/customer/Orders';
 import OrderDetail from '../pages/customer/OrderDetail';
 import Wallet from '../pages/customer/Wallet';
-import Recycling from '../pages/customer/Recycling';
+// import Recycling from '../pages/customer/Recycling';
 import Profile from '../pages/customer/Profile';
 import OrderConfirmation from '../pages/customer/OrderConfirmation';
 import ProductDetails from '../pages/customer/ProductDetails';
@@ -68,14 +68,14 @@ const CustomerRoutes = () => {
         } 
       />
 
-      <Route 
+      {/* <Route 
         path="/recycling" 
         element={
           <ProtectedRoute allowedRoles={['CUSTOMER']}>
             <Recycling />
           </ProtectedRoute>
         } 
-      />
+      /> */}
       
       <Route 
         path="/profile" 

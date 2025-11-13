@@ -15,10 +15,7 @@ import { useAuth } from '@/contexts/SupabaseAuthContext';
 import { useCustomerAddress } from '@/hooks/useCustomerAddress';
 
 interface DeliveryAddress {
-  street: string;
-  city: string;
-  state: string;
-  country: string;
+  location: string;
   landmark: string;
   phone: string;
   additional_info: string;
@@ -42,10 +39,7 @@ export const DeliveryAddressModal: React.FC<DeliveryAddressModalProps> = ({
   const defaultPhone = customerPhone || '';
 
   const [address, setAddress] = useState<DeliveryAddress>({
-    street: '',
-    city: '',
-    state: '',
-    country: 'Nigeria',
+    location: '',
     landmark: '',
     phone: defaultPhone,
     additional_info: ''
@@ -57,15 +51,14 @@ export const DeliveryAddressModal: React.FC<DeliveryAddressModalProps> = ({
   useEffect(() => {
     if (isOpen && savedAddress) {
       setAddress({
-        ...savedAddress,
-        phone: savedAddress.phone || defaultPhone, // Use saved phone or current user phone
+        location: savedAddress.street || '', // Map street to location
+        landmark: savedAddress.landmark || '',
+        phone: savedAddress.phone || defaultPhone,
+        additional_info: savedAddress.additional_info || ''
       });
     } else if (isOpen) {
       setAddress({
-        street: '',
-        city: '',
-        state: '',
-        country: 'Nigeria',
+        location: '',
         landmark: '',
         phone: defaultPhone,
         additional_info: ''
@@ -76,9 +69,7 @@ export const DeliveryAddressModal: React.FC<DeliveryAddressModalProps> = ({
   const validateForm = () => {
     const newErrors: Partial<DeliveryAddress> = {};
 
-    if (!address.street.trim()) newErrors.street = 'Street address is required';
-    if (!address.city.trim()) newErrors.city = 'City is required';
-    if (!address.state.trim()) newErrors.state = 'State is required';
+    if (!address.location.trim()) newErrors.location = 'Location is required';
     if (!address.phone.trim()) newErrors.phone = 'Phone number is required';
 
     setErrors(newErrors);
@@ -87,8 +78,19 @@ export const DeliveryAddressModal: React.FC<DeliveryAddressModalProps> = ({
 
   const handleSubmit = () => {
     if (validateForm()) {
+      // Convert simplified address to full address format for saving
+      const fullAddress = {
+        street: address.location,
+        city: 'Ibadan', // Default to Ibadan for campus deliveries
+        state: 'Oyo State',
+        country: 'Nigeria',
+        landmark: address.landmark,
+        phone: address.phone,
+        additional_info: address.additional_info
+      };
+      
       // Save address for future use
-      saveAddress(address);
+      saveAddress(fullAddress);
       onAddressConfirmed(address);
       onClose();
     }
@@ -124,48 +126,22 @@ export const DeliveryAddressModal: React.FC<DeliveryAddressModalProps> = ({
         
         <div className="space-y-4 py-4">
           <div className="space-y-2">
-            <Label htmlFor="street">Street Address *</Label>
+            <Label htmlFor="location">Location *</Label>
             <Input
-              id="street"
-              placeholder="e.g., 123 Main Street, Apartment 4B"
-              value={address.street}
-              onChange={(e) => handleInputChange('street', e.target.value)}
-              className={errors.street ? 'border-red-500' : ''}
+              id="location"
+              placeholder="e.g., UI Campus, Faculty of Science, Room 205"
+              value={address.location}
+              onChange={(e) => handleInputChange('location', e.target.value)}
+              className={errors.location ? 'border-red-500' : ''}
             />
-            {errors.street && <p className="text-red-500 text-sm">{errors.street}</p>}
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="city">City *</Label>
-              <Input
-                id="city"
-                placeholder="e.g., Lagos"
-                value={address.city}
-                onChange={(e) => handleInputChange('city', e.target.value)}
-                className={errors.city ? 'border-red-500' : ''}
-              />
-              {errors.city && <p className="text-red-500 text-sm">{errors.city}</p>}
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="state">State *</Label>
-              <Input
-                id="state"
-                placeholder="e.g., Lagos"
-                value={address.state}
-                onChange={(e) => handleInputChange('state', e.target.value)}
-                className={errors.state ? 'border-red-500' : ''}
-              />
-              {errors.state && <p className="text-red-500 text-sm">{errors.state}</p>}
-            </div>
+            {errors.location && <p className="text-red-500 text-sm">{errors.location}</p>}
           </div>
 
           <div className="space-y-2">
             <Label htmlFor="landmark">Nearest Landmark</Label>
             <Input
               id="landmark"
-              placeholder="e.g., Near Shoprite Mall"
+              placeholder="e.g., Near Faculty of Arts, Behind Library"
               value={address.landmark}
               onChange={(e) => handleInputChange('landmark', e.target.value)}
             />

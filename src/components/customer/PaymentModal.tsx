@@ -15,6 +15,13 @@ import { paymentService } from '@/services/paymentService';
 import { Loader2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
+interface CustomerDetails {
+  name?: string;
+  email: string;
+  phone?: string;
+  address?: string;
+}
+
 interface PaymentModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -24,6 +31,7 @@ interface PaymentModalProps {
   orderNumber: string;
   customerEmail: string;
   customerId?: string;
+  customerDetails?: Partial<CustomerDetails>;
   metadata?: Record<string, any>;
 }
 
@@ -36,6 +44,7 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({
   orderNumber,
   customerEmail,
   customerId,
+  customerDetails = {},
   metadata = {},
 }): JSX.Element | null => {
   const navigate = useNavigate();
@@ -159,21 +168,45 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({
         <DialogHeader>
           <DialogTitle>Complete Your Payment</DialogTitle>
           <DialogDescription>
-            Secure payment powered by Paystack. Your payment information is encrypted and secure.
+            You're about to complete your order #{orderNumber}
           </DialogDescription>
         </DialogHeader>
+
         <div className="space-y-4 py-4">
-          <div className="flex justify-between items-center py-2 border-b">
-            <span className="text-sm text-gray-600">Order Number:</span>
-            <span className="font-medium">{orderNumber}</span>
+          {/* Customer Information */}
+          <div className="space-y-3 p-4 rounded-lg border">
+            <h4 className="font-medium text-sm">Customer Information</h4>
+            <div className="space-y-2 text-sm">
+              <div className="flex items-center justify-between">
+                <span className="text-muted-foreground">Email:</span>
+                <span className="font-medium truncate max-w-[60%] text-right">{customerEmail}</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-muted-foreground">Phone:</span>
+                <span className="font-medium text-right">{customerDetails.phone || 'Not provided'}</span>
+              </div>
+              {customerDetails.address && (
+                <div className="flex items-start justify-between gap-3">
+                  <span className="text-muted-foreground">Address:</span>
+                  <span className="font-medium text-right break-words max-w-[60%]">{customerDetails.address}</span>
+                </div>
+              )}
+            </div>
           </div>
-          <div className="flex justify-between items-center py-2 border-b">
-            <span className="text-sm text-gray-600">Customer:</span>
-            <span className="font-medium">{user?.email}</span>
-          </div>
-          <div className="flex justify-between items-center py-2">
-            <span className="text-sm text-gray-600">Amount:</span>
-            <span className="font-bold text-lg">₦{amount.toLocaleString()}</span>
+
+          {/* Order Summary */}
+          <div className="space-y-3 border-t pt-4">
+            <h4 className="font-medium text-sm">Order Summary</h4>
+            <div className="space-y-2">
+              <div className="flex justify-between">
+                <span className="text-sm text-muted-foreground">Order Number:</span>
+                <span className="font-medium">#{orderNumber}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-sm text-muted-foreground">Total Amount:</span>
+                <span className="text-lg font-bold">₦{amount.toLocaleString()}</span>
+              </div>
+            </div>
           </div>
           
           {/* Payment Method Selection */}

@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -10,10 +10,23 @@ import { VendorOrderAcceptance } from './VendorOrderAcceptance';
 import { toast } from 'sonner';
 
 const OrderDetailReal = () => {
-  const { orderId } = useParams();
+  const { orderId } = useParams<{ orderId: string }>();
   const navigate = useNavigate();
   const { orders, loading, updateOrderStatus } = useVendorOrders();
   const [actionLoading, setActionLoading] = useState(false);
+  
+  // Debug: Log the full order data when it changes
+  useEffect(() => {
+    if (orderId && orders.length > 0) {
+      const currentOrder = orders.find(o => o.id === orderId);
+      console.log('Current Order Data:', JSON.stringify(currentOrder, null, 2));
+      if (currentOrder?.customer) {
+        console.log('Customer Data:', JSON.stringify(currentOrder.customer, null, 2));
+      } else {
+        console.log('No customer data found in order');
+      }
+    }
+  }, [orderId, orders]);
   
   const order = orders.find(o => o.id === orderId);
 
@@ -113,7 +126,7 @@ const OrderDetailReal = () => {
           <CardContent className="pt-6 text-center">
             <AlertCircle className="h-12 w-12 text-gray-400 mx-auto mb-4" />
             <h2 className="text-xl font-medium mb-4">Order not found</h2>
-            <p className="text-gray-500 mb-4">
+            <p className="text-gray-500 mb-4">               
               The order you're looking for doesn't exist or has been removed.
             </p>
           </CardContent>
@@ -225,19 +238,41 @@ const OrderDetailReal = () => {
                     <div className="text-sm text-gray-600 space-y-1">
                       {typeof order.delivery_address === 'object' ? (
                         <>
-                          <p className="font-medium">{order.delivery_address.street}</p>
-                          <p>{order.delivery_address.city}, {order.delivery_address.state}</p>
-                          {order.delivery_address.landmark && (
-                            <p className="text-xs text-gray-500">Landmark: {order.delivery_address.landmark}</p>
-                          )}
-                          {order.delivery_address.phone && (
-                            <div className="flex items-center space-x-2 mt-2">
-                              <Phone className="h-4 w-4 text-gray-400" />
-                              <span className="text-sm font-medium">Contact: {order.delivery_address.phone}</span>
-                            </div>
-                          )}
-                          {order.delivery_address.additional_info && (
-                            <p className="text-xs text-blue-600 italic">Note: {order.delivery_address.additional_info}</p>
+                          {/* Handle simplified address format (new campus format) */}
+                          {order.delivery_address.location ? (
+                            <>
+                              <p className="font-medium">{order.delivery_address.location}</p>
+                              {order.delivery_address.landmark && (
+                                <p className="text-xs text-gray-500">Near {order.delivery_address.landmark}</p>
+                              )}
+                              {order.delivery_address.phone && (
+                                <div className="flex items-center space-x-2 mt-2">
+                                  <Phone className="h-4 w-4 text-gray-400" />
+                                  <span className="text-sm font-medium">Contact: {order.delivery_address.phone}</span>
+                                </div>
+                              )}
+                              {order.delivery_address.additional_info && (
+                                <p className="text-xs text-blue-600 italic">Note: {order.delivery_address.additional_info}</p>
+                              )}
+                            </>
+                          ) : (
+                            /* Handle full address format (old format) */
+                            <>
+                              <p className="font-medium">{order.delivery_address.street || 'Address not available'}</p>
+                              <p>{order.delivery_address.city}, {order.delivery_address.state}</p>
+                              {order.delivery_address.landmark && (
+                                <p className="text-xs text-gray-500">Landmark: {order.delivery_address.landmark}</p>
+                              )}
+                              {order.delivery_address.phone && (
+                                <div className="flex items-center space-x-2 mt-2">
+                                  <Phone className="h-4 w-4 text-gray-400" />
+                                  <span className="text-sm font-medium">Contact: {order.delivery_address.phone}</span>
+                                </div>
+                              )}
+                              {order.delivery_address.additional_info && (
+                                <p className="text-xs text-blue-600 italic">Note: {order.delivery_address.additional_info}</p>
+                              )}
+                            </>
                           )}
                         </>
                       ) : (
@@ -277,35 +312,6 @@ const OrderDetailReal = () => {
         </div>
         
         <div className="space-y-6">
-          {/* Customer Information */}
-          <Card>
-            <CardContent className="pt-6">
-              <h3 className="text-lg font-semibold mb-4">Customer Information</h3>
-              
-              <div className="space-y-3">
-                <div className="flex items-center gap-3">
-                  <User className="h-5 w-5 text-gray-400" />
-                  <div>
-                    <p className="font-medium">{order.customer?.name}</p>
-                    <p className="text-sm text-gray-600">Customer</p>
-                  </div>
-                </div>
-                
-                <div className="flex items-center gap-3">
-                  <Mail className="h-5 w-5 text-gray-400" />
-                  <p className="text-sm">{order.customer?.email}</p>
-                </div>
-                
-                {order.customer?.phone && (
-                  <div className="flex items-center gap-3">
-                    <Phone className="h-5 w-5 text-gray-400" />
-                    <p className="text-sm">{order.customer.phone}</p>
-                  </div>
-                )}
-              </div>
-            </CardContent>
-          </Card>
-
           {/* Rider Information */}
           {order.rider && (
             <Card>

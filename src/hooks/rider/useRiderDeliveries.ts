@@ -20,12 +20,18 @@ export interface DeliveryData {
   special_instructions: string;
   vendor_name?: string;
   customer_name?: string;
+  customer_email?: string;
+  customer_phone?: string;
+  delivery_address?: any;
   items_count?: number;
+  order_items?: any[];
   order?: {
-    customer_profile?: { name: string };
+    customer_profile?: { name: string; email: string; phone: string };
     vendor_profile?: { name: string };
     order_items?: any[];
     subtotal?: number;
+    delivery_address?: any;
+    special_instructions?: string;
   };
 }
 
@@ -75,9 +81,17 @@ export const useRiderDeliveries = () => {
               subtotal,
               status,
               payment_status,
-              customer_profile:profiles!customer_id(name),
+              delivery_address,
+              special_instructions,
+              customer_profile:profiles!customer_id(name, email, phone),
               vendor_profile:profiles!vendor_id(name),
-              order_items(count)
+              order_items(
+                product_name,
+                quantity,
+                unit_price,
+                total_price,
+                product_description
+              )
             )
           `)
           .eq('status', 'available')
@@ -93,13 +107,30 @@ export const useRiderDeliveries = () => {
 
       const data = await retryWithBackoff(operation);
 
-      const formattedDeliveries = data?.map(delivery => ({
-        ...delivery,
-        vendor_name: delivery.orders?.vendor_profile?.name || 'Unknown Vendor',
-        customer_name: delivery.orders?.customer_profile?.name || 'Unknown Customer',
-        items_count: delivery.orders?.order_items?.length || 0,
-        order: delivery.orders
-      })) || [];
+      const formattedDeliveries = data?.map(delivery => {
+        console.log('Processing delivery:', delivery.id, 'Customer profile:', delivery.orders?.customer_profile);
+        
+        return {
+          ...delivery,
+          vendor_name: delivery.orders?.vendor_profile?.name || 'Unknown Vendor',
+          customer_name: delivery.orders?.customer_profile?.name || delivery.orders?.customer_profile?.email || 'Customer',
+          customer_email: delivery.orders?.customer_profile?.email || '',
+          customer_phone: delivery.orders?.customer_profile?.phone || '',
+          delivery_address: delivery.orders?.delivery_address || {},
+          special_instructions: delivery.orders?.special_instructions || '',
+          items_count: delivery.orders?.order_items?.length || 0,
+          order_items: delivery.orders?.order_items || [],
+          // Ensure order.customer_profile includes required fields
+          order: {
+            ...delivery.orders,
+            customer_profile: {
+              name: delivery.orders?.customer_profile?.name || delivery.orders?.customer_profile?.email || 'Customer',
+              email: (delivery as any).orders?.customer_profile?.email || '',
+              phone: (delivery as any).orders?.customer_profile?.phone || ''
+            },
+          }
+        };
+      }) || [];
 
       console.log('[RiderDeliveries] Available deliveries loaded:', formattedDeliveries.length);
       setAvailableDeliveries(formattedDeliveries);
@@ -151,9 +182,17 @@ export const useRiderDeliveries = () => {
       const formattedDeliveries = data?.map(delivery => ({
         ...delivery,
         vendor_name: delivery.orders?.vendor_profile?.name || 'Unknown Vendor',
-        customer_name: delivery.orders?.customer_profile?.name || 'Unknown Customer',
+        customer_name: delivery.orders?.customer_profile?.name || 'Customer',
         items_count: delivery.orders?.order_items?.length || 0,
-        order: delivery.orders
+        // Ensure order.customer_profile satisfies the DeliveryData type (name, email, phone)
+        order: {
+          ...delivery.orders,
+          customer_profile: {
+            name: delivery.orders?.customer_profile?.name || 'Customer',
+            email: (delivery as any).orders?.customer_profile?.email || '',
+            phone: (delivery as any).orders?.customer_profile?.phone || ''
+          },
+        }
       })) || [];
 
       console.log('[RiderDeliveries] Current deliveries loaded:', formattedDeliveries.length);

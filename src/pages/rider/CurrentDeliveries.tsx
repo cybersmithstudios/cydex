@@ -278,7 +278,7 @@ const CurrentDeliveriesPage = () => {
                       </Button>
                       
                       <Button
-                        onClick={() => handleStatusUpdate(delivery.id, delivery.status)}
+                        onClick={() => handleStatusUpdate(delivery.order_id, delivery.status)}
                         disabled={isLoading}
                         className="bg-primary hover:bg-primary/90 text-black flex-1 sm:flex-none"
                       >

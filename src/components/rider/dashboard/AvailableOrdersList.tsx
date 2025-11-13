@@ -64,7 +64,7 @@ export const AvailableOrdersList: React.FC<AvailableOrdersListProps> = ({
                   <div className="flex flex-col items-start sm:items-end justify-between mt-3 sm:mt-0 sm:ml-4">
                     <div className="text-left sm:text-right">
                       <div className="text-base sm:text-lg font-bold">
-                        ₦{Number(order.delivery_fee).toLocaleString('en-NG', {minimumFractionDigits: 2, maximumFractionDigits: 2})}
+                        ₦500.00
                       </div>
                       <div className="text-xs sm:text-sm text-green-600">
                         +₦{Number(order.eco_bonus).toLocaleString('en-NG', {minimumFractionDigits: 2, maximumFractionDigits: 2})} eco bonus

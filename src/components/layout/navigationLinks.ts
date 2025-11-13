@@ -20,7 +20,7 @@ export const getNavLinks = (userRole: 'CUSTOMER' | 'RIDER' | 'VENDOR' | 'ADMIN')
         { name: 'Orders', href: '/customer/orders', icon: Package },
         { name: 'Pricing', href: '/customer/pricing', icon: Calculator },
         { name: 'Wallet', href: '/customer/wallet', icon: Wallet },
-        { name: 'Recycling', href: '/customer/recycling', icon: Recycle },
+        // { name: 'Recycling', href: '/customer/recycling', icon: Recycle },
         { name: 'Profile', href: '/customer/profile', icon: User },
       ];
     case 'RIDER':
@@ -36,7 +36,7 @@ export const getNavLinks = (userRole: 'CUSTOMER' | 'RIDER' | 'VENDOR' | 'ADMIN')
         { name: 'Dashboard', href: '/vendor', icon: Home },
         { name: 'Orders', href: '/vendor/orders', icon: Package },
         { name: 'Wallet', href: '/vendor/wallet', icon: Wallet },
-        { name: 'Recycling', href: '/vendor/recycling', icon: Recycle },
+        // { name: 'Recycling', href: '/vendor/recycling', icon: Recycle },
         { name: 'Settings', href: '/vendor/settings', icon: Settings },
       ];
     case 'ADMIN':

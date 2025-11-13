@@ -1,9 +1,10 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Package, Leaf, Clock, MapPin, AlertCircle } from 'lucide-react';
+import { Package, Leaf, Clock, MapPin, AlertCircle, Eye } from 'lucide-react';
 import { DeliveryData } from '@/hooks/useRiderData';
+import { OrderDetailModal } from '@/components/rider/OrderDetailModal';
 
 interface OrdersTableProps {
   orders: DeliveryData[];
@@ -18,6 +19,18 @@ export const OrdersTable: React.FC<OrdersTableProps> = ({
   loading = false,
   error = null 
 }) => {
+  const [selectedOrder, setSelectedOrder] = useState<DeliveryData | null>(null);
+  const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
+
+  const handleViewDetails = (order: DeliveryData) => {
+    setSelectedOrder(order);
+    setIsDetailModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsDetailModalOpen(false);
+    setSelectedOrder(null);
+  };
   if (loading) {
     return (
       <div className="min-h-[400px] flex items-center justify-center">
@@ -159,10 +172,7 @@ export const OrdersTable: React.FC<OrdersTableProps> = ({
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div className="space-y-1">
                     <p className="text-sm font-medium text-gray-900">
-                      ₦{Number(order.delivery_fee).toLocaleString('en-NG', {
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 2
-                      })}
+                      ₦500.00
                     </p>
                     {Number(order.eco_bonus) > 0 && (
                       <p className="text-xs text-green-600">
@@ -181,20 +191,41 @@ export const OrdersTable: React.FC<OrdersTableProps> = ({
                 </td>
                 
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <Button
-                    onClick={() => onAcceptOrder(order.id)}
-                    className="bg-primary hover:bg-primary/90 text-black font-medium"
-                    size="sm"
-                    aria-label={`Accept delivery order from ${order.vendor_name}`}
-                  >
-                    Accept Order
-                  </Button>
+                  <div className="flex gap-2">
+                    <Button
+                      onClick={() => handleViewDetails(order)}
+                      variant="outline"
+                      size="sm"
+                      className="text-xs"
+                    >
+                      <Eye className="h-3 w-3 mr-1" />
+                      View
+                    </Button>
+                    <Button
+                      onClick={() => onAcceptOrder(order.id)}
+                      className="bg-primary hover:bg-primary/90 text-black font-medium text-xs"
+                      size="sm"
+                      aria-label={`Accept delivery order from ${order.vendor_name}`}
+                    >
+                      Accept
+                    </Button>
+                  </div>
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
+      
+      {/* Order Detail Modal */}
+      {selectedOrder && (
+        <OrderDetailModal
+          isOpen={isDetailModalOpen}
+          onClose={handleCloseModal}
+          order={selectedOrder}
+          onAcceptOrder={onAcceptOrder}
+        />
+      )}
     </div>
   );
 };

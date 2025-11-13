@@ -1,15 +1,55 @@
-
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/SupabaseAuthContext';
 import { toast } from 'sonner';
+
+// Type for database order items (as they come from the database)
+interface DBOrderItem {
+  id: string;
+  order_id: string;
+  product_id?: string;
+  product_name?: string;
+  quantity?: number;
+  unit_price?: number;
+  total_price?: number;
+  product_description?: string | null;
+  product_category?: string | null;
+  is_eco_friendly?: boolean | null;
+  carbon_impact?: number | null;
+  created_at?: string;
+  weight_kg?: number | null;
+  [key: string]: any; // Allow other properties
+}
+
+// Type for our application's order items
+interface OrderItem {
+  id: string;
+  order_id: string;
+  product_id: string;
+  product_name: string;
+  quantity: number;
+  unit_price: number;
+  total_price: number;
+  product_description: string | null;
+  product_category: string | null;
+  is_eco_friendly: boolean;
+  carbon_impact: number;
+  created_at: string;
+  weight_kg: number | null;
+}
+
+interface CustomerData {
+  id: string;
+  name: string;
+  email: string;
+  phone?: string;
+}
 
 export interface VendorOrder {
   id: string;
   order_number: string;
   customer_id: string;
   vendor_id: string;
-  rider_id?: string;
   status: string;
   payment_status: string;
   delivery_type: string;
@@ -18,6 +58,10 @@ export interface VendorOrder {
   delivery_fee: number;
   created_at: string;
   updated_at: string;
+  delivery_address: any;
+  customer: CustomerData;
+  order_items: OrderItem[];
+  rider_id?: string;
   delivered_at?: string;
   cancelled_at?: string;
   cancel_reason?: string;
@@ -26,230 +70,186 @@ export interface VendorOrder {
   rider_assigned_at?: string;
   picked_up_at?: string;
   ready_for_pickup_at?: string;
-  delivery_address: any;
   time_slot?: string;
   special_instructions?: string;
-  customer: {
-    name: string;
-    email: string;
-    phone?: string;
-  };
-  rider?: {
-    name: string;
-    email: string;
-    phone?: string;
-  };
-  order_items: Array<{
-    id: string;
-    product_name: string;
-    quantity: number;
-    unit_price: number;
-    total_price: number;
-    product_description?: string;
-    product_category?: string;
-    is_eco_friendly: boolean;
-    carbon_impact: number;
-  }>;
 }
 
 export const useVendorOrders = () => {
+  const { user } = useAuth();
   const [orders, setOrders] = useState<VendorOrder[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const { user } = useAuth();
 
-  const fetchOrders = async () => {
+  const loadOrders = useCallback(async () => {
     if (!user?.id) {
       setLoading(false);
       return;
     }
 
+    setLoading(true);
+    setError(null);
+
     try {
-      setLoading(true);
-      setError(null);
+      // Fetch orders for the current vendor
+      const { data: orders, error: ordersError } = await supabase
+        .from('orders')
+        .select('*')
+        .eq('vendor_id', user.id)
+        .eq('payment_status', 'paid')
+        .order('created_at', { ascending: false });
 
-        const { data, error: fetchError } = await supabase
-          .from('orders')
-          .select(`
-            *,
-            order_items(*)
-          `)
-          .eq('vendor_id', user.id)
-          .eq('payment_status', 'paid')
-          .order('created_at', { ascending: false });
-
-      if (fetchError) {
-        console.error('Error fetching vendor orders:', fetchError);
-        throw fetchError;
+      if (ordersError) throw ordersError;
+      
+      if (!orders?.length) {
+        setOrders([]);
+        return;
       }
 
-      // Fetch customer and rider info separately to avoid RLS issues
-      const ordersWithCustomer = await Promise.all((data || []).map(async (order: any) => {
-        let customer = null;
-        let rider = null;
+      // Get order items for all orders
+      const orderIds = orders.map(order => order.id);
+      const { data: orderItems = [], error: itemsError } = await supabase
+        .from('order_items')
+        .select('*')
+        .in('order_id', orderIds);
 
-        // Fetch customer profile
-        if (order.customer_id) {
-          const { data: customerProfile, error: customerError } = await supabase
-            .from('profiles')
-            .select('name, email, phone')
-            .eq('id', order.customer_id)
-            .maybeSingle();
-          
-          if (!customerError && customerProfile) {
-            customer = customerProfile;
-          }
-        }
+      if (itemsError) throw itemsError;
 
-        // Fetch rider profile if assigned
-        if (order.rider_id) {
-          const { data: riderProfile, error: riderError } = await supabase
+      // Get unique customer IDs
+      const customerIds = [...new Set(orders
+        .map(order => order.customer_id)
+        .filter(Boolean) as string[]
+      )];
+
+      // Fetch customer profiles
+      const customersMap = new Map<string, CustomerData>();
+      
+      if (customerIds.length > 0) {
+        // Define a type for the profile data
+        type ProfileData = {
+          id: string;
+          email?: string | null;
+          full_name?: string | null;
+          first_name?: string | null;
+          last_name?: string | null;
+          phone?: string | null;
+          [key: string]: any; // Allow other properties
+        };
+
+        try {
+          // Fetch all profile data at once
+          const { data: profiles, error: profilesError } = await supabase
             .from('profiles')
-            .select('name, email, phone')
-            .eq('id', order.rider_id)
-            .maybeSingle();
-          
-          if (!riderError && riderProfile) {
-            rider = riderProfile;
+            .select('*')
+            .in('id', customerIds);
+
+          if (profilesError) {
+            console.error('Error fetching profiles:', profilesError);
+            throw profilesError;
           }
+          
+          if (profiles && profiles.length > 0) {
+            // Process each profile
+            profiles.forEach((profile: ProfileData) => {
+              if (!profile?.id) return;
+              
+              // Extract data with fallbacks
+              const id = profile.id;
+              const email = profile.email?.trim() || `user-${id.substring(0, 6)}@example.com`;
+              
+              // Determine the best name to use
+              let name = 'Customer';
+              if (profile.full_name) {
+                name = profile.full_name;
+              } else if (profile.first_name || profile.last_name) {
+                name = [profile.first_name, profile.last_name].filter(Boolean).join(' ');
+              } else if (profile.email) {
+                name = profile.email.split('@')[0];
+              } else {
+                name = `Customer ${id.substring(0, 6)}`;
+              }
+              
+              const phone = profile.phone?.trim() || 'Not provided';
+              
+              customersMap.set(id, {
+                id,
+                name: name.trim(),
+                email: email.trim(),
+                phone
+              });
+            });
+          }
+        } catch (error) {
+          console.error('Error processing profiles:', error);
+          // Continue with empty profiles map if there's an error
+          // The fallback in the order processing will handle missing profiles
         }
+      }
+
+      // Process and combine all data
+      const processedOrders = orders.map(order => {
+        // Get or create customer data
+        const customer = order.customer_id && customersMap.get(order.customer_id)
+          ? customersMap.get(order.customer_id)!
+          : {
+              id: order.customer_id || 'unknown',
+              name: 'Customer',
+              email: 'no-email@example.com',
+              phone: 'Not provided'
+            };
+
+        // Get and transform order items to match the OrderItem interface
+        const items = (orderItems as DBOrderItem[])
+          .filter(item => item.order_id === order.id)
+          .map(item => {
+            const orderItem: OrderItem = {
+              id: item.id,
+              order_id: item.order_id,
+              product_id: item.product_id || 'unknown-product',
+              product_name: item.product_name || 'Unknown Product',
+              quantity: item.quantity ?? 1,
+              unit_price: item.unit_price ?? 0,
+              total_price: item.total_price ?? 0,
+              product_description: item.product_description ?? null,
+              product_category: item.product_category ?? null,
+              is_eco_friendly: item.is_eco_friendly ?? false,
+              carbon_impact: item.carbon_impact ?? 0,
+              created_at: item.created_at || new Date().toISOString(),
+              weight_kg: item.weight_kg ?? null
+            };
+            return orderItem;
+          });
 
         return {
           ...order,
-          customer: {
-            name: customer?.name || 'Unknown Customer',
-            email: customer?.email || 'unknown@email.com',
-            phone: customer?.phone || undefined,
-          },
-          rider: rider ? {
-            name: rider.name || 'Unknown Rider',
-            email: rider.email || 'unknown@email.com',
-            phone: rider.phone || undefined,
-          } : undefined,
-          order_items: (order.order_items || []).map((item: any) => ({
-            ...item,
-            is_eco_friendly: item.is_eco_friendly ?? true,
-            carbon_impact: item.carbon_impact ?? 0
-          })),
+          customer,
+          order_items: items
         };
-      }));
+      });
 
-      setOrders(ordersWithCustomer);
-    } catch (err: any) {
-      console.error('Error in fetchOrders:', err);
-      setError(err.message || 'Failed to fetch orders');
-      toast.error('Failed to load orders');
+      setOrders(processedOrders);
+    } catch (err) {
+      console.error('Error loading orders:', err);
+      setError('Failed to load orders');
+      toast.error('Failed to load orders. Please try again.');
     } finally {
       setLoading(false);
     }
-  };
-
-  const updateOrderStatus = async (orderId: string, newStatus: string) => {
-    try {
-      // Find the order to check current status
-      const order = orders.find(o => o.id === orderId);
-      if (!order) {
-        toast.error('Order not found');
-        return false;
-      }
-      // Only allow valid transitions
-      if (order.status === 'pending' && newStatus === 'accepted') {
-        // Accept order - use 'processing' status as per DB constraint
-        const updateData: any = {
-          status: 'processing',
-          vendor_accepted_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-        };
-        const { error } = await supabase
-          .from('orders')
-          .update(updateData)
-          .eq('id', orderId)
-          .eq('vendor_id', user?.id);
-        if (error) throw error;
-        await fetchOrders();
-        toast.success('Order accepted');
-        return true;
-      } else if ((order.status === 'processing' || order.status === 'accepted') && newStatus === 'ready_for_pickup') {
-        // Mark as ready for pickup - use 'ready' status as per DB constraint
-        const updateData: any = {
-          status: 'ready',
-          ready_for_pickup_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-        };
-        const { error } = await supabase
-          .from('orders')
-          .update(updateData)
-          .eq('id', orderId)
-          .eq('vendor_id', user?.id);
-        if (error) throw error;
-        await fetchOrders();
-        toast.success('Order marked as ready for pickup');
-        return true;
-      } else if (newStatus === 'delivered') {
-        toast.error('Vendors cannot mark orders as delivered');
-        return false;
-      } else if (newStatus === 'cancelled' && (order.status === 'pending' || order.status === 'accepted' || order.status === 'processing')) {
-        // Allow vendor to cancel only if pending or accepted
-        const updateData: any = {
-          status: 'cancelled',
-          cancelled_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-        };
-        const { error } = await supabase
-          .from('orders')
-          .update(updateData)
-          .eq('id', orderId)
-          .eq('vendor_id', user?.id);
-        if (error) throw error;
-        await fetchOrders();
-        toast.success('Order cancelled');
-        return true;
-      } else {
-        toast.error('Invalid status transition');
-        return false;
-      }
-    } catch (error: any) {
-      console.error('Error updating order status:', error);
-      toast.error('Failed to update order status');
-      return false;
-    }
-  };
-
-  useEffect(() => {
-    fetchOrders();
   }, [user?.id]);
 
-  // Set up real-time subscription for order updates
+  // Load orders on mount and when loadOrders changes
   useEffect(() => {
-    if (!user?.id) return;
+    loadOrders();
+  }, [loadOrders]);
 
-    const channel = supabase
-      .channel('vendor-orders-changes')
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'orders',
-          filter: `vendor_id=eq.${user.id}`
-        },
-        () => {
-          console.log('Order updated, refreshing...');
-          fetchOrders();
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [user?.id]);
+  // Refresh function
+  const refresh = useCallback(() => loadOrders(), [loadOrders]);
 
   return {
     orders,
     loading,
     error,
-    refetch: fetchOrders,
-    updateOrderStatus
+    refresh
   };
 };
+
+export default useVendorOrders;

@@ -88,7 +88,7 @@ const OrdersPageReal = () => {
             {getStatusBadge(order.status)}
           </div>
           <p className="text-sm text-gray-600">
-            Customer: {order.customer?.name || 'Unknown'}
+            Customer: {order.customer?.name || order.customer?.email || 'Customer'}
           </p>
           <p className="text-xs text-gray-500">
             {formatDate(order.created_at)}

@@ -236,16 +236,25 @@ const OrderDetailPage = () => {
     );
   }
 
+  // Build a robust delivery address string that supports both simplified and full shapes
+  const deliveryAddressStr = typeof order.delivery_address === 'object'
+    ? (order.delivery_address.location
+        ? order.delivery_address.location
+        : [order.delivery_address.street, order.delivery_address.city, order.delivery_address.state]
+            .filter(Boolean)
+            .join(', '))
+    : String(order.delivery_address || '');
+
   // Transform order data to match component expectations
   const transformedOrder = {
     id: order.id,
-    vendor: order.vendor?.name || 'Unknown Vendor',
+    vendor: order.vendor?.name || 'Vendor',
     status: order.status,
     paymentStatus: order.payment_status,
     carbonSaved: order.carbon_credits_earned,
     trackingSteps: generateTrackingSteps(order),
     eta: calculateETA(order.status, order.delivery_type),
-    deliveryAddress: `${order.delivery_address.street}, ${order.delivery_address.city}, ${order.delivery_address.state}`,
+    deliveryAddress: deliveryAddressStr,
     orderDate: new Date(order.created_at).toLocaleDateString(),
     updatedAt: new Date(order.updated_at).toLocaleString(),
     items: order.order_items?.length || 0,
@@ -267,7 +276,7 @@ const OrderDetailPage = () => {
     totalAmount: formatCurrency(order.total_amount),
     deliveryFee: formatCurrency(order.delivery_fee),
     discount: formatCurrency(0), // We don't have discount tracking yet
-    paymentMethod: order.payment_method || 'Unknown',
+    paymentMethod: order.payment_method || (order.payment_status === 'paid' ? 'Paystack' : 'Card'),
     verificationCode: order.verification_code,
     orderNumber: order.order_number
   };

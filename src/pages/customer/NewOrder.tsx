@@ -66,9 +66,17 @@ const NewOrder = () => {
   const [deliveryAddress, setDeliveryAddress] = useState<any>(null);
 
   // Autofill deliveryAddress from savedAddress so modal is skipped next orders
+  // IMPORTANT: convert saved full address shape -> simplified modal shape
+  // savedAddress comes from useCustomerAddress() and has {street, city, state, country, landmark, phone, additional_info}
+  // but deliveryAddress used in this component expects the simplified shape {location, landmark, phone, additional_info}
   useEffect(() => {
     if (!deliveryAddress && savedAddress) {
-      setDeliveryAddress(savedAddress);
+      setDeliveryAddress({
+        location: savedAddress.street,
+        landmark: savedAddress.landmark,
+        phone: savedAddress.phone,
+        additional_info: savedAddress.additional_info,
+      });
     }
   }, [savedAddress]);
   const itemsPerPage = 12;
@@ -172,7 +180,7 @@ const NewOrder = () => {
       }
 
       const subtotal = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-      const delivery_fee = 1000;
+      const delivery_fee = 500;
       const total_amount = subtotal + delivery_fee;
 
       await createOrderWithAddress();
@@ -185,7 +193,7 @@ const NewOrder = () => {
   const handleActualCheckout = async () => {
     try {
       const subtotal = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-      const delivery_fee = 1000;
+      const delivery_fee = 500;
       const total_amount = subtotal + delivery_fee;
 
       await createOrderWithAddress();
@@ -200,8 +208,31 @@ const NewOrder = () => {
     
     try {
       const subtotal = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-      const delivery_fee = 1000;
+      const delivery_fee = 500;
       const total_amount = subtotal + delivery_fee;
+
+      // Build full delivery address for database, supporting both simplified and full shapes
+      const fullDeliveryAddress = (
+        // If we have the simplified shape (from modal)
+        (deliveryAddress as any).location !== undefined
+      ) ? {
+        street: (deliveryAddress as any).location,
+        city: 'Ibadan',
+        state: 'Oyo State',
+        country: 'Nigeria',
+        landmark: (deliveryAddress as any).landmark,
+        phone: (deliveryAddress as any).phone,
+        additional_info: (deliveryAddress as any).additional_info,
+      } : {
+        // Otherwise, assume it's already in full shape (from savedAddress)
+        street: (deliveryAddress as any).street,
+        city: (deliveryAddress as any).city || 'Ibadan',
+        state: (deliveryAddress as any).state || 'Oyo State',
+        country: (deliveryAddress as any).country || 'Nigeria',
+        landmark: (deliveryAddress as any).landmark,
+        phone: (deliveryAddress as any).phone,
+        additional_info: (deliveryAddress as any).additional_info,
+      };
 
       // Create the order
       const { data: order, error: orderError } = await supabase
@@ -212,7 +243,7 @@ const NewOrder = () => {
           status: 'pending',
           payment_status: 'pending',
           delivery_type: 'standard',
-          delivery_address: deliveryAddress,
+          delivery_address: fullDeliveryAddress,
           subtotal,
           delivery_fee,
           total_amount,

@@ -44,16 +44,9 @@ export const DeliveryScheduler: React.FC<DeliverySchedulerProps> = ({
   const [notes, setNotes] = useState('');
   const [loading, setLoading] = useState(false);
   
-  // Calculate delivery fees and total
+  // Calculate delivery fees and total - Flat rate pricing
   const getDeliveryFee = () => {
-    switch (deliveryType) {
-      case 'express':
-        return 2000;
-      case 'eco':
-        return 500;
-      default:
-        return 1000;
-    }
+    return 500; // Flat rate of ₦500 for all delivery types
   };
   
   const handleScheduleDelivery = () => {
@@ -117,7 +110,7 @@ export const DeliveryScheduler: React.FC<DeliverySchedulerProps> = ({
                   <Clock className="mb-2 h-6 w-6" />
                   <span className="font-medium">Standard</span>
                   <span className="text-xs text-gray-500">1-2 hours</span>
-                  <span className="font-medium mt-2">₦1,000</span>
+                  <span className="font-medium mt-2">₦500</span>
                 </Label>
               </div>
               
@@ -134,7 +127,7 @@ export const DeliveryScheduler: React.FC<DeliverySchedulerProps> = ({
                   <Clock className="mb-2 h-6 w-6" />
                   <span className="font-medium">Express</span>
                   <span className="text-xs text-gray-500">30-45 min</span>
-                  <span className="font-medium mt-2">₦2,000</span>
+                  <span className="font-medium mt-2">₦500</span>
                 </Label>
               </div>
               

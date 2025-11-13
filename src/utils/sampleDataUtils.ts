@@ -118,7 +118,7 @@ export const createSampleOrders = async () => {
           postal_code: '10001'
         },
         subtotal: 45.99,
-        delivery_fee: 5.99,
+        delivery_fee: 500,
         total_amount: 51.98,
         carbon_credits_earned: 5,
         payment_method: 'credit_card',
@@ -140,7 +140,7 @@ export const createSampleOrders = async () => {
           postal_code: '90210'
         },
         subtotal: 78.50,
-        delivery_fee: 9.99,
+        delivery_fee: 500,
         total_amount: 88.49,
         carbon_credits_earned: 8,
         payment_method: 'paypal',
@@ -163,7 +163,7 @@ export const createSampleOrders = async () => {
           postal_code: '60601'
         },
         subtotal: 32.25,
-        delivery_fee: 4.99,
+        delivery_fee: 500,
         total_amount: 37.24,
         carbon_credits_earned: 3,
         payment_method: 'credit_card'
