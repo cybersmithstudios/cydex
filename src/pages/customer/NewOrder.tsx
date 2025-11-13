@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Search, ArrowLeft } from 'lucide-react';
 import { useAuth } from '@/contexts/SupabaseAuthContext';
 import DashboardLayout from '@/components/layout/DashboardLayout';
@@ -27,6 +27,7 @@ import { OrderHeader } from '@/components/customer/order/OrderHeader';
 const NewOrder = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { products, loading } = useProducts();
   const { 
     cartItems, 
@@ -79,6 +80,44 @@ const NewOrder = () => {
       });
     }
   }, [savedAddress]);
+  
+  // Auto-select vendor from URL params or cart items
+  useEffect(() => {
+    // First check URL params (from product details checkout)
+    const vendorIdFromUrl = searchParams.get('vendor');
+    const vendorNameFromUrl = searchParams.get('vendorName');
+    const fromCheckout = searchParams.get('checkout') === 'true';
+    
+    if (vendorIdFromUrl && vendorNameFromUrl && !selectedVendor) {
+      setSelectedVendor(vendorIdFromUrl);
+      setSelectedVendorName(decodeURIComponent(vendorNameFromUrl));
+      // Auto-open cart if coming from checkout and cart has items
+      if (fromCheckout && cartItems.length > 0 && !isCartOpen) {
+        setIsCartOpen(true);
+      }
+      // Don't clear cart when auto-selecting from URL params
+      return;
+    }
+    
+    // If no vendor selected and cart has items, auto-select vendor from cart
+    if (!selectedVendor && cartItems.length > 0) {
+      const vendorIds = Array.from(new Set(cartItems.map(item => item.vendor_id).filter(Boolean)));
+      if (vendorIds.length === 1) {
+        // All items are from the same vendor
+        const vendorItem = cartItems.find(item => item.vendor_id);
+        if (vendorItem) {
+          setSelectedVendor(vendorItem.vendor_id);
+          setSelectedVendorName(vendorItem.vendor_name);
+          // Auto-open cart if it has items
+          if (cartItems.length > 0 && !isCartOpen) {
+            setIsCartOpen(true);
+          }
+          // Don't clear cart when auto-selecting from cart items
+        }
+      }
+    }
+  }, [searchParams, cartItems, selectedVendor, isCartOpen, setIsCartOpen]);
+  
   const itemsPerPage = 12;
 
   // Filter products to only show those from selected vendor with valid vendor info

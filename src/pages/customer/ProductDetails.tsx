@@ -42,8 +42,15 @@ const ProductDetails = () => {
   }, [vendorCartItems]);
 
   const handleProceedToCheckout = () => {
+    if (!product || vendorCartItems.length === 0) {
+      toast.error('No items in cart');
+      return;
+    }
+    
     setIsCartOpen(false);
-    navigate('/customer/new-order');
+    // Navigate with vendor ID in URL params so NewOrder can auto-select the vendor
+    // Add checkout=true to indicate we're coming from checkout flow
+    navigate(`/customer/new-order?vendor=${product.vendor_id}&vendorName=${encodeURIComponent(product.vendor?.name || 'Unknown Vendor')}&checkout=true`);
   };
 
   useEffect(() => {
