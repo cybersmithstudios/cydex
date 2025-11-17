@@ -25,7 +25,7 @@ function App() {
               <Toaster />
               <ShadcnToaster />
               <BrowserRouter>
-                <div className="min-h-screen bg-background font-sans antialiased opacity-70">
+                <div className="min-h-screen bg-background font-sans antialiased ">
                   <AppRoutes />
                 </div>
               </BrowserRouter>
