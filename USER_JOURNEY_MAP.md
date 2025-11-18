@@ -610,7 +610,232 @@ available → accepted → picking_up → picked_up → delivering → delivered
 - All timestamps are stored in ISO format
 - Verification codes are 4-digit numeric codes
 - Delivery fee is currently fixed at ₦500
-- Platform may take commission from vendor sales (implementation varies)
-- Eco bonuses for riders based on vehicle type and carbon savings
+- Platform takes 10% commission from vendor sales
+- Eco bonuses for riders: 5% of delivery fee
+- Payout fee: 1.5% for both vendors and riders
 - All amounts in Nigerian Naira (₦)
+
+---
+
+## Wallet & Payment System Details
+
+### Payment Flow with Escrow
+
+1. **Customer Payment**
+   - Customer pays via Paystack
+   - Payment amount held in escrow (not immediately released)
+   - Payment reference and metadata stored
+   - Customer transaction record created
+   - Order status remains `pending` until vendor accepts
+
+2. **Escrow Hold**
+   - When payment confirmed (`payment_status = paid`):
+     - `payment_holds` record created automatically via database trigger
+     - Calculates: vendor amount (90%), rider amount (100% of delivery fee), platform fee (10%)
+     - Status: `held`
+   - Funds remain held until order is delivered
+
+3. **Settlement on Delivery**
+   - When order status changes to `delivered`:
+     - Database trigger automatically processes settlement
+     - Creates settlement records for vendor and rider
+     - Updates vendor and rider wallets
+     - Creates transaction records
+     - Releases funds from escrow
+     - Payment hold status changes to `released`
+
+### Wallet System
+
+#### Vendor Wallet
+- **Available Balance**: Funds available for payout
+- **Pending Balance**: Orders paid but not yet delivered
+- **Total Earned**: Lifetime earnings
+- **Total Withdrawn**: Lifetime withdrawals
+
+#### Rider Wallet
+- **Available Balance**: Earnings available for withdrawal
+- **Pending Balance**: Deliveries in progress
+- **Total Earned**: Lifetime earnings
+- **Total Withdrawn**: Lifetime withdrawals
+- **Carbon Credits**: Eco points earned
+
+#### Customer Wallet
+- **Available Balance**: Wallet credits/refunds
+- **Bonus Balance**: Promotional credits
+- **Carbon Credits**: Eco points for sustainable choices
+- **Total Spent**: Lifetime spending
+
+### Transaction Types
+
+#### Vendor Transactions
+- `sale`: Income from completed orders (status: completed)
+- `payout`: Withdrawals to bank account (status: pending/completed/failed)
+- `refund`: Order cancellations/refunds (status: completed)
+- `adjustment`: Manual corrections (admin only)
+
+#### Rider Transactions
+- `earning`: Income from completed deliveries (status: completed)
+- `withdrawal`: Payouts to bank account (status: pending/completed/failed)
+- `bonus`: Eco bonuses and incentives (status: completed)
+- `adjustment`: Manual corrections (admin only)
+- `refund`: Reversed earnings (rare)
+
+#### Customer Transactions
+- `payment`: Order payments (status: completed)
+- `refund`: Cancelled order refunds (status: completed)
+- `bonus`: Promotional credits (status: completed)
+- `reward`: Loyalty rewards (status: completed)
+- `adjustment`: Manual corrections (admin only)
+
+### Payout Process
+
+#### Vendor Payout
+1. Vendor requests payout from Wallet page
+2. Selects bank account and amount
+3. System validates available balance
+4. Calculates 1.5% processing fee
+5. Creates `vendor_payout_requests` record with status `pending`
+6. Deducts amount from available balance immediately
+7. Admin/System processes payout (status: `processing` → `completed`)
+8. If successful: creates transaction record
+9. If failed: returns amount to available balance
+
+#### Rider Payout
+1. Rider requests payout from Earnings/Wallet page
+2. Selects bank account and amount
+3. System validates available balance
+4. Calculates 1.5% processing fee
+5. Creates `rider_payout_requests` record with status `pending`
+6. Deducts amount from available balance immediately
+7. Admin/System processes payout (status: `processing` → `completed`)
+8. If successful: creates transaction record
+9. If failed: returns amount to available balance
+
+### Settlement Calculations
+
+#### Order Settlement Example (₦5,000 order)
+```
+Subtotal: ₦4,500
+Delivery Fee: ₦500
+Total: ₦5,000
+
+On Delivery:
+- Vendor: ₦4,500 × 0.90 = ₦4,050 (90%)
+- Platform: ₦4,500 × 0.10 = ₦450 (10%)
+- Rider Base: ₦500 (100% of delivery fee)
+- Rider Eco Bonus: ₦500 × 0.05 = ₦25 (5%)
+- Rider Total: ₦525
+```
+
+### Refund Policy
+
+**Eligibility:**
+- Order not yet delivered
+- Payment confirmed
+- Within 24 hours of order placement
+
+**Process:**
+1. Check refund eligibility via `settlementService.canRefundOrder()`
+2. If eligible:
+   - Update payment hold status to `refunded`
+   - Create customer refund transaction
+   - Update order status to `cancelled` and payment_status to `refunded`
+   - Return funds to customer
+3. If ineligible: reject refund request
+
+### Database Tables for Wallet System
+
+#### Core Tables
+- `vendor_wallet` - Vendor balance tracking
+- `rider_wallet` - Rider balance tracking
+- `customer_wallet` - Customer balance tracking
+- `payment_holds` - Escrow fund tracking
+- `settlements` - Settlement records for all parties
+
+#### Transaction Tables
+- `vendor_transactions` - Vendor financial transactions
+- `vendor_payout_requests` - Vendor withdrawal requests
+- `rider_transactions` - Rider financial transactions
+- `rider_earnings` - Detailed earnings per delivery
+- `rider_payout_requests` - Rider withdrawal requests
+- `customer_transactions` - Customer payment history
+
+#### Supporting Tables
+- `vendor_bank_accounts` - Vendor payout destinations
+- `rider_bank_details` - Rider payout destinations
+
+### Implementation References
+
+**Services:**
+- `src/services/settlementService.ts` - Core settlement logic
+- `src/services/paymentService.ts` - Paystack integration
+- `src/services/webhookHandler.ts` - Payment webhook processing
+
+**Hooks:**
+- `src/hooks/useVendorFinancials.ts` - Vendor wallet management
+- `src/hooks/useCustomerWallet.ts` - Customer wallet management
+- `src/hooks/rider/useRiderEarnings.ts` - Rider earnings management
+
+**Pages:**
+- `src/pages/vendor/Wallet.tsx` - Vendor wallet interface
+- `src/pages/rider/Earnings.tsx` - Rider earnings interface
+- `src/pages/customer/Wallet.tsx` - Customer wallet interface
+
+**Database:**
+- `supabase/migrations/20250120000000_wallet_payment_enhancement.sql` - Wallet system migration
+
+### Automated Settlement Triggers
+
+**Database Triggers:**
+1. `create_payment_hold_trigger`: Creates escrow hold when payment confirmed
+2. `process_order_settlement_trigger`: Releases funds and settles when order delivered
+
+**Functions:**
+- `create_payment_hold()`: Creates payment hold record
+- `process_order_settlement()`: Handles settlement distribution
+- `calculate_settlement_amounts()`: Calculates vendor/rider/platform split
+- `get_wallet_balance()`: Retrieves wallet balance by user role
+
+### Security Features
+
+1. **Row Level Security (RLS)**: All wallet tables have RLS policies
+2. **User Isolation**: Users can only access their own wallet data
+3. **Admin Oversight**: Admins have read access to all financial data
+4. **System Operations**: Settlement automation runs with system privileges
+5. **Transaction Logging**: All financial operations are logged
+6. **Webhook Verification**: Paystack webhook signatures validated (production)
+
+### Real-Time Updates
+
+**Supabase Subscriptions:**
+- Wallet balances update in real-time
+- Transaction history refreshes automatically
+- Payout request status updates instantly
+- Settlement notifications pushed to users
+
+### Error Handling
+
+**Payment Failures:**
+- Webhook handler logs all payment events
+- Failed payments recorded in `payment_logs`
+- Orders remain in `pending` state
+- Users notified of payment issues
+
+**Settlement Failures:**
+- Errors logged to console and monitoring
+- Settlement status marked as `failed`
+- Manual intervention required
+- Audit trail maintained
+
+### Future Enhancements
+
+**Planned Features:**
+1. Paystack Transfer API integration for automated payouts
+2. Multi-currency support
+3. Wallet-to-wallet transfers
+4. Scheduled automatic payouts
+5. Dynamic commission rates
+6. Referral bonuses
+7. Loyalty program integration
+8. Advanced analytics dashboards
 

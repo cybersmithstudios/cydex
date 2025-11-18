@@ -101,6 +101,9 @@ class PaymentService {
       platform: 'Cydex',
       environment: this.isTestMode ? 'test' : 'production',
       timestamp: new Date().toISOString(),
+      // Settlement information for escrow handling
+      settlement_type: 'escrow',
+      hold_funds: true,
     };
 
     return {
@@ -110,6 +113,7 @@ class PaymentService {
       publicKey: this.getPublicKey(),
       currency: 'NGN',
       metadata: {
+        ...defaultMetadata,
         ...metadata,
         custom_fields: [
           ...(metadata.custom_fields || []),
@@ -127,6 +131,11 @@ class PaymentService {
             display_name: 'Environment',
             variable_name: 'environment',
             value: this.isTestMode ? 'test' : 'production',
+          },
+          {
+            display_name: 'Settlement Type',
+            variable_name: 'settlement_type',
+            value: 'escrow',
           },
         ],
       },

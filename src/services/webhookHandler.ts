@@ -91,11 +91,12 @@ export class PaystackWebhookHandler {
       }
 
       // Update order payment status in database
+      // The payment_hold will be created automatically by the database trigger
       const { error: orderError } = await supabase
         .from('orders')
         .update({
           payment_status: 'paid',
-          status: 'processing',
+          status: 'pending', // Keep as pending until vendor accepts
           payment_reference: data.reference,
           payment_gateway: 'paystack',
           payment_details: {
@@ -112,6 +113,36 @@ export class PaystackWebhookHandler {
         throw new Error(`Failed to update order: ${orderError.message}`);
       }
 
+      // Create customer transaction record
+      if (customerId) {
+        const transactionId = `CTX-${orderNumber}-${Date.now()}`;
+        await supabase.from('customer_transactions').insert({
+          customer_id: customerId,
+          transaction_id: transactionId,
+          type: 'payment',
+          amount: data.amount / 100,
+          status: 'completed',
+          description: `Payment for order ${orderNumber}`,
+          reference_id: null, // Will be updated with order ID if needed
+          reference_type: 'order',
+          payment_method: data.channel,
+          metadata: {
+            paystack_reference: data.reference,
+            transaction_id: data.id,
+          },
+          processed_at: new Date().toISOString(),
+        });
+
+        // Update customer wallet
+        await supabase.rpc('update_customer_wallet_on_payment', {
+          p_customer_id: customerId,
+          p_amount: data.amount / 100,
+        }).catch(err => {
+          console.warn('Failed to update customer wallet:', err);
+          // Don't throw - wallet update is not critical for order processing
+        });
+      }
+
       // Log successful payment
       await this.logPaymentEvent('success', {
         reference: data.reference,
@@ -126,6 +157,7 @@ export class PaystackWebhookHandler {
         reference: data.reference,
         amount: data.amount / 100,
         customer: data.customer.email,
+        message: 'Payment held in escrow pending delivery',
       });
 
     } catch (error) {

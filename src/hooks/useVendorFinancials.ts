@@ -199,21 +199,49 @@ export const useVendorFinancials = () => {
     }
   };
 
+  // Fetch wallet balance from new wallet table
+  const [walletBalance, setWalletBalance] = useState({
+    available_balance: 0,
+    pending_balance: 0,
+    total_earned: 0,
+    total_withdrawn: 0
+  });
+
+  const fetchWalletBalance = async () => {
+    if (!user?.id) return;
+    
+    try {
+      const { data, error } = await supabase
+        .from('vendor_wallet')
+        .select('*')
+        .eq('vendor_id', user.id)
+        .single();
+
+      if (error) {
+        // Wallet doesn't exist yet, return zero balance
+        setWalletBalance({
+          available_balance: 0,
+          pending_balance: 0,
+          total_earned: 0,
+          total_withdrawn: 0
+        });
+      } else {
+        setWalletBalance({
+          available_balance: Number(data.available_balance),
+          pending_balance: Number(data.pending_balance),
+          total_earned: Number(data.total_earned),
+          total_withdrawn: Number(data.total_withdrawn)
+        });
+      }
+    } catch (error) {
+      console.error('Error fetching wallet balance:', error);
+    }
+  };
+
   // Calculate balances
   const calculateBalance = () => {
     const completedTransactions = transactions.filter(t => t.status === 'completed');
     
-    const totalBalance = completedTransactions.reduce((acc, t) => {
-      if (t.type === 'sale') {
-        return acc + t.net_amount;
-      } else if (t.type === 'payout') {
-        return acc - t.amount;
-      } else if (t.type === 'refund') {
-        return acc - t.amount;
-      }
-      return acc;
-    }, 0);
-
     const salesThisMonth = completedTransactions
       .filter(t => {
         const transactionDate = new Date(t.created_at);
@@ -222,19 +250,12 @@ export const useVendorFinancials = () => {
                transactionDate.getMonth() === now.getMonth() && 
                transactionDate.getFullYear() === now.getFullYear();
       })
-      .reduce((acc, t) => acc + t.net_amount, 0);
-
-    const availableForPayout = completedTransactions
-      .filter(t => t.type === 'sale')
-      .reduce((acc, t) => acc + t.net_amount, 0) - 
-      completedTransactions
-      .filter(t => t.type === 'payout')
-      .reduce((acc, t) => acc + t.amount, 0);
+      .reduce((acc, t) => acc + Number(t.net_amount), 0);
 
     return {
-      totalBalance,
+      totalBalance: walletBalance.available_balance,
       salesThisMonth,
-      availableForPayout: Math.max(0, availableForPayout)
+      availableForPayout: walletBalance.available_balance
     };
   };
 
@@ -244,7 +265,8 @@ export const useVendorFinancials = () => {
     await Promise.all([
       fetchTransactions(),
       fetchBankAccounts(),
-      fetchPayoutRequests()
+      fetchPayoutRequests(),
+      fetchWalletBalance()
     ]);
     setRefreshing(false);
   };
@@ -256,7 +278,8 @@ export const useVendorFinancials = () => {
       await Promise.all([
         fetchTransactions(),
         fetchBankAccounts(),
-        fetchPayoutRequests()
+        fetchPayoutRequests(),
+        fetchWalletBalance()
       ]);
       setLoading(false);
     };
