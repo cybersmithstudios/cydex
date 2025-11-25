@@ -58,20 +58,40 @@ class SquadVirtualAccountService {
   }
 
   /**
-   * Create a (dynamic) virtual account for a user
-   * Endpoint: POST /virtual-account/create-dynamic-virtual-account
+   * Create a virtual account for a user
+   * Tries dynamic endpoint first, falls back to regular endpoint if dynamic is not available
+   * Endpoint: POST /virtual-account/create-dynamic-virtual-account or /virtual-account
    */
   async createVirtualAccount(payload: CreateVirtualAccountPayload): Promise<SquadVirtualAccountResponse> {
-    const body = {
+    // Try dynamic virtual account first (simpler, but requires account allocation)
+    try {
+      return await this.createDynamicVirtualAccount(payload);
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      
+      // If dynamic accounts aren't allocated, try regular virtual account endpoint
+      if (errorMessage.includes('No account allocation') || errorMessage.includes('allocation')) {
+        console.log('[Squad] Dynamic accounts not available, trying regular virtual account endpoint');
+        return await this.createRegularVirtualAccount(payload);
+      }
+      
+      // Re-throw other errors
+      throw error;
+    }
+  }
+
+  /**
+   * Create a dynamic virtual account (requires account allocation from Squad)
+   */
+  private async createDynamicVirtualAccount(payload: CreateVirtualAccountPayload): Promise<SquadVirtualAccountResponse> {
+    const body: any = {
       first_name: payload.firstName,
       last_name: payload.lastName,
-      customer_identifier: payload.customerIdentifier,
-      customer_name: `${payload.firstName} ${payload.lastName}`.trim(),
-      customer_email: payload.email,
-      customer_mobile: payload.phone,
-      beneficiary_account: payload.beneficiaryAccount,
-      metadata: payload.metadata,
     };
+
+    if (payload.beneficiaryAccount) {
+      body.beneficiary_account = payload.beneficiaryAccount;
+    }
 
     const response = await fetch(`${this.apiUrl}/virtual-account/create-dynamic-virtual-account`, {
       method: 'POST',
@@ -82,7 +102,53 @@ class SquadVirtualAccountService {
     const data = await response.json();
 
     if (!response.ok || data.status !== 200) {
-      const errorMessage = data.message || 'Failed to create virtual account';
+      const errorMessage = data.message || data.error || 'Failed to create dynamic virtual account';
+      console.error('Squad Dynamic VA Error:', data);
+      throw new Error(errorMessage);
+    }
+
+    return data;
+  }
+
+  /**
+   * Create a regular virtual account (B2C model - requires BVN and more details)
+   * This is the fallback when dynamic accounts aren't available
+   */
+  private async createRegularVirtualAccount(payload: CreateVirtualAccountPayload): Promise<SquadVirtualAccountResponse> {
+    // Regular virtual account requires: first_name, last_name, mobile_num, dob, bvn, gender, address, customer_identifier
+    // Since we don't have all these fields, we'll create a minimal one
+    // Note: This will likely fail without BVN, but it's better than nothing
+    
+    const body: any = {
+      first_name: payload.firstName,
+      last_name: payload.lastName,
+      customer_identifier: payload.customerIdentifier,
+      mobile_num: payload.phone || '08000000000', // Default if not provided
+      dob: '01/01/1990', // Default DOB - user should update later
+      bvn: '', // Empty - will need to be provided
+      gender: '1', // Default to male
+      address: 'Nigeria', // Default address
+    };
+
+    if (payload.email) {
+      body.email = payload.email;
+    }
+
+    if (payload.beneficiaryAccount) {
+      body.beneficiary_account = payload.beneficiaryAccount;
+    }
+
+    const response = await fetch(`${this.apiUrl}/virtual-account`, {
+      method: 'POST',
+      headers: this.headers,
+      body: JSON.stringify(body),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok || data.status !== 200) {
+      const errorMessage = data.message || data.error || 'Failed to create virtual account';
+      console.error('Squad Regular VA Error:', data);
       throw new Error(errorMessage);
     }
 

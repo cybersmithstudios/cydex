@@ -324,9 +324,15 @@ const CustomerWalletPage = () => {
                 <p className="text-sm text-gray-500 mb-2">
                   Your virtual account is being created automatically. This usually takes 2-5 seconds.
                 </p>
-                <p className="text-xs text-gray-400 mb-4">
+                <p className="text-xs text-gray-400 mb-2">
                   If it's taking longer, try refreshing or check the browser console for errors.
                 </p>
+                <div className="p-3 bg-amber-50 border border-amber-200 rounded-lg mb-4">
+                  <p className="text-xs text-amber-800">
+                    <strong>Note:</strong> If you see an "account allocation" error, virtual accounts require setup with Squad support. 
+                    You can still use the platform - funds can be added via bank transfer to your wallet.
+                  </p>
+                </div>
                 <div className="flex flex-col sm:flex-row gap-2 justify-center">
                   <Button
                     variant="outline"
@@ -357,7 +363,7 @@ const CustomerWalletPage = () => {
                     Retry Setup
                   </Button>
                 </div>
-              </div>
+                    </div>
             )}
             </CardContent>
           </Card>
@@ -381,7 +387,7 @@ const CustomerWalletPage = () => {
                     <span className="text-sm font-medium text-blue-900">Available Balance</span>
                     <span className="text-xl font-bold text-blue-700">
                       {formatCurrency(wallet.available_balance)}
-                    </span>
+                        </span>
                   </div>
                 </div>
 
@@ -593,9 +599,9 @@ const CustomerWalletPage = () => {
                   </div>
                     )}
                   </div>
-            </Tabs>
-          </CardContent>
-        </Card>
+              </Tabs>
+            </CardContent>
+          </Card>
 
         {/* Add Bank Account Dialog */}
         <Dialog open={showAddBankDialog} onOpenChange={setShowAddBankDialog}>
@@ -615,7 +621,7 @@ const CustomerWalletPage = () => {
                   value={newBankAccount.account_name}
                   onChange={(e) => setNewBankAccount(prev => ({ ...prev, account_name: e.target.value }))}
                 />
-              </div>
+        </div>
               <div>
                 <Label htmlFor="bank-name">Bank Name</Label>
                 <Input
@@ -624,7 +630,7 @@ const CustomerWalletPage = () => {
                   value={newBankAccount.bank_name}
                   onChange={(e) => setNewBankAccount(prev => ({ ...prev, bank_name: e.target.value }))}
                 />
-              </div>
+                      </div>
               <div>
                 <Label htmlFor="bank-code">Bank Code (NIP)</Label>
                 <Input
@@ -645,15 +651,15 @@ const CustomerWalletPage = () => {
                   value={newBankAccount.account_number}
                   onChange={(e) => setNewBankAccount(prev => ({ ...prev, account_number: e.target.value }))}
                 />
-              </div>
-            </div>
+                    </div>
+                  </div>
             <DialogFooter>
               <Button variant="outline" onClick={() => {
                 setShowAddBankDialog(false);
                 setNewBankAccount({ account_name: '', bank_name: '', bank_code: '', account_number: '' });
               }}>
                 Cancel
-              </Button>
+                      </Button>
               <Button
                 onClick={async () => {
                   if (!newBankAccount.account_name || !newBankAccount.bank_name || !newBankAccount.account_number) {

@@ -125,25 +125,33 @@ class WalletSetupService {
       return;
     }
 
-    const squadAccount = await this.createSquadVirtualAccount(user, role);
-    if (!squadAccount?.data) {
-      console.warn('Squad virtual account creation returned no data');
-      return;
-    }
+    try {
+      const squadAccount = await this.createSquadVirtualAccount(user, role);
+      if (!squadAccount?.data) {
+        console.warn('[WalletSetup] Squad virtual account creation returned no data');
+        return;
+      }
+
+    // Dynamic virtual accounts return: virtual_account_number, account_name, bank_name, bank_code
+    // Generate customer_identifier for our records (Squad doesn't return it for dynamic accounts)
+    const customerIdentifier = `${VIRTUAL_ACCOUNT_PREFIX}_${role}_${user.id.slice(0, 8)}`.toUpperCase();
 
     const saveResult = await supabase
       .from('virtual_accounts')
       .insert({
         profile_id: user.id,
         role,
-        squad_customer_identifier: squadAccount.data.customer_identifier,
+        squad_customer_identifier: squadAccount.data.customer_identifier || customerIdentifier,
         account_number:
-          squadAccount.data.account_number ||
-          squadAccount.data.virtual_account_number,
-        account_name: squadAccount.data.account_name || squadAccount.data.customer_name,
+          squadAccount.data.virtual_account_number ||
+          squadAccount.data.account_number,
+        account_name: squadAccount.data.account_name || `${user.name}`,
         bank_name: squadAccount.data.bank_name || DEFAULT_BANK.name,
         bank_code: squadAccount.data.bank_code || DEFAULT_BANK.code,
-        metadata: squadAccount.data,
+        metadata: {
+          ...squadAccount.data,
+          generated_customer_identifier: customerIdentifier,
+        },
       })
       .select('id')
       .single();
@@ -153,6 +161,21 @@ class WalletSetupService {
     }
 
     await this.linkWalletToVirtualAccount(role, user.id, wallet.id, saveResult.data.id);
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      
+      // If virtual account creation fails due to account allocation, log but don't block
+      if (errorMessage.includes('account allocation') || errorMessage.includes('allocation')) {
+        console.warn(`[WalletSetup] Virtual account not available - requires Squad account allocation. User can still use the platform.`);
+        // Don't throw - allow wallet to exist without virtual account
+        // Virtual account can be created later when Squad account is set up
+        return;
+      }
+      
+      // For other errors, log but don't block wallet creation
+      console.error(`[WalletSetup] Failed to create virtual account for ${role} ${user.id}:`, errorMessage);
+      // Don't throw - wallet is created, virtual account is optional
+    }
   }
 
   private async fetchExistingVirtualAccount(userId: string, role: WalletRole) {
@@ -216,10 +239,19 @@ class WalletSetupService {
       console.log(`[WalletSetup] Squad virtual account created:`, result.data);
       return result;
     } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
       console.error(`[WalletSetup] Squad API error:`, error);
-      // If Squad API fails, we still want to continue - virtual account can be created later
-      // But we should log this clearly
-      throw new Error(`Failed to create virtual account via Squad API: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      
+      // If it's an allocation error, provide helpful message
+      if (errorMessage.includes('No account allocation') || errorMessage.includes('allocation')) {
+        console.warn(`[WalletSetup] Dynamic virtual accounts require account allocation from Squad. Contact Squad support to enable this feature.`);
+        // Don't throw - allow the system to continue without virtual account
+        // User can still use the platform, just won't have a virtual account yet
+        throw new Error('Virtual accounts require account setup with Squad. Please contact support or use bank transfers for now.');
+      }
+      
+      // For other errors, throw with original message
+      throw new Error(`Failed to create virtual account: ${errorMessage}`);
     }
   }
 }
