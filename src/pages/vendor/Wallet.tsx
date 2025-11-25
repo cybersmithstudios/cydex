@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useVendorFinancials } from '@/hooks/useVendorFinancials';
+import { toast } from 'sonner';
 
 const WalletPage = () => {
   const isMobile = useIsMobile();
@@ -29,7 +30,8 @@ const WalletPage = () => {
     addBankAccount,
     requestPayout,
     refreshData,
-    balances 
+    balances,
+    virtualAccount
   } = useVendorFinancials();
 
   const [showAddBankDialog, setShowAddBankDialog] = useState(false);
@@ -37,6 +39,7 @@ const WalletPage = () => {
   const [newBankAccount, setNewBankAccount] = useState({
     account_name: '',
     bank_name: '',
+    bank_code: '',
     account_number: '',
     is_default: false,
     is_verified: false
@@ -112,6 +115,7 @@ const WalletPage = () => {
       setNewBankAccount({
         account_name: '',
         bank_name: '',
+        bank_code: '',
         account_number: '',
         is_default: false,
         is_verified: false
@@ -210,7 +214,8 @@ const WalletPage = () => {
                       <SelectContent>
                         {bankAccounts.map((account) => (
                           <SelectItem key={account.id} value={account.id}>
-                            {account.bank_name} - **** {account.account_number.slice(-4)}
+                            {account.bank_name}
+                            {account.bank_code ? ` (${account.bank_code})` : ''} - **** {account.account_number.slice(-4)}
                           </SelectItem>
                         ))}
                       </SelectContent>
@@ -297,6 +302,54 @@ const WalletPage = () => {
             </CardContent>
           </Card>
           
+          {/* Virtual Account Card */}
+          {virtualAccount && (
+            <Card className="mb-4 sm:mb-6">
+              <CardHeader className="pb-2 sm:pb-4">
+                <CardTitle className="text-base sm:text-lg flex items-center gap-2">
+                  <CreditCard className="h-4 w-4 sm:h-5 sm:w-5" />
+                  Your Virtual Account
+                </CardTitle>
+                <CardDescription className="text-sm">
+                  Receive payments directly to this account
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3 sm:space-y-4">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 p-3 sm:p-4 bg-gray-50 rounded-lg">
+                    <div>
+                      <p className="text-xs sm:text-sm text-gray-500 mb-1">Account Number</p>
+                      <p className="font-mono text-base sm:text-lg font-semibold">
+                        {virtualAccount.account_number}
+                      </p>
+                    </div>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        navigator.clipboard.writeText(virtualAccount.account_number);
+                        toast.success('Account number copied!');
+                      }}
+                      className="w-full sm:w-auto"
+                    >
+                      Copy
+                    </Button>
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                    <div>
+                      <p className="text-xs sm:text-sm text-gray-500 mb-1">Account Name</p>
+                      <p className="font-medium text-sm sm:text-base">{virtualAccount.account_name}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs sm:text-sm text-gray-500 mb-1">Bank</p>
+                      <p className="font-medium text-sm sm:text-base">{virtualAccount.bank_name}</p>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
           {/* Payment Methods Card */}
           <Card>
             <CardHeader className="pb-2 sm:pb-4">
@@ -364,6 +417,18 @@ const WalletPage = () => {
                           onChange={(e) => setNewBankAccount(prev => ({ ...prev, bank_name: e.target.value }))}
                         />
                       </div>
+                    <div>
+                      <Label htmlFor="bank-code">Bank Code (NIP)</Label>
+                      <Input
+                        id="bank-code"
+                        placeholder="e.g. 000013 for GTBank"
+                        value={newBankAccount.bank_code}
+                        onChange={(e) => setNewBankAccount(prev => ({ ...prev, bank_code: e.target.value }))}
+                      />
+                      <p className="text-xs text-gray-500 mt-1">
+                        Enter the 6-digit NIP bank code required by Squad for transfers.
+                      </p>
+                    </div>
                       <div>
                         <Label htmlFor="account-number">Account Number</Label>
                         <Input

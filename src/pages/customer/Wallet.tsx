@@ -5,14 +5,19 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import {
+import { 
   Wallet, ArrowUp, ArrowDown, RefreshCw, Download,
-  DollarSign, TrendingUp, CreditCard, Gift, Leaf
+  DollarSign, TrendingUp, CreditCard, Gift, Leaf, Building2, Plus
 } from 'lucide-react';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useAuth } from '@/contexts/SupabaseAuthContext';
 import { settlementService } from '@/services/settlementService';
 import { toast } from 'sonner';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { supabase } from '@/integrations/supabase/client';
 
 const CustomerWalletPage = () => {
   const { user } = useAuth();
@@ -22,12 +27,41 @@ const CustomerWalletPage = () => {
   const [wallet, setWallet] = useState<any>(null);
   const [transactions, setTransactions] = useState<any[]>([]);
   const [activeTab, setActiveTab] = useState('all');
+  const [showWithdrawDialog, setShowWithdrawDialog] = useState(false);
+  const [withdrawAmount, setWithdrawAmount] = useState('');
+  const [bankAccounts, setBankAccounts] = useState<any[]>([]);
+  const [selectedBankAccount, setSelectedBankAccount] = useState('');
+  const [showAddBankDialog, setShowAddBankDialog] = useState(false);
+  const [newBankAccount, setNewBankAccount] = useState({
+    account_name: '',
+    bank_name: '',
+    bank_code: '',
+    account_number: ''
+  });
 
   useEffect(() => {
     if (user?.id) {
       loadWalletData();
+      loadBankAccounts();
     }
   }, [user?.id]);
+
+  const loadBankAccounts = async () => {
+    if (!user?.id) return;
+    try {
+      const { data, error } = await supabase
+        .from('customer_bank_accounts')
+        .select('*')
+        .eq('customer_id', user.id)
+        .order('is_default', { ascending: false })
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      setBankAccounts(data || []);
+    } catch (error) {
+      console.error('Error loading bank accounts:', error);
+    }
+  };
 
   const loadWalletData = async () => {
     setLoading(true);
@@ -37,11 +71,26 @@ const CustomerWalletPage = () => {
         settlementService.getTransactionHistory(user!.id, 'customer', 50),
       ]);
 
+      console.log('Wallet data loaded:', walletData);
       setWallet(walletData);
-      setTransactions(txHistory);
+      setTransactions(txHistory || []);
+      
+      // If no virtual account, it will be created automatically on next login
+      if (!walletData.virtual_account) {
+        console.log('No virtual account found, will be created automatically');
+      }
     } catch (error) {
       console.error('Error loading wallet data:', error);
       toast.error('Failed to load wallet data');
+      // Set default wallet to prevent blank page
+      setWallet({
+        available_balance: 0,
+        bonus_balance: 0,
+        carbon_credits: 0,
+        total_spent: 0,
+        virtual_account: null,
+      });
+      setTransactions([]);
     } finally {
       setLoading(false);
     }
@@ -111,10 +160,13 @@ const CustomerWalletPage = () => {
         <div className="p-4 sm:p-6 max-w-7xl mx-auto">
           <div className="animate-pulse space-y-4">
             <div className="h-8 bg-gray-200 rounded w-1/4"></div>
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-              <div className="lg:col-span-2 h-64 bg-gray-200 rounded"></div>
-              <div className="h-64 bg-gray-200 rounded"></div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              <div className="h-32 bg-gray-200 rounded"></div>
+              <div className="h-32 bg-gray-200 rounded"></div>
+              <div className="h-32 bg-gray-200 rounded"></div>
+              <div className="h-32 bg-gray-200 rounded"></div>
             </div>
+            <div className="h-64 bg-gray-200 rounded"></div>
           </div>
         </div>
       </DashboardLayout>
@@ -131,7 +183,7 @@ const CustomerWalletPage = () => {
             <p className="text-sm sm:text-base text-gray-600">Track your spending and rewards</p>
           </div>
 
-          <Button
+          <Button 
             variant="outline"
             className="flex items-center gap-2 w-full sm:w-auto text-xs sm:text-sm"
             onClick={handleRefresh}
@@ -152,7 +204,7 @@ const CustomerWalletPage = () => {
                 <div className="p-2 bg-red-100 rounded-full">
                   <CreditCard className="h-4 w-4 text-red-600" />
                 </div>
-              </div>
+                  </div>
               <h3 className="text-xl sm:text-2xl font-bold">
                 {formatCurrency(wallet?.total_spent || 0)}
               </h3>
@@ -209,14 +261,252 @@ const CustomerWalletPage = () => {
           </Card>
         </div>
 
-        {/* Transaction History */}
+        {/* Virtual Account Info - Always show */}
         <Card>
+          <CardHeader>
+            <CardTitle className="text-base sm:text-lg flex items-center gap-2">
+              <CreditCard className="h-4 w-4 sm:h-5 sm:w-5" />
+              Your Virtual Account
+            </CardTitle>
+            <CardDescription className="text-sm">
+              {wallet?.virtual_account 
+                ? 'Receive payments directly to this account' 
+                : 'Your virtual account is being set up...'}
+            </CardDescription>
+            </CardHeader>
+          <CardContent>
+            {wallet?.virtual_account ? (
+              <div className="space-y-4">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 p-4 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg border border-blue-200">
+                  <div className="flex-1">
+                    <p className="text-xs sm:text-sm text-gray-600 mb-2">Account Number</p>
+                    <p className="font-mono text-lg sm:text-xl font-bold text-gray-900">
+                      {wallet.virtual_account.account_number}
+                    </p>
+                    </div>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      navigator.clipboard.writeText(wallet.virtual_account.account_number);
+                      toast.success('Account number copied to clipboard!');
+                    }}
+                    className="w-full sm:w-auto border-blue-300 hover:bg-blue-100"
+                  >
+                    Copy Account Number
+                  </Button>
+              </div>
+              
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="p-3 bg-gray-50 rounded-lg">
+                    <p className="text-xs sm:text-sm text-gray-500 mb-1">Account Name</p>
+                    <p className="font-medium text-sm sm:text-base">{wallet.virtual_account.account_name}</p>
+                      </div>
+                  <div className="p-3 bg-gray-50 rounded-lg">
+                    <p className="text-xs sm:text-sm text-gray-500 mb-1">Bank</p>
+                    <p className="font-medium text-sm sm:text-base">{wallet.virtual_account.bank_name}</p>
+                  </div>
+                </div>
+
+                <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
+                  <p className="text-sm font-medium text-green-800 mb-1">How to Deposit</p>
+                  <p className="text-xs text-green-700">
+                    Transfer money from any bank to the account number above. Funds will be credited automatically to your wallet.
+                  </p>
+                </div>
+              </div>
+            ) : (
+              <div className="text-center py-8">
+                <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-blue-100 mb-4">
+                  <CreditCard className="h-8 w-8 text-blue-600 animate-pulse" />
+                </div>
+                <h3 className="font-medium text-base sm:text-lg mb-2">Setting up your virtual account</h3>
+                <p className="text-sm text-gray-500 mb-2">
+                  Your virtual account is being created automatically. This usually takes 2-5 seconds.
+                </p>
+                <p className="text-xs text-gray-400 mb-4">
+                  If it's taking longer, try refreshing or check the browser console for errors.
+                </p>
+                <div className="flex flex-col sm:flex-row gap-2 justify-center">
+                  <Button
+                    variant="outline"
+                    onClick={handleRefresh}
+                    disabled={refreshing}
+                  >
+                    <RefreshCw className={`h-4 w-4 mr-2 ${refreshing ? 'animate-spin' : ''}`} />
+                    Refresh Now
+                  </Button>
+                  <Button
+                    variant="outline"
+                    onClick={async () => {
+                      // Force wallet setup retry
+                      const { walletSetupService } = await import('@/services/walletSetupService');
+                      if (user) {
+                        toast.info('Retrying virtual account setup...');
+                        await walletSetupService.ensureWalletSetup({
+                          id: user.id,
+                          role: user.role,
+                          name: user.name,
+                          email: user.email,
+                          phone: null,
+                        });
+                        setTimeout(() => handleRefresh(), 2000);
+                      }
+                    }}
+                  >
+                    Retry Setup
+                  </Button>
+                </div>
+              </div>
+            )}
+            </CardContent>
+          </Card>
+
+        {/* Withdrawal Section */}
+        {wallet && wallet.available_balance > 0 && (
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-base sm:text-lg flex items-center gap-2">
+                <ArrowUp className="h-4 w-4 sm:h-5 sm:w-5" />
+                Withdraw Funds
+              </CardTitle>
+              <CardDescription className="text-sm">
+                Transfer money from your wallet to your bank account
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-sm font-medium text-blue-900">Available Balance</span>
+                    <span className="text-xl font-bold text-blue-700">
+                      {formatCurrency(wallet.available_balance)}
+                    </span>
+                  </div>
+                </div>
+
+                <Dialog open={showWithdrawDialog} onOpenChange={setShowWithdrawDialog}>
+                  <DialogTrigger asChild>
+                    <Button className="w-full bg-primary hover:bg-primary-hover text-black">
+                      <ArrowUp className="h-4 w-4 mr-2" />
+                      Withdraw to Bank Account
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>Withdraw Funds</DialogTitle>
+                      <DialogDescription>
+                        Transfer money from your wallet to your bank account. A 1.5% processing fee applies.
+                      </DialogDescription>
+                    </DialogHeader>
+                    <div className="space-y-4">
+                      <div>
+                        <Label htmlFor="withdraw-amount">Amount (₦)</Label>
+                        <Input
+                          id="withdraw-amount"
+                          type="number"
+                          placeholder="Enter amount"
+                          value={withdrawAmount}
+                          onChange={(e) => setWithdrawAmount(e.target.value)}
+                        />
+                        <p className="text-sm text-gray-500 mt-1">
+                          Available: {formatCurrency(wallet.available_balance)}
+                        </p>
+                      </div>
+                      <div>
+                        <Label htmlFor="bank-account">Bank Account</Label>
+                        <Select value={selectedBankAccount} onValueChange={setSelectedBankAccount}>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select bank account" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {bankAccounts.length > 0 ? (
+                              bankAccounts.map((account) => (
+                                <SelectItem key={account.id} value={account.id}>
+                                  {account.bank_name} - **** {account.account_number.slice(-4)}
+                                </SelectItem>
+                              ))
+                            ) : (
+                              <SelectItem value="none" disabled>
+                                No bank accounts added
+                              </SelectItem>
+                            )}
+                          </SelectContent>
+                        </Select>
+                        {bankAccounts.length === 0 && (
+                          <Button
+                            variant="outline"
+                            className="w-full mt-2"
+                            onClick={() => {
+                              setShowWithdrawDialog(false);
+                              setShowAddBankDialog(true);
+                            }}
+                          >
+                            <Plus className="h-4 w-4 mr-2" />
+                            Add Bank Account
+                          </Button>
+                        )}
+                      </div>
+                    </div>
+                    <DialogFooter>
+                      <Button variant="outline" onClick={() => setShowWithdrawDialog(false)}>
+                        Cancel
+                      </Button>
+                      <Button
+                        onClick={async () => {
+                          if (!withdrawAmount || !selectedBankAccount) {
+                            toast.error('Please fill all fields');
+                            return;
+                          }
+                          const amount = parseFloat(withdrawAmount);
+                          if (isNaN(amount) || amount <= 0) {
+                            toast.error('Please enter a valid amount');
+                            return;
+                          }
+                          if (amount > wallet.available_balance) {
+                            toast.error('Insufficient balance');
+                            return;
+                          }
+                          if (amount < 100) {
+                            toast.error('Minimum withdrawal amount is ₦100');
+                            return;
+                          }
+
+                          try {
+                            await settlementService.requestCustomerWithdrawal(
+                              user!.id,
+                              amount,
+                              selectedBankAccount
+                            );
+                            toast.success(`Withdrawal of ${formatCurrency(amount)} initiated successfully!`);
+                            setShowWithdrawDialog(false);
+                            setWithdrawAmount('');
+                            setSelectedBankAccount('');
+                            await Promise.all([loadWalletData(), loadBankAccounts()]);
+                          } catch (error) {
+                            console.error('Withdrawal error:', error);
+                            toast.error(error instanceof Error ? error.message : 'Failed to process withdrawal');
+                          }
+                        }}
+                      >
+                        Withdraw
+                      </Button>
+                    </DialogFooter>
+                  </DialogContent>
+                </Dialog>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Transaction History */}
+          <Card>
           <CardHeader>
             <CardTitle className="text-base sm:text-lg">Transaction History</CardTitle>
             <CardDescription className="text-sm">
               View all your payments, refunds, and rewards
             </CardDescription>
-          </CardHeader>
+            </CardHeader>
 
           <CardContent>
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
@@ -233,8 +523,8 @@ const CustomerWalletPage = () => {
                 <TabsTrigger value="bonus" className="text-xs sm:text-sm">
                   Rewards
                 </TabsTrigger>
-              </TabsList>
-
+                </TabsList>
+                
               <div className="space-y-3 sm:space-y-4">
                 {filteredTransactions.length > 0 ? (
                   filteredTransactions.map((transaction) => (
@@ -265,7 +555,7 @@ const CustomerWalletPage = () => {
                               <span className="text-xs sm:text-sm text-gray-600">
                                 {transaction.transaction_id}
                               </span>
-                            </div>
+              </div>
 
                             <div className="mt-1 flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3">
                               {getStatusBadge(transaction.status)}
@@ -301,11 +591,111 @@ const CustomerWalletPage = () => {
                         : `No ${activeTab} transactions found`}
                     </p>
                   </div>
-                )}
-              </div>
+                    )}
+                  </div>
             </Tabs>
           </CardContent>
         </Card>
+
+        {/* Add Bank Account Dialog */}
+        <Dialog open={showAddBankDialog} onOpenChange={setShowAddBankDialog}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Add Bank Account</DialogTitle>
+              <DialogDescription>
+                Add a bank account to withdraw funds from your wallet
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div>
+                <Label htmlFor="account-name">Account Name</Label>
+                <Input
+                  id="account-name"
+                  placeholder="Account holder name"
+                  value={newBankAccount.account_name}
+                  onChange={(e) => setNewBankAccount(prev => ({ ...prev, account_name: e.target.value }))}
+                />
+              </div>
+              <div>
+                <Label htmlFor="bank-name">Bank Name</Label>
+                <Input
+                  id="bank-name"
+                  placeholder="Bank name"
+                  value={newBankAccount.bank_name}
+                  onChange={(e) => setNewBankAccount(prev => ({ ...prev, bank_name: e.target.value }))}
+                />
+              </div>
+              <div>
+                <Label htmlFor="bank-code">Bank Code (NIP)</Label>
+                <Input
+                  id="bank-code"
+                  placeholder="e.g. 000013 for GTBank"
+                  value={newBankAccount.bank_code}
+                  onChange={(e) => setNewBankAccount(prev => ({ ...prev, bank_code: e.target.value }))}
+                />
+                <p className="text-xs text-gray-500 mt-1">
+                  Enter the 6-digit NIP bank code required by Squad for transfers.
+                </p>
+              </div>
+              <div>
+                <Label htmlFor="account-number">Account Number</Label>
+                <Input
+                  id="account-number"
+                  placeholder="10-digit account number"
+                  value={newBankAccount.account_number}
+                  onChange={(e) => setNewBankAccount(prev => ({ ...prev, account_number: e.target.value }))}
+                />
+              </div>
+            </div>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => {
+                setShowAddBankDialog(false);
+                setNewBankAccount({ account_name: '', bank_name: '', bank_code: '', account_number: '' });
+              }}>
+                Cancel
+              </Button>
+              <Button
+                onClick={async () => {
+                  if (!newBankAccount.account_name || !newBankAccount.bank_name || !newBankAccount.account_number) {
+                    toast.error('Please fill all required fields');
+                    return;
+                  }
+                  if (!newBankAccount.bank_code) {
+                    toast.error('Bank code is required for withdrawals');
+                    return;
+                  }
+
+                  try {
+                    const { data, error } = await supabase
+                      .from('customer_bank_accounts')
+                      .insert({
+                        customer_id: user!.id,
+                        account_name: newBankAccount.account_name,
+                        bank_name: newBankAccount.bank_name,
+                        bank_code: newBankAccount.bank_code,
+                        account_number: newBankAccount.account_number,
+                        is_default: bankAccounts.length === 0, // First account is default
+                      })
+                      .select()
+                      .single();
+
+                    if (error) throw error;
+
+                    toast.success('Bank account added successfully!');
+                    setShowAddBankDialog(false);
+                    setNewBankAccount({ account_name: '', bank_name: '', bank_code: '', account_number: '' });
+                    await loadBankAccounts();
+                  } catch (error) {
+                    console.error('Error adding bank account:', error);
+                    toast.error(error instanceof Error ? error.message : 'Failed to add bank account');
+                  }
+                }}
+              >
+                Add Account
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </div>
     </DashboardLayout>
   );

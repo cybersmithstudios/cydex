@@ -10,7 +10,7 @@ import {
   handleResetPassword, 
   handleVerifyEmail 
 } from './auth/AuthHandlers';
-import { cleanupAuthState } from './auth/AuthCleanup';
+import { walletSetupService } from '@/services/walletSetupService';
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -19,6 +19,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
   const [profile, setProfile] = useState<any>(null);
+  const [walletSetupAttempted, setWalletSetupAttempted] = useState(false);
 
   useEffect(() => {
     console.log('SupabaseAuthContext - Setting up auth listener');
@@ -95,6 +96,24 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     return () => subscription.unsubscribe();
   }, []);
+
+  useEffect(() => {
+    // Reset wallet setup tracker whenever the active profile changes
+    setWalletSetupAttempted(false);
+  }, [profile?.id]);
+
+  useEffect(() => {
+    if (!profile?.id || !profile?.role) return;
+    if (walletSetupAttempted) return;
+
+    walletSetupService.ensureWalletSetup({
+      id: profile.id,
+      role: profile.role,
+      name: profile.name,
+      email: profile.email,
+      phone: profile.phone,
+    }).finally(() => setWalletSetupAttempted(true));
+  }, [profile?.id, profile?.role, profile?.name, profile?.email, profile?.phone, walletSetupAttempted]);
 
   const login = async (email: string, password: string) => {
     setLoading(true);

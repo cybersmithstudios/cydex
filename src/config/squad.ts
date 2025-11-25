@@ -1,9 +1,9 @@
 // Squad Payment Gateway Configuration for Cydex
 
 export const SQUAD_CONFIG = {
-  // Test Keys - Replace with production keys when going live
-  TEST_PUBLIC_KEY: import.meta.env.VITE_SQUAD_PUBLIC_KEY || '',
-  TEST_SECRET_KEY: import.meta.env.VITE_SQUAD_SECRET_KEY || '',
+  // Test Keys - Default values (can be overridden by env vars)
+  TEST_PUBLIC_KEY: import.meta.env.VITE_SQUAD_PUBLIC_KEY || 'sandbox_pk_3646639faa50071d6ad804005e06d521ee6abc626f3c',
+  TEST_SECRET_KEY: import.meta.env.VITE_SQUAD_SECRET_KEY || 'sandbox_sk_3646639faa50071d6ad87167420fd234eb7dc0716f26',
   
   // Production Keys (to be filled when ready for production)
   PROD_PUBLIC_KEY: import.meta.env.VITE_SQUAD_PROD_PUBLIC_KEY || '',
@@ -15,9 +15,9 @@ export const SQUAD_CONFIG = {
   // Currency settings
   CURRENCY: 'NGN',
   
-  // API Base URL
-  API_BASE_URL: import.meta.env.VITE_SQUAD_API_URL || 'https://sandbox-api-demo.squadco.com',
-  PROD_API_BASE_URL: 'https://api.squadco.com',
+  // API Base URL - Based on Squad documentation
+  API_BASE_URL: import.meta.env.VITE_SQUAD_API_URL || 'https://sandbox-api-d.squadco.com',
+  PROD_API_BASE_URL: 'https://api-d.squadco.com',
   
   // Payment settings
   CALLBACK_URL: import.meta.env.VITE_APP_URL || 'http://localhost:8080',

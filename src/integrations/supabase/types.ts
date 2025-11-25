@@ -764,6 +764,7 @@ export type Database = {
         Row: {
           account_name: string
           account_number: string
+          bank_code: string | null
           bank_name: string
           bvn: string | null
           created_at: string | null
@@ -776,6 +777,7 @@ export type Database = {
         Insert: {
           account_name: string
           account_number: string
+          bank_code?: string | null
           bank_name: string
           bvn?: string | null
           created_at?: string | null
@@ -788,6 +790,7 @@ export type Database = {
         Update: {
           account_name?: string
           account_number?: string
+          bank_code?: string | null
           bank_name?: string
           bvn?: string | null
           created_at?: string | null
@@ -1076,6 +1079,7 @@ export type Database = {
         Row: {
           account_name: string
           account_number: string
+          bank_code: string | null
           bank_name: string
           created_at: string | null
           id: string
@@ -1087,6 +1091,7 @@ export type Database = {
         Insert: {
           account_name: string
           account_number: string
+          bank_code?: string | null
           bank_name: string
           created_at?: string | null
           id?: string
@@ -1098,6 +1103,7 @@ export type Database = {
         Update: {
           account_name?: string
           account_number?: string
+          bank_code?: string | null
           bank_name?: string
           created_at?: string | null
           id?: string
@@ -1128,6 +1134,8 @@ export type Database = {
           processed_at: string | null
           requested_at: string | null
           status: string
+          transfer_metadata: Json | null
+          transfer_reference: string | null
           updated_at: string | null
           vendor_id: string
         }
@@ -1142,6 +1150,8 @@ export type Database = {
           processed_at?: string | null
           requested_at?: string | null
           status?: string
+          transfer_metadata?: Json | null
+          transfer_reference?: string | null
           updated_at?: string | null
           vendor_id: string
         }
@@ -1156,6 +1166,8 @@ export type Database = {
           processed_at?: string | null
           requested_at?: string | null
           status?: string
+          transfer_metadata?: Json | null
+          transfer_reference?: string | null
           updated_at?: string | null
           vendor_id?: string
         }

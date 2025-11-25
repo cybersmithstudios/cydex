@@ -2,6 +2,7 @@
 // Handles fund settlement, escrow management, and payout operations
 
 import { supabase } from '@/integrations/supabase/client';
+import { squadTransferService } from '@/services/squadTransferService';
 
 interface SettlementCalculation {
   vendorAmount: number;
@@ -118,39 +119,76 @@ class SettlementService {
   }
 
   /**
-   * Get vendor wallet balance
+   * Get vendor wallet balance with virtual account info
    */
   async getVendorWalletBalance(vendorId: string) {
-    const { data, error } = await supabase
+    // First get wallet
+    const { data: wallet, error: walletError } = await supabase
       .from('vendor_wallet')
       .select('*')
       .eq('vendor_id', vendorId)
       .single();
 
-    if (error) {
+    if (walletError) {
       // Wallet doesn't exist yet, return zero balance
       return {
         available_balance: 0,
         pending_balance: 0,
         total_earned: 0,
         total_withdrawn: 0,
+        virtual_account: null,
       };
     }
 
-    return data;
+    // Fetch virtual account separately
+    let virtualAccount = null;
+    if (wallet.virtual_account_id) {
+      const { data: vaData, error: vaError } = await supabase
+        .from('virtual_accounts')
+        .select('account_number, account_name, bank_name, bank_code, is_active')
+        .eq('id', wallet.virtual_account_id)
+        .single();
+      
+      if (!vaError && vaData) {
+        virtualAccount = vaData;
+      }
+    } else {
+      // Try to find virtual account by profile_id and role
+      const { data: vaData, error: vaError } = await supabase
+        .from('virtual_accounts')
+        .select('account_number, account_name, bank_name, bank_code, is_active')
+        .eq('profile_id', vendorId)
+        .eq('role', 'vendor')
+        .maybeSingle();
+      
+      if (!vaError && vaData) {
+        virtualAccount = vaData;
+        // Link it to wallet
+        await supabase
+          .from('vendor_wallet')
+          .update({ virtual_account_id: vaData.id })
+          .eq('vendor_id', vendorId);
+      }
+    }
+
+    return {
+      ...wallet,
+      virtual_account: virtualAccount,
+    };
   }
 
   /**
-   * Get rider wallet balance
+   * Get rider wallet balance with virtual account info
    */
   async getRiderWalletBalance(riderId: string) {
-    const { data, error } = await supabase
+    // First get wallet
+    const { data: wallet, error: walletError } = await supabase
       .from('rider_wallet')
       .select('*')
       .eq('rider_id', riderId)
       .single();
 
-    if (error) {
+    if (walletError) {
       // Wallet doesn't exist yet, return zero balance
       return {
         available_balance: 0,
@@ -158,33 +196,104 @@ class SettlementService {
         total_earned: 0,
         total_withdrawn: 0,
         carbon_credits: 0,
+        virtual_account: null,
       };
     }
 
-    return data;
+    // Fetch virtual account separately
+    let virtualAccount = null;
+    if (wallet.virtual_account_id) {
+      const { data: vaData, error: vaError } = await supabase
+        .from('virtual_accounts')
+        .select('account_number, account_name, bank_name, bank_code, is_active')
+        .eq('id', wallet.virtual_account_id)
+        .single();
+      
+      if (!vaError && vaData) {
+        virtualAccount = vaData;
+      }
+    } else {
+      // Try to find virtual account by profile_id and role
+      const { data: vaData, error: vaError } = await supabase
+        .from('virtual_accounts')
+        .select('account_number, account_name, bank_name, bank_code, is_active')
+        .eq('profile_id', riderId)
+        .eq('role', 'rider')
+        .maybeSingle();
+      
+      if (!vaError && vaData) {
+        virtualAccount = vaData;
+        // Link it to wallet
+        await supabase
+          .from('rider_wallet')
+          .update({ virtual_account_id: vaData.id })
+          .eq('rider_id', riderId);
+      }
+    }
+
+    return {
+      ...wallet,
+      virtual_account: virtualAccount,
+    };
   }
 
   /**
-   * Get customer wallet balance
+   * Get customer wallet balance with virtual account info
    */
   async getCustomerWalletBalance(customerId: string) {
-    const { data, error } = await supabase
+    // First get wallet
+    const { data: wallet, error: walletError } = await supabase
       .from('customer_wallet')
       .select('*')
       .eq('customer_id', customerId)
       .single();
 
-    if (error) {
+    if (walletError) {
       // Wallet doesn't exist yet, return zero balance
       return {
         available_balance: 0,
         bonus_balance: 0,
         carbon_credits: 0,
         total_spent: 0,
+        virtual_account: null,
       };
     }
 
-    return data;
+    // Fetch virtual account separately if wallet has virtual_account_id
+    let virtualAccount = null;
+    if (wallet.virtual_account_id) {
+      const { data: vaData, error: vaError } = await supabase
+        .from('virtual_accounts')
+        .select('account_number, account_name, bank_name, bank_code, is_active')
+        .eq('id', wallet.virtual_account_id)
+        .single();
+      
+      if (!vaError && vaData) {
+        virtualAccount = vaData;
+      }
+    } else {
+      // Try to find virtual account by profile_id and role
+      const { data: vaData, error: vaError } = await supabase
+        .from('virtual_accounts')
+        .select('account_number, account_name, bank_name, bank_code, is_active')
+        .eq('profile_id', customerId)
+        .eq('role', 'customer')
+        .maybeSingle();
+      
+      if (!vaError && vaData) {
+        virtualAccount = vaData;
+        // Link it to wallet
+        await supabase
+          .from('customer_wallet')
+          .update({ virtual_account_id: vaData.id })
+          .eq('customer_id', customerId);
+      }
+    }
+
+    return {
+      ...wallet,
+      virtual_account: virtualAccount,
+    };
   }
 
   /**
@@ -227,7 +336,7 @@ class SettlementService {
   }
 
   /**
-   * Request vendor payout
+   * Request vendor payout - initiates Squad transfer
    */
   async requestVendorPayout(
     vendorId: string,
@@ -241,11 +350,60 @@ class SettlementService {
       throw new Error('Insufficient balance for payout');
     }
 
+    // Fetch bank account details
+    const { data: bankAccount, error: bankError } = await supabase
+      .from('vendor_bank_accounts')
+      .select('*')
+      .eq('id', bankAccountId)
+      .eq('vendor_id', vendorId)
+      .single();
+
+    if (bankError || !bankAccount) {
+      throw new Error(`Bank account not found: ${bankError?.message || 'Unknown error'}`);
+    }
+
+    if (!bankAccount.bank_code) {
+      throw new Error('Bank code is required for payout. Please update your bank account details.');
+    }
+
     // Calculate fee (1.5%)
     const fee = amount * 0.015;
     const netAmount = amount - fee;
 
-    // Create payout request
+    // Lookup account name via Squad (required before transfer)
+    let accountName = bankAccount.account_name;
+    try {
+      const lookupResult = await squadTransferService.lookupAccount(
+        bankAccount.bank_code,
+        bankAccount.account_number
+      );
+      if (lookupResult.data?.account_name) {
+        accountName = lookupResult.data.account_name;
+      }
+    } catch (error) {
+      console.warn('Account lookup failed, using stored name:', error);
+      // Continue with stored name if lookup fails
+    }
+
+    // Generate transfer reference
+    const transferReference = `CYDEX_VENDOR_${vendorId.slice(0, 8)}_${Date.now()}`;
+
+    // Initiate Squad transfer
+    let transferResult;
+    try {
+      transferResult = await squadTransferService.initiateTransfer({
+        amount: netAmount, // Transfer net amount after fee
+        bankCode: bankAccount.bank_code,
+        accountNumber: bankAccount.account_number,
+        accountName: accountName,
+        remark: `Vendor payout - ${vendorId.slice(0, 8)}`,
+        reference: transferReference,
+      });
+    } catch (error) {
+      throw new Error(`Transfer initiation failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+
+    // Create payout request with transfer reference
     const { data, error } = await supabase
       .from('vendor_payout_requests')
       .insert({
@@ -254,7 +412,9 @@ class SettlementService {
         amount,
         fee,
         net_amount: netAmount,
-        status: 'pending',
+        status: transferResult.status === 200 ? 'processing' : 'pending',
+        transfer_reference: transferReference,
+        transfer_metadata: transferResult.data || {},
       })
       .select()
       .single();
@@ -268,6 +428,7 @@ class SettlementService {
       .from('vendor_wallet')
       .update({
         available_balance: wallet.available_balance - amount,
+        total_withdrawn: wallet.total_withdrawn + amount,
         updated_at: new Date().toISOString(),
       })
       .eq('vendor_id', vendorId);
@@ -276,7 +437,7 @@ class SettlementService {
   }
 
   /**
-   * Request rider payout
+   * Request rider payout - initiates Squad transfer
    */
   async requestRiderPayout(
     riderId: string,
@@ -290,11 +451,60 @@ class SettlementService {
       throw new Error('Insufficient balance for payout');
     }
 
+    // Fetch bank account details
+    const { data: bankAccount, error: bankError } = await supabase
+      .from('rider_bank_details')
+      .select('*')
+      .eq('id', bankAccountId)
+      .eq('rider_id', riderId)
+      .single();
+
+    if (bankError || !bankAccount) {
+      throw new Error(`Bank account not found: ${bankError?.message || 'Unknown error'}`);
+    }
+
+    if (!bankAccount.bank_code) {
+      throw new Error('Bank code is required for payout. Please update your bank account details.');
+    }
+
     // Calculate fee (1.5%)
     const fee = amount * 0.015;
     const netAmount = amount - fee;
 
-    // Create payout request
+    // Lookup account name via Squad (required before transfer)
+    let accountName = bankAccount.account_name;
+    try {
+      const lookupResult = await squadTransferService.lookupAccount(
+        bankAccount.bank_code,
+        bankAccount.account_number
+      );
+      if (lookupResult.data?.account_name) {
+        accountName = lookupResult.data.account_name;
+      }
+    } catch (error) {
+      console.warn('Account lookup failed, using stored name:', error);
+      // Continue with stored name if lookup fails
+    }
+
+    // Generate transfer reference
+    const transferReference = `CYDEX_RIDER_${riderId.slice(0, 8)}_${Date.now()}`;
+
+    // Initiate Squad transfer
+    let transferResult;
+    try {
+      transferResult = await squadTransferService.initiateTransfer({
+        amount: netAmount, // Transfer net amount after fee
+        bankCode: bankAccount.bank_code,
+        accountNumber: bankAccount.account_number,
+        accountName: accountName,
+        remark: `Rider payout - ${riderId.slice(0, 8)}`,
+        reference: transferReference,
+      });
+    } catch (error) {
+      throw new Error(`Transfer initiation failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+
+    // Create payout request with transfer reference
     const { data, error } = await supabase
       .from('rider_payout_requests')
       .insert({
@@ -303,7 +513,9 @@ class SettlementService {
         amount,
         fee,
         net_amount: netAmount,
-        status: 'pending',
+        status: transferResult.status === 200 ? 'processing' : 'pending',
+        transfer_reference: transferReference,
+        transfer_metadata: transferResult.data || {},
       })
       .select()
       .single();
@@ -317,11 +529,176 @@ class SettlementService {
       .from('rider_wallet')
       .update({
         available_balance: wallet.available_balance - amount,
+        total_withdrawn: wallet.total_withdrawn + amount,
         updated_at: new Date().toISOString(),
       })
       .eq('rider_id', riderId);
 
     return data;
+  }
+
+  /**
+   * Request customer withdrawal
+   */
+  async requestCustomerWithdrawal(
+    customerId: string,
+    amount: number,
+    bankAccountId: string
+  ) {
+    // Check available balance
+    const wallet = await this.getCustomerWalletBalance(customerId);
+    
+    if (wallet.available_balance < amount) {
+      throw new Error('Insufficient balance for withdrawal');
+    }
+
+    // Fetch bank account details
+    const { data: bankAccount, error: bankError } = await supabase
+      .from('customer_bank_accounts')
+      .select('*')
+      .eq('id', bankAccountId)
+      .eq('customer_id', customerId)
+      .single();
+
+    if (bankError || !bankAccount) {
+      throw new Error(`Bank account not found: ${bankError?.message || 'Unknown error'}`);
+    }
+
+    if (!bankAccount.bank_code) {
+      throw new Error('Bank code is required for withdrawal. Please update your bank account details.');
+    }
+
+    // Calculate fee (1.5%)
+    const fee = amount * 0.015;
+    const netAmount = amount - fee;
+
+    // Lookup account name via Squad
+    let accountName = bankAccount.account_name;
+    try {
+      const lookupResult = await squadTransferService.lookupAccount(
+        bankAccount.bank_code,
+        bankAccount.account_number
+      );
+      if (lookupResult.data?.account_name) {
+        accountName = lookupResult.data.account_name;
+      }
+    } catch (error) {
+      console.warn('Account lookup failed, using stored name:', error);
+    }
+
+    // Generate transfer reference
+    const transferReference = `CYDEX_CUSTOMER_${customerId.slice(0, 8)}_${Date.now()}`;
+
+    // Initiate Squad transfer
+    let transferResult;
+    try {
+      transferResult = await squadTransferService.initiateTransfer({
+        amount: netAmount,
+        bankCode: bankAccount.bank_code,
+        accountNumber: bankAccount.account_number,
+        accountName: accountName,
+        remark: `Customer withdrawal - ${customerId.slice(0, 8)}`,
+        reference: transferReference,
+      });
+    } catch (error) {
+      throw new Error(`Transfer initiation failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+
+    // Create withdrawal request
+    const { data, error } = await supabase
+      .from('customer_withdrawal_requests')
+      .insert({
+        customer_id: customerId,
+        bank_account_id: bankAccountId,
+        amount,
+        fee,
+        net_amount: netAmount,
+        status: transferResult.status === 200 ? 'processing' : 'pending',
+        transfer_reference: transferReference,
+        transfer_metadata: transferResult.data || {},
+      })
+      .select()
+      .single();
+
+    if (error) {
+      throw new Error(`Failed to create withdrawal request: ${error.message}`);
+    }
+
+    // Update wallet
+    await supabase
+      .from('customer_wallet')
+      .update({
+        available_balance: wallet.available_balance - amount,
+        updated_at: new Date().toISOString(),
+      })
+      .eq('customer_id', customerId);
+
+    return data;
+  }
+
+  /**
+   * Requery payout transfer status and update payout request
+   */
+  async requeryPayoutStatus(
+    payoutRequestId: string,
+    userType: 'vendor' | 'rider' | 'customer'
+  ) {
+    const tableName = userType === 'vendor' 
+      ? 'vendor_payout_requests' 
+      : userType === 'rider' 
+      ? 'rider_payout_requests'
+      : 'customer_withdrawal_requests';
+    
+    // Fetch payout request
+    const { data: payout, error: fetchError } = await supabase
+      .from(tableName)
+      .select('*')
+      .eq('id', payoutRequestId)
+      .single();
+
+    if (fetchError || !payout || !payout.transfer_reference) {
+      throw new Error('Payout request not found or missing transfer reference');
+    }
+
+    // Requery Squad transfer
+    try {
+      const requeryResult = await squadTransferService.requeryTransfer(payout.transfer_reference);
+      
+      // Update payout status based on Squad response
+      let newStatus = payout.status;
+      if (requeryResult.status === 200 && requeryResult.data) {
+        // Check transfer status from Squad response
+        const transferStatus = requeryResult.data.transaction_status || requeryResult.data.status;
+        if (transferStatus === 'success' || transferStatus === 'completed') {
+          newStatus = 'completed';
+        } else if (transferStatus === 'failed' || transferStatus === 'reversed') {
+          newStatus = 'failed';
+        } else if (transferStatus === 'pending') {
+          newStatus = 'processing';
+        }
+      }
+
+      // Update payout request
+      const { data: updatedPayout, error: updateError } = await supabase
+        .from(tableName)
+        .update({
+          status: newStatus,
+          transfer_metadata: requeryResult.data || payout.transfer_metadata,
+          processed_at: newStatus === 'completed' || newStatus === 'failed' ? new Date().toISOString() : payout.processed_at,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', payoutRequestId)
+        .select()
+        .single();
+
+      if (updateError) {
+        throw new Error(`Failed to update payout: ${updateError.message}`);
+      }
+
+      return updatedPayout;
+    } catch (error) {
+      throw new Error(`Failed to requery transfer: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
   }
 
   /**

@@ -1,6 +1,5 @@
 
 import React, { useState, useEffect } from 'react';
-import { usePaystackPayment } from 'react-paystack';
 import {
   Dialog,
   DialogContent,
@@ -11,7 +10,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/SupabaseAuthContext';
 import { toast } from 'sonner';
-import { paymentService } from '@/services/paymentService';
+import { squadPaymentService } from '@/services/squadPaymentService';
 import { Loader2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
@@ -49,15 +48,18 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({
 }): JSX.Element | null => {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
-  const [paymentConfig, setPaymentConfig] = useState<any>(null);
+  const [checkoutUrl, setCheckoutUrl] = useState<string | null>(null);
   const { user } = useAuth();
 
-  // Initialize payment config when modal opens
+  // Initialize payment when modal opens
   useEffect(() => {
     if (!isOpen) return;
 
+    const initializeSquadPayment = async () => {
+      setIsLoading(true);
     try {
-      const config = paymentService.createPaymentConfig(
+        // Create payment config
+        const config = squadPaymentService.createPaymentConfig(
         amount,
         customerEmail,
         orderNumber,
@@ -69,97 +71,51 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({
         }
       );
       
-      setPaymentConfig(config);
+        // Initialize payment with Squad API
+        const result = await squadPaymentService.initializePayment({
+          amount: config.amount, // Already in kobo
+          email: config.email,
+          transaction_ref: config.reference,
+          currency: 'NGN',
+          callback_url: `${window.location.origin}/customer/order-confirmation?order=${orderNumber}`,
+          customer_name: customerDetails.name,
+          payment_channels: ['card', 'bank', 'ussd', 'transfer'],
+          metadata: {
+            order_number: orderNumber,
+            customer_id: customerId || user?.id,
+            ...config.metadata,
+          },
+        });
+
+        if (result.success && result.checkout_url) {
+          setCheckoutUrl(result.checkout_url);
+        } else {
+          toast.error(result.error || 'Failed to initialize payment');
+          onError(new Error(result.error || 'Payment initialization failed'));
+          onClose();
+        }
     } catch (error) {
       console.error('Error initializing payment:', error);
       toast.error('Failed to initialize payment. Please try again.');
       onError(error instanceof Error ? error : new Error('Payment initialization failed'));
       onClose();
-    }
-  }, [isOpen, amount, customerEmail, orderNumber, customerId, user?.id, metadata, onError, onClose]);
-
-  // Define the payment config type that matches react-paystack's expected props
-  const getPaymentConfig = () => {
-    if (!paymentConfig) {
-      return {
-        email: customerEmail,
-        amount: 0,
-        publicKey: paymentService.getPublicKey(),
-        text: 'Pay Now',
-        onSuccess: () => {},
-        onClose: () => {},
-      };
-    }
-    return {
-      ...paymentConfig,
-      text: 'Pay Now',
-      onSuccess: () => {},
-      onClose: () => {},
+      } finally {
+        setIsLoading(false);
+      }
     };
-  };
 
-  const initializePayment = usePaystackPayment(getPaymentConfig());
+    initializeSquadPayment();
+  }, [isOpen, amount, customerEmail, orderNumber, customerId, user?.id, metadata, onError, onClose, customerDetails.name]);
 
-  const handlePayment = async () => {
-    if (!paymentConfig) {
-      toast.error('Payment configuration not ready. Please try again.');
+  const handlePayment = () => {
+    if (!checkoutUrl) {
+      toast.error('Payment not ready. Please try again.');
       return;
     }
 
-    // Close our dialog first so Paystack iframe is unobstructed
-    onClose();
-
-    setIsLoading(true);
-
-    try {
-      // Initialize payment with success and error callbacks
-      await new Promise<void>((resolve, reject) => {
-        initializePayment({
-          onSuccess: async (response) => {
-            try {
-              // Verify the payment with our backend
-              const verification = await paymentService.verifyPayment(response.reference);
-              
-              if (verification.success) {
-                toast.success('Payment successful!');
-                onSuccess(response.reference);
-                // Navigate to confirmation page
-                navigate('/customer/order-confirmation', {
-                  state: {
-                    orderNumber,
-                    amount,
-                  },
-                });
-                resolve();
-              } else {
-                const error = new Error(verification.error || 'Payment verification failed');
-                onError(error);
-                reject(error);
-              }
-            } catch (error) {
-              console.error('Payment verification error:', error);
-              const errorObj = error instanceof Error ? error : new Error('Payment verification failed');
-              onError(errorObj);
-              toast.error('Payment verification failed. Please contact support.');
-              reject(errorObj);
-            } finally {
-              setIsLoading(false);
-            }
-          },
-          onClose: () => {
-            setIsLoading(false);
-            onClose();
-            reject(new Error('Payment was closed by user'));
-          },
-        });
-      });
-    } catch (error) {
-      // Error is already handled in the promise callbacks
-      console.error('Payment initialization error:', error);
-      if (error instanceof Error) {
-        onError(error);
-      }
-    }
+    // Redirect to Squad checkout page
+    // Squad will redirect back to callback_url after payment
+    window.location.href = checkoutUrl;
   };
 
   return (
@@ -220,7 +176,7 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({
               </div>
               <div className="border-2 border-primary rounded-lg p-3 text-center bg-primary/5">
                 <div className="text-primary mb-1">💳</div>
-                <p className="text-sm font-medium text-primary">Paystack</p>
+                <p className="text-sm font-medium text-primary">Squad</p>
                 <p className="text-xs text-gray-600 mt-1">Available</p>
               </div>
             </div>
@@ -244,7 +200,7 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({
                 <div className="mt-1 text-sm text-blue-700">
                   <p>This is a test transaction. No real money will be charged.</p>
                   <p className="mt-1 font-mono text-xs bg-blue-100 p-1 rounded">
-                    Use card: 4084 0840 8408 4081 (any future date, any 3-digit CVV)
+                    Use Squad test cards from dashboard or any valid test card
                   </p>
                 </div>
               </div>
@@ -254,21 +210,21 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({
           <Button 
             className="w-full bg-primary hover:bg-primary/80 text-black font-semibold py-3"
             onClick={handlePayment}
-            disabled={isLoading || !paymentConfig}
+            disabled={isLoading || !checkoutUrl}
           >
             {isLoading ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Processing...
+                Initializing Payment...
               </>
             ) : (
-              `Pay with Paystack - ₦${amount.toLocaleString()}`
+              `Pay with Squad - ₦${amount.toLocaleString()}`
             )}
           </Button>
           
           <div className="text-center">
             <p className="text-xs text-gray-500">
-              Secured by Paystack • SSL Encrypted
+              Secured by Squad • SSL Encrypted
             </p>
           </div>
         </div>

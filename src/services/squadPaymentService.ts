@@ -1,4 +1,5 @@
 // Payment Service for Cydex - Squad Integration
+import { SQUAD_CONFIG } from '@/config/squad';
 
 interface PaymentVerificationResult {
   success: boolean;
@@ -22,9 +23,9 @@ interface PaymentLog {
 
 class SquadPaymentService {
   private readonly isTestMode = import.meta.env.VITE_NODE_ENV !== 'production';
-  private readonly publicKey = import.meta.env.VITE_SQUAD_PUBLIC_KEY;
-  private readonly secretKey = import.meta.env.VITE_SQUAD_SECRET_KEY;
-  private readonly apiUrl = import.meta.env.VITE_SQUAD_API_URL || 'https://sandbox-api-demo.squadco.com';
+  private readonly publicKey = SQUAD_CONFIG.getPublicKey();
+  private readonly secretKey = SQUAD_CONFIG.getSecretKey();
+  private readonly apiUrl = SQUAD_CONFIG.getApiUrl();
 
   /**
    * Get the public key for frontend use
@@ -120,52 +121,56 @@ class SquadPaymentService {
 
   /**
    * Initialize payment with Squad API
+   * Based on Squad API documentation: POST /transaction/initiate
    * @param config Payment configuration
-   * @returns Payment initialization response
+   * @returns Payment initialization response with checkout_url
    */
   async initializePayment(config: {
-    amount: number;
+    amount: number; // Amount in kobo
     email: string;
-    reference: string;
+    transaction_ref?: string;
     currency?: string;
     callback_url?: string;
+    customer_name?: string;
+    payment_channels?: string[];
     metadata?: Record<string, any>;
-  }): Promise<{ success: boolean; data?: any; error?: string }> {
+  }): Promise<{ success: boolean; data?: any; error?: string; checkout_url?: string }> {
     try {
-      const response = await fetch(`${this.apiUrl}/payment/initiate`, {
+      // Squad API endpoint: POST /transaction/initiate
+      const response = await fetch(`${this.apiUrl}/transaction/initiate`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${this.secretKey}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          amount: config.amount,
+          amount: config.amount, // Already in kobo
           email: config.email,
           currency: config.currency || 'NGN',
-          reference: config.reference,
+          initiate_type: 'inline', // Required by Squad API
+          transaction_ref: config.transaction_ref,
           callback_url: config.callback_url,
+          customer_name: config.customer_name,
+          payment_channels: config.payment_channels || ['card', 'bank', 'ussd', 'transfer'],
           metadata: config.metadata,
         }),
       });
 
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.message || 'Failed to initialize payment');
-      }
-
       const responseData = await response.json();
 
-      if (!responseData.status) {
+      if (!response.ok || responseData.status !== 200) {
         return {
           success: false,
-          error: responseData.message || 'Payment initialization failed',
+          error: responseData.message || 'Failed to initialize payment',
           data: responseData,
         };
       }
 
+      // Squad returns: { status: 200, message: "success", data: { checkout_url: "...", ... } }
       return {
         success: true,
         data: responseData.data,
+        checkout_url: responseData.data?.checkout_url,
       };
     } catch (error) {
       console.error('Payment initialization error:', error);
@@ -178,21 +183,23 @@ class SquadPaymentService {
 
   /**
    * Verify payment with Squad API
-   * @param reference Payment reference to verify
+   * Based on Squad API documentation: GET /transaction/verify/{transaction_ref}
+   * @param transaction_ref Payment transaction reference to verify
    * @returns Verification result with payment status
    */
-  async verifyPayment(reference: string): Promise<PaymentVerificationResult> {
-    if (!reference) {
+  async verifyPayment(transaction_ref: string): Promise<PaymentVerificationResult> {
+    if (!transaction_ref) {
       return {
         success: false,
-        error: 'Reference is required',
+        error: 'Transaction reference is required',
         message: 'No payment reference provided',
       };
     }
 
     try {
+      // Squad API endpoint: GET /transaction/verify/{transaction_ref}
       const response = await fetch(
-        `${this.apiUrl}/transaction/verify/${encodeURIComponent(reference)}`,
+        `${this.apiUrl}/transaction/verify/${encodeURIComponent(transaction_ref)}`,
         {
           method: 'GET',
           headers: {
@@ -202,14 +209,9 @@ class SquadPaymentService {
         }
       );
 
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.message || 'Failed to verify payment');
-      }
-
       const responseData = await response.json();
 
-      if (!responseData.status) {
+      if (!response.ok || responseData.status !== 200) {
         return {
           success: false,
           error: responseData.message || 'Payment verification failed',
@@ -217,6 +219,8 @@ class SquadPaymentService {
         };
       }
 
+      // Squad returns: { status: 200, success: true, message: "Success", data: {...} }
+      // Transaction status can be: Success, Failed, Abandoned, or Pending
       return {
         success: true,
         data: responseData.data,

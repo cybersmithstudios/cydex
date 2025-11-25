@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/SupabaseAuthContext';
 import { toast } from '@/hooks/use-toast';
+import { settlementService } from '@/services/settlementService';
 
 export interface VendorTransaction {
   id: string;
@@ -26,6 +27,7 @@ export interface VendorBankAccount {
   vendor_id: string;
   account_name: string;
   bank_name: string;
+  bank_code?: string;
   account_number: string;
   is_default: boolean;
   is_verified: boolean;
@@ -164,36 +166,26 @@ export const useVendorFinancials = () => {
     if (!user?.id) return;
 
     try {
-      const fee = amount * 0.015; // 1.5% fee
-      const netAmount = amount - fee;
+      const payout = await settlementService.requestVendorPayout(
+        user.id,
+        amount,
+        bankAccountId
+      );
 
-      const { data, error } = await supabase
-        .from('vendor_payout_requests')
-        .insert({
-          vendor_id: user.id,
-          bank_account_id: bankAccountId,
-          amount,
-          fee,
-          net_amount: netAmount
-        })
-        .select()
-        .single();
-
-      if (error) throw error;
-      
-      setPayoutRequests(prev => [data as PayoutRequest, ...prev]);
+      // Refresh related data to keep UI in sync
+      await Promise.all([fetchPayoutRequests(), fetchWalletBalance(), fetchTransactions()]);
       toast({
-        title: "Payout requested",
-        description: `Payout of ₦${amount.toLocaleString()} has been requested`
+        title: "Payout initiated",
+        description: `Transfer of ₦${amount.toLocaleString()} is processing`
       });
       
-      return data;
+      return payout;
     } catch (error) {
       console.error('Error requesting payout:', error);
       toast({
         variant: "destructive",
         title: "Error",
-        description: "Failed to request payout"
+        description: error instanceof Error ? error.message : "Failed to request payout"
       });
       throw error;
     }
@@ -207,31 +199,24 @@ export const useVendorFinancials = () => {
     total_withdrawn: 0
   });
 
+  const [virtualAccount, setVirtualAccount] = useState<any>(null);
+
   const fetchWalletBalance = async () => {
     if (!user?.id) return;
     
     try {
-      const { data, error } = await supabase
-        .from('vendor_wallet')
-        .select('*')
-        .eq('vendor_id', user.id)
-        .single();
+      const walletData = await settlementService.getVendorWalletBalance(user.id);
+      
+      setWalletBalance({
+        available_balance: Number(walletData.available_balance || 0),
+        pending_balance: Number(walletData.pending_balance || 0),
+        total_earned: Number(walletData.total_earned || 0),
+        total_withdrawn: Number(walletData.total_withdrawn || 0)
+      });
 
-      if (error) {
-        // Wallet doesn't exist yet, return zero balance
-        setWalletBalance({
-          available_balance: 0,
-          pending_balance: 0,
-          total_earned: 0,
-          total_withdrawn: 0
-        });
-      } else {
-        setWalletBalance({
-          available_balance: Number(data.available_balance),
-          pending_balance: Number(data.pending_balance),
-          total_earned: Number(data.total_earned),
-          total_withdrawn: Number(data.total_withdrawn)
-        });
+      // Set virtual account if available
+      if (walletData.virtual_account) {
+        setVirtualAccount(walletData.virtual_account);
       }
     } catch (error) {
       console.error('Error fetching wallet balance:', error);
@@ -241,7 +226,7 @@ export const useVendorFinancials = () => {
   // Calculate balances
   const calculateBalance = () => {
     const completedTransactions = transactions.filter(t => t.status === 'completed');
-    
+
     const salesThisMonth = completedTransactions
       .filter(t => {
         const transactionDate = new Date(t.created_at);
@@ -298,6 +283,7 @@ export const useVendorFinancials = () => {
     addBankAccount,
     requestPayout,
     refreshData,
-    balances: calculateBalance()
+    balances: calculateBalance(),
+    virtualAccount,
   };
 };
