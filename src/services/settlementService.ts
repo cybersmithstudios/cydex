@@ -48,15 +48,35 @@ class SettlementService {
       throw new Error(`Failed to fetch order: ${error?.message || 'Order not found'}`);
     }
 
-    // Platform takes 10% from vendor sales
-    const platformFee = order.subtotal * 0.10;
-    const vendorAmount = order.subtotal - platformFee;
+    // Get order items to calculate platform fee per item
+    const { data: orderItems, error: itemsError } = await supabase
+      .from('order_items')
+      .select('quantity, unit_price')
+      .eq('order_id', orderId);
+
+    if (itemsError) {
+      throw new Error(`Failed to fetch order items: ${itemsError.message}`);
+    }
+
+    // Calculate platform fee: ₦20 per item
+    const totalItems = orderItems?.reduce((sum, item) => sum + item.quantity, 0) || 0;
+    const platformFeePerItem = totalItems * 20;
+
+    // Vendor's original price (before platform fee)
+    const vendorOriginalPrice = order.subtotal - platformFeePerItem;
+
+    // Platform takes 10% from vendor's original sales + ₦20 per item
+    const platformFeePercentage = vendorOriginalPrice * 0.10;
+    const totalPlatformFee = platformFeePercentage + platformFeePerItem;
+    
+    // Vendor receives: original price - 10% platform fee
+    const vendorAmount = vendorOriginalPrice - platformFeePercentage;
     const riderAmount = order.delivery_fee;
 
     return {
       vendorAmount,
       riderAmount,
-      platformFee,
+      platformFee: totalPlatformFee,
       total: order.total_amount,
     };
   }

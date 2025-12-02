@@ -2,10 +2,15 @@
 import React, { useState, useEffect } from 'react';
 import DashboardLayout from '@/components/layout/DashboardLayout';
 import { useRiderData } from '@/hooks/useRiderData';
+import { useRiderWallet } from '@/hooks/useRiderWallet';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { 
   TrendingUp, 
   Wallet, 
@@ -13,7 +18,8 @@ import {
   RefreshCw,
   Download,
   ArrowUp,
-  ArrowDown
+  ArrowDown,
+  Plus
 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -27,8 +33,31 @@ const EarningsPage = () => {
     refetch
   } = useRiderData();
   
+  const {
+    walletBalance,
+    bankAccounts,
+    payoutRequests,
+    loading: walletLoading,
+    refreshing: walletRefreshing,
+    addBankAccount,
+    requestPayout,
+    refreshData: refreshWalletData
+  } = useRiderWallet();
+  
   const [refreshing, setRefreshing] = useState(false);
   const [selectedPeriod, setSelectedPeriod] = useState<'today' | 'week' | 'month'>('today');
+  const [showWithdrawDialog, setShowWithdrawDialog] = useState(false);
+  const [withdrawAmount, setWithdrawAmount] = useState('');
+  const [selectedBankAccount, setSelectedBankAccount] = useState('');
+  const [showAddBankDialog, setShowAddBankDialog] = useState(false);
+  const [newBankAccount, setNewBankAccount] = useState({
+    account_name: '',
+    bank_name: '',
+    bank_code: '',
+    account_number: '',
+    is_default: false,
+    is_verified: false
+  });
 
   // Auto-refresh earnings every 60 seconds
   useEffect(() => {
@@ -47,13 +76,47 @@ const EarningsPage = () => {
       await Promise.all([
         refetch.todaysEarnings(),
         refetch.weeklyEarnings(),
-        refetch.monthlyEarnings()
+        refetch.monthlyEarnings(),
+        refreshWalletData()
       ]);
       toast.success('Earnings refreshed');
     } catch (error) {
       toast.error('Failed to refresh earnings');
     } finally {
       setRefreshing(false);
+    }
+  };
+
+  const handleAddBankAccount = async () => {
+    try {
+      await addBankAccount(newBankAccount);
+      setNewBankAccount({
+        account_name: '',
+        bank_name: '',
+        bank_code: '',
+        account_number: '',
+        is_default: false,
+        is_verified: false
+      });
+      setShowAddBankDialog(false);
+    } catch (error) {
+      // Error handled in hook
+    }
+  };
+
+  const handleRequestWithdrawal = async () => {
+    if (!withdrawAmount || !selectedBankAccount) {
+      toast.error('Please enter amount and select bank account');
+      return;
+    }
+    
+    try {
+      await requestPayout(parseFloat(withdrawAmount), selectedBankAccount);
+      setWithdrawAmount('');
+      setSelectedBankAccount('');
+      setShowWithdrawDialog(false);
+    } catch (error) {
+      // Error handled in hook
     }
   };
 
@@ -175,20 +238,86 @@ const EarningsPage = () => {
                 <div className="min-w-0 flex-1">
                   <p className="text-xs text-gray-500 truncate">Available</p>
                   <h3 className="text-sm sm:text-base font-bold truncate">
-                    {formatCurrency(monthlyTotal)}
+                    {formatCurrency(walletBalance.available_balance)}
                   </h3>
                 </div>
                 <div className="flex-shrink-0 p-1.5 bg-primary/10 rounded-full">
                   <Wallet className="h-3 w-3 text-primary" />
                 </div>
               </div>
-              <Button 
-                variant="outline" 
-                size="sm" 
-                className="w-full mt-2 h-7 text-xs"
-              >
-                Withdraw
-              </Button>
+              <Dialog open={showWithdrawDialog} onOpenChange={setShowWithdrawDialog}>
+                <DialogTrigger asChild>
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="w-full mt-2 h-7 text-xs"
+                    disabled={walletBalance.available_balance <= 0}
+                  >
+                    Withdraw
+                  </Button>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Request Withdrawal</DialogTitle>
+                    <DialogDescription>
+                      Withdraw your earnings to your bank account. A 1.5% processing fee will be applied.
+                    </DialogDescription>
+                  </DialogHeader>
+                  <div className="space-y-4">
+                    <div>
+                      <Label htmlFor="amount">Amount (₦)</Label>
+                      <Input
+                        id="amount"
+                        type="number"
+                        placeholder="Enter amount"
+                        value={withdrawAmount}
+                        onChange={(e) => setWithdrawAmount(e.target.value)}
+                      />
+                      <p className="text-sm text-gray-500 mt-1">
+                        Available: {formatCurrency(walletBalance.available_balance)}
+                      </p>
+                    </div>
+                    <div>
+                      <Label htmlFor="bank-account">Bank Account</Label>
+                      {bankAccounts.length > 0 ? (
+                        <Select value={selectedBankAccount} onValueChange={setSelectedBankAccount}>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select bank account" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {bankAccounts.map((account) => (
+                              <SelectItem key={account.id} value={account.id}>
+                                {account.bank_name} - **** {account.account_number.slice(-4)}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      ) : (
+                        <div className="text-sm text-gray-500">
+                          No bank accounts added.{' '}
+                          <button 
+                            onClick={() => {
+                              setShowWithdrawDialog(false);
+                              setShowAddBankDialog(true);
+                            }}
+                            className="text-primary underline"
+                          >
+                            Add one now
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                  <DialogFooter>
+                    <Button variant="outline" onClick={() => setShowWithdrawDialog(false)}>
+                      Cancel
+                    </Button>
+                    <Button onClick={handleRequestWithdrawal} disabled={!withdrawAmount || !selectedBankAccount}>
+                      Request Withdrawal
+                    </Button>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
             </CardContent>
           </Card>
 
@@ -319,6 +448,45 @@ const EarningsPage = () => {
           </Card>
         </div>
 
+        {/* Wallet Balance Details */}
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm">Wallet Balance</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-2">
+            <div className="flex justify-between items-center text-sm">
+              <span className="text-gray-600">Available Balance</span>
+              <span className="font-medium text-green-600">
+                {formatCurrency(walletBalance.available_balance)}
+              </span>
+            </div>
+            <div className="flex justify-between items-center text-sm">
+              <span className="text-gray-600">Pending Earnings</span>
+              <span className="font-medium text-amber-600">
+                {formatCurrency(walletBalance.pending_balance)}
+              </span>
+            </div>
+            <div className="border-t pt-2 flex justify-between items-center">
+              <span className="font-bold text-sm">Total Earned</span>
+              <span className="text-base font-bold">{formatCurrency(walletBalance.total_earned)}</span>
+            </div>
+            <div className="pt-2">
+              <Dialog open={showWithdrawDialog} onOpenChange={setShowWithdrawDialog}>
+                <DialogTrigger asChild>
+                  <Button 
+                    className="w-full" 
+                    size="sm"
+                    disabled={walletBalance.available_balance <= 0}
+                  >
+                    <ArrowDown className="h-3 w-3 mr-2" />
+                    Withdraw Funds
+                  </Button>
+                </DialogTrigger>
+              </Dialog>
+            </div>
+          </CardContent>
+        </Card>
+
         {/* Recent Transactions - Compact */}
         <Card>
           <CardHeader className="pb-2">
@@ -363,6 +531,67 @@ const EarningsPage = () => {
           </CardContent>
         </Card>
       </div>
+
+      {/* Add Bank Account Dialog */}
+      <Dialog open={showAddBankDialog} onOpenChange={setShowAddBankDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Add Bank Account</DialogTitle>
+            <DialogDescription>
+              Add a new bank account for withdrawals
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="account-name">Account Name</Label>
+              <Input
+                id="account-name"
+                placeholder="Account holder name"
+                value={newBankAccount.account_name}
+                onChange={(e) => setNewBankAccount(prev => ({ ...prev, account_name: e.target.value }))}
+              />
+            </div>
+            <div>
+              <Label htmlFor="bank-name">Bank Name</Label>
+              <Input
+                id="bank-name"
+                placeholder="Bank name"
+                value={newBankAccount.bank_name}
+                onChange={(e) => setNewBankAccount(prev => ({ ...prev, bank_name: e.target.value }))}
+              />
+            </div>
+            <div>
+              <Label htmlFor="bank-code">Bank Code (NIP)</Label>
+              <Input
+                id="bank-code"
+                placeholder="e.g. 000013 for GTBank"
+                value={newBankAccount.bank_code}
+                onChange={(e) => setNewBankAccount(prev => ({ ...prev, bank_code: e.target.value }))}
+              />
+              <p className="text-xs text-gray-500 mt-1">
+                Enter the 6-digit NIP bank code required by Squad for transfers.
+              </p>
+            </div>
+            <div>
+              <Label htmlFor="account-number">Account Number</Label>
+              <Input
+                id="account-number"
+                placeholder="Account number"
+                value={newBankAccount.account_number}
+                onChange={(e) => setNewBankAccount(prev => ({ ...prev, account_number: e.target.value }))}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowAddBankDialog(false)}>
+              Cancel
+            </Button>
+            <Button onClick={handleAddBankAccount}>
+              Add Account
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </DashboardLayout>
   );
 };

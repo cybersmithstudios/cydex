@@ -5,9 +5,9 @@ export const SQUAD_CONFIG = {
   TEST_PUBLIC_KEY: import.meta.env.VITE_SQUAD_PUBLIC_KEY || 'sandbox_pk_3646639faa50071d6ad804005e06d521ee6abc626f3c',
   TEST_SECRET_KEY: import.meta.env.VITE_SQUAD_SECRET_KEY || 'sandbox_sk_3646639faa50071d6ad87167420fd234eb7dc0716f26',
   
-  // Production Keys (to be filled when ready for production)
-  PROD_PUBLIC_KEY: import.meta.env.VITE_SQUAD_PROD_PUBLIC_KEY || '',
-  PROD_SECRET_KEY: import.meta.env.VITE_SQUAD_PROD_SECRET_KEY || '',
+  // Production Keys
+  PROD_PUBLIC_KEY: import.meta.env.VITE_SQUAD_PROD_PUBLIC_KEY || 'pk_e6f1ce02fce219e926f5fd8f6b79ff2bd1c2446d',
+  PROD_SECRET_KEY: import.meta.env.VITE_SQUAD_PROD_SECRET_KEY || 'sk_e6f1ce02fce219e925e2f2991f7f944da8d2320b',
   
   // Environment check
   IS_PRODUCTION: import.meta.env.PROD || import.meta.env.VITE_NODE_ENV === 'production',

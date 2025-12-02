@@ -454,6 +454,108 @@ const WalletPage = () => {
           </Card>
         </div>
         
+        {/* Daily Earnings Breakdown */}
+        <Card>
+          <CardHeader className="pb-2 sm:pb-4">
+            <CardTitle className="text-base sm:text-lg">Daily Earnings</CardTitle>
+            <CardDescription className="text-sm">Your earnings breakdown by day</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Tabs defaultValue="today" className="w-full">
+              <TabsList className="grid w-full grid-cols-3 mb-4">
+                <TabsTrigger value="today" className="text-xs sm:text-sm">Today</TabsTrigger>
+                <TabsTrigger value="week" className="text-xs sm:text-sm">This Week</TabsTrigger>
+                <TabsTrigger value="month" className="text-xs sm:text-sm">This Month</TabsTrigger>
+              </TabsList>
+              
+              <TabsContent value="today" className="space-y-3">
+                <div className="grid grid-cols-2 gap-3 sm:gap-4 mb-4">
+                  <div className="p-3 bg-green-50 rounded-lg">
+                    <p className="text-xs text-gray-600 mb-1">Today's Sales</p>
+                    <p className="text-lg sm:text-xl font-bold text-green-700">
+                      {formatAmount(
+                        transactions
+                          .filter(t => t.type === 'sale' && t.status === 'completed' && 
+                            new Date(t.created_at).toDateString() === new Date().toDateString())
+                          .reduce((sum, t) => sum + t.net_amount, 0)
+                      )}
+                    </p>
+                  </div>
+                  <div className="p-3 bg-blue-50 rounded-lg">
+                    <p className="text-xs text-gray-600 mb-1">Orders</p>
+                    <p className="text-lg sm:text-xl font-bold text-blue-700">
+                      {transactions.filter(t => t.type === 'sale' && t.status === 'completed' && 
+                        new Date(t.created_at).toDateString() === new Date().toDateString()).length}
+                    </p>
+                  </div>
+                </div>
+              </TabsContent>
+              
+              <TabsContent value="week" className="space-y-3">
+                <div className="space-y-2">
+                  {(() => {
+                    const weekAgo = new Date();
+                    weekAgo.setDate(weekAgo.getDate() - 7);
+                    const weekTransactions = transactions.filter(t => 
+                      t.type === 'sale' && t.status === 'completed' && 
+                      new Date(t.created_at) >= weekAgo
+                    );
+                    
+                    // Group by date
+                    const dailyEarnings = weekTransactions.reduce((acc: Record<string, number>, t) => {
+                      const date = new Date(t.created_at).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+                      acc[date] = (acc[date] || 0) + t.net_amount;
+                      return acc;
+                    }, {});
+                    
+                    return Object.entries(dailyEarnings).length > 0 ? (
+                      Object.entries(dailyEarnings).map(([date, amount]) => (
+                        <div key={date} className="flex justify-between items-center p-2 hover:bg-gray-50 rounded">
+                          <span className="text-sm text-gray-600">{date}</span>
+                          <span className="font-medium">{formatAmount(amount)}</span>
+                        </div>
+                      ))
+                    ) : (
+                      <p className="text-sm text-gray-500 text-center py-4">No sales this week</p>
+                    );
+                  })()}
+                </div>
+              </TabsContent>
+              
+              <TabsContent value="month" className="space-y-3">
+                <div className="space-y-2 max-h-64 overflow-y-auto">
+                  {(() => {
+                    const monthAgo = new Date();
+                    monthAgo.setDate(monthAgo.getDate() - 30);
+                    const monthTransactions = transactions.filter(t => 
+                      t.type === 'sale' && t.status === 'completed' && 
+                      new Date(t.created_at) >= monthAgo
+                    );
+                    
+                    // Group by date
+                    const dailyEarnings = monthTransactions.reduce((acc: Record<string, number>, t) => {
+                      const date = new Date(t.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                      acc[date] = (acc[date] || 0) + t.net_amount;
+                      return acc;
+                    }, {});
+                    
+                    return Object.entries(dailyEarnings).length > 0 ? (
+                      Object.entries(dailyEarnings).reverse().map(([date, amount]) => (
+                        <div key={date} className="flex justify-between items-center p-2 hover:bg-gray-50 rounded">
+                          <span className="text-sm text-gray-600">{date}</span>
+                          <span className="font-medium">{formatAmount(amount)}</span>
+                        </div>
+                      ))
+                    ) : (
+                      <p className="text-sm text-gray-500 text-center py-4">No sales this month</p>
+                    );
+                  })()}
+                </div>
+              </TabsContent>
+            </Tabs>
+          </CardContent>
+        </Card>
+        
         {/* Transaction History */}
         <Card>
           <CardHeader className="pb-2 sm:pb-4">

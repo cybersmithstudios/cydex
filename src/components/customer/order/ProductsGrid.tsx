@@ -68,7 +68,7 @@ export const ProductsGrid: React.FC<ProductsGridProps> = ({
               addToCart={() => addToCart({
                 id: product.id,
                 name: product.name,
-                price: product.price,
+                price: product.price + 20, // Add ₦20 platform fee
                 vendor_id: product.vendor_id,
                 vendor_name: product.vendor?.name || 'Unknown Vendor'
               })} 
