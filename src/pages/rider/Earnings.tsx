@@ -22,6 +22,7 @@ import {
   Plus
 } from 'lucide-react';
 import { toast } from 'sonner';
+import { NIGERIAN_BANKS } from '@/utils/nigerianBanks';
 
 const EarningsPage = () => {
   const { 
@@ -552,24 +553,33 @@ const EarningsPage = () => {
               />
             </div>
             <div>
-              <Label htmlFor="bank-name">Bank Name</Label>
-              <Input
-                id="bank-name"
-                placeholder="Bank name"
-                value={newBankAccount.bank_name}
-                onChange={(e) => setNewBankAccount(prev => ({ ...prev, bank_name: e.target.value }))}
-              />
-            </div>
-            <div>
-              <Label htmlFor="bank-code">Bank Code (NIP)</Label>
-              <Input
-                id="bank-code"
-                placeholder="e.g. 000013 for GTBank"
+              <Label htmlFor="bank-select">Select Bank</Label>
+              <Select
                 value={newBankAccount.bank_code}
-                onChange={(e) => setNewBankAccount(prev => ({ ...prev, bank_code: e.target.value }))}
-              />
+                onValueChange={(code) => {
+                  const bank = NIGERIAN_BANKS.find(b => b.code === code);
+                  if (bank) {
+                    setNewBankAccount(prev => ({
+                      ...prev,
+                      bank_name: bank.name,
+                      bank_code: bank.code
+                    }));
+                  }
+                }}
+              >
+                <SelectTrigger id="bank-select">
+                  <SelectValue placeholder="Select your bank" />
+                </SelectTrigger>
+                <SelectContent>
+                  {NIGERIAN_BANKS.map((bank) => (
+                    <SelectItem key={bank.code} value={bank.code}>
+                      {bank.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
               <p className="text-xs text-gray-500 mt-1">
-                Enter the 6-digit NIP bank code required by Squad for transfers.
+                Select your bank from the list. The bank code will be automatically filled.
               </p>
             </div>
             <div>
