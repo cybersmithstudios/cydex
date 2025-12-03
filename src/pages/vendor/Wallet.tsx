@@ -46,7 +46,6 @@ const WalletPage = () => {
     is_verified: false
   });
   const [payoutAmount, setPayoutAmount] = useState('');
-  const [selectedBankAccount, setSelectedBankAccount] = useState('');
   const [filteredTransactions, setFilteredTransactions] = useState(transactions);
   const [activeTab, setActiveTab] = useState('all');
 
@@ -128,12 +127,24 @@ const WalletPage = () => {
   };
 
   const handleRequestPayout = async () => {
-    if (!payoutAmount || !selectedBankAccount) return;
+    if (!payoutAmount) {
+      toast.error('Please enter an amount');
+      return;
+    }
+
+    // Find default bank account or use first available
+    const defaultAccount = bankAccounts.find(acc => acc.is_default) || bankAccounts[0];
+    
+    if (!defaultAccount) {
+      toast.error('Please add a bank account first');
+      setShowPayoutDialog(false);
+      setShowAddBankDialog(true);
+      return;
+    }
     
     try {
-      await requestPayout(parseFloat(payoutAmount), selectedBankAccount);
+      await requestPayout(parseFloat(payoutAmount), defaultAccount.id);
       setPayoutAmount('');
-      setSelectedBankAccount('');
       setShowPayoutDialog(false);
     } catch (error) {
       // Error handled in hook
@@ -205,29 +216,23 @@ const WalletPage = () => {
                     <p className="text-sm text-gray-500 mt-1">
                       Available: {formatAmount(balances.availableForPayout)}
                     </p>
-                  </div>
-                  <div>
-                    <Label htmlFor="bank-account">Bank Account</Label>
-                    <Select value={selectedBankAccount} onValueChange={setSelectedBankAccount}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select bank account" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {bankAccounts.map((account) => (
-                          <SelectItem key={account.id} value={account.id}>
-                            {account.bank_name}
-                            {account.bank_code ? ` (${account.bank_code})` : ''} - **** {account.account_number.slice(-4)}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    {bankAccounts.length > 0 && (
+                      <p className="text-xs text-gray-400 mt-2">
+                        Payout will be sent to: {bankAccounts.find(acc => acc.is_default)?.bank_name || bankAccounts[0]?.bank_name} - **** {bankAccounts.find(acc => acc.is_default)?.account_number.slice(-4) || bankAccounts[0]?.account_number.slice(-4)}
+                      </p>
+                    )}
+                    {bankAccounts.length === 0 && (
+                      <p className="text-xs text-red-500 mt-2">
+                        No bank account added. Please add a bank account first.
+                      </p>
+                    )}
                   </div>
                 </div>
                 <DialogFooter>
                   <Button variant="outline" onClick={() => setShowPayoutDialog(false)}>
                     Cancel
                   </Button>
-                  <Button onClick={handleRequestPayout}>
+                  <Button onClick={handleRequestPayout} disabled={!payoutAmount || bankAccounts.length === 0}>
                     Request Payout
                   </Button>
                 </DialogFooter>
@@ -360,30 +365,36 @@ const WalletPage = () => {
             
             <CardContent>
               <div className="space-y-3 sm:space-y-4">
-                {bankAccounts.map((account) => (
-                  <div key={account.id} className="p-3 border rounded-lg hover:bg-gray-50 transition-colors">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center">
-                        <Avatar className="h-6 w-6 sm:h-8 sm:w-8 mr-2 sm:mr-3">
-                          <AvatarFallback className="bg-blue-100 text-blue-600 text-xs sm:text-sm">
-                            {account.bank_name.substring(0, 1)}
-                          </AvatarFallback>
-                        </Avatar>
-                        <div>
-                          <p className="font-medium text-sm sm:text-base">{account.bank_name}</p>
-                          <p className="text-xs sm:text-sm text-gray-500">
-                            **** {account.account_number.slice(-4)}
-                          </p>
+                {bankAccounts.length > 0 ? (
+                  bankAccounts.map((account) => (
+                    <div key={account.id} className="p-3 border rounded-lg hover:bg-gray-50 transition-colors">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center">
+                          <Avatar className="h-6 w-6 sm:h-8 sm:w-8 mr-2 sm:mr-3">
+                            <AvatarFallback className="bg-blue-100 text-blue-600 text-xs sm:text-sm">
+                              {account.bank_name.substring(0, 1)}
+                            </AvatarFallback>
+                          </Avatar>
+                          <div>
+                            <p className="font-medium text-sm sm:text-base">{account.bank_name}</p>
+                            <p className="text-xs sm:text-sm text-gray-500">
+                              **** {account.account_number.slice(-4)}
+                            </p>
+                          </div>
                         </div>
+                        {account.is_default && (
+                          <Badge variant="outline" className="border-green-500 text-green-500 text-xs">
+                            Default
+                          </Badge>
+                        )}
                       </div>
-                      {account.is_default && (
-                        <Badge variant="outline" className="border-green-500 text-green-500 text-xs">
-                          Default
-                        </Badge>
-                      )}
                     </div>
-                  </div>
-                ))}
+                  ))
+                ) : (
+                  <p className="text-sm text-gray-500 text-center py-4">
+                    No bank accounts added yet
+                  </p>
+                )}
                 
                 <Dialog open={showAddBankDialog} onOpenChange={setShowAddBankDialog}>
                   <DialogTrigger asChild>
@@ -447,6 +458,18 @@ const WalletPage = () => {
                           value={newBankAccount.account_number}
                           onChange={(e) => setNewBankAccount(prev => ({ ...prev, account_number: e.target.value }))}
                         />
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="checkbox"
+                          id="is-default"
+                          checked={newBankAccount.is_default}
+                          onChange={(e) => setNewBankAccount(prev => ({ ...prev, is_default: e.target.checked }))}
+                          className="rounded"
+                        />
+                        <Label htmlFor="is-default" className="text-sm cursor-pointer">
+                          Set as default account
+                        </Label>
                       </div>
                     </div>
                     <DialogFooter>

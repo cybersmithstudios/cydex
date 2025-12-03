@@ -49,7 +49,6 @@ const EarningsPage = () => {
   const [selectedPeriod, setSelectedPeriod] = useState<'today' | 'week' | 'month'>('today');
   const [showWithdrawDialog, setShowWithdrawDialog] = useState(false);
   const [withdrawAmount, setWithdrawAmount] = useState('');
-  const [selectedBankAccount, setSelectedBankAccount] = useState('');
   const [showAddBankDialog, setShowAddBankDialog] = useState(false);
   const [newBankAccount, setNewBankAccount] = useState({
     account_name: '',
@@ -106,15 +105,24 @@ const EarningsPage = () => {
   };
 
   const handleRequestWithdrawal = async () => {
-    if (!withdrawAmount || !selectedBankAccount) {
-      toast.error('Please enter amount and select bank account');
+    if (!withdrawAmount) {
+      toast.error('Please enter an amount');
+      return;
+    }
+
+    // Find default bank account or use first available
+    const defaultAccount = bankAccounts.find(acc => acc.is_default) || bankAccounts[0];
+    
+    if (!defaultAccount) {
+      toast.error('Please add a bank account first');
+      setShowWithdrawDialog(false);
+      setShowAddBankDialog(true);
       return;
     }
     
     try {
-      await requestPayout(parseFloat(withdrawAmount), selectedBankAccount);
+      await requestPayout(parseFloat(withdrawAmount), defaultAccount.id);
       setWithdrawAmount('');
-      setSelectedBankAccount('');
       setShowWithdrawDialog(false);
     } catch (error) {
       // Error handled in hook
@@ -277,25 +285,14 @@ const EarningsPage = () => {
                       <p className="text-sm text-gray-500 mt-1">
                         Available: {formatCurrency(walletBalance.available_balance)}
                       </p>
-                    </div>
-                    <div>
-                      <Label htmlFor="bank-account">Bank Account</Label>
-                      {bankAccounts.length > 0 ? (
-                        <Select value={selectedBankAccount} onValueChange={setSelectedBankAccount}>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select bank account" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {bankAccounts.map((account) => (
-                              <SelectItem key={account.id} value={account.id}>
-                                {account.bank_name} - **** {account.account_number.slice(-4)}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      ) : (
-                        <div className="text-sm text-gray-500">
-                          No bank accounts added.{' '}
+                      {bankAccounts.length > 0 && (
+                        <p className="text-xs text-gray-400 mt-2">
+                          Withdrawal will be sent to: {bankAccounts.find(acc => acc.is_default)?.bank_name || bankAccounts[0]?.bank_name} - **** {bankAccounts.find(acc => acc.is_default)?.account_number.slice(-4) || bankAccounts[0]?.account_number.slice(-4)}
+                        </p>
+                      )}
+                      {bankAccounts.length === 0 && (
+                        <p className="text-xs text-red-500 mt-2">
+                          No bank account added.{' '}
                           <button 
                             onClick={() => {
                               setShowWithdrawDialog(false);
@@ -305,7 +302,7 @@ const EarningsPage = () => {
                           >
                             Add one now
                           </button>
-                        </div>
+                        </p>
                       )}
                     </div>
                   </div>
@@ -313,7 +310,7 @@ const EarningsPage = () => {
                     <Button variant="outline" onClick={() => setShowWithdrawDialog(false)}>
                       Cancel
                     </Button>
-                    <Button onClick={handleRequestWithdrawal} disabled={!withdrawAmount || !selectedBankAccount}>
+                    <Button onClick={handleRequestWithdrawal} disabled={!withdrawAmount || bankAccounts.length === 0}>
                       Request Withdrawal
                     </Button>
                   </DialogFooter>
@@ -531,77 +528,127 @@ const EarningsPage = () => {
             )}
           </CardContent>
         </Card>
-      </div>
 
-      {/* Add Bank Account Dialog */}
-      <Dialog open={showAddBankDialog} onOpenChange={setShowAddBankDialog}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Add Bank Account</DialogTitle>
-            <DialogDescription>
-              Add a new bank account for withdrawals
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4">
-            <div>
-              <Label htmlFor="account-name">Account Name</Label>
-              <Input
-                id="account-name"
-                placeholder="Account holder name"
-                value={newBankAccount.account_name}
-                onChange={(e) => setNewBankAccount(prev => ({ ...prev, account_name: e.target.value }))}
-              />
+        {/* Bank Accounts Section */}
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm">Bank Accounts</CardTitle>
+            <p className="text-xs text-gray-500 mt-1">Manage your bank accounts for withdrawals</p>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-2">
+              {bankAccounts.length > 0 ? (
+                bankAccounts.map((account) => (
+                  <div key={account.id} className="p-2 border rounded-lg flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <div>
+                        <p className="font-medium text-sm">{account.bank_name}</p>
+                        <p className="text-xs text-gray-500">**** {account.account_number.slice(-4)}</p>
+                      </div>
+                    </div>
+                    {account.is_default && (
+                      <Badge variant="outline" className="border-green-500 text-green-500 text-xs">
+                        Default
+                      </Badge>
+                    )}
+                  </div>
+                ))
+              ) : (
+                <p className="text-sm text-gray-500 text-center py-4">
+                  No bank accounts added yet
+                </p>
+              )}
+              
+              <Dialog open={showAddBankDialog} onOpenChange={setShowAddBankDialog}>
+                <DialogTrigger asChild>
+                  <Button variant="outline" className="w-full border-dashed text-xs">
+                    <Plus className="mr-2 h-3 w-3" />
+                    Add Bank Account
+                  </Button>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Add Bank Account</DialogTitle>
+                    <DialogDescription>
+                      Add a new bank account for withdrawals
+                    </DialogDescription>
+                  </DialogHeader>
+                  <div className="space-y-4">
+                    <div>
+                      <Label htmlFor="account-name">Account Name</Label>
+                      <Input
+                        id="account-name"
+                        placeholder="Account holder name"
+                        value={newBankAccount.account_name}
+                        onChange={(e) => setNewBankAccount(prev => ({ ...prev, account_name: e.target.value }))}
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="bank-select">Select Bank</Label>
+                      <Select
+                        value={newBankAccount.bank_code}
+                        onValueChange={(code) => {
+                          const bank = NIGERIAN_BANKS.find(b => b.code === code);
+                          if (bank) {
+                            setNewBankAccount(prev => ({
+                              ...prev,
+                              bank_name: bank.name,
+                              bank_code: bank.code
+                            }));
+                          }
+                        }}
+                      >
+                        <SelectTrigger id="bank-select">
+                          <SelectValue placeholder="Select your bank" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {NIGERIAN_BANKS.map((bank) => (
+                            <SelectItem key={bank.code} value={bank.code}>
+                              {bank.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <p className="text-xs text-gray-500 mt-1">
+                        Select your bank from the list. The bank code will be automatically filled.
+                      </p>
+                    </div>
+                    <div>
+                      <Label htmlFor="account-number">Account Number</Label>
+                      <Input
+                        id="account-number"
+                        placeholder="Account number"
+                        value={newBankAccount.account_number}
+                        onChange={(e) => setNewBankAccount(prev => ({ ...prev, account_number: e.target.value }))}
+                      />
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="checkbox"
+                        id="is-default"
+                        checked={newBankAccount.is_default}
+                        onChange={(e) => setNewBankAccount(prev => ({ ...prev, is_default: e.target.checked }))}
+                        className="rounded"
+                      />
+                      <Label htmlFor="is-default" className="text-sm cursor-pointer">
+                        Set as default account
+                      </Label>
+                    </div>
+                  </div>
+                  <DialogFooter>
+                    <Button variant="outline" onClick={() => setShowAddBankDialog(false)}>
+                      Cancel
+                    </Button>
+                    <Button onClick={handleAddBankAccount}>
+                      Add Account
+                    </Button>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
             </div>
-            <div>
-              <Label htmlFor="bank-select">Select Bank</Label>
-              <Select
-                value={newBankAccount.bank_code}
-                onValueChange={(code) => {
-                  const bank = NIGERIAN_BANKS.find(b => b.code === code);
-                  if (bank) {
-                    setNewBankAccount(prev => ({
-                      ...prev,
-                      bank_name: bank.name,
-                      bank_code: bank.code
-                    }));
-                  }
-                }}
-              >
-                <SelectTrigger id="bank-select">
-                  <SelectValue placeholder="Select your bank" />
-                </SelectTrigger>
-                <SelectContent>
-                  {NIGERIAN_BANKS.map((bank) => (
-                    <SelectItem key={bank.code} value={bank.code}>
-                      {bank.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <p className="text-xs text-gray-500 mt-1">
-                Select your bank from the list. The bank code will be automatically filled.
-              </p>
-            </div>
-            <div>
-              <Label htmlFor="account-number">Account Number</Label>
-              <Input
-                id="account-number"
-                placeholder="Account number"
-                value={newBankAccount.account_number}
-                onChange={(e) => setNewBankAccount(prev => ({ ...prev, account_number: e.target.value }))}
-              />
-            </div>
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setShowAddBankDialog(false)}>
-              Cancel
-            </Button>
-            <Button onClick={handleAddBankAccount}>
-              Add Account
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+          </CardContent>
+        </Card>
+      </div>
     </DashboardLayout>
   );
 };
