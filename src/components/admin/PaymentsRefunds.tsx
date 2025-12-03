@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from '@/components/ui/table';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -8,101 +8,82 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { SearchIcon, DownloadIcon, Filter, DollarSign, CreditCard, TrendingUp, AlertCircle, Eye, CheckCircle, XCircle } from 'lucide-react';
+import { SearchIcon, DownloadIcon, Filter, DollarSign, CreditCard, TrendingUp, AlertCircle, Eye, CheckCircle, XCircle, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
+import { supabase } from '@/integrations/supabase/client';
+
+interface Transaction {
+  id: string;
+  transaction_id: string;
+  customer_id: string;
+  amount: number;
+  status: string;
+  payment_method?: string;
+  created_at: string;
+  reference_id?: string;
+  type: string;
+  description?: string;
+  customer?: {
+    name: string;
+    email: string;
+  };
+  order?: {
+    order_number: string;
+  };
+}
 
 export const PaymentsRefunds = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
-  const [selectedPayment, setSelectedPayment] = useState<any>(null);
+  const [selectedPayment, setSelectedPayment] = useState<Transaction | null>(null);
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [payments, setPayments] = useState<Transaction[]>([]);
+  const [refunds, setRefunds] = useState<Transaction[]>([]);
   
-  // Enhanced payment data with more details
-  const payments = [
-    { 
-      id: 'PAY-001', 
-      customer: 'John Doe', 
-      customerEmail: 'john@example.com',
-      amount: '₦5,000', 
-      method: 'Card', 
-      status: 'completed', 
-      date: '2023-04-10',
-      orderId: 'ORD-5678',
-      transactionId: 'TXN-ABC123',
-      gatewayFee: '₦150',
-      netAmount: '₦4,850'
-    },
-    { 
-      id: 'PAY-002', 
-      customer: 'Sarah Lewis', 
-      customerEmail: 'sarah@example.com',
-      amount: '₦7,500', 
-      method: 'Bank Transfer', 
-      status: 'pending', 
-      date: '2023-04-09',
-      orderId: 'ORD-5679',
-      transactionId: 'TXN-DEF456',
-      gatewayFee: '₦225',
-      netAmount: '₦7,275'
-    },
-    { 
-      id: 'PAY-003', 
-      customer: 'Michael Brown', 
-      customerEmail: 'michael@example.com',
-      amount: '₦3,200', 
-      method: 'Wallet', 
-      status: 'completed', 
-      date: '2023-04-08',
-      orderId: 'ORD-5680',
-      transactionId: 'TXN-GHI789',
-      gatewayFee: '₦96',
-      netAmount: '₦3,104'
-    },
-    { 
-      id: 'PAY-004', 
-      customer: 'Emma Wilson', 
-      customerEmail: 'emma@example.com',
-      amount: '₦10,000', 
-      method: 'Card', 
-      status: 'failed', 
-      date: '2023-04-07',
-      orderId: 'ORD-5681',
-      transactionId: 'TXN-JKL012',
-      gatewayFee: '₦0',
-      netAmount: '₦0'
-    },
-  ];
-  
-  // Enhanced refund data
-  const refunds = [
-    { 
-      id: 'REF-001', 
-      customer: 'Emma Wilson', 
-      customerEmail: 'emma@example.com',
-      amount: '₦10,000', 
-      reason: 'Order Cancelled', 
-      status: 'completed', 
-      date: '2023-04-08',
-      originalPaymentId: 'PAY-004',
-      processedBy: 'Admin User',
-      refundMethod: 'Original Card'
-    },
-    { 
-      id: 'REF-002', 
-      customer: 'Alex Johnson', 
-      customerEmail: 'alex@example.com',
-      amount: '₦4,300', 
-      reason: 'Item Unavailable', 
-      status: 'pending', 
-      date: '2023-04-07',
-      originalPaymentId: 'PAY-005',
-      processedBy: 'System',
-      refundMethod: 'Bank Transfer'
-    },
-  ];
+  useEffect(() => {
+    fetchTransactions();
+  }, []);
+
+  const fetchTransactions = async () => {
+    setLoading(true);
+    try {
+      // Fetch customer transactions (payments and refunds)
+      const { data: customerTxns, error } = await supabase
+        .from('customer_transactions')
+        .select(`
+          *,
+          customer:profiles!customer_transactions_customer_id_fkey (
+            name,
+            email
+          ),
+          order:orders!customer_transactions_reference_id_fkey (
+            order_number
+          )
+        `)
+        .order('created_at', { ascending: false })
+        .limit(100);
+
+      if (error) throw error;
+
+      // Separate payments and refunds
+      const paymentTxns = customerTxns?.filter(t => t.type === 'payment') || [];
+      const refundTxns = customerTxns?.filter(t => t.type === 'refund') || [];
+
+      setPayments(paymentTxns as Transaction[]);
+      setRefunds(refundTxns as Transaction[]);
+    } catch (error) {
+      console.error('Error fetching transactions:', error);
+      toast.error('Failed to load transactions');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // Stats calculations
-  const totalPayments = payments.reduce((sum, p) => sum + parseFloat(p.amount.replace('₦', '').replace(',', '')), 0);
+  const totalPayments = payments
+    .filter(p => p.status === 'completed')
+    .reduce((sum, p) => sum + Number(p.amount), 0);
   const completedPayments = payments.filter(p => p.status === 'completed').length;
   const pendingPayments = payments.filter(p => p.status === 'pending').length;
   const failedPayments = payments.filter(p => p.status === 'failed').length;
@@ -115,32 +96,95 @@ export const PaymentsRefunds = () => {
         return <Badge className="bg-yellow-100 text-yellow-800"><AlertCircle className="w-3 h-3 mr-1" />Pending</Badge>;
       case 'failed':
         return <Badge className="bg-red-100 text-red-800"><XCircle className="w-3 h-3 mr-1" />Failed</Badge>;
+      case 'cancelled':
+        return <Badge className="bg-gray-100 text-gray-800"><XCircle className="w-3 h-3 mr-1" />Cancelled</Badge>;
       default:
         return <Badge>{status}</Badge>;
     }
   };
   
   const filteredPayments = payments.filter(payment => {
-    const matchesSearch = payment.customer.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         payment.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         payment.customerEmail.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesSearch = 
+      payment.customer?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      payment.transaction_id.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      payment.customer?.email?.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStatus = statusFilter === 'all' || payment.status === statusFilter;
     return matchesSearch && matchesStatus;
   });
   
   const filteredRefunds = refunds.filter(refund => 
-    refund.customer.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    refund.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    refund.customerEmail.toLowerCase().includes(searchTerm.toLowerCase())
+    refund.customer?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    refund.transaction_id.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    refund.customer?.email?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const handleApproveRefund = (refundId: string) => {
-    toast.success(`Refund ${refundId} has been approved and processed`);
+  const formatCurrency = (amount: number) => {
+    return `₦${amount.toLocaleString('en-NG', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
   };
 
-  const handleRejectRefund = (refundId: string) => {
-    toast.error(`Refund ${refundId} has been rejected`);
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('en-NG', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
   };
+
+  const handleApproveRefund = async (refundId: string) => {
+    try {
+      const { error } = await supabase
+        .from('customer_transactions')
+        .update({ status: 'completed', processed_at: new Date().toISOString() })
+        .eq('id', refundId);
+
+      if (error) throw error;
+
+      toast.success('Refund has been approved and processed');
+      fetchTransactions();
+    } catch (error) {
+      console.error('Error approving refund:', error);
+      toast.error('Failed to approve refund');
+    }
+  };
+
+  const handleRejectRefund = async (refundId: string) => {
+    try {
+      const { error } = await supabase
+        .from('customer_transactions')
+        .update({ status: 'cancelled' })
+        .eq('id', refundId);
+
+      if (error) throw error;
+
+      toast.error('Refund has been rejected');
+      fetchTransactions();
+    } catch (error) {
+      console.error('Error rejecting refund:', error);
+      toast.error('Failed to reject refund');
+    }
+  };
+
+  // Calculate payment method distribution
+  const paymentMethodStats = payments.reduce((acc, p) => {
+    const method = p.payment_method || 'Unknown';
+    acc[method] = (acc[method] || 0) + 1;
+    return acc;
+  }, {} as Record<string, number>);
+
+  const totalTransactions = payments.length;
+  const successRate = totalTransactions > 0 
+    ? ((completedPayments / totalTransactions) * 100).toFixed(1)
+    : '0.0';
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
   
   return (
     <div className="space-y-6">
@@ -152,8 +196,8 @@ export const PaymentsRefunds = () => {
             <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">₦{totalPayments.toLocaleString()}</div>
-            <p className="text-xs text-muted-foreground">+12% from last month</p>
+            <div className="text-2xl font-bold">{formatCurrency(totalPayments)}</div>
+            <p className="text-xs text-muted-foreground">From completed payments</p>
           </CardContent>
         </Card>
         
@@ -215,21 +259,17 @@ export const PaymentsRefunds = () => {
               <SelectItem value="failed">Failed</SelectItem>
             </SelectContent>
           </Select>
-          <Button variant="outline" size="sm">
-            <Filter className="mr-2 h-4 w-4" />
-            More Filters
-          </Button>
-          <Button variant="outline" size="sm">
-            <DownloadIcon className="mr-2 h-4 w-4" />
-            Export
+          <Button variant="outline" size="sm" onClick={fetchTransactions}>
+            <RefreshCw className="mr-2 h-4 w-4" />
+            Refresh
           </Button>
         </div>
       </div>
       
       <Tabs defaultValue="payments" className="space-y-4">
         <TabsList>
-          <TabsTrigger value="payments">Payments</TabsTrigger>
-          <TabsTrigger value="refunds">Refunds</TabsTrigger>
+          <TabsTrigger value="payments">Payments ({payments.length})</TabsTrigger>
+          <TabsTrigger value="refunds">Refunds ({refunds.length})</TabsTrigger>
           <TabsTrigger value="analytics">Analytics</TabsTrigger>
         </TabsList>
         
@@ -238,7 +278,7 @@ export const PaymentsRefunds = () => {
             <CardHeader>
               <CardTitle>Payment Transactions</CardTitle>
               <CardDescription>
-                View and manage all payment transactions.
+                View and manage all payment transactions from customers.
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -255,78 +295,90 @@ export const PaymentsRefunds = () => {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {filteredPayments.map((payment) => (
-                    <TableRow key={payment.id}>
-                      <TableCell className="font-medium">{payment.id}</TableCell>
-                      <TableCell>
-                        <div>
-                          <div className="font-medium">{payment.customer}</div>
-                          <div className="text-sm text-gray-500">{payment.customerEmail}</div>
-                        </div>
-                      </TableCell>
-                      <TableCell className="font-semibold">{payment.amount}</TableCell>
-                      <TableCell>
-                        <div className="flex items-center gap-1">
-                          <CreditCard className="w-4 h-4" />
-                          {payment.method}
-                        </div>
-                      </TableCell>
-                      <TableCell>{getStatusBadge(payment.status)}</TableCell>
-                      <TableCell>{payment.date}</TableCell>
-                      <TableCell>
-                        <Dialog open={isDetailsOpen} onOpenChange={setIsDetailsOpen}>
-                          <DialogTrigger asChild>
-                            <Button 
-                              variant="ghost" 
-                              size="sm"
-                              onClick={() => setSelectedPayment(payment)}
-                            >
-                              <Eye className="w-4 h-4 mr-1" />
-                              View
-                            </Button>
-                          </DialogTrigger>
-                          <DialogContent className="max-w-2xl">
-                            <DialogHeader>
-                              <DialogTitle>Payment Details - {selectedPayment?.id}</DialogTitle>
-                              <DialogDescription>
-                                Complete transaction information
-                              </DialogDescription>
-                            </DialogHeader>
-                            {selectedPayment && (
-                              <div className="grid gap-4">
-                                <div className="grid grid-cols-2 gap-4">
-                                  <div>
-                                    <h4 className="font-semibold mb-2">Customer Information</h4>
-                                    <p><strong>Name:</strong> {selectedPayment.customer}</p>
-                                    <p><strong>Email:</strong> {selectedPayment.customerEmail}</p>
-                                  </div>
-                                  <div>
-                                    <h4 className="font-semibold mb-2">Transaction Details</h4>
-                                    <p><strong>Order ID:</strong> {selectedPayment.orderId}</p>
-                                    <p><strong>Transaction ID:</strong> {selectedPayment.transactionId}</p>
-                                  </div>
-                                </div>
-                                <div className="grid grid-cols-2 gap-4">
-                                  <div>
-                                    <h4 className="font-semibold mb-2">Payment Information</h4>
-                                    <p><strong>Amount:</strong> {selectedPayment.amount}</p>
-                                    <p><strong>Gateway Fee:</strong> {selectedPayment.gatewayFee}</p>
-                                    <p><strong>Net Amount:</strong> {selectedPayment.netAmount}</p>
-                                  </div>
-                                  <div>
-                                    <h4 className="font-semibold mb-2">Status & Method</h4>
-                                    <p><strong>Status:</strong> {getStatusBadge(selectedPayment.status)}</p>
-                                    <p><strong>Method:</strong> {selectedPayment.method}</p>
-                                    <p><strong>Date:</strong> {selectedPayment.date}</p>
-                                  </div>
-                                </div>
-                              </div>
-                            )}
-                          </DialogContent>
-                        </Dialog>
+                  {filteredPayments.length === 0 ? (
+                    <TableRow>
+                      <TableCell colSpan={7} className="text-center text-gray-500 py-8">
+                        No payment transactions found
                       </TableCell>
                     </TableRow>
-                  ))}
+                  ) : (
+                    filteredPayments.map((payment) => (
+                      <TableRow key={payment.id}>
+                        <TableCell className="font-medium">{payment.transaction_id}</TableCell>
+                        <TableCell>
+                          <div>
+                            <div className="font-medium">{payment.customer?.name || 'Unknown'}</div>
+                            <div className="text-sm text-gray-500">{payment.customer?.email || 'N/A'}</div>
+                          </div>
+                        </TableCell>
+                        <TableCell className="font-semibold">{formatCurrency(Number(payment.amount))}</TableCell>
+                        <TableCell>
+                          <div className="flex items-center gap-1">
+                            <CreditCard className="w-4 h-4" />
+                            {payment.payment_method || 'Card'}
+                          </div>
+                        </TableCell>
+                        <TableCell>{getStatusBadge(payment.status)}</TableCell>
+                        <TableCell>{formatDate(payment.created_at)}</TableCell>
+                        <TableCell>
+                          <Dialog open={isDetailsOpen && selectedPayment?.id === payment.id} onOpenChange={setIsDetailsOpen}>
+                            <DialogTrigger asChild>
+                              <Button 
+                                variant="ghost" 
+                                size="sm"
+                                onClick={() => setSelectedPayment(payment)}
+                              >
+                                <Eye className="w-4 h-4 mr-1" />
+                                View
+                              </Button>
+                            </DialogTrigger>
+                            <DialogContent className="max-w-2xl">
+                              <DialogHeader>
+                                <DialogTitle>Payment Details - {selectedPayment?.transaction_id}</DialogTitle>
+                                <DialogDescription>
+                                  Complete transaction information
+                                </DialogDescription>
+                              </DialogHeader>
+                              {selectedPayment && (
+                                <div className="grid gap-4">
+                                  <div className="grid grid-cols-2 gap-4">
+                                    <div>
+                                      <h4 className="font-semibold mb-2">Customer Information</h4>
+                                      <p><strong>Name:</strong> {selectedPayment.customer?.name || 'Unknown'}</p>
+                                      <p><strong>Email:</strong> {selectedPayment.customer?.email || 'N/A'}</p>
+                                    </div>
+                                    <div>
+                                      <h4 className="font-semibold mb-2">Transaction Details</h4>
+                                      <p><strong>Transaction ID:</strong> {selectedPayment.transaction_id}</p>
+                                      <p><strong>Order Number:</strong> {selectedPayment.order?.order_number || 'N/A'}</p>
+                                    </div>
+                                  </div>
+                                  <div className="grid grid-cols-2 gap-4">
+                                    <div>
+                                      <h4 className="font-semibold mb-2">Payment Information</h4>
+                                      <p><strong>Amount:</strong> {formatCurrency(Number(selectedPayment.amount))}</p>
+                                      <p><strong>Method:</strong> {selectedPayment.payment_method || 'Card'}</p>
+                                    </div>
+                                    <div>
+                                      <h4 className="font-semibold mb-2">Status & Date</h4>
+                                      <p><strong>Status:</strong> {getStatusBadge(selectedPayment.status)}</p>
+                                      <p><strong>Date:</strong> {formatDate(selectedPayment.created_at)}</p>
+                                    </div>
+                                  </div>
+                                  {selectedPayment.description && (
+                                    <div>
+                                      <h4 className="font-semibold mb-2">Description</h4>
+                                      <p>{selectedPayment.description}</p>
+                                    </div>
+                                  )}
+                                </div>
+                              )}
+                            </DialogContent>
+                          </Dialog>
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  )}
                 </TableBody>
               </Table>
             </CardContent>
@@ -355,51 +407,60 @@ export const PaymentsRefunds = () => {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {filteredRefunds.map((refund) => (
-                    <TableRow key={refund.id}>
-                      <TableCell className="font-medium">{refund.id}</TableCell>
-                      <TableCell>
-                        <div>
-                          <div className="font-medium">{refund.customer}</div>
-                          <div className="text-sm text-gray-500">{refund.customerEmail}</div>
-                        </div>
-                      </TableCell>
-                      <TableCell className="font-semibold">{refund.amount}</TableCell>
-                      <TableCell>{refund.reason}</TableCell>
-                      <TableCell>{getStatusBadge(refund.status)}</TableCell>
-                      <TableCell>{refund.date}</TableCell>
-                      <TableCell>
-                        <div className="flex gap-1">
-                          <Button variant="ghost" size="sm">
-                            <Eye className="w-4 h-4 mr-1" />
-                            View
-                          </Button>
-                          {refund.status === 'pending' && (
-                            <>
-                              <Button 
-                                variant="ghost" 
-                                size="sm" 
-                                className="text-green-600"
-                                onClick={() => handleApproveRefund(refund.id)}
-                              >
-                                <CheckCircle className="w-4 h-4 mr-1" />
-                                Approve
-                              </Button>
-                              <Button 
-                                variant="ghost" 
-                                size="sm" 
-                                className="text-red-600"
-                                onClick={() => handleRejectRefund(refund.id)}
-                              >
-                                <XCircle className="w-4 h-4 mr-1" />
-                                Reject
-                              </Button>
-                            </>
-                          )}
-                        </div>
+                  {filteredRefunds.length === 0 ? (
+                    <TableRow>
+                      <TableCell colSpan={7} className="text-center text-gray-500 py-8">
+                        No refund requests found
                       </TableCell>
                     </TableRow>
-                  ))}
+                  ) : (
+                    filteredRefunds.map((refund) => (
+                      <TableRow key={refund.id}>
+                        <TableCell className="font-medium">{refund.transaction_id}</TableCell>
+                        <TableCell>
+                          <div>
+                            <div className="font-medium">{refund.customer?.name || 'Unknown'}</div>
+                            <div className="text-sm text-gray-500">{refund.customer?.email || 'N/A'}</div>
+                          </div>
+                        </TableCell>
+                        <TableCell className="font-semibold">{formatCurrency(Number(refund.amount))}</TableCell>
+                        <TableCell>{refund.description || 'No reason provided'}</TableCell>
+                        <TableCell>{getStatusBadge(refund.status)}</TableCell>
+                        <TableCell>{formatDate(refund.created_at)}</TableCell>
+                        <TableCell>
+                          <div className="flex gap-1">
+                            {refund.status === 'pending' && (
+                              <>
+                                <Button 
+                                  variant="ghost" 
+                                  size="sm" 
+                                  className="text-green-600"
+                                  onClick={() => handleApproveRefund(refund.id)}
+                                >
+                                  <CheckCircle className="w-4 h-4 mr-1" />
+                                  Approve
+                                </Button>
+                                <Button 
+                                  variant="ghost" 
+                                  size="sm" 
+                                  className="text-red-600"
+                                  onClick={() => handleRejectRefund(refund.id)}
+                                >
+                                  <XCircle className="w-4 h-4 mr-1" />
+                                  Reject
+                                </Button>
+                              </>
+                            )}
+                            {refund.status !== 'pending' && (
+                              <span className="text-sm text-gray-500">
+                                {refund.status === 'completed' ? 'Processed' : 'Closed'}
+                              </span>
+                            )}
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  )}
                 </TableBody>
               </Table>
             </CardContent>
@@ -414,29 +475,30 @@ export const PaymentsRefunds = () => {
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  <div className="flex justify-between items-center">
-                    <span>Card Payments</span>
-                    <span className="font-semibold">45%</span>
-                  </div>
-                  <div className="w-full bg-gray-200 rounded-full h-2">
-                    <div className="bg-blue-600 h-2 rounded-full" style={{ width: '45%' }}></div>
-                  </div>
-                  
-                  <div className="flex justify-between items-center">
-                    <span>Bank Transfer</span>
-                    <span className="font-semibold">30%</span>
-                  </div>
-                  <div className="w-full bg-gray-200 rounded-full h-2">
-                    <div className="bg-green-600 h-2 rounded-full" style={{ width: '30%' }}></div>
-                  </div>
-                  
-                  <div className="flex justify-between items-center">
-                    <span>Wallet</span>
-                    <span className="font-semibold">25%</span>
-                  </div>
-                  <div className="w-full bg-gray-200 rounded-full h-2">
-                    <div className="bg-purple-600 h-2 rounded-full" style={{ width: '25%' }}></div>
-                  </div>
+                  {Object.entries(paymentMethodStats).map(([method, count]) => {
+                    const percentage = totalTransactions > 0 
+                      ? ((count / totalTransactions) * 100).toFixed(1)
+                      : '0';
+                    return (
+                      <div key={method}>
+                        <div className="flex justify-between items-center mb-1">
+                          <span>{method}</span>
+                          <span className="font-semibold">{percentage}%</span>
+                        </div>
+                        <div className="w-full bg-gray-200 rounded-full h-2">
+                          <div 
+                            className="bg-blue-600 h-2 rounded-full" 
+                            style={{ width: `${percentage}%` }}
+                          ></div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                  {Object.keys(paymentMethodStats).length === 0 && (
+                    <p className="text-sm text-gray-500 text-center py-4">
+                      No payment method data available
+                    </p>
+                  )}
                 </div>
               </CardContent>
             </Card>
@@ -451,20 +513,26 @@ export const PaymentsRefunds = () => {
                     <span>Success Rate</span>
                     <div className="flex items-center gap-2">
                       <TrendingUp className="w-4 h-4 text-green-600" />
-                      <span className="font-semibold text-green-600">94.2%</span>
+                      <span className="font-semibold text-green-600">{successRate}%</span>
                     </div>
                   </div>
                   <div className="flex items-center justify-between">
                     <span>Average Transaction</span>
-                    <span className="font-semibold">₦6,425</span>
+                    <span className="font-semibold">
+                      {formatCurrency(totalTransactions > 0 ? totalPayments / completedPayments : 0)}
+                    </span>
                   </div>
                   <div className="flex items-center justify-between">
-                    <span>Monthly Growth</span>
-                    <span className="font-semibold text-green-600">+12.5%</span>
+                    <span>Total Transactions</span>
+                    <span className="font-semibold">{totalTransactions}</span>
                   </div>
                   <div className="flex items-center justify-between">
                     <span>Refund Rate</span>
-                    <span className="font-semibold text-yellow-600">2.1%</span>
+                    <span className="font-semibold text-yellow-600">
+                      {totalTransactions > 0 
+                        ? ((refunds.length / totalTransactions) * 100).toFixed(1)
+                        : '0.0'}%
+                    </span>
                   </div>
                 </div>
               </CardContent>
