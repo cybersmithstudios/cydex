@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { SearchIcon, DownloadIcon, Filter, DollarSign, CreditCard, TrendingUp, AlertCircle, Eye, CheckCircle, XCircle, Loader2 } from 'lucide-react';
+import { SearchIcon, DownloadIcon, Filter, DollarSign, CreditCard, TrendingUp, AlertCircle, Eye, CheckCircle, XCircle, Loader2, RefreshCw } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 

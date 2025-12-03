@@ -106,13 +106,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (!profile?.id || !profile?.role) return;
     if (walletSetupAttempted) return;
 
-    walletSetupService.ensureWalletSetup({
+    const setupPromise = walletSetupService.ensureWalletSetup({
       id: profile.id,
       role: profile.role,
       name: profile.name,
       email: profile.email,
       phone: profile.phone,
-    }).finally(() => setWalletSetupAttempted(true));
+    });
+
+    if (setupPromise) {
+      setupPromise.finally(() => setWalletSetupAttempted(true));
+    } else {
+      setWalletSetupAttempted(true);
+    }
   }, [profile?.id, profile?.role, profile?.name, profile?.email, profile?.phone, walletSetupAttempted]);
 
   const login = async (email: string, password: string) => {

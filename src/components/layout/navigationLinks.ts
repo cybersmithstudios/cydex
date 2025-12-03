@@ -45,8 +45,6 @@ export const getNavLinks = (userRole: 'CUSTOMER' | 'RIDER' | 'VENDOR' | 'ADMIN')
         { name: 'Users', href: '/admin/users', icon: Users },
         { name: 'Orders', href: '/admin/orders', icon: Package },
         { name: 'Payments', href: '/admin/payments', icon: CreditCard },
-        { name: 'Carbon Credits', href: '/admin/carbon-credits', icon: Recycle },
-        { name: 'Partnerships', href: '/admin/partnerships', icon: ShieldCheck },
         { name: 'Content', href: '/admin/content', icon: FileText },
         { name: 'Security', href: '/admin/security', icon: Shield },
       ];
