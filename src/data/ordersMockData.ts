@@ -1,4 +1,6 @@
 
+import { DELIVERY_FEE } from '@/constants/delivery';
+
 // Mock order data
 export const orders = [
   {
@@ -15,7 +17,7 @@ export const orders = [
     address: '123 Green Street, Lagos',
     paymentMethod: 'Wallet',
     deliveryType: 'Express',
-    deliveryFee: 500,
+    deliveryFee: DELIVERY_FEE,
     timeSlot: '2:00 PM - 4:00 PM'
   },
   {
@@ -32,7 +34,7 @@ export const orders = [
     address: '456 Eco Avenue, Lagos',
     paymentMethod: 'Card',
     deliveryType: 'Standard',
-    deliveryFee: 500,
+    deliveryFee: DELIVERY_FEE,
     timeSlot: '10:00 AM - 12:00 PM',
     rider: {
       name: 'Alex Martinez',
@@ -53,7 +55,7 @@ export const orders = [
     address: '789 Sustainable Road, Lagos',
     paymentMethod: 'Wallet',
     deliveryType: 'Standard',
-    deliveryFee: 500,
+    deliveryFee: DELIVERY_FEE,
     timeSlot: '2:00 PM - 4:00 PM',
     rider: {
       name: 'James Rodriguez',

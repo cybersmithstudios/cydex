@@ -23,6 +23,7 @@ import { DesktopCategoriesSidebar } from '@/components/customer/order/DesktopCat
 import { ProductsGrid } from '@/components/customer/order/ProductsGrid';
 import { PaginationSection } from '@/components/customer/order/PaginationSection';
 import { OrderHeader } from '@/components/customer/order/OrderHeader';
+import { DELIVERY_FEE } from '@/constants/delivery';
 
 const NewOrder = () => {
   const { user } = useAuth();
@@ -219,7 +220,7 @@ const NewOrder = () => {
       }
 
       const subtotal = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-      const delivery_fee = 500;
+      const delivery_fee = DELIVERY_FEE;
       const total_amount = subtotal + delivery_fee;
 
       await createOrderWithAddress();
@@ -232,7 +233,7 @@ const NewOrder = () => {
   const handleActualCheckout = async () => {
     try {
       const subtotal = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-      const delivery_fee = 500;
+      const delivery_fee = DELIVERY_FEE;
       const total_amount = subtotal + delivery_fee;
 
       await createOrderWithAddress();
@@ -247,7 +248,7 @@ const NewOrder = () => {
     
     try {
       const subtotal = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-      const delivery_fee = 500;
+      const delivery_fee = DELIVERY_FEE;
       const total_amount = subtotal + delivery_fee;
 
       // Build full delivery address for database, supporting both simplified and full shapes

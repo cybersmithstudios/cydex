@@ -13,8 +13,10 @@ export interface PricingParams {
   includeGreenFee: boolean;
 }
 
+import { DELIVERY_FEE } from '@/constants/delivery';
+
 // Flat rate pricing configuration
-const FLAT_RATE = 500; // ₦500 per delivery
+const FLAT_RATE = DELIVERY_FEE; // ₦500 per delivery
 const STUDENT_DISCOUNT_PERCENT = 0.10; // 10% discount for students
 const GREEN_FEE = 20; // ₦20 optional green fee
 

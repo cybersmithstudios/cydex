@@ -22,6 +22,7 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover';
 import { cn } from '@/lib/utils';
+import { DELIVERY_FEE } from '@/constants/delivery';
 
 interface DeliverySchedulerProps {
   isOpen: boolean;
@@ -46,7 +47,7 @@ export const DeliveryScheduler: React.FC<DeliverySchedulerProps> = ({
   
   // Calculate delivery fees and total - Flat rate pricing
   const getDeliveryFee = () => {
-    return 500; // Flat rate of ₦500 for all delivery types
+    return DELIVERY_FEE; // Flat rate of ₦500 for all delivery types
   };
   
   const handleScheduleDelivery = () => {

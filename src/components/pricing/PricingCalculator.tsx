@@ -9,6 +9,7 @@ import { calculatePrice, formatNaira, PricingBreakdown, PricingParams } from '@/
 import { getStudentEligibility } from '@/services/studentVerificationService';
 import { useAuth } from '@/contexts/SupabaseAuthContext';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { DELIVERY_FEE } from '@/constants/delivery';
 
 interface PricingCalculatorProps {
   onPriceCalculated?: (breakdown: PricingBreakdown, params: PricingParams) => void;
@@ -73,14 +74,14 @@ export const PricingCalculator: React.FC<PricingCalculatorProps> = ({
           Delivery Price Calculator
         </CardTitle>
         <p className="text-sm text-gray-600">
-          Simple flat rate pricing: ₦500 per delivery
+          Simple flat rate pricing: ₦{DELIVERY_FEE} per delivery
         </p>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="p-4 bg-blue-50 border border-blue-200 rounded-md">
           <h3 className="font-semibold text-blue-900 mb-2">Flat Rate Pricing</h3>
           <p className="text-sm text-blue-700">
-            All deliveries are charged a flat rate of ₦500, regardless of distance or weight.
+            All deliveries are charged a flat rate of ₦{DELIVERY_FEE}, regardless of distance or weight.
             This ensures predictable pricing for all customers.
           </p>
         </div>

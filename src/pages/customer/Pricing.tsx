@@ -1,5 +1,6 @@
 // Phase 3: Pricing Page
 import React from 'react';
+import { DELIVERY_FEE } from '@/constants/delivery';
 import DashboardLayout from '@/components/layout/DashboardLayout';
 import { PricingCalculator } from '@/components/pricing/PricingCalculator';
 import { SubscriptionForm } from '@/components/pricing/SubscriptionForm';
@@ -15,7 +16,7 @@ const Pricing = () => {
         <div className="text-center space-y-4">
           <h1 className="text-lg sm:text-xl md:text-2xl font-bold">Pricing & Subscriptions</h1>
           <p className="text-sm sm:text-base text-gray-600 max-w-2xl mx-auto">
-            Simple flat rate pricing: ₦500 per delivery. 
+            Simple flat rate pricing: ₦{DELIVERY_FEE} per delivery. 
             Special discounts available for University of Ibadan students.
           </p>
         </div>
@@ -30,7 +31,7 @@ const Pricing = () => {
               </CardTitle>
             </CardHeader>
             <CardContent className="pt-1 sm:pt-2">
-              <div className="text-2xl sm:text-3xl font-bold">₦500</div>
+              <div className="text-2xl sm:text-3xl font-bold">₦{DELIVERY_FEE}</div>
               <p className="text-xs sm:text-sm text-gray-500">Per delivery</p>
             </CardContent>
           </Card>
@@ -101,7 +102,7 @@ const Pricing = () => {
               <div className="space-y-3">
                 <h4 className="font-semibold text-sm">Flat Rate Pricing</h4>
                 <ul className="space-y-1 text-gray-600">
-                  <li>• All deliveries: ₦500 flat rate</li>
+                  <li>• All deliveries: ₦{DELIVERY_FEE} flat rate</li>
                   <li>• No distance or weight calculations</li>
                   <li>• Predictable pricing for all customers</li>
                 </ul>
@@ -110,7 +111,7 @@ const Pricing = () => {
               <div className="space-y-3">
                 <h4 className="font-semibold text-sm">Available Discounts</h4>
                 <ul className="space-y-1 text-gray-600">
-                  <li>• UI students: 10% discount (₦450)</li>
+                  <li>• UI students: 10% discount (₦{DELIVERY_FEE * 0.9})</li>
                   <li>• Green fee: ₦20 (optional)</li>
                   <li>• Student subscription plans available</li>
                 </ul>
