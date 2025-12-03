@@ -276,7 +276,8 @@ const OrderDetailPage = () => {
     totalAmount: formatCurrency(order.total_amount),
     deliveryFee: formatCurrency(order.delivery_fee),
     discount: formatCurrency(0), // We don't have discount tracking yet
-    paymentMethod: order.payment_method || (order.payment_status === 'paid' ? 'Paystack' : 'Card'),
+    // Normalize payment method label - default to generic 'Card' instead of legacy 'Paystack'
+    paymentMethod: order.payment_method || 'Card',
     verificationCode: order.verification_code,
     orderNumber: order.order_number
   };

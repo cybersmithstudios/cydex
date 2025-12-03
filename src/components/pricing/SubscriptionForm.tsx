@@ -5,14 +5,12 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { CheckCircle, Users, Zap, Leaf } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { getStudentEligibility, createStudentSubscription } from '@/services/studentVerificationService';
+import { getStudentEligibility } from '@/services/studentVerificationService';
 import { useAuth } from '@/contexts/SupabaseAuthContext';
-import { usePaystackPayment } from 'react-paystack';
 import { toast } from 'sonner';
 
 export const SubscriptionForm: React.FC = () => {
   const { user } = useAuth();
-  const [loading, setLoading] = useState(false);
   const [studentInfo, setStudentInfo] = useState({
     isEligible: false,
     hasSubscription: false,
@@ -35,61 +33,6 @@ export const SubscriptionForm: React.FC = () => {
     
     loadStudentInfo();
   }, [user]);
-
-  const subscriptionPrice = 100000; // ₦1,000 in kobo
-
-  const createPaystackPaymentConfig = () => ({
-    reference: `sub_${new Date().getTime()}`,
-    email: user?.email || '',
-    amount: subscriptionPrice,
-    publicKey: 'pk_test_your_paystack_public_key', // Replace with actual key
-    text: 'Subscribe Now',
-    onSuccess: (reference: any) => {
-      console.log('Payment successful:', reference);
-      handleSubscriptionSuccess(reference.reference);
-    },
-    onClose: () => {
-      console.log('Payment closed');
-      toast.info('Payment cancelled');
-    },
-  });
-
-  const initializePayment = usePaystackPayment(createPaystackPaymentConfig());
-
-  const handleSubscriptionSuccess = async (paymentReference: string) => {
-    try {
-      setLoading(true);
-      const subscription = await createStudentSubscription(user!.id, paymentReference);
-      
-      if (subscription) {
-        toast.success('Subscription activated successfully!');
-        // Refresh student info
-        const updatedInfo = await getStudentEligibility(user!.email, user!.id);
-        setStudentInfo({
-          isEligible: updatedInfo.isEligibleForDiscount,
-          hasSubscription: updatedInfo.hasActiveSubscription,
-          subscription: updatedInfo.subscription,
-          eligibleForSubscription: updatedInfo.eligibleForSubscription
-        });
-      } else {
-        toast.error('Failed to activate subscription. Please contact support.');
-      }
-    } catch (error) {
-      console.error('Subscription error:', error);
-      toast.error('Failed to activate subscription. Please try again.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleSubscribe = () => {
-    if (!user) {
-      toast.error('Please log in to subscribe');
-      return;
-    }
-    
-    initializePayment({});
-  };
 
   if (!user) {
     return (
@@ -165,42 +108,24 @@ export const SubscriptionForm: React.FC = () => {
           </div>
         </div>
 
-        {/* Pricing */}
+        {/* Pricing (informational only for now) */}
         <div className="p-6 rounded-lg border bg-primary/5">
           <div className="text-center">
             <div className="text-3xl font-bold text-primary mb-2">₦1,000</div>
-            <div className="text-muted-foreground mb-4">per month</div>
+            <div className="text-muted-foreground mb-4">per month (coming soon)</div>
             <p className="text-sm text-muted-foreground">
-              Exclusive pricing for UI students. Save money on frequent deliveries!
+              Exclusive pricing for UI students. Subscription payments will be processed via Squad soon.
             </p>
           </div>
         </div>
 
-        {/* Action Button */}
-        {studentInfo.hasSubscription ? (
-          <Alert className="border-green-200 bg-green-50">
-            <CheckCircle className="h-4 w-4" />
-            <AlertDescription>
-              Your student subscription is active! Enjoy unlimited deliveries.
-            </AlertDescription>
-          </Alert>
-        ) : (
-          <Button 
-            onClick={handleSubscribe} 
-            disabled={loading}
-            className="w-full"
-            size="lg"
-          >
-            {loading ? 'Processing...' : 'Subscribe for ₦1,000/month'}
-          </Button>
-        )}
-
-        <div className="text-center">
-          <p className="text-xs text-muted-foreground">
-            Available only for University of Ibadan students. 
-            Payment processed securely via Paystack.
-          </p>
-        </div>
+        {/* Action / status */}
+        <Alert className="border-blue-200 bg-blue-50">
+          <CheckCircle className="h-4 w-4" />
+          <AlertDescription>
+            Student subscription payments are not yet live. This feature will be enabled with Squad in a future update.
+          </AlertDescription>
+        </Alert>
       </CardContent>
     </Card>
   );
