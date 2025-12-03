@@ -34,11 +34,18 @@ DELETE FROM public.orders;
 -- 2. DELETE ALL PRODUCTS AND RELATED DATA
 -- ===================================================================
 
--- Delete product images/reviews if they exist
-DELETE FROM public.product_images;
-DELETE FROM public.product_reviews;
+-- Delete products (only if tables exist)
+DO $$
+BEGIN
+  IF EXISTS (SELECT FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'product_images') THEN
+    DELETE FROM public.product_images;
+  END IF;
+  
+  IF EXISTS (SELECT FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'product_reviews') THEN
+    DELETE FROM public.product_reviews;
+  END IF;
+END $$;
 
--- Delete products
 DELETE FROM public.products;
 
 -- Delete categories if they're not system categories (optional - keeping structure)
@@ -122,11 +129,14 @@ WHERE profile_id IN (
   SELECT id FROM public.profiles WHERE role != 'ADMIN'
 );
 
--- Delete addresses
-DELETE FROM public.addresses
-WHERE user_id IN (
-  SELECT id FROM public.profiles WHERE role != 'ADMIN'
-);
+-- Delete addresses (if table exists)
+DO $$
+BEGIN
+  IF EXISTS (SELECT FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'addresses') THEN
+    DELETE FROM public.addresses
+    WHERE user_id IN (SELECT id FROM public.profiles WHERE role != 'ADMIN');
+  END IF;
+END $$;
 
 -- Delete student subscriptions
 DELETE FROM public.student_subscriptions
