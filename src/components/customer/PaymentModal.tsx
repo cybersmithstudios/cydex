@@ -12,7 +12,6 @@ import { useAuth } from '@/contexts/SupabaseAuthContext';
 import { toast } from 'sonner';
 import { squadPaymentService } from '@/services/squadPaymentService';
 import { Loader2 } from 'lucide-react';
-import { SQUAD_CONFIG } from '@/config/squad';
 import { useNavigate } from 'react-router-dom';
 
 interface CustomerDetails {
@@ -183,34 +182,6 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({
             </div>
           </div>
 
-          {/* Show Test Mode info only in non-production environments */}
-          {!SQUAD_CONFIG.IS_PRODUCTION && (
-            <div className="bg-blue-50 p-3 rounded-lg border border-blue-100">
-              <div className="flex items-start">
-                <div className="flex-shrink-0 mt-0.5">
-                  <svg className="h-5 w-5 text-blue-400" viewBox="0 0 20 20" fill="currentColor">
-                    <path 
-                      fillRule="evenodd" 
-                      d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h.01a1 1 0 100-2H10V9a1 1 0 00-1-1z" 
-                      clipRule="evenodd" 
-                    />
-                  </svg>
-                </div>
-                <div className="ml-3">
-                  <h3 className="text-sm font-medium text-blue-800">
-                    Test Mode
-                  </h3>
-                  <div className="mt-1 text-sm text-blue-700">
-                    <p>This is a test transaction. No real money will be charged.</p>
-                    <p className="mt-1 font-mono text-xs bg-blue-100 p-1 rounded">
-                      Use Squad test cards from dashboard or any valid test card
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-          
           <Button 
             className="w-full bg-primary hover:bg-primary/80 text-black font-semibold py-3"
             onClick={handlePayment}
