@@ -1,6 +1,6 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Leaf } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 import { CardTitle, CardDescription } from '@/components/ui/card';
 import { getOrderStatusBadge, getPaymentStatusBadge } from '@/utils/StatusUtils';
 import { useNavigate } from 'react-router-dom';
@@ -10,10 +10,9 @@ interface OrderDetailHeaderProps {
   vendor: string;
   status: string;
   paymentStatus: string;
-  carbonSaved: number;
 }
 
-const OrderDetailHeader = ({ id, vendor, status, paymentStatus, carbonSaved }: OrderDetailHeaderProps) => {
+const OrderDetailHeader = ({ id, vendor, status, paymentStatus }: OrderDetailHeaderProps) => {
   const navigate = useNavigate();
 
   return (
@@ -39,18 +38,9 @@ const OrderDetailHeader = ({ id, vendor, status, paymentStatus, carbonSaved }: O
           </CardDescription>
         </div>
         
-        <div className="flex flex-col items-start sm:items-end gap-2 w-full sm:w-auto">
-          <div className="flex flex-wrap gap-1 sm:gap-2">
-            {getOrderStatusBadge(status)}
-            {getPaymentStatusBadge(paymentStatus)}
-          </div>
-          
-          <div className="flex items-center text-xs sm:text-sm bg-green-50 text-green-700 px-2 py-1 rounded-md">
-            <Leaf className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
-            <span className="whitespace-nowrap">
-              {carbonSaved} kg CO₂ saved
-            </span>
-          </div>
+        <div className="flex flex-wrap gap-1 sm:gap-2 w-full sm:w-auto">
+          {getOrderStatusBadge(status)}
+          {getPaymentStatusBadge(paymentStatus)}
         </div>
       </div>
     </div>
