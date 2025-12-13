@@ -97,7 +97,7 @@ export const DeliveryScheduler: React.FC<DeliverySchedulerProps> = ({
           {/* Delivery Type */}
           <div>
             <h3 className="font-medium mb-3">Delivery Type</h3>
-            <RadioGroup value={deliveryType} onValueChange={setDeliveryType} className="grid grid-cols-3 gap-4">
+            <RadioGroup value={deliveryType} onValueChange={setDeliveryType} className="grid grid-cols-2 gap-4">
               <div>
                 <RadioGroupItem 
                   value="standard" 
@@ -128,23 +128,6 @@ export const DeliveryScheduler: React.FC<DeliverySchedulerProps> = ({
                   <Clock className="mb-2 h-6 w-6" />
                   <span className="font-medium">Express</span>
                   <span className="text-xs text-gray-500">30-45 min</span>
-                  <span className="font-medium mt-2">₦500</span>
-                </Label>
-              </div>
-              
-              <div>
-                <RadioGroupItem 
-                  value="eco" 
-                  id="eco" 
-                  className="peer sr-only" 
-                />
-                <Label
-                  htmlFor="eco"
-                  className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary"
-                >
-                  <Leaf className="mb-2 h-6 w-6 text-green-600" />
-                  <span className="font-medium">Eco-Friendly</span>
-                  <span className="text-xs text-gray-500">2-3 hours (bike/EV)</span>
                   <span className="font-medium mt-2">₦500</span>
                 </Label>
               </div>
