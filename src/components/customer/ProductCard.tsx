@@ -2,8 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Leaf, Star, Plus } from 'lucide-react';
+import { Star, Plus } from 'lucide-react';
 import { Product } from '@/hooks/useProducts';
 import { useVendorRatings } from '@/hooks/useVendorRatings';
 
@@ -35,12 +34,6 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, addToCart }) 
           alt={product.name} 
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
         />
-        {product.is_eco_friendly && (
-          <Badge className="absolute top-1 right-1 bg-green-500 flex items-center gap-0.5 px-1 py-0.5 text-xs shadow-sm">
-            <Leaf className="h-2.5 w-2.5" />
-            <span className="text-xs hidden xs:inline">Eco</span>
-          </Badge>
-        )}
       </div>
       
       <CardContent className="p-1.5 xs:p-2 sm:p-3 flex-1 flex flex-col">
