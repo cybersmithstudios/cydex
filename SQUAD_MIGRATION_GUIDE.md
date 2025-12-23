@@ -2,7 +2,7 @@
 
 This guide explains how to switch from Paystack to Squad payment gateway and what you need to get from Squad.
 
-## 📋 What You Need from Squad
+## 📋 What You Need from 
 
 ### 1. **Squad Account Setup**
 1. **Sign up for Squad**: Go to [https://squadco.com](https://squadco.com) and create an account
