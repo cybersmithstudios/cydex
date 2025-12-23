@@ -219,89 +219,88 @@ const ProductDetails = () => {
                   <p className="text-sm sm:text-base text-gray-600 leading-relaxed">{product.description}</p>
 
                   <div className="flex items-center gap-2 sm:gap-3">
-                      <Star className="h-4 w-4 sm:h-5 sm:w-5 text-yellow-400 fill-yellow-400 flex-shrink-0" />
-                      <div>
-                        <p className="text-xs sm:text-sm font-medium">Vendor Rating</p>
-                        <p className="text-xs text-gray-500">
-                          {displayRating.toFixed(1)} stars
-                          {vendorRating && vendorRating.total_ratings > 0 && (
-                            <span> • {vendorRating.total_ratings} reviews</span>
-                          )}
-                        </p>
-                      </div>
+                    <Star className="h-4 w-4 sm:h-5 sm:w-5 text-yellow-400 fill-yellow-400 flex-shrink-0" />
+                    <div>
+                      <p className="text-xs sm:text-sm font-medium">Vendor Rating</p>
+                      <p className="text-xs text-gray-500">
+                        {displayRating.toFixed(1)} stars
+                        {vendorRating && vendorRating.total_ratings > 0 && (
+                          <span> • {vendorRating.total_ratings} reviews</span>
+                        )}
+                      </p>
                     </div>
                   </div>
+                </div>
 
-                  {/* Show detailed ratings if available */}
-                  {vendorRating && vendorRating.total_ratings > 0 && (
-                    <div className="border-t pt-3 sm:pt-4">
-                      <h4 className="text-xs sm:text-sm font-medium mb-2">Detailed Ratings</h4>
-                      <div className="grid grid-cols-2 gap-3 sm:gap-4 text-xs">
-                        {vendorRating.average_delivery_rating > 0 && (
-                          <div className="flex items-center gap-2">
-                            <span>Delivery:</span>
-                            <div className="flex items-center">
-                              <Star className="h-3 w-3 text-yellow-400 fill-yellow-400 mr-1" />
-                              <span>{vendorRating.average_delivery_rating.toFixed(1)}</span>
-                            </div>
+                {/* Show detailed ratings if available */}
+                {vendorRating && vendorRating.total_ratings > 0 && (
+                  <div className="border-t pt-3 sm:pt-4">
+                    <h4 className="text-xs sm:text-sm font-medium mb-2">Detailed Ratings</h4>
+                    <div className="grid grid-cols-2 gap-3 sm:gap-4 text-xs">
+                      {vendorRating.average_delivery_rating > 0 && (
+                        <div className="flex items-center gap-2">
+                          <span>Delivery:</span>
+                          <div className="flex items-center">
+                            <Star className="h-3 w-3 text-yellow-400 fill-yellow-400 mr-1" />
+                            <span>{vendorRating.average_delivery_rating.toFixed(1)}</span>
                           </div>
-                        )}
-                        {vendorRating.average_product_quality_rating > 0 && (
-                          <div className="flex items-center gap-2">
-                            <span>Quality:</span>
-                            <div className="flex items-center">
-                              <Star className="h-3 w-3 text-yellow-400 fill-yellow-400 mr-1" />
-                              <span>{vendorRating.average_product_quality_rating.toFixed(1)}</span>
-                            </div>
+                        </div>
+                      )}
+                      {vendorRating.average_product_quality_rating > 0 && (
+                        <div className="flex items-center gap-2">
+                          <span>Quality:</span>
+                          <div className="flex items-center">
+                            <Star className="h-3 w-3 text-yellow-400 fill-yellow-400 mr-1" />
+                            <span>{vendorRating.average_product_quality_rating.toFixed(1)}</span>
                           </div>
-                        )}
-                      </div>
+                        </div>
+                      )}
                     </div>
-                  )}
+                  </div>
+                )}
 
-                  <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4 pt-2 border-t">
-                    <div className="flex items-center border rounded-md w-full sm:w-auto justify-between sm:justify-start">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          e.stopPropagation();
-                          setQuantity((prev) => Math.max(1, prev - 1));
-                        }}
-                        className="px-3 sm:px-4 h-10 sm:h-11 min-w-[44px] touch-manipulation"
-                        disabled={quantity <= 1}
-                      >
-                        <span className="text-lg sm:text-xl font-semibold">−</span>
-                      </Button>
-                      <span className="w-12 sm:w-16 text-center text-base sm:text-lg font-semibold select-none">{quantity}</span>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          e.stopPropagation();
-                          setQuantity((prev) => Math.min(product.stock_quantity, prev + 1));
-                        }}
-                        className="px-3 sm:px-4 h-10 sm:h-11 min-w-[44px] touch-manipulation"
-                        disabled={quantity >= product.stock_quantity}
-                      >
-                        <span className="text-lg sm:text-xl font-semibold">+</span>
-                      </Button>
-                    </div>
-                    <Button 
-                      className="flex-1 sm:flex-initial bg-primary hover:bg-primary/80 text-black h-10 sm:h-11 text-sm sm:text-base touch-manipulation"
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4 pt-2 border-t">
+                  <div className="flex items-center border rounded-md w-full sm:w-auto justify-between sm:justify-start">
+                    <Button
+                      variant="ghost"
+                      size="sm"
                       onClick={(e) => {
                         e.preventDefault();
                         e.stopPropagation();
-                        handleAddToCart();
+                        setQuantity((prev) => Math.max(1, prev - 1));
                       }}
+                      className="px-3 sm:px-4 h-10 sm:h-11 min-w-[44px] touch-manipulation"
+                      disabled={quantity <= 1}
                     >
-                      <ShoppingCart className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
-                      <span className="hidden xs:inline">Add to Cart</span>
-                      <span className="xs:hidden">Add</span>
+                      <span className="text-lg sm:text-xl font-semibold">−</span>
+                    </Button>
+                    <span className="w-12 sm:w-16 text-center text-base sm:text-lg font-semibold select-none">{quantity}</span>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        setQuantity((prev) => Math.min(product.stock_quantity, prev + 1));
+                      }}
+                      className="px-3 sm:px-4 h-10 sm:h-11 min-w-[44px] touch-manipulation"
+                      disabled={quantity >= product.stock_quantity}
+                    >
+                      <span className="text-lg sm:text-xl font-semibold">+</span>
                     </Button>
                   </div>
+                  <Button
+                    className="flex-1 sm:flex-initial bg-primary hover:bg-primary/80 text-black h-10 sm:h-11 text-sm sm:text-base touch-manipulation"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      handleAddToCart();
+                    }}
+                  >
+                    <ShoppingCart className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
+                    <span className="hidden xs:inline">Add to Cart</span>
+                    <span className="xs:hidden">Add</span>
+                  </Button>
                 </div>
               </CardContent>
             </Card>
