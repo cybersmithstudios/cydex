@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
-import { Truck, Box, Clock, Leaf, ChevronRight } from 'lucide-react';
+import { Truck, Box, Clock, ChevronRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useCustomerOrders } from '@/hooks/useCustomerOrders';
 import { formatDistanceToNow } from 'date-fns';
@@ -205,15 +205,11 @@ const CustomerDashboard = () => {
                             </div>
                           </div>
                           
-                          <div className="flex items-center justify-between mt-3 sm:mt-0 sm:ml-4">
-                            <div className="flex items-center text-xs sm:text-sm bg-green-50 text-green-700 px-2 py-1 rounded">
-                              <Leaf className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
-                              <span>{order.carbon_credits_earned || 0} kg CO₂ saved</span>
-                            </div>
+                          <div className="flex items-center justify-end mt-3 sm:mt-0 sm:ml-4">
                             <Button 
                               variant="ghost" 
                               size="sm" 
-                              className="p-1 h-auto ml-2 sm:ml-4"
+                              className="p-1 h-auto"
                               onClick={(e) => {
                                 e.stopPropagation();
                                 handleOrderClick(order.id);
@@ -289,15 +285,11 @@ const CustomerDashboard = () => {
                           </div>
                         </div>
                         
-                        <div className="flex items-center justify-between mt-3 sm:mt-0 sm:ml-4">
-                          <div className="flex items-center text-xs sm:text-sm bg-green-50 text-green-700 px-2 py-1 rounded">
-                            <Leaf className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
-                            <span>{order.carbon_credits_earned || 0} kg CO₂ saved</span>
-                          </div>
+                        <div className="flex items-center justify-end mt-3 sm:mt-0 sm:ml-4">
                           <Button 
                             variant="ghost" 
                             size="sm" 
-                            className="p-1 h-auto ml-2 sm:ml-4"
+                            className="p-1 h-auto"
                             onClick={(e) => {
                               e.stopPropagation();
                               handleOrderClick(order.id);

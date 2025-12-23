@@ -6,7 +6,7 @@ import DashboardLayout from '@/components/layout/DashboardLayout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { ArrowLeft, Leaf, ShoppingCart, Star, Store, Package, Scale } from 'lucide-react';
+import { ArrowLeft, ShoppingCart, Star, Store, Package } from 'lucide-react';
 import { toast } from 'sonner';
 import { Product } from '@/hooks/useProducts';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -180,13 +180,6 @@ const ProductDetails = () => {
                 alt={product.name}
                 className="w-full h-full object-cover"
               />
-              {product.is_eco_friendly && (
-                <Badge className="absolute top-2 right-2 sm:top-4 sm:right-4 bg-green-500 flex items-center gap-1 text-xs sm:text-sm px-2 py-1">
-                  <Leaf className="h-3 w-3 sm:h-3 sm:w-3" />
-                  <span className="hidden xs:inline">Eco-Friendly</span>
-                  <span className="xs:hidden">Eco</span>
-                </Badge>
-              )}
             </div>
           </Card>
 
@@ -225,15 +218,7 @@ const ProductDetails = () => {
 
                   <p className="text-sm sm:text-base text-gray-600 leading-relaxed">{product.description}</p>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-                    <div className="flex items-center gap-2 sm:gap-3">
-                      <Scale className="h-4 w-4 sm:h-5 sm:w-5 text-gray-400 flex-shrink-0" />
-                      <div>
-                        <p className="text-xs sm:text-sm font-medium">Carbon Impact</p>
-                        <p className="text-xs text-gray-500">{product.carbon_impact}kg CO2 saved</p>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-2 sm:gap-3">
+                  <div className="flex items-center gap-2 sm:gap-3">
                       <Star className="h-4 w-4 sm:h-5 sm:w-5 text-yellow-400 fill-yellow-400 flex-shrink-0" />
                       <div>
                         <p className="text-xs sm:text-sm font-medium">Vendor Rating</p>

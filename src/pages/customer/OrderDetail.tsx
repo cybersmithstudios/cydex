@@ -251,7 +251,6 @@ const OrderDetailPage = () => {
     vendor: order.vendor?.name || 'Vendor',
     status: order.status,
     paymentStatus: order.payment_status,
-    carbonSaved: order.carbon_credits_earned,
     trackingSteps: generateTrackingSteps(order),
     eta: calculateETA(order.status, order.delivery_type),
     deliveryAddress: deliveryAddressStr,
@@ -292,7 +291,6 @@ const OrderDetailPage = () => {
               vendor={transformedOrder.vendor}
               status={transformedOrder.status}
               paymentStatus={transformedOrder.paymentStatus}
-              carbonSaved={transformedOrder.carbonSaved}
             />
           </CardHeader>
           

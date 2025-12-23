@@ -286,8 +286,7 @@ const NewOrder = () => {
           delivery_address: fullDeliveryAddress,
           subtotal,
           delivery_fee,
-          total_amount,
-          carbon_credits_earned: cartItems.length
+          total_amount
         })
         .select()
         .single();
@@ -300,9 +299,7 @@ const NewOrder = () => {
         product_name: item.name,
         quantity: item.quantity,
         unit_price: item.price,
-        total_price: item.price * item.quantity,
-        is_eco_friendly: true,
-        carbon_impact: 1
+        total_price: item.price * item.quantity
       }));
 
       const { error: itemsError } = await supabase
