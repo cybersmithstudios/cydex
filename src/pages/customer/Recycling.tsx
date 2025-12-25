@@ -88,7 +88,7 @@ const RecyclingPage = () => {
               <div className="mb-1 sm:mb-2">
                 <span className="text-xl sm:text-2xl md:text-3xl font-bold">{Math.round((recyclingStats.totalRecycled / recyclingStats.monthlyGoal) * 100)}%</span>
               </div>
-              <Progress value={(recyclingStats.totalRecycled / recyclingStats.monthlyGoal) * 100} className="h-2 bg-gray-100" />
+              <Progress value={(recyclingStats.totalRecycled / recyclingStats.monthlyGoal) * 100} className="h-2 bg-muted" />
               <p className="text-xs sm:text-sm text-gray-500 mt-1 sm:mt-2">{recyclingStats.monthlyGoal - recyclingStats.totalRecycled} more items to goal</p>
             </CardContent>
           </Card>
@@ -127,7 +127,7 @@ const RecyclingPage = () => {
                       {recentRecycling.map((item) => (
                         <div 
                           key={item.id} 
-                          className="bg-white border rounded-lg p-3 hover:shadow-md transition-shadow"
+                          className="bg-card border-border border rounded-lg p-3 hover:shadow-md transition-shadow"
                         >
                           <div className="flex flex-col sm:flex-row justify-between">
                             <div className="flex items-start gap-3">
@@ -165,7 +165,7 @@ const RecyclingPage = () => {
                   
                   <TabsContent value="impact">
                     <div className="space-y-3 sm:space-y-4">
-                      <div className="bg-white border rounded-lg p-3 sm:p-4">
+                      <div className="bg-card border-border border rounded-lg p-3 sm:p-4">
                         <h3 className="font-medium mb-3 sm:mb-4 text-sm sm:text-base">Environmental Impact</h3>
                         <div className="space-y-3 sm:space-y-4">
                           <div>

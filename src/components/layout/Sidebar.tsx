@@ -115,13 +115,13 @@ const Sidebar: React.FC<SidebarProps> = ({
                 <img 
                   src="/lovable-uploads/525fd30a-476a-4e14-ae55-ec2b11d54013.png" 
                   alt="Cydex Logo" 
-                  className="h-8"
+                  className="h-8 dark:invert"
                 />
               ) : (
                 <img 
                   src="/og-tab.png" 
                   alt="Cydex Icon" 
-                  className="h-8 w-8"
+                  className="h-8 w-8 dark:invert"
                 />
               )}
             </Link>

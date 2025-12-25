@@ -39,7 +39,7 @@ export const VendorSelectionCard: React.FC<VendorSelectionCardProps> = ({
             <ChefHat className="h-12 w-12 text-primary/40" />
           </div>
         )}
-        <div className="absolute top-2 right-2 bg-white/90 backdrop-blur-sm rounded-full px-2 py-1 flex items-center gap-1">
+        <div className="absolute top-2 right-2 bg-card/90 backdrop-blur-sm rounded-full px-2 py-1 flex items-center gap-1">
           <Star className="h-3 w-3 text-yellow-500 fill-yellow-500" />
           <span className="text-xs font-medium">{displayRating.toFixed(1)}</span>
         </div>

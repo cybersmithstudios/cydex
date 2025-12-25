@@ -48,7 +48,7 @@ const CustomerDashboard = () => {
       case 'cancelled':
         return <Badge className="bg-red-500 text-xs">Cancelled</Badge>;
       case 'refunded':
-        return <Badge className="bg-gray-500 text-xs">Refunded</Badge>;
+        return <Badge className="bg-muted text-xs">Refunded</Badge>;
       default:
         return <Badge className="text-xs">Unknown</Badge>;
     }
@@ -71,14 +71,14 @@ const CustomerDashboard = () => {
     return (
       <DashboardLayout userRole="CUSTOMER">
         <div className="p-2 sm:p-4 md:p-6 max-w-full mx-auto space-y-3 sm:space-y-4 md:space-y-6">
-          <div className="animate-pulse space-y-4">
-            <div className="h-8 bg-gray-200 rounded w-1/4"></div>
+            <div className="animate-pulse space-y-4">
+            <div className="h-8 bg-muted rounded w-1/4"></div>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 md:gap-6">
               {[1, 2, 3].map((i) => (
-                <div key={i} className="h-32 bg-gray-200 rounded"></div>
+                <div key={i} className="h-32 bg-muted rounded"></div>
               ))}
             </div>
-            <div className="h-96 bg-gray-200 rounded"></div>
+            <div className="h-96 bg-muted rounded"></div>
           </div>
         </div>
       </DashboardLayout>
@@ -130,7 +130,7 @@ const CustomerDashboard = () => {
             </CardHeader>
             <CardContent className="pt-1 sm:pt-2">
               <div className="text-2xl sm:text-3xl font-bold">{orders.length}</div>
-              <p className="text-xs sm:text-sm text-gray-500">Orders placed</p>
+              <p className="text-xs sm:text-sm text-muted-foreground">Orders placed</p>
             </CardContent>
           </Card>
         </div>
@@ -271,7 +271,7 @@ const CustomerDashboard = () => {
                             {order.order_items && order.order_items.length > 0 && (
                               <div className="mt-2 flex -space-x-1 overflow-hidden">
                                 {order.order_items.slice(0, 3).map((item, index) => (
-                                  <div key={index} className="h-6 w-6 sm:h-8 sm:w-8 bg-gray-100 border border-white rounded flex items-center justify-center flex-shrink-0" title={item.product_name || 'Product'}>
+                                  <div key={index} className="h-6 w-6 sm:h-8 sm:w-8 bg-muted border border-background rounded flex items-center justify-center flex-shrink-0" title={item.product_name || 'Product'}>
                                     <Box className="h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground" />
                                     </div>
                                   ))}

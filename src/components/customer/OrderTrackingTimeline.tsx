@@ -28,14 +28,14 @@ const OrderTrackingTimeline = ({
 }: OrderTrackingTimelineProps) => {
   return (
     <div className="space-y-4">
-      <div className="border rounded-lg p-3 sm:p-4 bg-gray-50">
+      <div className="border border-border rounded-lg p-3 sm:p-4 bg-muted">
         <h3 className="font-medium mb-3 sm:mb-4 text-sm sm:text-base">Order Tracking</h3>
         <div className="relative">
-          <div className="absolute left-3 sm:left-4 top-0 bottom-0 w-0.5 sm:w-1 bg-gray-200"></div>
+          <div className="absolute left-3 sm:left-4 top-0 bottom-0 w-0.5 sm:w-1 bg-muted"></div>
           {steps.map((step, index) => (
             <div key={step.id} className="flex mb-4 sm:mb-6 relative">
               <div className={`h-6 w-6 sm:h-8 sm:w-8 rounded-full flex items-center justify-center z-10 flex-shrink-0 ${
-                step.completed ? 'bg-green-500 text-white' : 'bg-gray-200'
+                step.completed ? 'bg-green-500 text-white' : 'bg-muted'
               }`}>
                 {step.completed ? (
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 sm:h-5 sm:w-5" viewBox="0 0 20 20" fill="currentColor">

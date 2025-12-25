@@ -18,7 +18,7 @@ const DeliveryAgentCard = ({ rider }: DeliveryAgentCardProps) => {
     <div className="border rounded-lg p-3 sm:p-4">
       <h3 className="font-medium mb-3 text-sm sm:text-base">Delivery Agent</h3>
       <div className="flex items-center gap-3">
-        <div className="h-10 w-10 sm:h-12 sm:w-12 bg-gray-200 rounded-full flex items-center justify-center flex-shrink-0">
+        <div className="h-10 w-10 sm:h-12 sm:w-12 bg-muted rounded-full flex items-center justify-center flex-shrink-0">
           {rider.photo ? (
             <img src={rider.photo} alt={rider.name} className="h-10 w-10 sm:h-12 sm:w-12 rounded-full object-cover" />
           ) : (

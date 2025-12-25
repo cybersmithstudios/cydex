@@ -54,7 +54,7 @@ const ActiveOrderCard = ({ order }: ActiveOrderProps) => {
 
   return (
     <div 
-      className="bg-white border rounded-lg p-3 md:p-4 hover:shadow-md transition-shadow cursor-pointer"
+      className="bg-card border-border border rounded-lg p-3 md:p-4 hover:shadow-md transition-shadow cursor-pointer"
       onClick={() => navigate(`/customer/orders/${order.id}`)}
     >
       <div className="flex flex-col md:flex-row justify-between">

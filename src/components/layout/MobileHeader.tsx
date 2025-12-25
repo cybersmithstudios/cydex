@@ -72,7 +72,7 @@ const MobileHeader: React.FC<MobileHeaderProps> = ({
           <img 
             src="/lovable-uploads/525fd30a-476a-4e14-ae55-ec2b11d54013.png" 
             alt="Cydex Logo" 
-            className="h-6"
+            className="h-6 dark:invert"
           />
         </span>
       </div>

@@ -258,7 +258,7 @@ export const DeliveryScheduler: React.FC<DeliverySchedulerProps> = ({
           </div>
           
           {/* Order Summary */}
-          <div className="bg-gray-50 rounded-lg p-4">
+          <div className="bg-muted rounded-lg p-4">
             <h3 className="font-medium mb-3">Order Summary</h3>
             <div className="space-y-2">
               <div className="flex justify-between text-sm">

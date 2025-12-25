@@ -26,7 +26,7 @@ const OrderItemsList = ({ products }: OrderItemsListProps) => {
             .filter(product => product.quantity > 0)
             .map((product) => (
               <div key={product.id} className="p-3 sm:p-4 flex items-center gap-3 sm:gap-4">
-                <div className="h-12 w-12 sm:h-16 sm:w-16 bg-gray-100 rounded flex items-center justify-center flex-shrink-0">
+                <div className="h-12 w-12 sm:h-16 sm:w-16 bg-muted rounded flex items-center justify-center flex-shrink-0">
                   {product.image ? (
                     <img src={product.image} alt={product.name} className="h-10 w-10 sm:h-14 sm:w-14 object-cover rounded" />
                   ) : (

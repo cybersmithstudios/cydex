@@ -126,8 +126,8 @@ const ProfilePage = () => {
     return (
       <DashboardLayout userRole="CUSTOMER">
         <div className="p-2 sm:p-4 md:p-6 max-w-full mx-auto space-y-3 sm:space-y-4 md:space-y-6">
-          <div className="animate-pulse h-44 rounded bg-gray-100 mb-4"></div>
-          <div className="animate-pulse h-96 rounded bg-gray-100"></div>
+          <div className="animate-pulse h-44 rounded bg-muted mb-4"></div>
+          <div className="animate-pulse h-96 rounded bg-muted"></div>
         </div>
       </DashboardLayout>
     );

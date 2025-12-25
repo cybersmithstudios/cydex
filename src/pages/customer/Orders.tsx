@@ -41,7 +41,7 @@ const OrdersPage = () => {
       case 'delivered': return 'bg-green-100 text-green-800';
       case 'completed': return 'bg-green-100 text-green-800';
       case 'cancelled': return 'bg-red-100 text-red-800';
-      default: return 'bg-gray-100 text-gray-800';
+      default: return 'bg-muted text-foreground';
     }
   };
 
@@ -154,9 +154,9 @@ const OrdersPage = () => {
       <DashboardLayout userRole="CUSTOMER">
         <div className="p-2 sm:p-4 md:p-6 max-w-4xl mx-auto">
           <div className="animate-pulse space-y-3 sm:space-y-4">
-            <div className="h-6 sm:h-8 bg-gray-200 rounded w-1/4"></div>
+            <div className="h-6 sm:h-8 bg-muted rounded w-1/4"></div>
             {[1, 2, 3].map((i) => (
-              <div key={i} className="h-24 sm:h-32 bg-gray-200 rounded"></div>
+              <div key={i} className="h-24 sm:h-32 bg-muted rounded"></div>
             ))}
           </div>
         </div>
