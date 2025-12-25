@@ -363,7 +363,7 @@ const VendorRecyclingPage = () => {
 
 // Recycling History Card Component
 const RecyclingHistoryCard = ({ item }: { item: any }) => (
-  <div className="bg-white border rounded-lg p-3 sm:p-4 hover:shadow-md transition-shadow">
+  <div className="bg-card border-border border rounded-lg p-3 sm:p-4 hover:shadow-md transition-shadow">
     <div className="flex flex-col gap-3">
       <div className="flex items-start gap-3">
         <div className="p-1.5 sm:p-2 bg-primary-light rounded-full flex-shrink-0">
@@ -374,8 +374,8 @@ const RecyclingHistoryCard = ({ item }: { item: any }) => (
             <h3 className="font-medium text-sm sm:text-base capitalize">{item.material_type} Recycling</h3>
             <Badge variant="outline" className="text-xs w-fit">{item.weight_kg} kg</Badge>
           </div>
-          <div className="mt-1 text-xs sm:text-sm text-gray-600">{new Date(item.activity_date).toLocaleDateString()}</div>
-          <div className="mt-2 flex items-center text-xs sm:text-sm text-gray-600">
+          <div className="mt-1 text-xs sm:text-sm text-muted-foreground">{new Date(item.activity_date).toLocaleDateString()}</div>
+          <div className="mt-2 flex items-center text-xs sm:text-sm text-muted-foreground">
             <Truck className="h-3 w-3 sm:h-4 sm:w-4 mr-1 flex-shrink-0" />
             <span className="truncate">Partner: {item.partner_name}</span>
           </div>
@@ -394,7 +394,7 @@ const RecyclingHistoryCard = ({ item }: { item: any }) => (
 
 // Partner Card Component
 const PartnerCard = ({ partner }: { partner: any }) => (
-  <div className="bg-white border rounded-lg p-3 sm:p-4 hover:shadow-md transition-shadow">
+  <div className="bg-card border-border border rounded-lg p-3 sm:p-4 hover:shadow-md transition-shadow">
     <div className="flex flex-col sm:flex-row justify-between gap-3">
       <div className="flex items-start gap-3">
         <Avatar className="h-8 w-8 sm:h-10 sm:w-10 flex-shrink-0">
@@ -403,10 +403,10 @@ const PartnerCard = ({ partner }: { partner: any }) => (
         </Avatar>
         <div className="flex-1 min-w-0">
           <h3 className="font-medium text-sm sm:text-base">{partner.name}</h3>
-          <div className="mt-1 text-xs sm:text-sm text-gray-600">
+          <div className="mt-1 text-xs sm:text-sm text-muted-foreground">
             Materials: {partner.materials.join(', ')}
           </div>
-          <div className="mt-2 flex items-center text-xs sm:text-sm text-gray-600">
+          <div className="mt-2 flex items-center text-xs sm:text-sm text-muted-foreground">
             <Users className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
             <span>Rating: {partner.rating}</span>
           </div>

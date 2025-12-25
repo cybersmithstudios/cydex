@@ -22,11 +22,11 @@ const HowItWorks = () => {
   };
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-background">
       <Navbar />
       
       {/* Hero Section - Mobile Optimized */}
-      <section className="pt-28 sm:pt-24 md:pt-32 pb-12 sm:pb-16 bg-gradient-to-b from-white to-gray-50 relative overflow-hidden">
+      <section className="pt-28 sm:pt-24 md:pt-32 pb-12 sm:pb-16 bg-gradient-to-b from-background to-muted relative overflow-hidden">
         {/* Background Elements - Responsive */}
         <div className="absolute inset-0 z-0">
           <div className="absolute top-1/4 -right-20 w-72 sm:w-96 h-72 sm:h-96 bg-primary opacity-10 rounded-full filter blur-3xl animate-pulse-soft"></div>
@@ -59,7 +59,7 @@ const HowItWorks = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.2 }}
-              className="text-base sm:text-lg md:text-xl text-gray-600 mb-6 sm:mb-8 max-w-2xl mx-auto lg:mx-0"
+              className="text-base sm:text-lg md:text-xl text-muted-foreground mb-6 sm:mb-8 max-w-2xl mx-auto lg:mx-0"
             >
               Cydex helps you make a positive environmental impact while enjoying fast and cost-effective deliveries with benefits for customers, riders and vendors.
             </motion.p>
@@ -93,11 +93,11 @@ const HowItWorks = () => {
       </section>
       
       {/* Step-by-Step Process Sections - Mobile Optimized */}
-      <section id="how-it-works-section" className="py-12 sm:py-16 md:py-20 bg-white">
+      <section id="how-it-works-section" className="py-12 sm:py-16 md:py-20 bg-background">
         <div className="container mx-auto px-4 sm:px-6">
           <div className="text-center mb-12 sm:mb-16">
             <h2 className="text-2xl sm:text-3xl font-bold mb-3 sm:mb-4">How Cydex Works</h2>
-            <p className="text-sm sm:text-base text-gray-600 max-w-3xl mx-auto">
+            <p className="text-sm sm:text-base text-muted-foreground max-w-3xl mx-auto">
               Our platform connects eco-conscious customers, green delivery riders, and sustainable vendors - creating a complete ecosystem for zero-emission deliveries.
             </p>
           </div>
@@ -157,18 +157,18 @@ const HowItWorks = () => {
       </section>
       
       {/* Carbon Credit System - Mobile Optimized */}
-      <section className="py-12 sm:py-16 md:py-20 bg-gray-50">
+      <section className="py-12 sm:py-16 md:py-20 bg-muted">
         <div className="container mx-auto px-4 sm:px-6">
           <div className="text-center mb-12 sm:mb-16">
             <h2 className="text-2xl sm:text-3xl font-bold mb-3 sm:mb-4">Carbon Credit System Explained</h2>
-            <p className="text-sm sm:text-base text-gray-600 max-w-3xl mx-auto">
+            <p className="text-sm sm:text-base text-muted-foreground max-w-3xl mx-auto">
               Our innovative carbon credit system rewards eco-friendly choices and helps reduce carbon footprint.
             </p>
           </div>
           
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-12 items-center">
             <div>
-              <div className="bg-white rounded-xl p-6 sm:p-8 shadow-lg">
+              <div className="bg-card rounded-xl p-6 sm:p-8 shadow-lg">
                 <h3 className="text-xl sm:text-2xl font-bold mb-6">How Carbon Credits Work</h3>
                 
                 <div className="space-y-4 sm:space-y-6">
@@ -195,7 +195,7 @@ const HowItWorks = () => {
             
             <div className="glass p-3 sm:p-6 rounded-xl relative">
               <div className="hidden sm:block absolute -top-4 -right-4 bg-primary/20 w-full h-full rounded-xl transform rotate-3 z-0"></div>
-              <div className="relative z-10 bg-white p-3 sm:p-6 rounded-xl shadow-lg">
+              <div className="relative z-10 bg-card p-3 sm:p-6 rounded-xl shadow-lg">
                 <h3 className="text-lg sm:text-2xl font-bold mb-3 sm:mb-6">CO₂ Savings Calculator</h3>
                 
                 <div className="space-y-2 sm:space-y-4">
@@ -203,12 +203,12 @@ const HowItWorks = () => {
                   <SavingsRow label="5 km electric vehicle:" value="-950g CO₂" />
                   <SavingsRow label="10 delivery sustainable packaging:" value="-2kg CO₂" />
                   
-                  <div className="mt-3 sm:mt-6 pt-3 sm:pt-6 border-t border-gray-200">
+                  <div className="mt-3 sm:mt-6 pt-3 sm:pt-6 border-t border-border">
                     <div className="flex flex-col sm:flex-row justify-between items-center">
                       <div className="text-sm sm:text-lg font-medium">Monthly average savings:</div>
                       <div className="text-lg sm:text-2xl font-bold text-green-600">15kg CO₂</div>
                     </div>
-                    <p className="text-xs sm:text-sm text-gray-500 mt-1 sm:mt-2">Equivalent to planting 1 tree every month!</p>
+                    <p className="text-xs sm:text-sm text-muted-foreground mt-1 sm:mt-2">Equivalent to planting 1 tree every month!</p>
                   </div>
                 </div>
               </div>
@@ -223,7 +223,7 @@ const HowItWorks = () => {
           <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-4 sm:mb-6">
             Join Cydex & Make Your Deliveries Count
           </h2>
-          <p className="text-base sm:text-lg text-gray-600 max-w-3xl mx-auto mb-8 sm:mb-10">
+          <p className="text-base sm:text-lg text-muted-foreground max-w-3xl mx-auto mb-8 sm:mb-10">
             Start making a positive impact today by joining our growing network of eco-conscious users.
           </p>
           
@@ -264,10 +264,10 @@ const HowItWorks = () => {
 
 // Helper Components
 const StepCard = ({ number, title, description }: { number: string; title: string; description: string }) => (
-  <div className="bg-white rounded-xl p-5 sm:p-6 shadow-md border border-gray-100 hover:shadow-lg transition-shadow">
+  <div className="bg-card rounded-xl p-5 sm:p-6 shadow-md border border-border hover:shadow-lg transition-shadow">
     <div className="text-3xl sm:text-4xl font-bold text-primary/30 mb-3 sm:mb-4">{number}</div>
     <h4 className="text-lg sm:text-xl font-semibold mb-2">{title}</h4>
-    <p className="text-sm sm:text-base text-gray-600">{description}</p>
+    <p className="text-sm sm:text-base text-muted-foreground">{description}</p>
   </div>
 );
 
@@ -278,7 +278,7 @@ const CreditFeature = ({ icon, title, description }: { icon: React.ReactNode; ti
     </div>
     <div className="ml-3 sm:ml-4">
       <h4 className="text-base sm:text-lg font-semibold">{title}</h4>
-      <p className="text-sm sm:text-base text-gray-600">{description}</p>
+      <p className="text-sm sm:text-base text-muted-foreground">{description}</p>
     </div>
   </div>
 );

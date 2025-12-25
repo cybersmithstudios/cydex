@@ -645,7 +645,7 @@ const TransactionCard = ({
   getTransactionStatus,
   isMobile 
 }: any) => (
-  <div className="bg-white border rounded-lg p-3 sm:p-4 hover:shadow-md transition-shadow">
+  <div className="bg-card border-border border rounded-lg p-3 sm:p-4 hover:shadow-md transition-shadow">
     <div className="flex items-start justify-between gap-3 sm:gap-4">
       <div className="flex items-start gap-3">
         <div className={`p-1.5 sm:p-2 rounded-full ${

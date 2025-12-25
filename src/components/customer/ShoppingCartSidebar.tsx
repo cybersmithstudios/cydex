@@ -37,10 +37,10 @@ export const ShoppingCartSidebar: React.FC<ShoppingCartSidebarProps> = ({
   return (
     <div className="fixed inset-0 z-50 bg-black/50 flex justify-end">
       <div 
-        className="w-full max-w-md bg-white h-full shadow-xl flex flex-col animate-in slide-in-from-right"
+        className="w-full max-w-md bg-background h-full shadow-xl flex flex-col animate-in slide-in-from-right"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex items-center justify-between p-4 border-b">
+        <div className="flex items-center justify-between p-4 border-b border-border">
           <h2 className="font-semibold text-lg">Your Cart</h2>
           <Button variant="ghost" size="sm" onClick={onClose}>
             <X className="h-4 w-4" />
@@ -48,8 +48,8 @@ export const ShoppingCartSidebar: React.FC<ShoppingCartSidebarProps> = ({
         </div>
         
         {cartItems.length === 0 ? (
-          <div className="flex flex-col items-center justify-center flex-grow p-6 text-gray-500">
-            <ShoppingBag className="h-16 w-16 mb-4 text-gray-300" />
+          <div className="flex flex-col items-center justify-center flex-grow p-6 text-muted-foreground">
+            <ShoppingBag className="h-16 w-16 mb-4 text-muted-foreground/50" />
             <p className="mb-2">Your cart is empty</p>
             <Button variant="link" onClick={onClose}>Browse Products</Button>
           </div>
@@ -61,7 +61,7 @@ export const ShoppingCartSidebar: React.FC<ShoppingCartSidebarProps> = ({
                   <div key={item.id} className="flex items-center gap-3">
                     <div className="flex-grow">
                       <h3 className="font-medium line-clamp-1">{item.name}</h3>
-                      <p className="text-xs text-gray-500">{item.vendor_name}</p>
+                      <p className="text-xs text-muted-foreground">{item.vendor_name}</p>
                       <div className="flex items-center justify-between mt-1">
                         <span className="font-semibold">₦{item.price.toLocaleString()}</span>
                         

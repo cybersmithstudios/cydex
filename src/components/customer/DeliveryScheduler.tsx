@@ -83,10 +83,10 @@ export const DeliveryScheduler: React.FC<DeliverySchedulerProps> = ({
   return (
     <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
       <div 
-        className="w-full max-w-2xl bg-white rounded-lg shadow-xl flex flex-col max-h-[90vh] animate-in fade-in-0 zoom-in-95"
+        className="w-full max-w-2xl bg-background rounded-lg shadow-xl flex flex-col max-h-[90vh] animate-in fade-in-0 zoom-in-95"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex items-center justify-between p-4 border-b">
+        <div className="flex items-center justify-between p-4 border-b border-border">
           <h2 className="font-semibold text-lg">Schedule Delivery</h2>
           <Button variant="ghost" size="sm" onClick={onClose}>
             <X className="h-4 w-4" />

@@ -34,8 +34,8 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
 
   return (
     <div className="lg:hidden fixed inset-0 z-40">
-      <div className="absolute inset-0 bg-gray-600 bg-opacity-75" onClick={onClose}></div>
-      <div className="absolute inset-y-0 left-0 w-64 bg-white shadow-lg">
+      <div className="absolute inset-0 bg-black/50 dark:bg-black/70" onClick={onClose}></div>
+      <div className="absolute inset-y-0 left-0 w-64 bg-background shadow-lg">
         <div className="p-4 border-b flex items-center justify-between">
           <Link to="/" className="text-xl font-bold" onClick={onClose}>
             <span className="text-primary">Cy</span>dex
@@ -45,7 +45,7 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
           </button>
         </div>
         <div className="px-2 py-4">
-          <div className="mb-6 px-4 py-3 bg-gray-50 rounded-lg">
+          <div className="mb-6 px-4 py-3 bg-muted rounded-lg">
             <div className="flex items-center mb-2">
               <Avatar className="h-10 w-10">
                 <AvatarImage src={user?.avatar} alt={user?.name || 'User'} />
@@ -53,7 +53,7 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
               </Avatar>
               <div className="ml-3">
                 <p className="font-medium">{user?.name}</p>
-                <p className="text-xs text-gray-500">{userRoleTitle}</p>
+                <p className="text-xs text-muted-foreground">{userRoleTitle}</p>
               </div>
             </div>
             <Button 
@@ -72,7 +72,7 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
                 <li key={link.href}>
                   <Link
                     to={link.href}
-                    className="flex items-center py-2 px-3 rounded-md transition-colors text-gray-700 hover:bg-gray-100"
+                    className="flex items-center py-2 px-3 rounded-md transition-colors text-foreground hover:bg-muted"
                     onClick={onClose}
                   >
                     <link.icon className="h-5 w-5" />

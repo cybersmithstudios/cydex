@@ -48,7 +48,7 @@ const Feature = ({ icon, title, description, delay }: FeatureProps) => {
         <div className="text-primary">{React.cloneElement(icon as React.ReactElement, { size: 24 })}</div>
       </div>
       <h3 className="text-lg md:text-xl font-semibold mb-1.5 md:mb-2">{title}</h3>
-      <p className="text-sm md:text-base text-gray-600">{description}</p>
+      <p className="text-sm md:text-base text-muted-foreground">{description}</p>
     </div>
   );
 };
@@ -112,7 +112,7 @@ const FeaturesSection = () => {
   ];
 
   return (
-    <section id="features" className="py-12 md:py-24 bg-white relative overflow-hidden">
+    <section id="features" className="py-12 md:py-24 bg-background relative overflow-hidden">
       <div 
         ref={sectionRef}
         className="container mx-auto px-4 md:px-6"
@@ -123,7 +123,7 @@ const FeaturesSection = () => {
           <h2 className="text-2xl md:text-4xl font-bold mb-3 md:mb-4">
             Revolutionizing <span className="text-primary">Green Logistics</span>
           </h2>
-          <p className="text-sm md:text-base text-gray-600 max-w-2xl mx-auto">
+          <p className="text-sm md:text-base text-muted-foreground max-w-2xl mx-auto">
             Our innovative features combine cutting-edge technology with 
             environmental consciousness to deliver a superior, sustainable service.
           </p>

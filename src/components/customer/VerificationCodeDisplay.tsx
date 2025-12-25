@@ -67,7 +67,7 @@ export const VerificationCodeDisplay: React.FC<VerificationCodeDisplayProps> = (
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="text-center">
-          <div className="inline-flex items-center justify-center w-32 h-16 bg-white rounded-lg border-2 border-primary/20 mb-3">
+          <div className="inline-flex items-center justify-center w-32 h-16 bg-card rounded-lg border-2 border-primary/20 mb-3">
             <span className="text-3xl font-bold text-primary tracking-widest">
               {code}
             </span>

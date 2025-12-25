@@ -30,7 +30,7 @@ export const AvailableOrdersList: React.FC<AvailableOrdersListProps> = ({
             </div>
           ) : (
             availableDeliveries.slice(0, 5).map((order) => (
-              <div key={order.id} className="bg-white border rounded-lg p-3 sm:p-4 hover:shadow-md transition-shadow">
+              <div key={order.id} className="bg-card border-border border rounded-lg p-3 sm:p-4 hover:shadow-md transition-shadow">
                 <div className="flex flex-col sm:flex-row justify-between">
                   <div className="flex items-start space-x-3 sm:space-x-4">
                     <div className="p-1.5 sm:p-2 bg-blue-100 rounded-full flex-shrink-0">

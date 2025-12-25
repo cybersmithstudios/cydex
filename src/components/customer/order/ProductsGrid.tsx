@@ -76,8 +76,8 @@ export const ProductsGrid: React.FC<ProductsGridProps> = ({
           ))}
         </div>
       ) : (
-        <div className="text-center py-8 bg-white rounded-lg border">
-          <p className="text-gray-500 text-sm mb-2">No products found</p>
+        <div className="text-center py-8 bg-card rounded-lg border border-border">
+          <p className="text-muted-foreground text-sm mb-2">No products found</p>
           <Button 
             variant="link" 
             size="sm"

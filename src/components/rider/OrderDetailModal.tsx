@@ -155,36 +155,36 @@ export const OrderDetailModal: React.FC<OrderDetailModalProps> = ({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-3">
               <div className="flex items-center gap-2">
-                <Store className="h-4 w-4 text-gray-500" />
+                <Store className="h-4 w-4 text-muted-foreground" />
                 <div>
                   <p className="font-medium">Pickup Location</p>
-                  <p className="text-sm text-gray-600">{order.vendor_name}</p>
+                  <p className="text-sm text-muted-foreground">{order.vendor_name}</p>
                 </div>
               </div>
               
               <div className="flex items-center gap-2">
-                <User className="h-4 w-4 text-gray-500" />
+                <User className="h-4 w-4 text-muted-foreground" />
                 <div>
                   <p className="font-medium">Delivery To</p>
-                  <p className="text-sm text-gray-600">{resolvedName}</p>
+                  <p className="text-sm text-muted-foreground">{resolvedName}</p>
                 </div>
               </div>
             </div>
             
             <div className="space-y-3">
               <div className="flex items-center gap-2">
-                <Navigation className="h-4 w-4 text-gray-500" />
+                <Navigation className="h-4 w-4 text-muted-foreground" />
                 <div>
                   <p className="font-medium">Distance</p>
-                  <p className="text-sm text-gray-600">{Number(order.actual_distance || 1.5).toFixed(1)} km</p>
+                  <p className="text-sm text-muted-foreground">{Number(order.actual_distance || 1.5).toFixed(1)} km</p>
                 </div>
               </div>
               
               <div className="flex items-center gap-2">
-                <Clock className="h-4 w-4 text-gray-500" />
+                <Clock className="h-4 w-4 text-muted-foreground" />
                 <div>
                   <p className="font-medium">Estimated Delivery</p>
-                  <p className="text-sm text-gray-600">
+                  <p className="text-sm text-muted-foreground">
                     {new Date(order.estimated_delivery_time).toLocaleTimeString([], {
                       hour: '2-digit',
                       minute: '2-digit'
@@ -203,28 +203,28 @@ export const OrderDetailModal: React.FC<OrderDetailModalProps> = ({
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <div className="flex items-center gap-2">
-                  <User className="h-4 w-4 text-gray-500" />
+                  <User className="h-4 w-4 text-muted-foreground" />
                   <div>
                     <p className="text-sm font-medium">Name</p>
-                    <p className="text-sm text-gray-600">{resolvedName || 'Customer Name Not Available'}</p>
+                    <p className="text-sm text-muted-foreground">{resolvedName || 'Customer Name Not Available'}</p>
                   </div>
                 </div>
                 
                 <div className="flex items-center gap-2">
-                  <Mail className="h-4 w-4 text-gray-500" />
+                  <Mail className="h-4 w-4 text-muted-foreground" />
                   <div>
                     <p className="text-sm font-medium">Email</p>
-                    <p className="text-sm text-gray-600">{resolvedEmail || 'Email Not Available'}</p>
+                    <p className="text-sm text-muted-foreground">{resolvedEmail || 'Email Not Available'}</p>
                   </div>
                 </div>
               </div>
               
               <div className="space-y-2">
                 <div className="flex items-center gap-2">
-                  <Phone className="h-4 w-4 text-gray-500" />
+                  <Phone className="h-4 w-4 text-muted-foreground" />
                   <div>
                     <p className="text-sm font-medium">Phone</p>
-                    <p className="text-sm text-gray-600">{customerPhone || 'Phone Not Available'}</p>
+                    <p className="text-sm text-muted-foreground">{customerPhone || 'Phone Not Available'}</p>
                   </div>
                 </div>
               </div>
@@ -237,10 +237,10 @@ export const OrderDetailModal: React.FC<OrderDetailModalProps> = ({
           <div className="space-y-3">
             <h3 className="font-semibold text-lg">Delivery Address</h3>
             <div className="flex items-start gap-2">
-              <MapPin className="h-4 w-4 text-gray-500 mt-0.5" />
+              <MapPin className="h-4 w-4 text-muted-foreground mt-0.5" />
               <div>
                 <p className="text-sm font-medium">Address</p>
-                <p className="text-sm text-gray-600">{formatAddress(order.delivery_address)}</p>
+                <p className="text-sm text-muted-foreground">{formatAddress(order.delivery_address)}</p>
               </div>
             </div>
           </div>
@@ -253,13 +253,13 @@ export const OrderDetailModal: React.FC<OrderDetailModalProps> = ({
             <div className="space-y-2">
               {resolvedItems && resolvedItems.length > 0 ? (
                 resolvedItems.map((item: any, index: number) => (
-                  <div key={index} className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                  <div key={index} className="flex justify-between items-center p-3 bg-muted rounded-lg">
                     <div className="flex-1">
                       <p className="font-medium text-sm">{item.product_name || 'Unknown Item'}</p>
                       {item.product_description && (
-                        <p className="text-xs text-gray-600">{item.product_description}</p>
+                        <p className="text-xs text-muted-foreground">{item.product_description}</p>
                       )}
-                      <p className="text-xs text-gray-500">
+                      <p className="text-xs text-muted-foreground">
                         Qty: {item.quantity || 1} × ₦{(item.unit_price || 0).toLocaleString()}
                       </p>
                     </div>
@@ -269,7 +269,7 @@ export const OrderDetailModal: React.FC<OrderDetailModalProps> = ({
                   </div>
                 ))
               ) : (
-                <div className="text-center py-4 text-gray-500">
+                <div className="text-center py-4 text-muted-foreground">
                   <Package className="h-8 w-8 mx-auto mb-2 opacity-50" />
                   <p className="text-sm">No items available</p>
                 </div>

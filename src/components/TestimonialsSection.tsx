@@ -143,7 +143,7 @@ const TestimonialsSection = () => {
           <h2 className="text-2xl md:text-4xl font-bold mb-3 md:mb-4">
             What Our <span className="text-primary">Clients Say</span>
           </h2>
-          <p className="text-sm md:text-base text-gray-600 max-w-2xl mx-auto">
+          <p className="text-sm md:text-base text-muted-foreground max-w-2xl mx-auto">
             Don't just take our word for it – hear from businesses that have 
             transformed their logistics with our sustainable solutions.
           </p>
@@ -184,13 +184,13 @@ const TestimonialsSection = () => {
                       ))}
                     </div>
                     
-                    <blockquote className="text-base md:text-lg italic text-gray-700 mb-3 md:mb-4">
+                    <blockquote className="text-base md:text-lg italic text-foreground mb-3 md:mb-4">
                       "{testimonial.quote}"
                     </blockquote>
                     
                     <div>
                       <p className="font-semibold text-sm md:text-base">{testimonial.author}</p>
-                      <p className="text-gray-500 text-xs md:text-sm">
+                      <p className="text-muted-foreground text-xs md:text-sm">
                         {testimonial.role} • {testimonial.location}
                       </p>
                     </div>
@@ -215,7 +215,7 @@ const TestimonialsSection = () => {
                 className={`w-2 h-2 md:w-3 md:h-3 rounded-full transition-all duration-300 ${
                   index === current 
                     ? "bg-primary w-4 md:w-6" 
-                    : "bg-gray-300 hover:bg-gray-400"
+                    : "bg-muted hover:bg-muted/80"
                 }`}
                 aria-label={`Go to testimonial ${index + 1}`}
               />
@@ -224,7 +224,7 @@ const TestimonialsSection = () => {
 
           <button
             onClick={goToPrev}
-            className="absolute top-1/2 -translate-y-1/2 -left-3 md:-left-5 bg-white h-8 w-8 md:h-10 md:w-10 rounded-full shadow-lg flex items-center justify-center hover:bg-gray-50 transition-colors z-10"
+            className="absolute top-1/2 -translate-y-1/2 -left-3 md:-left-5 bg-card h-8 w-8 md:h-10 md:w-10 rounded-full shadow-lg flex items-center justify-center hover:bg-muted transition-colors z-10"
             aria-label="Previous testimonial"
           >
             <ChevronLeft size={18} />

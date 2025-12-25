@@ -114,7 +114,7 @@ export const CurrentDeliveryCard: React.FC<CurrentDeliveryCardProps> = ({
                     onVerificationFailure={handleVerificationFailure}
                   />
                 ) : (
-                  <div className="bg-white border rounded-lg p-3 sm:p-4">
+                  <div className="bg-card border-border border rounded-lg p-3 sm:p-4">
                     <div className="flex flex-col space-y-3">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">

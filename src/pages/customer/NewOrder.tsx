@@ -415,10 +415,10 @@ const NewOrder = () => {
               <ArrowLeft className="h-4 w-4" />
               Back to Vendors
             </Button>
-            <div className="border-l h-6 border-gray-200"></div>
+            <div className="border-l h-6 border-border"></div>
             <div>
               <h1 className="text-xl font-bold">{selectedVendorName}</h1>
-              <p className="text-sm text-gray-600">Browse menu and add items to cart</p>
+              <p className="text-sm text-muted-foreground">Browse menu and add items to cart</p>
             </div>
           </div>
           

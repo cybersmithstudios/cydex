@@ -99,7 +99,7 @@ const Sidebar: React.FC<SidebarProps> = ({
     <aside 
       ref={sidebarRef}
       className={cn(
-        "fixed inset-y-0 left-0 bg-white shadow-md z-40 overflow-hidden transition-all duration-300 ease-in-out",
+        "fixed inset-y-0 left-0 bg-background shadow-md z-40 overflow-hidden transition-all duration-300 ease-in-out",
         (isSidebarOpen || isHovering) ? "w-64" : "w-20",
         "hidden lg:block"
       )}
@@ -127,7 +127,7 @@ const Sidebar: React.FC<SidebarProps> = ({
             </Link>
             <button
               onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-              className={cn("p-1 rounded-md hover:bg-gray-100", !(isSidebarOpen || isHovering) && "hidden")}
+              className={cn("p-1 rounded-md hover:bg-muted", !(isSidebarOpen || isHovering) && "hidden")}
             >
               <ChevronDown className={cn("h-5 w-5 transform transition-transform", isSidebarOpen ? "rotate-90" : "rotate-0")} />
             </button>
@@ -146,8 +146,8 @@ const Sidebar: React.FC<SidebarProps> = ({
                       className={cn(
                         "flex items-center py-2 px-3 rounded-md transition-colors",
                         isActive 
-                          ? "bg-primary-light text-gray-900" 
-                          : "text-gray-700 hover:bg-gray-100",
+                          ? "bg-primary-light text-foreground" 
+                          : "text-foreground hover:bg-muted",
                         !(isSidebarOpen || isHovering) && "justify-center"
                       )}
                     >
@@ -170,14 +170,14 @@ const Sidebar: React.FC<SidebarProps> = ({
                 <AvatarFallback>{user?.name?.[0] || 'U'}</AvatarFallback>
               </Avatar>
               <div className="ml-3 flex-1 min-w-0">
-                <p className="text-sm font-medium text-gray-900 truncate">{user?.name}</p>
-                <p className="text-xs text-gray-500 truncate">{getRoleTitle()}</p>
+                <p className="text-sm font-medium text-foreground truncate">{user?.name}</p>
+                <p className="text-xs text-muted-foreground truncate">{getRoleTitle()}</p>
               </div>
               <button 
                 onClick={onLogoutClick}
-                className="p-1 rounded-full hover:bg-gray-100"
+                className="p-1 rounded-full hover:bg-muted"
               >
-                <LogOut className="h-4 w-4 text-gray-500" />
+                <LogOut className="h-4 w-4 text-muted-foreground" />
               </button>
             </div>
           ) : (

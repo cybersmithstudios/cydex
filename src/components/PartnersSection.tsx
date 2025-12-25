@@ -56,7 +56,7 @@ const PartnersSection = () => {
     <section 
       id="partners" 
       ref={sectionRef} 
-      className="py-12 md:py-24 bg-white"
+      className="py-12 md:py-24 bg-background"
     >
       <div className="container mx-auto px-4 md:px-6">
         <div className={`text-center mb-10 md:mb-16 transform transition-all duration-700 ${
@@ -65,7 +65,7 @@ const PartnersSection = () => {
           <h2 className="text-2xl md:text-4xl font-bold mb-3 md:mb-4">
             Our <span className="text-primary">Green Partners</span>
           </h2>
-          <p className="text-sm md:text-base text-gray-600 max-w-2xl mx-auto">
+          <p className="text-sm md:text-base text-muted-foreground max-w-2xl mx-auto">
             We collaborate with leading sustainable businesses and organizations 
             to create a more environmentally responsible delivery ecosystem.
           </p>
@@ -82,7 +82,7 @@ const PartnersSection = () => {
               }`}
               style={{ transitionDelay: `${index * 100}ms` }}
             >
-              <div className="p-3 md:p-4 rounded-lg md:rounded-xl bg-gray-50 hover:bg-gray-100 transition-all duration-300 w-full h-24 md:h-32 flex items-center justify-center hover:shadow-md">
+              <div className="p-3 md:p-4 rounded-lg md:rounded-xl bg-muted hover:bg-muted/80 transition-all duration-300 w-full h-24 md:h-32 flex items-center justify-center hover:shadow-md">
                 <img
                   src={partner.logo}
                   alt={partner.name}

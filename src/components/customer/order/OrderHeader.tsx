@@ -20,7 +20,7 @@ export const OrderHeader: React.FC<OrderHeaderProps> = ({
     <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-2 sm:mb-4">
       <div className="flex-1">
         <h1 className="text-base sm:text-xl md:text-2xl font-bold">New Order</h1>
-        <p className="text-xs sm:text-sm text-gray-600 hidden sm:block">Browse eco-friendly products</p>
+        <p className="text-xs sm:text-sm text-muted-foreground hidden sm:block">Browse eco-friendly products</p>
       </div>
       
       <div className="flex items-center gap-2 w-full sm:w-auto">

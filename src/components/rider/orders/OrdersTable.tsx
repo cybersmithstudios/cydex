@@ -71,13 +71,13 @@ export const OrdersTable: React.FC<OrdersTableProps> = ({
   }
 
   return (
-    <div className="overflow-hidden rounded-lg border border-gray-200 bg-white">
+    <div className="overflow-hidden rounded-lg border border-border bg-card">
       <div className="overflow-x-auto">
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
+        <table className="min-w-full divide-y divide-border">
+          <thead className="bg-muted">
             <tr>
               <th 
-                className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
                 scope="col"
               >
                 Order Details
@@ -108,13 +108,13 @@ export const OrdersTable: React.FC<OrdersTableProps> = ({
               </th>
             </tr>
           </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
+          <tbody className="bg-card divide-y divide-border">
             {orders.map((order) => (
-              <tr key={order.id} className="hover:bg-gray-50 transition-colors">
+              <tr key={order.id} className="hover:bg-muted transition-colors">
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div className="flex items-start space-x-3">
                     <div className="flex-shrink-0">
-                      <Package className="h-5 w-5 text-gray-400" />
+                      <Package className="h-5 w-5 text-muted-foreground" />
                     </div>
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center space-x-2">

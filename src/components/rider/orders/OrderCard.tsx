@@ -24,7 +24,7 @@ export const OrderCard: React.FC<OrderCardProps> = ({
 
   return (
     <>
-      <div className="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition-all duration-200 hover:border-primary/30">
+      <div className="bg-card border-border border rounded-lg p-4 hover:shadow-md transition-all duration-200 hover:border-primary/30">
         {/* Header */}
         <div className="flex items-start justify-between mb-3">
           <div className="flex items-start space-x-3 flex-1 min-w-0">

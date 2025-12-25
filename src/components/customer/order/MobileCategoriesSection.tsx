@@ -20,10 +20,10 @@ export const MobileCategoriesSection: React.FC<MobileCategoriesSectionProps> = (
   categories
 }) => {
   return (
-    <div className="lg:hidden bg-white rounded-lg shadow-sm border overflow-hidden">
+    <div className="lg:hidden bg-card rounded-lg shadow-sm border-border border overflow-hidden">
       <button
         onClick={() => setIsCategoriesExpanded(!isCategoriesExpanded)}
-        className="w-full flex items-center justify-between p-2 sm:p-3 hover:bg-gray-50 transition-colors"
+        className="w-full flex items-center justify-between p-2 sm:p-3 hover:bg-muted transition-colors"
       >
         <div className="flex items-center gap-2">
           <span className="text-xs sm:text-sm font-medium">Categories</span>
@@ -34,9 +34,9 @@ export const MobileCategoriesSection: React.FC<MobileCategoriesSectionProps> = (
           )}
         </div>
         {isCategoriesExpanded ? (
-          <ChevronUp className="h-4 w-4 text-gray-500" />
+          <ChevronUp className="h-4 w-4 text-muted-foreground" />
         ) : (
-          <ChevronDown className="h-4 w-4 text-gray-500" />
+          <ChevronDown className="h-4 w-4 text-muted-foreground" />
         )}
       </button>
       

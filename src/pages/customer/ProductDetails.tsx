@@ -130,7 +130,7 @@ const ProductDetails = () => {
       <DashboardLayout userRole="CUSTOMER">
         <div className="p-3 sm:p-4 md:p-6 max-w-5xl mx-auto text-center">
           <h2 className="text-lg sm:text-xl md:text-2xl font-bold mb-2 sm:mb-3">Product Not Found</h2>
-          <p className="text-sm sm:text-base text-gray-600 mb-4 sm:mb-6 px-4">The product you're looking for doesn't exist or has been removed.</p>
+          <p className="text-sm sm:text-base text-muted-foreground mb-4 sm:mb-6 px-4">The product you're looking for doesn't exist or has been removed.</p>
           <Button onClick={() => navigate('/customer/new-order')} className="text-sm sm:text-base">
             <ArrowLeft className="mr-2 h-4 w-4" />
             Back to Products
@@ -189,7 +189,7 @@ const ProductDetails = () => {
               <CardHeader className="pb-3 sm:pb-6">
                 <div className="space-y-2 sm:space-y-3">
                   <CardTitle className="text-xl sm:text-2xl md:text-3xl font-bold leading-tight">{product.name}</CardTitle>
-                  <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-2 text-xs sm:text-sm text-gray-600">
+                  <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-2 text-xs sm:text-sm text-muted-foreground">
                     <div className="flex items-center gap-1 sm:gap-2">
                       <Store className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
                       <span className="truncate">{product.vendor?.name || 'Unknown Vendor'}</span>
@@ -199,7 +199,7 @@ const ProductDetails = () => {
                       <span className="whitespace-nowrap">
                         {displayRating.toFixed(1)}
                         {vendorRating && vendorRating.total_ratings > 0 && (
-                          <span className="text-gray-400 ml-1">({vendorRating.total_ratings})</span>
+                          <span className="text-muted-foreground ml-1">({vendorRating.total_ratings})</span>
                         )}
                       </span>
                     </div>
@@ -216,7 +216,7 @@ const ProductDetails = () => {
                     </Badge>
                   </div>
 
-                  <p className="text-sm sm:text-base text-gray-600 leading-relaxed">{product.description}</p>
+                  <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">{product.description}</p>
 
                   <div className="flex items-center gap-2 sm:gap-3">
                     <Star className="h-4 w-4 sm:h-5 sm:w-5 text-yellow-400 fill-yellow-400 flex-shrink-0" />

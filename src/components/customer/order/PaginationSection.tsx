@@ -48,7 +48,7 @@ export const PaginationSection: React.FC<PaginationSectionProps> = ({
         })}
         
         {totalPages > 5 && (
-          <span className="text-xs text-gray-500 px-2">
+          <span className="text-xs text-muted-foreground px-2">
             {currentPage} of {totalPages}
           </span>
         )}

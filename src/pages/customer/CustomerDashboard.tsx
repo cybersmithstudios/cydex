@@ -91,7 +91,7 @@ const CustomerDashboard = () => {
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4">
           <div>
             <h1 className="text-lg sm:text-xl md:text-2xl font-bold">Welcome, {user?.name || user?.email?.split('@')[0] || 'Customer'}</h1>
-            <p className="text-sm sm:text-base text-gray-600">
+            <p className="text-sm sm:text-base text-muted-foreground">
               Track your deliveries and eco-impact
             </p>
           </div>
@@ -110,7 +110,7 @@ const CustomerDashboard = () => {
             </CardHeader>
             <CardContent className="pt-1 sm:pt-2">
               <div className="text-2xl sm:text-3xl font-bold">{activeOrders.length}</div>
-              <p className="text-xs sm:text-sm text-gray-500">Packages on the way</p>
+              <p className="text-xs sm:text-sm text-muted-foreground">Packages on the way</p>
             </CardContent>
           </Card>
           
@@ -120,7 +120,7 @@ const CustomerDashboard = () => {
             </CardHeader>
             <CardContent className="pt-1 sm:pt-2">
               <div className="text-2xl sm:text-3xl font-bold">{totalCarbonSaved.toFixed(1)} kg</div>
-              <p className="text-xs sm:text-sm text-gray-500">CO₂ reduced this month</p>
+              <p className="text-xs sm:text-sm text-muted-foreground">CO₂ reduced this month</p>
             </CardContent>
           </Card>
 
@@ -153,7 +153,7 @@ const CustomerDashboard = () => {
                     {activeOrders.map((order) => (
                       <div 
                         key={order.id} 
-                        className="bg-white border rounded-lg p-3 sm:p-4 hover:shadow-md transition-shadow cursor-pointer" 
+                        className="bg-card border-border border rounded-lg p-3 sm:p-4 hover:shadow-md transition-shadow cursor-pointer" 
                         onClick={() => handleOrderClick(order.id)}
                       >
                         <div className="flex flex-col sm:flex-row justify-between">
@@ -170,33 +170,33 @@ const CustomerDashboard = () => {
                                 <h3 className="font-medium text-sm sm:text-base truncate">
                                   {order.vendor?.name || 'Unknown Vendor'}
                                 </h3>
-                                <span className="mx-2 text-gray-300 hidden sm:inline">•</span>
-                                <span className="text-xs sm:text-sm text-gray-500">{order.order_number}</span>
+                                <span className="mx-2 text-muted-foreground/50 hidden sm:inline">•</span>
+                                <span className="text-xs sm:text-sm text-muted-foreground">{order.order_number}</span>
                               </div>
                               <div className="flex items-center mt-1 flex-wrap gap-2">
                                 {getStatusBadge(order.status)}
                                 {order.estimated_delivery_time && (
-                                  <div className="flex items-center text-xs sm:text-sm text-gray-600">
+                                  <div className="flex items-center text-xs sm:text-sm text-muted-foreground">
                                     <Clock className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
                                     <span>ETA: {new Date(order.estimated_delivery_time).toLocaleTimeString()}</span>
                                   </div>
                                 )}
                               </div>
-                              <div className="mt-1 sm:mt-2 text-xs sm:text-sm text-gray-600">
+                              <div className="mt-1 sm:mt-2 text-xs sm:text-sm text-muted-foreground">
                                 <span>{order.order_items?.length || 0} items</span>
-                                <span className="mx-2 text-gray-300">•</span>
+                                <span className="mx-2 text-muted-foreground/50">•</span>
                                 <span>Updated {formatDistanceToNow(new Date(order.updated_at))} ago</span>
                               </div>
                               {/* Order Items Preview */}
                               {order.order_items && order.order_items.length > 0 && (
                                 <div className="mt-2 flex -space-x-1 overflow-hidden">
                                   {order.order_items.slice(0, 3).map((item, index) => (
-                                    <div key={index} className="h-6 w-6 sm:h-8 sm:w-8 bg-gray-100 border border-white rounded flex items-center justify-center flex-shrink-0" title={item.product_name || 'Product'}>
-                                      <Box className="h-3 w-3 sm:h-4 sm:w-4 text-gray-400" />
+                                    <div key={index} className="h-6 w-6 sm:h-8 sm:w-8 bg-muted border border-background rounded flex items-center justify-center flex-shrink-0" title={item.product_name || 'Product'}>
+                                      <Box className="h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground" />
                                     </div>
                                   ))}
                                   {order.order_items.length > 3 && (
-                                    <div className="h-6 w-6 sm:h-8 sm:w-8 bg-gray-200 border border-white rounded flex items-center justify-center text-xs text-gray-600 font-medium">
+                                    <div className="h-6 w-6 sm:h-8 sm:w-8 bg-muted border border-background rounded flex items-center justify-center text-xs text-muted-foreground font-medium">
                                       +{order.order_items.length - 3}
                                     </div>
                                   )}
@@ -224,7 +224,7 @@ const CustomerDashboard = () => {
                   </div>
                 ) : (
                   <div className="text-center py-8 sm:py-10">
-                    <p className="text-gray-500 text-sm sm:text-base">No active orders</p>
+                    <p className="text-muted-foreground text-sm sm:text-base">No active orders</p>
                     <Button 
                       className="mt-3 sm:mt-4 bg-primary hover:bg-primary-hover text-black text-sm sm:text-base"
                       onClick={() => navigate('/customer/new-order')}
@@ -240,31 +240,31 @@ const CustomerDashboard = () => {
                   {pastOrders.map((order) => (
                     <div 
                       key={order.id} 
-                      className="bg-white border rounded-lg p-3 sm:p-4 hover:shadow-md transition-shadow cursor-pointer"
+                      className="bg-card border-border border rounded-lg p-3 sm:p-4 hover:shadow-md transition-shadow cursor-pointer"
                       onClick={() => handleOrderClick(order.id)}
                     >
                       <div className="flex flex-col sm:flex-row justify-between">
                         <div className="flex items-start space-x-3">
-                          <div className="p-1.5 sm:p-2 bg-gray-100 rounded-full flex-shrink-0">
-                            <Box className="h-4 w-4 sm:h-5 sm:w-5 md:h-6 md:w-6 text-gray-500" />
+                          <div className="p-1.5 sm:p-2 bg-muted rounded-full flex-shrink-0">
+                            <Box className="h-4 w-4 sm:h-5 sm:w-5 md:h-6 md:w-6 text-muted-foreground" />
                           </div>
                           <div className="min-w-0 flex-1">
                             <div className="flex items-center flex-wrap gap-1 sm:gap-0">
                               <h3 className="font-medium text-sm sm:text-base truncate">
                                 {order.vendor?.name || 'Unknown Vendor'}
                               </h3>
-                              <span className="mx-2 text-gray-300 hidden sm:inline">•</span>
-                              <span className="text-xs sm:text-sm text-gray-500">{order.order_number}</span>
+                              <span className="mx-2 text-muted-foreground/50 hidden sm:inline">•</span>
+                              <span className="text-xs sm:text-sm text-muted-foreground">{order.order_number}</span>
                             </div>
                             <div className="flex items-center mt-1 flex-wrap gap-2">
                               {getStatusBadge(order.status)}
-                              <div className="text-xs sm:text-sm text-gray-600">
+                              <div className="text-xs sm:text-sm text-muted-foreground">
                                 {new Date(order.created_at).toLocaleDateString()}
                               </div>
                             </div>
-                            <div className="mt-1 sm:mt-2 text-xs sm:text-sm text-gray-600">
+                            <div className="mt-1 sm:mt-2 text-xs sm:text-sm text-muted-foreground">
                               <span>{order.order_items?.length || 0} items</span>
-                              <span className="mx-2 text-gray-300">•</span>
+                              <span className="mx-2 text-muted-foreground/50">•</span>
                               <span>{formatCurrency(order.total_amount)}</span>
                             </div>
                             {/* Order Items Preview */}
@@ -272,11 +272,11 @@ const CustomerDashboard = () => {
                               <div className="mt-2 flex -space-x-1 overflow-hidden">
                                 {order.order_items.slice(0, 3).map((item, index) => (
                                   <div key={index} className="h-6 w-6 sm:h-8 sm:w-8 bg-gray-100 border border-white rounded flex items-center justify-center flex-shrink-0" title={item.product_name || 'Product'}>
-                                    <Box className="h-3 w-3 sm:h-4 sm:w-4 text-gray-400" />
-                                  </div>
-                                ))}
-                                {order.order_items.length > 3 && (
-                                  <div className="h-6 w-6 sm:h-8 sm:w-8 bg-gray-200 border border-white rounded flex items-center justify-center text-xs text-gray-600 font-medium">
+                                    <Box className="h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground" />
+                                    </div>
+                                  ))}
+                                  {order.order_items.length > 3 && (
+                                    <div className="h-6 w-6 sm:h-8 sm:w-8 bg-muted border border-background rounded flex items-center justify-center text-xs text-muted-foreground font-medium">
                                     +{order.order_items.length - 3}
                                   </div>
                                 )}

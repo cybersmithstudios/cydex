@@ -26,13 +26,13 @@ export const FiltersSection: React.FC<FiltersSectionProps> = ({
   vendors
 }) => {
   return (
-    <div className="bg-white rounded-lg shadow-sm border overflow-hidden">
+    <div className="bg-card rounded-lg shadow-sm border-border border overflow-hidden">
       <button
         onClick={() => setIsFiltersExpanded(!isFiltersExpanded)}
-        className="w-full flex items-center justify-between p-2 sm:p-3 hover:bg-gray-50 transition-colors"
+        className="w-full flex items-center justify-between p-2 sm:p-3 hover:bg-muted transition-colors"
       >
         <div className="flex items-center gap-2">
-          <Filter className="h-3 w-3 sm:h-4 sm:w-4 text-gray-500" />
+          <Filter className="h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground" />
           <span className="text-xs sm:text-sm font-medium">Filters & Sort</span>
           {(selectedCategory || selectedVendor || sortBy !== 'recommended') && (
             <Badge variant="secondary" className="text-xs px-1.5 py-0.5 h-5">
@@ -41,7 +41,7 @@ export const FiltersSection: React.FC<FiltersSectionProps> = ({
           )}
         </div>
         {isFiltersExpanded ? (
-          <ChevronUp className="h-4 w-4 text-gray-500" />
+          <ChevronUp className="h-4 w-4 text-muted-foreground" />
         ) : (
           <ChevronDown className="h-4 w-4 text-gray-500" />
         )}
