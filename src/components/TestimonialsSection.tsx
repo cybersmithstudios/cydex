@@ -140,7 +140,7 @@ const TestimonialsSection = () => {
         <div className={`text-center mb-10 md:mb-16 transform transition-all duration-700 ${
           isVisible ? "translate-y-0 opacity-100" : "translate-y-20 opacity-0"
         }`}>
-          <h2 className="text-2xl md:text-4xl font-bold mb-3 md:mb-4">
+          <h2 className="text-2xl md:text-4xl font-bold mb-3 md:mb-4 text-foreground">
             What Our <span className="text-primary">Clients Say</span>
           </h2>
           <p className="text-sm md:text-base text-muted-foreground max-w-2xl mx-auto">
@@ -150,7 +150,7 @@ const TestimonialsSection = () => {
         </div>
 
         <div className="max-w-4xl mx-auto relative">
-          <div className="relative overflow-hidden h-[450px] sm:h-[400px] md:h-[320px] bg-card/80 dark:bg-card/90 backdrop-blur-lg border border-border rounded-2xl shadow-lg px-4 py-6 md:p-10">
+          <div className="relative overflow-hidden h-[450px] sm:h-[400px] md:h-[320px] bg-muted dark:bg-muted/80 backdrop-blur-lg border border-border rounded-2xl shadow-lg px-4 py-6 md:p-10">
             {testimonials.map((testimonial, index) => (
               <div
                 key={index}
@@ -166,7 +166,7 @@ const TestimonialsSection = () => {
               >
                 <div className="flex flex-col md:flex-row items-center md:items-start gap-4 md:gap-10">
                   <div className="flex-shrink-0">
-                    <div className="w-16 h-16 md:w-20 md:h-20 rounded-full flex items-center justify-center bg-primary/20 border-2 border-primary/30">
+                    <div className="w-16 h-16 md:w-20 md:h-20 rounded-full flex items-center justify-center bg-primary/20 dark:bg-primary/30 border-2 border-primary/30 dark:border-primary/40">
                       <User size={28} className="text-primary" />
                     </div>
                   </div>
@@ -224,25 +224,25 @@ const TestimonialsSection = () => {
 
           <button
             onClick={goToPrev}
-            className="absolute top-1/2 -translate-y-1/2 -left-3 md:-left-5 bg-card h-8 w-8 md:h-10 md:w-10 rounded-full shadow-lg flex items-center justify-center hover:bg-muted transition-colors z-10"
+            className="absolute top-1/2 -translate-y-1/2 -left-3 md:-left-5 bg-card h-8 w-8 md:h-10 md:w-10 rounded-full shadow-lg flex items-center justify-center hover:bg-muted transition-colors z-10 text-foreground"
             aria-label="Previous testimonial"
           >
-            <ChevronLeft size={18} />
+            <ChevronLeft size={18} className="text-foreground" />
           </button>
 
           <button
             onClick={goToNext}
-            className="absolute top-1/2 -translate-y-1/2 -right-3 md:-right-5 bg-card h-8 w-8 md:h-10 md:w-10 rounded-full shadow-lg flex items-center justify-center hover:bg-muted transition-colors z-10"
+            className="absolute top-1/2 -translate-y-1/2 -right-3 md:-right-5 bg-card h-8 w-8 md:h-10 md:w-10 rounded-full shadow-lg flex items-center justify-center hover:bg-muted transition-colors z-10 text-foreground"
             aria-label="Next testimonial"
           >
-            <ChevronRight size={18} />
+            <ChevronRight size={18} className="text-foreground" />
           </button>
         </div>
 
         <div className={`text-center mt-8 md:mt-12 transform transition-all duration-700 delay-300 ${
           isVisible ? "translate-y-0 opacity-100" : "translate-y-20 opacity-0"
         }`}>
-          <p className="text-base md:text-lg font-semibold">
+          <p className="text-base md:text-lg font-semibold text-foreground">
             <span className="text-primary">98%</span> of customers recommend Cydex for sustainable deliveries
           </p>
         </div>

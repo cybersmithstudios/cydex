@@ -16,11 +16,11 @@ const AboutUs = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-background">
       <Navbar />
       
       {/* Hero Section - Mobile Optimized */}
-      <section className="pt-20 sm:pt-24 md:pt-32 pb-12 sm:pb-16 bg-gradient-to-b from-white to-gray-50 relative overflow-hidden">
+      <section className="pt-20 sm:pt-24 md:pt-32 pb-12 sm:pb-16 bg-gradient-to-b from-background to-muted/30 relative overflow-hidden">
         {/* Background Elements - Responsive */}
         <div className="absolute inset-0 z-0">
           <div className="absolute top-1/4 -right-20 w-72 sm:w-96 h-72 sm:h-96 bg-primary opacity-10 rounded-full filter blur-3xl"></div>
@@ -30,7 +30,7 @@ const AboutUs = () => {
             alt="Green landscape" 
             className="object-cover w-full h-full opacity-10"
           />
-          <div className="absolute inset-0 bg-gradient-to-b from-white via-transparent to-white"></div>
+          <div className="absolute inset-0 bg-gradient-to-b from-background via-transparent to-background"></div>
         </div>
         
         <div className="container mx-auto px-4 sm:px-6 text-center lg:text-left relative z-10">
@@ -59,7 +59,7 @@ const AboutUs = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.2 }}
-              className="text-base sm:text-lg md:text-xl text-gray-600 mb-6 sm:mb-8 max-w-2xl mx-auto lg:mx-0"
+              className="text-base sm:text-lg md:text-xl text-muted-foreground mb-6 sm:mb-8 max-w-2xl mx-auto lg:mx-0"
             >
               Since 2020, Cydex has been on a mission to transform the logistics industry by creating eco-friendly delivery solutions that don't compromise on speed or reliability.
             </motion.p>
@@ -84,7 +84,7 @@ const AboutUs = () => {
                 className="secondary-button hover:scale-105 w-full sm:w-auto"
                 size="lg"
                 onClick={() => {
-                  const storySection = document.querySelector('.py-20.bg-white');
+                  const storySection = document.querySelector('.py-20.bg-background');
                   if (storySection) {
                     storySection.scrollIntoView({ behavior: "smooth" });
                   }
@@ -103,21 +103,21 @@ const AboutUs = () => {
       </section>
       
       {/* Our Story Section - Mobile Optimized */}
-      <section className="py-12 sm:py-16 md:py-20 bg-white">
+      <section className="py-12 sm:py-16 md:py-20 bg-background">
         <div className="container mx-auto px-4 sm:px-6">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-12 items-center">
             <div>
               <h2 className="text-2xl sm:text-3xl font-bold mb-4 sm:mb-6">Our Story</h2>
-              <p className="text-sm sm:text-base text-gray-600 mb-3 sm:mb-4">
+              <p className="text-sm sm:text-base text-muted-foreground mb-3 sm:mb-4">
                 Cydex was born out of a simple observation: while the world was embracing e-commerce and on-demand deliveries, the environmental impact of this convenience was being ignored.
               </p>
-              <p className="text-sm sm:text-base text-gray-600 mb-3 sm:mb-4">
+              <p className="text-sm sm:text-base text-muted-foreground mb-3 sm:mb-4">
                 In 2020, our founders, a group of environmental scientists and tech entrepreneurs, joined forces with a mission to transform the logistics industry. They envisioned a platform where sustainability and efficiency could coexist.
               </p>
-              <p className="text-sm sm:text-base text-gray-600 mb-3 sm:mb-4">
+              <p className="text-sm sm:text-base text-muted-foreground mb-3 sm:mb-4">
                 Starting with just three electric bikes in a single neighborhood, Cydex has grown into a comprehensive eco-friendly delivery network spanning multiple cities, with thousands of riders and partnered businesses.
               </p>
-              <p className="text-sm sm:text-base text-gray-600">
+              <p className="text-sm sm:text-base text-muted-foreground">
                 Today, we're proud to have saved over 1.5 million kg of CO₂ emissions through our zero-emission delivery network.
               </p>
             </div>
@@ -167,11 +167,11 @@ const AboutUs = () => {
       </section>
       
       {/* Our Mission & Values - Mobile Optimized */}
-      <section className="py-12 sm:py-16 md:py-20 bg-gray-50">
+      <section className="py-12 sm:py-16 md:py-20 bg-muted/30 dark:bg-muted/20">
         <div className="container mx-auto px-4 sm:px-6">
           <div className="text-center mb-12 sm:mb-16">
             <h2 className="text-2xl sm:text-3xl font-bold mb-3 sm:mb-4">Our Mission & Values</h2>
-            <p className="text-sm sm:text-base text-gray-600 max-w-3xl mx-auto">
+            <p className="text-sm sm:text-base text-muted-foreground max-w-3xl mx-auto">
               At Cydex, we're driven by more than just making deliveries. We're committed to transforming logistics through sustainable practices and innovative technology.
             </p>
           </div>
@@ -197,11 +197,11 @@ const AboutUs = () => {
       </section>
       
       {/* Meet the Team - Mobile Optimized */}
-      <section className="py-12 sm:py-16 md:py-20 bg-white">
+      <section className="py-12 sm:py-16 md:py-20 bg-background">
         <div className="container mx-auto px-4 sm:px-6">
           <div className="text-center mb-12 sm:mb-16">
             <h2 className="text-2xl sm:text-3xl font-bold mb-3 sm:mb-4">Meet Our Team</h2>
-            <p className="text-sm sm:text-base text-gray-600 max-w-3xl mx-auto">
+            <p className="text-sm sm:text-base text-muted-foreground max-w-3xl mx-auto">
               The passionate individuals behind Cydex are united by a common mission to revolutionize the delivery industry through sustainability.
             </p>
           </div>
@@ -227,11 +227,11 @@ const AboutUs = () => {
       </section>
       
       {/* Our Partners - Mobile Optimized */}
-      <section className="py-12 sm:py-16 md:py-20 bg-gray-50">
+      <section className="py-12 sm:py-16 md:py-20 bg-muted/30 dark:bg-muted/20">
         <div className="container mx-auto px-4 sm:px-6">
           <div className="text-center mb-12 sm:mb-16">
             <h2 className="text-2xl sm:text-3xl font-bold mb-3 sm:mb-4">Our Partners & Certifications</h2>
-            <p className="text-sm sm:text-base text-gray-600 max-w-3xl mx-auto">
+            <p className="text-sm sm:text-base text-muted-foreground max-w-3xl mx-auto">
               We collaborate with leading environmental organizations and industry partners to maximize our positive impact.
             </p>
           </div>
@@ -250,7 +250,7 @@ const AboutUs = () => {
           <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-4 sm:mb-6">
             Join Us in Making a Difference
           </h2>
-          <p className="text-base sm:text-lg text-gray-600 max-w-3xl mx-auto mb-8 sm:mb-10">
+          <p className="text-base sm:text-lg text-muted-foreground max-w-3xl mx-auto mb-8 sm:mb-10">
             Be part of our mission to create a sustainable future for deliveries.
           </p>
           
@@ -290,29 +290,29 @@ const TimelineItem = ({
   description: string; 
 }) => (
   <div className="relative pl-0 group">
-    <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
+    <div className="bg-card p-6 rounded-xl border border-border shadow-sm hover:shadow-md transition-shadow">
       <div className="flex items-center gap-2 mb-1">
         <span className="text-sm font-medium text-primary">{year}</span>
       </div>
-      <h4 className="text-lg font-semibold mb-2 text-gray-900">{title}</h4>
-      <p className="text-sm sm:text-base text-gray-600">{description}</p>
+      <h4 className="text-lg font-semibold mb-2 text-foreground">{title}</h4>
+      <p className="text-sm sm:text-base text-muted-foreground">{description}</p>
     </div>
   </div>
 );
 
 const ValueCard = ({ icon, title, description }: { icon: React.ReactNode; title: string; description: string }) => (
-  <div className="bg-white rounded-xl p-6 sm:p-8 shadow-md border border-gray-100 hover:shadow-lg transition-shadow">
+  <div className="bg-card rounded-xl p-6 sm:p-8 shadow-md border border-border hover:shadow-lg transition-shadow">
     <div className="bg-primary/10 p-3 sm:p-4 rounded-full inline-block mb-4 sm:mb-6">
       {icon}
     </div>
     <h3 className="text-lg sm:text-xl font-bold mb-2 sm:mb-4">{title}</h3>
-    <p className="text-sm sm:text-base text-gray-600">{description}</p>
+    <p className="text-sm sm:text-base text-muted-foreground">{description}</p>
   </div>
 );
 
 const TeamMember = ({ image, name, role }: { image: string; name: string; role: string }) => (
   <div className="text-center">
-    <div className="relative mb-3 sm:mb-4 mx-auto w-28 h-28 sm:w-40 sm:h-40 rounded-full overflow-hidden shadow-lg border-4 border-white">
+      <div className="relative mb-3 sm:mb-4 mx-auto w-28 h-28 sm:w-40 sm:h-40 rounded-full overflow-hidden shadow-lg border-4 border-background">
       <img 
         src={image}
         alt={name}
@@ -325,9 +325,9 @@ const TeamMember = ({ image, name, role }: { image: string; name: string; role: 
 );
 
 const PartnerCard = ({ index }: { index: number }) => (
-  <div className="bg-white p-4 sm:p-6 rounded-lg sm:rounded-xl shadow-md w-full max-w-[140px] sm:max-w-[180px] h-[80px] sm:h-[100px] flex items-center justify-center">
-    <div className="bg-gray-200 w-full h-10 sm:h-12 rounded flex items-center justify-center">
-      <span className="text-xs sm:text-sm text-gray-500 font-medium">Partner {index}</span>
+  <div className="bg-card p-4 sm:p-6 rounded-lg sm:rounded-xl shadow-md w-full max-w-[140px] sm:max-w-[180px] h-[80px] sm:h-[100px] flex items-center justify-center">
+    <div className="bg-muted w-full h-10 sm:h-12 rounded flex items-center justify-center">
+      <span className="text-xs sm:text-sm text-muted-foreground font-medium">Partner {index}</span>
     </div>
   </div>
 );

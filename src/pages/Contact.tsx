@@ -41,11 +41,11 @@ const Contact = () => {
   };
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-background">
       <Navbar />
       
       {/* Hero Section */}
-      <section className="pt-24 sm:pt-28 md:pt-32 pb-12 sm:pb-16 bg-gradient-to-b from-white to-gray-50 relative overflow-hidden">
+      <section className="pt-24 sm:pt-28 md:pt-32 pb-12 sm:pb-16 bg-gradient-to-b from-background to-muted/30 relative overflow-hidden">
         {/* Background Elements */}
         <div className="absolute inset-0 z-0">
           <div className="absolute top-1/4 -right-20 w-96 h-96 bg-primary opacity-10 rounded-full filter blur-3xl"></div>
@@ -77,7 +77,7 @@ const Contact = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.2 }}
-            className="text-base sm:text-lg md:text-xl text-gray-600 max-w-2xl mx-auto mb-6 sm:mb-8"
+            className="text-base sm:text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-6 sm:mb-8"
           >
             Have questions about our services or want to join our mission? Our team is ready to assist you with any inquiries or feedback.
           </motion.p>
@@ -85,11 +85,11 @@ const Contact = () => {
       </section>
       
       {/* Contact Form & Info */}
-      <section className="py-12 sm:py-16 md:py-20 bg-white">
+      <section className="py-12 sm:py-16 md:py-20 bg-background">
         <div className="container mx-auto px-4 sm:px-6">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-10 md:gap-12">
             {/* Contact Form */}
-            <div className="bg-white rounded-lg sm:rounded-xl p-5 sm:p-6 md:p-8 shadow-md sm:shadow-lg border border-gray-100">
+            <div className="bg-card rounded-lg sm:rounded-xl p-5 sm:p-6 md:p-8 shadow-md sm:shadow-lg border border-border">
               <h2 className="text-xl sm:text-2xl font-bold mb-4 sm:mb-6">Send Us a Message</h2>
               
               <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
@@ -144,7 +144,7 @@ const Contact = () => {
             <div className="space-y-6 sm:space-8">
               <div>
                 <h2 className="text-xl sm:text-2xl font-bold mb-4 sm:mb-6">Contact Information</h2>
-                <p className="text-sm sm:text-base text-gray-600 mb-6 sm:mb-8">
+                <p className="text-sm sm:text-base text-muted-foreground mb-6 sm:mb-8">
                   Our team is available Monday through Friday from 9:00 AM to 6:00 PM to assist you with any questions or concerns.
                 </p>
               </div>
@@ -156,8 +156,8 @@ const Contact = () => {
                   </div>
                   <div className="ml-3 sm:ml-4">
                     <h3 className="text-base sm:text-lg font-bold">Email Us</h3>
-                    <p className="text-sm sm:text-base text-gray-600">cydexlogistics@gmail.com</p>
-                    <p className="text-xs sm:text-sm text-gray-500 mt-0.5">We'll respond within 24 hours</p>
+                    <p className="text-sm sm:text-base text-muted-foreground">cydexlogistics@gmail.com</p>
+                    <p className="text-xs sm:text-sm text-muted-foreground mt-0.5">We'll respond within 24 hours</p>
                   </div>
                 </div>
                 
@@ -167,8 +167,8 @@ const Contact = () => {
                   </div>
                   <div className="ml-3 sm:ml-4">
                     <h3 className="text-base sm:text-lg font-bold">Call Us</h3>
-                    <p className="text-sm sm:text-base text-gray-600">+2348028985352</p>
-                    <p className="text-xs sm:text-sm text-gray-500 mt-0.5">Mon-Fri, 9:00 AM - 6:00 PM</p>
+                    <p className="text-sm sm:text-base text-muted-foreground">+2348028985352</p>
+                    <p className="text-xs sm:text-sm text-muted-foreground mt-0.5">Mon-Fri, 9:00 AM - 6:00 PM</p>
                   </div>
                 </div>
                 
@@ -178,23 +178,23 @@ const Contact = () => {
                   </div>
                   <div className="ml-3 sm:ml-4">
                     <h3 className="text-base sm:text-lg font-bold">Visit Us</h3>
-                    <p className="text-sm sm:text-base text-gray-600">123 Business District, Ikeja,</p>
-                    <p className="text-sm sm:text-base text-gray-600">Lagos, Nigeria</p>
+                    <p className="text-sm sm:text-base text-muted-foreground">123 Business District, Ikeja,</p>
+                    <p className="text-sm sm:text-base text-muted-foreground">Lagos, Nigeria</p>
                   </div>
                 </div>
               </div>
               
-              <div className="pt-4 sm:pt-6 border-t border-gray-200 mt-6 sm:mt-8">
+              <div className="pt-4 sm:pt-6 border-t border-border mt-6 sm:mt-8">
                 <h3 className="text-base sm:text-lg font-bold mb-3 sm:mb-4">Follow Us</h3>
                 <div className="flex space-x-2 sm:space-x-3 md:space-x-4">
-                  <a href="https://www.instagram.com/cydexlogistics" target="_blank" rel="noopener noreferrer" className="bg-gray-100 hover:bg-gray-200 p-2 sm:p-3 rounded-full transition-colors" aria-label="Instagram">
-                    <Instagram className="h-4 w-4 sm:h-5 sm:w-5 text-gray-700" />
+                  <a href="https://www.instagram.com/cydexlogistics" target="_blank" rel="noopener noreferrer" className="bg-muted hover:bg-muted/80 p-2 sm:p-3 rounded-full transition-colors" aria-label="Instagram">
+                    <Instagram className="h-4 w-4 sm:h-5 sm:w-5 text-foreground" />
                   </a>
-                  <a href="https://x.com/cydexlogistics" target="_blank" rel="noopener noreferrer" className="bg-gray-100 hover:bg-gray-200 p-2 sm:p-3 rounded-full transition-colors" aria-label="X (Twitter)">
-                    <Twitter className="h-4 w-4 sm:h-5 sm:w-5 text-gray-700" />
+                  <a href="https://x.com/cydexlogistics" target="_blank" rel="noopener noreferrer" className="bg-muted hover:bg-muted/80 p-2 sm:p-3 rounded-full transition-colors" aria-label="X (Twitter)">
+                    <Twitter className="h-4 w-4 sm:h-5 sm:w-5 text-foreground" />
                   </a>
-                  <a href="https://www.linkedin.com/company/cydexlogistics" target="_blank" rel="noopener noreferrer" className="bg-gray-100 hover:bg-gray-200 p-2 sm:p-3 rounded-full transition-colors" aria-label="LinkedIn">
-                    <Linkedin className="h-4 w-4 sm:h-5 sm:w-5 text-gray-700" />
+                  <a href="https://www.linkedin.com/company/cydexlogistics" target="_blank" rel="noopener noreferrer" className="bg-muted hover:bg-muted/80 p-2 sm:p-3 rounded-full transition-colors" aria-label="LinkedIn">
+                    <Linkedin className="h-4 w-4 sm:h-5 sm:w-5 text-foreground" />
                   </a>
                 </div>
               </div>      
@@ -207,7 +207,7 @@ const Contact = () => {
       <section className="py-16 bg-primary/10">
         <div className="container mx-auto px-6 text-center">
           <h2 className="text-3xl font-bold mb-4">Need Immediate Help?</h2>
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto mb-8">
+          <p className="text-xl text-muted-foreground max-w-2xl mx-auto mb-8">
             Our support team is ready to assist you in real-time through our live chat service.
           </p>
           <Button 
