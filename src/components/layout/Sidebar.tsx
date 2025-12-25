@@ -146,12 +146,12 @@ const Sidebar: React.FC<SidebarProps> = ({
                       className={cn(
                         "flex items-center py-2 px-3 rounded-md transition-colors",
                         isActive 
-                          ? "bg-primary-light text-foreground" 
+                          ? "bg-primary-light text-gray-900 dark:text-gray-900" 
                           : "text-foreground hover:bg-muted",
                         !(isSidebarOpen || isHovering) && "justify-center"
                       )}
                     >
-                      <link.icon className={cn("h-5 w-5", isActive && "text-primary")} />
+                      <link.icon className={cn("h-5 w-5", isActive ? "text-primary" : "")} />
                       {(isSidebarOpen || isHovering) && <span className="ml-3">{link.name}</span>}
                     </Link>
                   </li>
