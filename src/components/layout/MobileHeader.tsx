@@ -5,10 +5,11 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Link } from 'react-router-dom';
-import { User, MessageSquare, Settings, LogOut } from 'lucide-react';
+import { User, MessageSquare, LogOut } from 'lucide-react';
 import { User as UserType } from '@/types/auth.types';
 import LogoutConfirmationDialog from '@/components/auth/LogoutConfirmationDialog';
 import { useCartContext } from '@/contexts/CartContext';
+import { toast } from 'sonner';
 
 interface MobileHeaderProps {
   onMenuToggle: () => void;
@@ -49,6 +50,11 @@ const MobileHeader: React.FC<MobileHeaderProps> = ({
   const onConfirmLogout = () => {
     handleLogout();
     setShowLogoutDialog(false);
+  };
+
+  const handleMessages = (e: React.MouseEvent) => {
+    e.preventDefault();
+    toast.info('Messages feature coming soon!');
   };
 
   return (
@@ -107,17 +113,10 @@ const MobileHeader: React.FC<MobileHeaderProps> = ({
                 <span>Profile</span>
               </Link>
             </DropdownMenuItem>
-            <DropdownMenuItem asChild>
-              <Link to={`/${userRole}/messages`} className="cursor-pointer">
-                <MessageSquare className="mr-2 h-4 w-4" />
-                <span>Messages</span>
-              </Link>
-            </DropdownMenuItem>
-            <DropdownMenuItem asChild>
-              <Link to={`/${userRole}/settings`} className="cursor-pointer">
-                <Settings className="mr-2 h-4 w-4" />
-                <span>Settings</span>
-              </Link>
+            <DropdownMenuItem onClick={handleMessages} className="opacity-60 cursor-pointer">
+              <MessageSquare className="mr-2 h-4 w-4" />
+              <span>Messages</span>
+              <span className="ml-auto text-xs text-gray-500">Coming Soon</span>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={onLogoutClick} className="text-red-500 cursor-pointer">
