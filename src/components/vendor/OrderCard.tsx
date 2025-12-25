@@ -66,10 +66,9 @@ const OrderCard = ({ order }: OrderCardProps) => {
     });
   };
 
-  const handleRejectOrder = (orderId: string) => {
-    toast.error('Order rejected', {
-      description: `Order ${orderId} has been rejected.`
-    });
+  const handleRejectOrder = async (orderId: string) => {
+    // Navigate to order detail page where rejection can be properly handled
+    navigate(`/vendor/orders/${orderId}`);
   };
 
   return (
