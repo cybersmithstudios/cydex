@@ -11,8 +11,9 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { Shield, LogOut, User as UserIcon, Settings, BarChart } from "lucide-react";
+import { Shield, LogOut, User as UserIcon, MessageSquare, BarChart } from "lucide-react";
 import { User } from "@/types/auth.types";
+import { toast } from "sonner";
 
 interface UserDropdownProps {
   user: User;
@@ -34,15 +35,8 @@ const UserDropdown = ({ user, onLogoutClick }: UserDropdownProps) => {
     }
   };
 
-  const goToSettings = () => {
-    if (user) {
-      // Only vendors have settings page, for others redirect to profile
-      if (user.role.toLowerCase() === 'vendor') {
-        navigate(`/${user.role.toLowerCase()}/settings`);
-      } else {
-        navigate(`/${user.role.toLowerCase()}/profile`);
-      }
-    }
+  const handleMessages = () => {
+    toast.info('Messages feature coming soon!');
   };
 
   const getInitials = (name: string) => {
@@ -88,9 +82,10 @@ const UserDropdown = ({ user, onLogoutClick }: UserDropdownProps) => {
           <UserIcon className="mr-2 h-4 w-4" />
           <span>Profile</span>
         </DropdownMenuItem>
-        <DropdownMenuItem onClick={goToSettings}>
-          <Settings className="mr-2 h-4 w-4" />
-          <span>{user.role.toLowerCase() === 'vendor' ? 'Settings' : 'Profile'}</span>
+        <DropdownMenuItem onClick={handleMessages} className="opacity-60">
+          <MessageSquare className="mr-2 h-4 w-4" />
+          <span>Messages</span>
+          <span className="ml-auto text-xs text-muted-foreground">Coming Soon</span>
         </DropdownMenuItem>
         {user.role === "ADMIN" && (
           <DropdownMenuItem onClick={() => navigate("/admin")}>
