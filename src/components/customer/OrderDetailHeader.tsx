@@ -39,8 +39,8 @@ const OrderDetailHeader = ({ id, vendor, status, paymentStatus }: OrderDetailHea
         </div>
         
         <div className="flex flex-wrap gap-1 sm:gap-2 w-full sm:w-auto">
-          {getOrderStatusBadge(status)}
-          {getPaymentStatusBadge(paymentStatus)}
+            {getOrderStatusBadge(status)}
+            {getPaymentStatusBadge(paymentStatus)}
         </div>
       </div>
     </div>
