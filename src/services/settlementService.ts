@@ -764,8 +764,10 @@ class SettlementService {
 
   /**
    * Check if order can be refunded
+   * @param orderId - Order ID to check
+   * @param bypassTimeCheck - If true, bypasses the 24-hour window check (for vendor rejections)
    */
-  async canRefundOrder(orderId: string): Promise<boolean> {
+  async canRefundOrder(orderId: string, bypassTimeCheck: boolean = false): Promise<boolean> {
     const { data: order, error } = await supabase
       .from('orders')
       .select('status, payment_status, created_at')
@@ -778,6 +780,9 @@ class SettlementService {
     if (order.status === 'delivered') return false;
     if (order.payment_status !== 'paid') return false;
 
+    // If bypassing time check (e.g., vendor rejection), allow refund
+    if (bypassTimeCheck) return true;
+
     // Check if order is within refund window (e.g., 24 hours)
     const orderDate = new Date(order.created_at);
     const now = new Date();
@@ -788,8 +793,11 @@ class SettlementService {
 
   /**
    * Process refund for cancelled order
+   * @param orderId - Order ID to refund
+   * @param reason - Reason for refund
+   * @param bypassTimeCheck - If true, bypasses the 24-hour window check (for vendor rejections)
    */
-  async processRefund(orderId: string, reason: string) {
+  async processRefund(orderId: string, reason: string, bypassTimeCheck: boolean = false) {
     // Get order and payment hold
     const { data: order } = await supabase
       .from('orders')
@@ -801,7 +809,7 @@ class SettlementService {
       throw new Error('Order not found');
     }
 
-    if (!(await this.canRefundOrder(orderId))) {
+    if (!(await this.canRefundOrder(orderId, bypassTimeCheck))) {
       throw new Error('Order cannot be refunded');
     }
 
@@ -816,7 +824,7 @@ class SettlementService {
 
     // Create customer transaction for refund
     const transactionId = `REFUND-${order.order_number}-${Date.now()}`;
-    await supabase
+    const { error: transactionError } = await supabase
       .from('customer_transactions')
       .insert({
         customer_id: order.customer_id,
@@ -834,17 +842,74 @@ class SettlementService {
         processed_at: new Date().toISOString(),
       });
 
-    // Update order status
-    await supabase
+    if (transactionError) {
+      console.error('Error creating refund transaction:', transactionError);
+      throw new Error('Failed to create refund transaction');
+    }
+
+    // Update customer wallet balance - add refund amount to available balance
+    const { data: wallet, error: walletError } = await supabase
+      .from('customer_wallet')
+      .select('available_balance')
+      .eq('customer_id', order.customer_id)
+      .single();
+
+    if (walletError && walletError.code !== 'PGRST116') { // PGRST116 = no rows returned
+      console.error('Error fetching customer wallet:', walletError);
+      // Continue anyway - wallet might not exist yet
+    }
+
+    // Insert or update customer wallet
+    if (wallet) {
+      // Update existing wallet
+      const { error: updateError } = await supabase
+        .from('customer_wallet')
+        .update({
+          available_balance: (parseFloat(wallet.available_balance.toString()) || 0) + order.total_amount,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('customer_id', order.customer_id);
+
+      if (updateError) {
+        console.error('Error updating customer wallet:', updateError);
+        throw new Error('Failed to update customer wallet');
+      }
+    } else {
+      // Create new wallet entry
+      const { error: insertError } = await supabase
+        .from('customer_wallet')
+        .insert({
+          customer_id: order.customer_id,
+          available_balance: order.total_amount,
+          bonus_balance: 0,
+          carbon_credits: 0,
+          total_spent: 0,
+        });
+
+      if (insertError) {
+        console.error('Error creating customer wallet:', insertError);
+        throw new Error('Failed to create customer wallet');
+      }
+    }
+
+    // Update order status with cancellation details
+    const { error: orderUpdateError } = await supabase
       .from('orders')
       .update({
         status: 'cancelled',
         payment_status: 'refunded',
+        cancelled_at: new Date().toISOString(),
+        cancel_reason: reason,
         updated_at: new Date().toISOString(),
       })
       .eq('id', orderId);
 
-    console.log(`Refund processed for order ${order.order_number}`);
+    if (orderUpdateError) {
+      console.error('Error updating order status:', orderUpdateError);
+      throw new Error('Failed to update order status');
+    }
+
+    console.log(`Refund processed for order ${order.order_number} - ₦${order.total_amount} credited to customer wallet`);
     return { success: true, transactionId };
   }
 

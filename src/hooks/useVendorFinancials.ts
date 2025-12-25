@@ -168,7 +168,7 @@ export const useVendorFinancials = () => {
     try {
       const payout = await settlementService.requestVendorPayout(
         user.id,
-        amount,
+          amount,
         bankAccountId
       );
 

@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/SupabaseAuthContext';
 import { toast } from 'sonner';
+import { settlementService } from '@/services/settlementService';
 
 // Type for database order items (as they come from the database)
 interface DBOrderItem {
@@ -244,11 +245,79 @@ export const useVendorOrders = () => {
   // Refresh function
   const refresh = useCallback(() => loadOrders(), [loadOrders]);
 
+  // Update order status
+  const updateOrderStatus = useCallback(async (orderId: string, status: string): Promise<boolean> => {
+    if (!user?.id) {
+      toast.error('You must be logged in to update orders');
+      return false;
+    }
+
+    try {
+      const updateData: any = { 
+        status,
+        updated_at: new Date().toISOString()
+      };
+
+      // Add timestamp fields based on status
+      if (status === 'accepted' || status === 'processing') {
+        updateData.vendor_accepted_at = new Date().toISOString();
+      } else if (status === 'cancelled') {
+        updateData.cancelled_at = new Date().toISOString();
+        updateData.cancel_reason = 'Order rejected by vendor';
+        
+        // Process refund to customer wallet when vendor rejects order
+        try {
+          await settlementService.processRefund(
+            orderId,
+            'Order rejected by vendor',
+            true // Bypass time check for vendor rejections
+          );
+          toast.success('Order rejected and refund processed. Amount credited to customer wallet.');
+        } catch (refundError) {
+          console.error('Error processing refund:', refundError);
+          // Still update order status even if refund fails
+          toast.warning('Order rejected, but refund processing encountered an issue. Please contact support.');
+        }
+      } else if (status === 'ready_for_pickup') {
+        updateData.ready_for_pickup_at = new Date().toISOString();
+      }
+
+      // Only update order status if not cancelled (refund already updates it)
+      if (status !== 'cancelled') {
+        const { error } = await supabase
+          .from('orders')
+          .update(updateData)
+          .eq('id', orderId)
+          .eq('vendor_id', user.id); // Ensure vendor can only update their own orders
+        
+        if (error) {
+          console.error('Error updating order status:', error);
+          toast.error('Failed to update order status');
+          return false;
+        }
+      }
+
+      if (status !== 'cancelled') {
+        toast.success(`Order status updated successfully`);
+      }
+      
+      // Refresh orders to get updated data
+      await loadOrders();
+      
+      return true;
+    } catch (error) {
+      console.error('Error in updateOrderStatus:', error);
+      toast.error('Failed to update order status');
+      return false;
+    }
+  }, [user?.id, loadOrders]);
+
   return {
     orders,
     loading,
     error,
-    refresh
+    refresh,
+    updateOrderStatus
   };
 };
 

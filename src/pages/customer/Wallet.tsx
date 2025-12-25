@@ -16,7 +16,7 @@ const CustomerWalletPage = () => {
           <CardHeader className="text-center pb-4">
             <div className="mx-auto w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-4">
               <Wallet className="h-8 w-8 text-primary" />
-            </div>
+              </div>
             <CardTitle className="text-xl sm:text-2xl">Wallet Feature Coming Soon</CardTitle>
           </CardHeader>
           <CardContent className="text-center pb-8">
