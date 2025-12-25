@@ -73,7 +73,13 @@ const OrderDetailReal = () => {
     setActionLoading(true);
     const success = await updateOrderStatus(order.id, newStatus);
     if (success) {
-      toast.success(`Order status updated to ${newStatus}`);
+      // Navigation will happen automatically when order status changes
+      if (newStatus === 'cancelled') {
+        // Optionally navigate back to orders list after rejection
+        setTimeout(() => {
+          navigate('/vendor/orders');
+        }, 1500);
+      }
     }
     setActionLoading(false);
   };
