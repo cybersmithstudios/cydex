@@ -60,7 +60,7 @@ const HeroSection = () => {
   };
 
   return (
-    <section className="z-10 relative min-h-[100vh] md:min-h-screen flex items-center pt-16 md:pt-24 pb-12 md:pb-16 overflow-hidden bg-gradient-to-b from-white to-gray-50">
+    <section className="z-10 relative min-h-[100vh] md:min-h-screen flex items-center pt-16 md:pt-24 pb-12 md:pb-16 overflow-hidden bg-gradient-to-b from-background to-muted">
       <div className="absolute inset-0 z-0">
         <div className="hidden md:block absolute top-1/4 -right-20 w-72 md:w-96 h-72 md:h-96 bg-primary opacity-10 rounded-full filter blur-3xl animate-pulse-soft"></div>
         <div className="hidden md:block absolute -bottom-20 -left-20 w-72 md:w-96 h-72 md:h-96 bg-primary opacity-10 rounded-full filter blur-3xl"></div>
@@ -81,7 +81,7 @@ const HeroSection = () => {
               <span className="text-primary drop-shadow-xs">Preserving Planet</span>
             </h1>
 
-            <p className={`text-sm md:text-base lg:text-lg text-gray-600 max-w-lg lg:max-w-none mx-auto lg:mx-0 transition-all duration-700 delay-200 transform ${isLoaded ? "translate-y-0 opacity-100" : "translate-y-10 opacity-0"}`}>
+            <p className={`text-sm md:text-base lg:text-lg text-muted-foreground max-w-lg lg:max-w-none mx-auto lg:mx-0 transition-all duration-700 delay-200 transform ${isLoaded ? "translate-y-0 opacity-100" : "translate-y-10 opacity-0"}`}>
               Cydex revolutionizes logistics with zero-emission vehicles, optimized routes, and sustainable packaging, reducing carbon footprint while maintaining exceptional delivery experiences.
             </p>
 
@@ -118,13 +118,13 @@ const HeroSection = () => {
         <div className={`mt-8 md:mt-10 flex items-center justify-center transition-all duration-700 delay-400 transform ${isLoaded ? "translate-y-0 opacity-100" : "translate-y-10 opacity-0"}`}>
           <div className="flex -space-x-2">
             {[1, 2, 3, 4].map(i => (
-              <div key={i} className="w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10 rounded-full border-2 border-white overflow-hidden">
+              <div key={i} className="w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10 rounded-full border-2 border-background dark:border-card overflow-hidden">
                 <img src={`https://api.dicebear.com/7.x/personas/svg?seed=${i}`} alt="User avatar" className="w-full h-full object-cover" />
               </div>
             ))}
           </div>
           <div className="ml-3 md:ml-4">
-            <p className="text-gray-600 text-xs sm:text-sm">
+            <p className="text-muted-foreground text-xs sm:text-sm">
               Trusted by <span className="font-semibold">500+</span> eco-conscious businesses
             </p>
           </div>

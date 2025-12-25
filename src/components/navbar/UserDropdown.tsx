@@ -11,9 +11,10 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { Shield, LogOut, User as UserIcon, MessageSquare, BarChart } from "lucide-react";
+import { Shield, LogOut, User as UserIcon, MessageSquare, BarChart, Sun, Moon, Monitor } from "lucide-react";
 import { User } from "@/types/auth.types";
 import { toast } from "sonner";
+import { useTheme } from "@/contexts/ThemeContext";
 
 interface UserDropdownProps {
   user: User;
@@ -22,6 +23,7 @@ interface UserDropdownProps {
 
 const UserDropdown = ({ user, onLogoutClick }: UserDropdownProps) => {
   const navigate = useNavigate();
+  const { theme, setTheme } = useTheme();
 
   const goToDashboard = () => {
     if (user) {
@@ -38,6 +40,19 @@ const UserDropdown = ({ user, onLogoutClick }: UserDropdownProps) => {
   const handleMessages = () => {
     toast.info('Messages feature coming soon!');
   };
+
+  const getThemeIcon = () => {
+    switch (theme) {
+      case 'light':
+        return Sun;
+      case 'dark':
+        return Moon;
+      default:
+        return Monitor;
+    }
+  };
+
+  const ThemeIcon = getThemeIcon();
 
   const getInitials = (name: string) => {
     return name
@@ -86,6 +101,23 @@ const UserDropdown = ({ user, onLogoutClick }: UserDropdownProps) => {
           <MessageSquare className="mr-2 h-4 w-4" />
           <span>Messages</span>
           <span className="ml-auto text-xs text-muted-foreground">Coming Soon</span>
+        </DropdownMenuItem>
+        <DropdownMenuSeparator />
+        <DropdownMenuLabel className="text-xs text-muted-foreground">Theme</DropdownMenuLabel>
+        <DropdownMenuItem onClick={() => setTheme('light')} className="cursor-pointer">
+          <Sun className="mr-2 h-4 w-4" />
+          <span>Light</span>
+          {theme === 'light' && <span className="ml-auto text-primary">✓</span>}
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={() => setTheme('dark')} className="cursor-pointer">
+          <Moon className="mr-2 h-4 w-4" />
+          <span>Dark</span>
+          {theme === 'dark' && <span className="ml-auto text-primary">✓</span>}
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={() => setTheme('system')} className="cursor-pointer">
+          <Monitor className="mr-2 h-4 w-4" />
+          <span>System</span>
+          {theme === 'system' && <span className="ml-auto text-primary">✓</span>}
         </DropdownMenuItem>
         {user.role === "ADMIN" && (
           <DropdownMenuItem onClick={() => navigate("/admin")}>

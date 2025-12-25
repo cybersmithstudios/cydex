@@ -100,15 +100,15 @@ const OrderDetailReal = () => {
     return (
       <div className="p-6">
         <div className="animate-pulse space-y-6">
-          <div className="h-8 bg-gray-200 rounded w-1/4"></div>
+          <div className="h-8 bg-muted rounded w-1/4"></div>
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <div className="lg:col-span-2 space-y-6">
-              <div className="h-64 bg-gray-200 rounded"></div>
-              <div className="h-48 bg-gray-200 rounded"></div>
+              <div className="h-64 bg-muted rounded"></div>
+              <div className="h-48 bg-muted rounded"></div>
             </div>
             <div className="space-y-6">
-              <div className="h-32 bg-gray-200 rounded"></div>
-              <div className="h-48 bg-gray-200 rounded"></div>
+              <div className="h-32 bg-muted rounded"></div>
+              <div className="h-48 bg-muted rounded"></div>
             </div>
           </div>
         </div>
@@ -130,9 +130,9 @@ const OrderDetailReal = () => {
         
         <Card>
           <CardContent className="pt-6 text-center">
-            <AlertCircle className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+            <AlertCircle className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
             <h2 className="text-xl font-medium mb-4">Order not found</h2>
-            <p className="text-gray-500 mb-4">               
+            <p className="text-muted-foreground mb-4">               
               The order you're looking for doesn't exist or has been removed.
             </p>
           </CardContent>
@@ -167,7 +167,7 @@ const OrderDetailReal = () => {
       <div className="flex justify-between items-start mb-6">
         <div>
           <h1 className="text-2xl font-bold">Order #{order.order_number}</h1>
-          <p className="text-gray-500">Placed on {formatDate(order.created_at)}</p>
+          <p className="text-muted-foreground">Placed on {formatDate(order.created_at)}</p>
         </div>
         <div className="text-right">
           {getStatusBadge(order.status)}
@@ -195,13 +195,13 @@ const OrderDetailReal = () => {
               
               <div className="space-y-4">
                 {order.order_items?.map((item, index) => (
-                  <div key={index} className="flex justify-between items-center p-4 bg-gray-50 rounded-lg">
+                  <div key={index} className="flex justify-between items-center p-4 bg-muted rounded-lg">
                     <div className="flex-1">
                       <h4 className="font-medium">{item.product_name}</h4>
                       {item.product_description && (
-                        <p className="text-sm text-gray-600">{item.product_description}</p>
+                        <p className="text-sm text-muted-foreground">{item.product_description}</p>
                       )}
-                      <p className="text-sm text-gray-500">
+                      <p className="text-sm text-muted-foreground">
                         Quantity: {item.quantity} × {formatCurrency(item.unit_price)}
                       </p>
                     </div>
@@ -238,10 +238,10 @@ const OrderDetailReal = () => {
               
               <div className="space-y-3">
                 <div className="flex items-start gap-3">
-                  <MapPin className="h-5 w-5 text-gray-400 mt-0.5" />
+                  <MapPin className="h-5 w-5 text-muted-foreground mt-0.5" />
                   <div>
                     <p className="font-medium">Delivery Address</p>
-                    <div className="text-sm text-gray-600 space-y-1">
+                    <div className="text-sm text-muted-foreground space-y-1">
                       {typeof order.delivery_address === 'object' ? (
                         <>
                           {/* Handle simplified address format (new campus format) */}
@@ -249,11 +249,11 @@ const OrderDetailReal = () => {
                             <>
                               <p className="font-medium">{order.delivery_address.location}</p>
                               {order.delivery_address.landmark && (
-                                <p className="text-xs text-gray-500">Near {order.delivery_address.landmark}</p>
+                                <p className="text-xs text-muted-foreground">Near {order.delivery_address.landmark}</p>
                               )}
                               {order.delivery_address.phone && (
                                 <div className="flex items-center space-x-2 mt-2">
-                                  <Phone className="h-4 w-4 text-gray-400" />
+                                  <Phone className="h-4 w-4 text-muted-foreground" />
                                   <span className="text-sm font-medium">Contact: {order.delivery_address.phone}</span>
                                 </div>
                               )}
@@ -267,11 +267,11 @@ const OrderDetailReal = () => {
                               <p className="font-medium">{order.delivery_address.street || 'Address not available'}</p>
                               <p>{order.delivery_address.city}, {order.delivery_address.state}</p>
                               {order.delivery_address.landmark && (
-                                <p className="text-xs text-gray-500">Landmark: {order.delivery_address.landmark}</p>
+                                <p className="text-xs text-muted-foreground">Landmark: {order.delivery_address.landmark}</p>
                               )}
                               {order.delivery_address.phone && (
                                 <div className="flex items-center space-x-2 mt-2">
-                                  <Phone className="h-4 w-4 text-gray-400" />
+                                  <Phone className="h-4 w-4 text-muted-foreground" />
                                   <span className="text-sm font-medium">Contact: {order.delivery_address.phone}</span>
                                 </div>
                               )}
@@ -289,19 +289,19 @@ const OrderDetailReal = () => {
                 </div>
                 
                 <div className="flex items-center gap-3">
-                  <Package className="h-5 w-5 text-gray-400" />
+                  <Package className="h-5 w-5 text-muted-foreground" />
                   <div>
                     <p className="font-medium">Delivery Type</p>
-                    <p className="text-sm text-gray-600 capitalize">{order.delivery_type}</p>
+                    <p className="text-sm text-muted-foreground capitalize">{order.delivery_type}</p>
                   </div>
                 </div>
                 
                 {order.time_slot && (
                   <div className="flex items-center gap-3">
-                    <Clock className="h-5 w-5 text-gray-400" />
+                    <Clock className="h-5 w-5 text-muted-foreground" />
                     <div>
                       <p className="font-medium">Time Slot</p>
-                      <p className="text-sm text-gray-600">{order.time_slot}</p>
+                      <p className="text-sm text-muted-foreground">{order.time_slot}</p>
                     </div>
                   </div>
                 )}
@@ -326,21 +326,21 @@ const OrderDetailReal = () => {
                 
                 <div className="space-y-3">
                   <div className="flex items-center gap-3">
-                    <User className="h-5 w-5 text-gray-400" />
+                    <User className="h-5 w-5 text-muted-foreground" />
                     <div>
                       <p className="font-medium">{order.rider.name}</p>
-                      <p className="text-sm text-gray-600">Delivery Rider</p>
+                      <p className="text-sm text-muted-foreground">Delivery Rider</p>
                     </div>
                   </div>
                   
                   <div className="flex items-center gap-3">
-                    <Mail className="h-5 w-5 text-gray-400" />
+                    <Mail className="h-5 w-5 text-muted-foreground" />
                     <p className="text-sm">{order.rider.email}</p>
                   </div>
                   
                   {order.rider.phone && (
                     <div className="flex items-center gap-3">
-                      <Phone className="h-5 w-5 text-gray-400" />
+                      <Phone className="h-5 w-5 text-muted-foreground" />
                       <p className="text-sm">{order.rider.phone}</p>
                     </div>
                   )}
@@ -367,7 +367,7 @@ const OrderDetailReal = () => {
                   <div className="w-2 h-2 bg-green-500 rounded-full"></div>
                   <div>
                     <p className="font-medium">Order Placed</p>
-                    <p className="text-sm text-gray-600">{formatDate(order.created_at)}</p>
+                    <p className="text-sm text-muted-foreground">{formatDate(order.created_at)}</p>
                   </div>
                 </div>
                 
@@ -376,7 +376,7 @@ const OrderDetailReal = () => {
                     <div className="w-2 h-2 bg-green-500 rounded-full"></div>
                     <div>
                       <p className="font-medium">Accepted by Vendor</p>
-                      <p className="text-sm text-gray-600">{formatDate(order.vendor_accepted_at)}</p>
+                      <p className="text-sm text-muted-foreground">{formatDate(order.vendor_accepted_at)}</p>
                     </div>
                   </div>
                 )}
@@ -386,7 +386,7 @@ const OrderDetailReal = () => {
                     <div className="w-2 h-2 bg-green-500 rounded-full"></div>
                     <div>
                       <p className="font-medium">Rider Assigned</p>
-                      <p className="text-sm text-gray-600">{formatDate(order.rider_assigned_at)}</p>
+                      <p className="text-sm text-muted-foreground">{formatDate(order.rider_assigned_at)}</p>
                     </div>
                   </div>
                 )}
@@ -396,7 +396,7 @@ const OrderDetailReal = () => {
                     <div className="w-2 h-2 bg-green-500 rounded-full"></div>
                     <div>
                       <p className="font-medium">Ready for Pickup</p>
-                      <p className="text-sm text-gray-600">{formatDate(order.ready_for_pickup_at)}</p>
+                      <p className="text-sm text-muted-foreground">{formatDate(order.ready_for_pickup_at)}</p>
                     </div>
                   </div>
                 )}
@@ -406,7 +406,7 @@ const OrderDetailReal = () => {
                     <div className="w-2 h-2 bg-green-500 rounded-full"></div>
                     <div>
                       <p className="font-medium">Picked Up</p>
-                      <p className="text-sm text-gray-600">{formatDate(order.picked_up_at)}</p>
+                      <p className="text-sm text-muted-foreground">{formatDate(order.picked_up_at)}</p>
                     </div>
                   </div>
                 )}
@@ -416,7 +416,7 @@ const OrderDetailReal = () => {
                     <div className="w-2 h-2 bg-green-500 rounded-full"></div>
                     <div>
                       <p className="font-medium">Delivered</p>
-                      <p className="text-sm text-gray-600">{formatDate(order.delivered_at)}</p>
+                      <p className="text-sm text-muted-foreground">{formatDate(order.delivered_at)}</p>
                     </div>
                   </div>
                 )}
@@ -426,7 +426,7 @@ const OrderDetailReal = () => {
                     <div className="w-2 h-2 bg-red-500 rounded-full"></div>
                     <div>
                       <p className="font-medium">Cancelled</p>
-                      <p className="text-sm text-gray-600">{formatDate(order.cancelled_at)}</p>
+                      <p className="text-sm text-muted-foreground">{formatDate(order.cancelled_at)}</p>
                       {order.cancel_reason && (
                         <p className="text-sm text-red-600">Reason: {order.cancel_reason}</p>
                       )}

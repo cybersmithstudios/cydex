@@ -6,6 +6,7 @@ import { BrowserRouter } from "react-router-dom";
 import { SupabaseProvider } from '@/contexts/SupabaseContext';
 import { AuthProvider } from "@/contexts/SupabaseAuthContext";
 import { CartProvider } from "@/contexts/CartContext";
+import { ThemeProvider } from "@/contexts/ThemeContext";
 import AppRoutes from "@/routes/AppRoutes";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import { Toaster as ShadcnToaster } from "@/components/ui/toaster";
@@ -17,23 +18,25 @@ function App() {
   const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY as string;
   return (
     <ErrorBoundary>
-      <QueryClientProvider client={queryClient}>
-        <SupabaseProvider supabaseUrl={supabaseUrl} supabaseKey={supabaseAnonKey}>
-        <AuthProvider>
-          <CartProvider>
-            <TooltipProvider>
-              <Toaster />
-              <ShadcnToaster />
-              <BrowserRouter>
-                <div className="min-h-screen bg-background font-sans antialiased ">
-                  <AppRoutes />
-                </div>
-              </BrowserRouter>
-            </TooltipProvider>
-          </CartProvider>
-        </AuthProvider>
-              </SupabaseProvider>
-      </QueryClientProvider>
+      <ThemeProvider>
+        <QueryClientProvider client={queryClient}>
+          <SupabaseProvider supabaseUrl={supabaseUrl} supabaseKey={supabaseAnonKey}>
+          <AuthProvider>
+            <CartProvider>
+              <TooltipProvider>
+                <Toaster />
+                <ShadcnToaster />
+                <BrowserRouter>
+                  <div className="min-h-screen bg-background font-sans antialiased ">
+                    <AppRoutes />
+                  </div>
+                </BrowserRouter>
+              </TooltipProvider>
+            </CartProvider>
+          </AuthProvider>
+                </SupabaseProvider>
+        </QueryClientProvider>
+      </ThemeProvider>
     </ErrorBoundary>
   );
 }

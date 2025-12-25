@@ -103,7 +103,7 @@
 
 @layer components {
   .glass {
-    @apply bg-white/10 backdrop-blur-lg border border-white/20 rounded-2xl shadow-lg;
+    @apply bg-white/10 dark:bg-black/20 backdrop-blur-lg border border-white/20 dark:border-white/10 rounded-2xl shadow-lg;
   }
   
   .hover-scale {
@@ -123,14 +123,14 @@
   }
   
   .nav-link {
-    @apply relative inline-block text-gray-700 hover:text-black transition-colors after:content-[''] after:absolute after:w-full after:scale-x-0 after:h-0.5 after:bottom-0 after:left-0 after:bg-primary after:transition-transform after:duration-300 hover:after:scale-x-100 hover:after:origin-bottom-left font-medium;
+    @apply relative inline-block text-gray-700 dark:text-gray-300 hover:text-black dark:hover:text-white transition-colors after:content-[''] after:absolute after:w-full after:scale-x-0 after:h-0.5 after:bottom-0 after:left-0 after:bg-primary after:transition-transform after:duration-300 hover:after:scale-x-100 hover:after:origin-bottom-left font-medium;
   }
   
   .primary-button {
-    @apply bg-primary hover:bg-primary-hover text-black font-medium py-3 px-6 rounded-full transition-all duration-300 shadow-lg hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-primary focus:ring-opacity-50;
+    @apply bg-primary hover:bg-primary-hover text-black dark:text-black font-medium py-3 px-6 rounded-full transition-all duration-300 shadow-lg hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-primary focus:ring-opacity-50;
   }
   
   .secondary-button {
-    @apply bg-white hover:bg-gray-50 text-black font-medium py-3 px-6 rounded-full transition-all duration-300 shadow-lg hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-white focus:ring-opacity-50 border border-gray-100;
+    @apply bg-white dark:bg-card hover:bg-gray-50 dark:hover:bg-muted text-black dark:text-foreground font-medium py-3 px-6 rounded-full transition-all duration-300 shadow-lg hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-white dark:focus:ring-muted focus:ring-opacity-50 border border-gray-100 dark:border-border;
   }
 }

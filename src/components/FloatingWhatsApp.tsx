@@ -8,7 +8,6 @@ interface FloatingWhatsAppProps {
   statusMessage: string;
   chatMessage: string;
   placeholder: string;
-  darkMode?: boolean;
   allowClickAway?: boolean;
   allowEsc?: boolean;
   notification?: boolean;
@@ -27,7 +26,6 @@ export const FloatingWhatsApp: React.FC<FloatingWhatsAppProps> = ({
   statusMessage,
   chatMessage,
   placeholder,
-  darkMode = false,
   allowClickAway = false,
   allowEsc = false,
   notification = false,
@@ -141,9 +139,7 @@ export const FloatingWhatsApp: React.FC<FloatingWhatsAppProps> = ({
     >
       {isOpen && (
         <div
-          className={`mb-4 w-72 overflow-hidden rounded-lg shadow-lg ${
-            darkMode ? 'bg-gray-800 text-white' : 'bg-white text-gray-800'
-          }`}
+          className="mb-4 w-72 overflow-hidden rounded-lg shadow-lg bg-card text-card-foreground"
           style={chatboxStyle}
         >
           <div className="bg-[#21CA1B] px-4 py-3 text-white">
@@ -162,25 +158,21 @@ export const FloatingWhatsApp: React.FC<FloatingWhatsAppProps> = ({
               </button>
             </div>
           </div>
-          <div className={`h-64 overflow-y-auto p-4 ${darkMode ? 'bg-gray-700' : 'bg-gray-100'}`}>
+          <div className="h-64 overflow-y-auto p-4 bg-muted">
             <div
-              className={`mb-2 max-w-[80%] rounded-lg p-3 ${
-                darkMode ? 'bg-gray-600' : 'bg-white'
-              } shadow`}
+              className="mb-2 max-w-[80%] rounded-lg p-3 bg-background shadow"
             >
               {chatMessage}
             </div>
           </div>
-          <div className="flex border-t p-2">
+          <div className="flex border-t border-border p-2">
             <input
               type="text"
               value={message}
               onChange={(e) => setMessage(e.target.value)}
               onKeyPress={handleKeyPress}
               placeholder={placeholder}
-              className={`flex-1 rounded px-3 py-2 focus:outline-none ${
-                darkMode ? 'bg-gray-700 text-white' : 'bg-gray-100 text-gray-800'
-              }`}
+              className="flex-1 rounded px-3 py-2 focus:outline-none bg-muted text-foreground placeholder:text-muted-foreground"
             />
             <button
               onClick={handleSend}

@@ -5,10 +5,11 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Link } from 'react-router-dom';
-import { User, MessageSquare, LogOut } from 'lucide-react';
+import { User, MessageSquare, LogOut, Sun, Moon, Monitor } from 'lucide-react';
 import { User as UserType } from '@/types/auth.types';
 import LogoutConfirmationDialog from '@/components/auth/LogoutConfirmationDialog';
 import { useCartContext } from '@/contexts/CartContext';
+import { useTheme } from '@/contexts/ThemeContext';
 import { toast } from 'sonner';
 
 interface MobileHeaderProps {
@@ -26,6 +27,7 @@ const MobileHeader: React.FC<MobileHeaderProps> = ({
 }) => {
   const [showLogoutDialog, setShowLogoutDialog] = useState(false);
   const { cartItems, setIsCartOpen } = useCartContext();
+  const { theme, setTheme } = useTheme();
 
   // Get role title for display
   const getRoleTitle = () => {
@@ -58,11 +60,11 @@ const MobileHeader: React.FC<MobileHeaderProps> = ({
   };
 
   return (
-    <div className="lg:hidden fixed top-0 left-0 right-0 z-50 bg-white border-b px-4 py-3 flex items-center justify-between">
+    <div className="lg:hidden fixed top-0 left-0 right-0 z-50 bg-background border-b border-border px-4 py-3 flex items-center justify-between">
       <div className="flex items-center">
         <button
           onClick={onMenuToggle}
-          className="p-2 rounded-md hover:bg-gray-100 mr-2"
+          className="p-2 rounded-md hover:bg-muted mr-2"
         >
           <Menu className="h-5 w-5" />
         </button>
@@ -77,7 +79,7 @@ const MobileHeader: React.FC<MobileHeaderProps> = ({
       <div className="flex items-center space-x-2">
         {userRole === 'customer' && (
           <button 
-            className="p-2 rounded-full hover:bg-gray-100 relative transition-colors"
+            className="p-2 rounded-full hover:bg-muted relative transition-colors"
             onClick={() => setIsCartOpen(true)}
             title="Shopping Cart"
           >
@@ -103,7 +105,7 @@ const MobileHeader: React.FC<MobileHeaderProps> = ({
             <DropdownMenuLabel>
               <div>
                 <p className="font-medium">{user?.name}</p>
-                <p className="text-xs text-gray-500">{getRoleTitle()}</p>
+                <p className="text-xs text-muted-foreground">{getRoleTitle()}</p>
               </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
@@ -116,7 +118,24 @@ const MobileHeader: React.FC<MobileHeaderProps> = ({
             <DropdownMenuItem onClick={handleMessages} className="opacity-60 cursor-pointer">
               <MessageSquare className="mr-2 h-4 w-4" />
               <span>Messages</span>
-              <span className="ml-auto text-xs text-gray-500">Coming Soon</span>
+              <span className="ml-auto text-xs text-muted-foreground">Coming Soon</span>
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuLabel className="text-xs text-muted-foreground">Theme</DropdownMenuLabel>
+            <DropdownMenuItem onClick={() => setTheme('light')} className="cursor-pointer">
+              <Sun className="mr-2 h-4 w-4" />
+              <span>Light</span>
+              {theme === 'light' && <span className="ml-auto text-primary">✓</span>}
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setTheme('dark')} className="cursor-pointer">
+              <Moon className="mr-2 h-4 w-4" />
+              <span>Dark</span>
+              {theme === 'dark' && <span className="ml-auto text-primary">✓</span>}
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setTheme('system')} className="cursor-pointer">
+              <Monitor className="mr-2 h-4 w-4" />
+              <span>System</span>
+              {theme === 'system' && <span className="ml-auto text-primary">✓</span>}
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={onLogoutClick} className="text-red-500 cursor-pointer">
