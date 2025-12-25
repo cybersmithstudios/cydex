@@ -134,7 +134,7 @@ const TestimonialsSection = () => {
     <section 
       id="testimonials" 
       ref={sectionRef}
-      className="py-12 md:py-24 bg-gray-50 relative overflow-hidden"
+      className="py-12 md:py-24 bg-muted/30 dark:bg-muted/20 relative overflow-hidden"
     >
       <div className="container mx-auto px-4 md:px-6">
         <div className={`text-center mb-10 md:mb-16 transform transition-all duration-700 ${
@@ -150,7 +150,7 @@ const TestimonialsSection = () => {
         </div>
 
         <div className="max-w-4xl mx-auto relative">
-          <div className="relative overflow-hidden h-[450px] sm:h-[400px] md:h-[320px] glass px-4 py-6 md:p-10">
+          <div className="relative overflow-hidden h-[450px] sm:h-[400px] md:h-[320px] bg-card/80 dark:bg-card/90 backdrop-blur-lg border border-border rounded-2xl shadow-lg px-4 py-6 md:p-10">
             {testimonials.map((testimonial, index) => (
               <div
                 key={index}
@@ -177,9 +177,9 @@ const TestimonialsSection = () => {
                         <Star
                           key={i}
                           size={16}
-                          fill={i < testimonial.rating ? "#AFFF64" : "none"}
-                          color={i < testimonial.rating ? "#AFFF64" : "#D1D5DB"}
-                          className="mr-1"
+                          fill={i < testimonial.rating ? "#6CE000" : "none"}
+                          color={i < testimonial.rating ? "#6CE000" : "currentColor"}
+                          className={`mr-1 ${i < testimonial.rating ? "text-primary" : "text-muted-foreground"}`}
                         />
                       ))}
                     </div>
@@ -232,7 +232,7 @@ const TestimonialsSection = () => {
 
           <button
             onClick={goToNext}
-            className="absolute top-1/2 -translate-y-1/2 -right-3 md:-right-5 bg-white h-8 w-8 md:h-10 md:w-10 rounded-full shadow-lg flex items-center justify-center hover:bg-gray-50 transition-colors z-10"
+            className="absolute top-1/2 -translate-y-1/2 -right-3 md:-right-5 bg-card h-8 w-8 md:h-10 md:w-10 rounded-full shadow-lg flex items-center justify-center hover:bg-muted transition-colors z-10"
             aria-label="Next testimonial"
           >
             <ChevronRight size={18} />
@@ -249,8 +249,8 @@ const TestimonialsSection = () => {
       </div>
 
       {/* Background decorative elements */}
-      <div className="absolute top-0 left-0 w-full h-16 md:h-20 bg-gradient-to-b from-white to-transparent"></div>
-      <div className="absolute bottom-0 left-0 w-full h-16 md:h-20 bg-gradient-to-t from-white to-transparent"></div>
+      <div className="absolute top-0 left-0 w-full h-16 md:h-20 bg-gradient-to-b from-background to-transparent"></div>
+      <div className="absolute bottom-0 left-0 w-full h-16 md:h-20 bg-gradient-to-t from-background to-transparent"></div>
     </section>
   );
 };
