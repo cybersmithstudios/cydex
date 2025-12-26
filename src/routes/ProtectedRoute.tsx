@@ -2,7 +2,6 @@
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/SupabaseAuthContext';
 import LoadingDisplay from '@/components/ui/LoadingDisplay';
-import { isAdmin } from '@/utils/adminUtils';
 
 export const ProtectedRoute = ({ 
   children, 
@@ -35,9 +34,7 @@ export const ProtectedRoute = ({
   }
   
   // Check role if allowedRoles is provided and not empty
-  // TEMPORARY: Hardcoded admin check - can be removed once you add admins via UI
-  const hasAdminAccess = allowedRoles.includes('ADMIN') && isAdmin(user);
-  if (!hasAdminAccess && !allowedRoles.includes(user.role)) {
+  if (!allowedRoles.includes(user.role)) {
     // Redirect to dashboard specific to their role
     const rolePath = user.role.toLowerCase();
     return <Navigate to={`/${rolePath}`} replace />;

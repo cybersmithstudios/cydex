@@ -5,7 +5,6 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
 import { Shield, LogOut, BarChart } from "lucide-react";
 import { User } from "@/types/auth.types";
-import { isAdmin } from "@/utils/adminUtils";
 
 interface MobileNavigationProps {
   isOpen: boolean;
@@ -65,7 +64,7 @@ const MobileNavigation = ({
               <BarChart className="mr-2 h-4 w-4" />
               Dashboard
             </Button>
-            {isAdmin(user) && (
+            {user.role === "ADMIN" && (
               <Button 
                 variant="ghost" 
                 className="justify-start p-2" 
