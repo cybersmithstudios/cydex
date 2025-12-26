@@ -3,13 +3,14 @@ import { useAuth } from '@/contexts/SupabaseAuthContext';
 import { useNavigate } from 'react-router-dom';
 import DashboardLayout from '@/components/layout/DashboardLayout';
 import { UserManagementReal } from '@/components/admin/UserManagementReal';
+import { isAdmin } from '@/utils/adminUtils';
 
 const AdminUsers = () => {
   const { user, loading, isAuthenticated } = useAuth();
   const navigate = useNavigate();
 
   React.useEffect(() => {
-    if (!loading && (!isAuthenticated || user?.role !== 'ADMIN')) {
+    if (!loading && (!isAuthenticated || !isAdmin(user))) {
       navigate('/admin/login');
       return;
     }
@@ -26,7 +27,7 @@ const AdminUsers = () => {
     );
   }
 
-  if (!isAuthenticated || user?.role !== 'ADMIN') {
+  if (!isAuthenticated || !isAdmin(user)) {
     return null;
   }
 

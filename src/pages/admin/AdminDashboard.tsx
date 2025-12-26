@@ -17,7 +17,7 @@ import {
   DollarSign,
   Package
 } from 'lucide-react';
-import { getAllUsers, updateUserRole, getSystemStats, updateUserStatus } from '@/utils/adminUtils';
+import { getAllUsers, updateUserRole, getSystemStats, updateUserStatus, isAdmin } from '@/utils/adminUtils';
 import { toast } from 'sonner';
 
 interface UserProfile {
@@ -67,12 +67,12 @@ const AdminDashboard = () => {
   const [isLoadingStats, setIsLoadingStats] = useState(true);
 
   useEffect(() => {
-    if (!loading && (!isAuthenticated || user?.role !== 'ADMIN')) {
+    if (!loading && (!isAuthenticated || !isAdmin(user))) {
       navigate('/admin/login');
       return;
     }
 
-    if (user?.role === 'ADMIN') {
+    if (isAdmin(user)) {
       loadUsers();
       loadStats();
     }
@@ -176,7 +176,7 @@ const AdminDashboard = () => {
     );
   }
 
-  if (!isAuthenticated || user?.role !== 'ADMIN') {
+  if (!isAuthenticated || !isAdmin(user)) {
     return null; // Will redirect in useEffect
   }
 

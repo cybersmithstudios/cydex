@@ -15,6 +15,7 @@ import { Shield, LogOut, User as UserIcon, MessageSquare, BarChart, Sun, Moon, M
 import { User } from "@/types/auth.types";
 import { toast } from "sonner";
 import { useTheme } from "@/contexts/ThemeContext";
+import { isAdmin } from "@/utils/adminUtils";
 
 interface UserDropdownProps {
   user: User;
@@ -119,7 +120,7 @@ const UserDropdown = ({ user, onLogoutClick }: UserDropdownProps) => {
           <span>System</span>
           {theme === 'system' && <span className="ml-auto text-primary">✓</span>}
         </DropdownMenuItem>
-        {user.role === "ADMIN" && (
+        {isAdmin(user) && (
           <DropdownMenuItem onClick={() => navigate("/admin")}>
             <Shield className="mr-2 h-4 w-4" />
             <span>Admin Panel</span>

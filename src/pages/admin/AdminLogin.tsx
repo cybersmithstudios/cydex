@@ -9,6 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Loader2, Shield, AlertTriangle } from 'lucide-react';
 import { toast } from 'sonner';
+import { isAdmin } from '@/utils/adminUtils';
 
 const AdminLogin = () => {
   const [email, setEmail] = useState('');
@@ -21,7 +22,8 @@ const AdminLogin = () => {
 
   useEffect(() => {
     if (isAuthenticated && user) {
-      if (user.role === 'ADMIN') {
+      // TEMPORARY: Hardcoded admin check - can be removed once you add admins via UI
+      if (isAdmin(user)) {
         navigate('/admin');
       } else {
         setError('Access denied. Admin privileges required.');

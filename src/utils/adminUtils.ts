@@ -1,6 +1,22 @@
 
 import { supabase } from '@/integrations/supabase/client';
 
+// ===================================================================
+// HARDCODED ADMIN - TEMPORARY
+// ===================================================================
+// This is a temporary hardcoded admin to allow initial access to the admin panel.
+// Once you can access the admin panel and add other admins, you can remove this.
+// To remove: Delete this function and all calls to isHardcodedAdmin() and isAdmin()
+// ===================================================================
+export const isHardcodedAdmin = (email: string | null | undefined): boolean => {
+  return email?.toLowerCase() === 'cydexlogistics@gmail.com';
+};
+
+export const isAdmin = (user: { role?: string; email?: string | null } | null | undefined): boolean => {
+  if (!user) return false;
+  return user.role === 'ADMIN' || isHardcodedAdmin(user.email);
+};
+
 export const checkAdminAccess = async (userId: string): Promise<boolean> => {
   try {
     const { data: result, error } = await supabase.rpc('is_admin');

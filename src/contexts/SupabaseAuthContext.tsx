@@ -56,9 +56,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 setProfile(fallbackProfile);
               } else {
                 // Normalize role to uppercase to match expected format
+                // TEMPORARY: Hardcoded admin check - can be removed once you add admins via UI
+                const isHardcodedAdmin = session.user.email?.toLowerCase() === 'cydexlogistics@gmail.com';
                 const normalizedProfile = {
                   ...profileData,
-                  role: profileData.role?.toUpperCase() || 'CUSTOMER'
+                  role: (isHardcodedAdmin ? 'ADMIN' : profileData.role?.toUpperCase()) || 'CUSTOMER'
                 };
                 console.log('Profile loaded:', normalizedProfile);
                 setProfile(normalizedProfile);

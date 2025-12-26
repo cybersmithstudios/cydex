@@ -63,27 +63,24 @@ BEGIN
     verified,
     status,
     carbon_credits,
-    created_at,
-    updated_at
+    created_at
   ) VALUES (
     new_user_id,
     user_name,
     user_email,
-    'ADMIN',
+    'admin',
     true,
     'active',
     0,
-    NOW(),
     NOW()
   )
   ON CONFLICT (id) 
   DO UPDATE SET
     name = EXCLUDED.name,
     email = EXCLUDED.email,
-    role = 'ADMIN',
+    role = 'admin',
     verified = true,
-    status = 'active',
-    updated_at = NOW();
+    status = 'active';
     
   RAISE NOTICE 'Profile created/updated for user: %', user_email;
 END $$;
