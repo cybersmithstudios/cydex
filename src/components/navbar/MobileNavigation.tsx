@@ -32,27 +32,27 @@ const MobileNavigation = ({
   if (!isOpen) return null;
 
   return (
-    <div className="sm:hidden absolute top-full left-0 right-0 bg-white shadow-md p-4 z-50 animate-fade-in">
+    <div className="sm:hidden absolute top-full left-0 right-0 bg-background shadow-md p-4 z-50 animate-fade-in border-t border-border">
       <nav className="flex flex-col space-y-4">
-        <Link to="/" className="p-2 hover:bg-gray-100 rounded-md" onClick={onClose}>
+        <Link to="/" className="p-2 hover:bg-muted rounded-md text-foreground" onClick={onClose}>
           Home
         </Link>
-        <Link to="/how-it-works" className="p-2 hover:bg-gray-100 rounded-md" onClick={onClose}>
+        <Link to="/how-it-works" className="p-2 hover:bg-muted rounded-md text-foreground" onClick={onClose}>
           How It Works
         </Link>
-        <Link to="/about" className="p-2 hover:bg-gray-100 rounded-md" onClick={onClose}>
+        <Link to="/about" className="p-2 hover:bg-muted rounded-md text-foreground" onClick={onClose}>
           About Us
         </Link>
-        <Link to="/faq" className="p-2 hover:bg-gray-100 rounded-md" onClick={onClose}>
+        <Link to="/faq" className="p-2 hover:bg-muted rounded-md text-foreground" onClick={onClose}>
           FAQ
         </Link>
-        <Link to="/contact" className="p-2 hover:bg-gray-100 rounded-md" onClick={onClose}>
+        <Link to="/contact" className="p-2 hover:bg-muted rounded-md text-foreground" onClick={onClose}>
           Contact Us
         </Link>
         
         {isAuthenticated && user ? (
           <>
-            <div className="border-t my-2 pt-2"></div>
+            <div className="border-t border-border my-2 pt-2"></div>
             <Button 
               variant="ghost" 
               className="justify-start p-2" 
@@ -91,7 +91,7 @@ const MobileNavigation = ({
           </>
         ) : (
           <>
-            <div className="border-t my-2 pt-2"></div>
+            <div className="border-t border-border my-2 pt-2"></div>
             <Button
               variant="outline"
               className="w-full justify-center"
