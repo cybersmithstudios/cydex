@@ -2,9 +2,7 @@
 import React from 'react';
 import { DELIVERY_FEE } from '@/constants/delivery';
 import DashboardLayout from '@/components/layout/DashboardLayout';
-import { PricingCalculator } from '@/components/pricing/PricingCalculator';
 import { SubscriptionForm } from '@/components/pricing/SubscriptionForm';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Calculator, CreditCard, Leaf } from 'lucide-react';
 
@@ -66,26 +64,13 @@ const Pricing = () => {
         {/* Main Content */}
         <Card>
           <CardHeader className="pb-3 sm:pb-4">
-            <CardTitle className="text-base sm:text-lg">Calculate Your Delivery Cost</CardTitle>
+            <CardTitle className="text-base sm:text-lg">Student Plans</CardTitle>
             <CardDescription className="text-sm">
-              Simple flat rate pricing with optional discounts
+              Subscribe to get unlimited deliveries at a discounted rate
             </CardDescription>
           </CardHeader>
           <CardContent className="pt-0">
-            <Tabs defaultValue="calculator" className="w-full">
-              <TabsList className="mb-3 sm:mb-4 w-full">
-                <TabsTrigger value="calculator" className="text-xs sm:text-sm flex-1">Price Calculator</TabsTrigger>
-                <TabsTrigger value="subscription" className="text-xs sm:text-sm flex-1">Student Plans</TabsTrigger>
-              </TabsList>
-              
-              <TabsContent value="calculator" className="mt-6">
-                <PricingCalculator />
-              </TabsContent>
-              
-              <TabsContent value="subscription" className="mt-6">
-                <SubscriptionForm />
-              </TabsContent>
-            </Tabs>
+            <SubscriptionForm />
           </CardContent>
         </Card>
 
